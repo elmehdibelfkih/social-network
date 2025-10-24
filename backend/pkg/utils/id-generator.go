@@ -58,11 +58,9 @@ func GenerateID() uint64 {
 }
 
 func SortIDs(ids []uint64) []uint64 {
-	// Make a copy to avoid modifying the original slice
 	sorted := make([]uint64, len(ids))
 	copy(sorted, ids)
 
-	// Sort numerically (ascending)
 	sort.Slice(sorted, func(i, j int) bool {
 		return sorted[i] < sorted[j]
 	})
