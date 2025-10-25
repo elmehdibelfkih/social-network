@@ -48,9 +48,6 @@ my-next-app/
 ├── public/               # Static assets (images, fonts, icons)
 │   └── favicon.ico
 │
-├── tests/                # Unit and integration tests
-│   └── components/
-│
 ├── .env.local            # Environment variables
 ├── next.config.mjs       # Next.js config
 ├── tsconfig.json         # TypeScript config
@@ -63,6 +60,18 @@ my-next-app/
 ## 🏠 app/
 Contains the main application logic and routes using the **Next.js App Router**.
 
+## how to define a route
+
+in next each folder contains a page.tsx is a route
+
+```
+├── customRoute/ #static route
+        page.tsx                
+    │── [id or something]/ #dynamin route
+        page.tsx
+```
+
+
 
 **Purpose:**
 - Organizes routes, layouts, and pages.
@@ -70,153 +79,55 @@ Contains the main application logic and routes using the **Next.js App Router**.
 - `app/api/` allows defining lightweight backend endpoints or proxy routes.
 
 
+
+
+
 ## 🧩 components/
 Holds reusable UI elements used throughout the application.
 
-**Examples:**
-```
-
-components/
-├── ui/                 # Generic UI elements (Button, Card, Modal)
-├── layout/             # Layout components (Header, Footer, Sidebar)
-└── forms/              # Form-specific components (Input, FormField)
-
-```
-
-**Purpose:**
-- Encourages reusability and consistent design.
-- Keeps UI building blocks isolated from business logic.
+- [lean more about components](./components.md)
 
 ---
 
 ## ⚓ hooks/
 Contains **custom React hooks** — reusable logic extracted from components.
 
-**Examples:**
-```
-
-hooks/
-└── useUser.ts          # Fetch or manage user-related state
-
-```
-
-**Purpose:**
-- Encapsulate logic like data fetching, event handling, or shared state.
-- Keeps components smaller and more focused on UI.
-
----
-
-## ⚙️ lib/
-Contains small, pure utility modules and app-wide configuration.
-
-**Examples:**
-```
-
-lib/
-├── api.ts              # Config for API calls or fetch wrappers
-├── auth.ts             # Authentication helpers (tokens, session)
-└── constants.ts        # Global constants and config values
-
-```
-
-**Purpose:**
-- Store reusable functions and configuration.
-- Should not contain React components.
+- [lean more about hooks](./hooks.md)
 
 ---
 
 ## 🌐 services/
 Contains higher-level functions that communicate with external APIs or backend services.
 
-**Examples:**
-```
-
-services/
-└── userService.ts      # Functions to get, update, or delete users
-
-```
-
-**Purpose:**
-- Acts as an abstraction layer between the frontend and backend.
-- Keeps data fetching logic centralized and testable.
+- [lean more about services](./services.md)
 
 ---
 
+## ⚙️ lib/
+Contains small, pure utility modules and app-wide configuration.
+
+---
+
+
 ## 🧾 types/
 Defines global **TypeScript types and interfaces**.
-
-**Examples:**
-```
-
-types/
-└── user.ts             # User model interface
-
-```
-
-**Purpose:**
-- Improves type safety across components and services.
-- Keeps models consistent between UI and API layers.
 
 ---
 
 ## 🎨 styles/
 Holds all style-related files for the project.
 
-**Examples:**
-```
-
-styles/
-├── globals.css         # Global CSS imports
-├── variables.css       # Global color, font, or spacing variables
-└── components/         # Component-specific styles
-
-```
-
-**Purpose:**
-- Centralizes styling resources.
-- Supports modular and global CSS/Tailwind configurations.
-
 ---
 
 ## 🖼 public/
 Static assets served directly from the root path (`/`).
 
-**Examples:**
-```
-
-public/
-└── favicon.ico         # App favicon or other assets
-
-```
-
-**Purpose:**
-- Store images, fonts, icons, and files that do not need bundling.
-
 ---
-
-## 🧪 tests/
-Contains unit and integration tests.
-
-**Examples:**
-```
-
-tests/
-└── components/         # Component-level test files
-
-```
-
-**Purpose:**
-- Keeps tests organized by type or feature.
-- Ensures stability and reliability of key components.
-
----
-
 ## ⚙️ Root Files
 - **.env.local** → Environment variables  
 - **next.config.mjs** → Next.js configuration file  
 - **tsconfig.json** → TypeScript configuration  
 - **package.json** → Dependencies and scripts  
-
 ---
 
 📘 **Summary**
@@ -229,6 +140,5 @@ This structure separates logic by concern:
 - **types/** → TypeScript definitions  
 - **styles/** → Styling organization  
 - **public/** → Static assets  
-- **tests/** → Code testing  
 
 This modular setup ensures a scalable, maintainable, and clear Next.js project architecture.
