@@ -1,9 +1,10 @@
+
 import TestComponent from '@/components/test'
 
-export default function HomePage() {
+export default function Auth() {
   return (
     <>
-      <TestComponent name="root" />
+      <TestComponent name="auth" />
     </>
   )
 }
