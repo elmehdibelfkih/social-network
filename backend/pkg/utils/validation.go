@@ -5,6 +5,11 @@ import (
 	"strings"
 )
 
+// todo: check the length of email, etc, ...
+// todo: trim spaces in email to
+// todo: return the trimmed element as a second param in success validation
+// todo: Use CamelCase for the naming of functions; the exported function must be CamelCase, and the local functions must be camelCase.
+
 func emailvalidation(mail string) bool {
 	mailregex := regexp.MustCompile(`^[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,4}$`)
 	return mailregex.MatchString(mail)

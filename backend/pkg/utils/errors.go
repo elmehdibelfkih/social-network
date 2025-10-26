@@ -19,8 +19,6 @@ var (
 func InitLogger() {
 	var err error
 
-
-
 	sqlitePath, _ = filepath.Abs("../logs/backend-sqlite.log")
 	backendPath, _ = filepath.Abs("../logs/backend.log")
 
