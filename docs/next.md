@@ -15,11 +15,6 @@ my-next-app/
 │   ├── dashboard/
 │   │   ├── layout.tsx    # Nested layout
 │   │   └── page.tsx      # /dashboard route
-│   └── api/
-│       ├── users/
-│       │   └── route.ts  # API route (Serverless function)
-│       └── posts/
-│           └── route.ts
 │
 ├── components/           # Reusable UI components (Buttons, Navbar, etc.)
 │   ├── ui/
@@ -70,17 +65,6 @@ in next each folder contains a page.tsx is a route
     │── [id or something]/ #dynamin route
         page.tsx
 ```
-
-
-
-**Purpose:**
-- Organizes routes, layouts, and pages.
-- Supports server-side rendering (SSR), static generation (SSG), and server actions.
-- `app/api/` allows defining lightweight backend endpoints or proxy routes.
-
-
-
-
 
 ## 🧩 components/
 Holds reusable UI elements used throughout the application.

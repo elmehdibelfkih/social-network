@@ -1,4 +1,4 @@
-// import React from "react";
+import styles from "@/styles/components/test.module.css"
 
 type RootMessage = {
     name: string;
@@ -6,6 +6,6 @@ type RootMessage = {
 
 export default function TestComponent({ name }: RootMessage) {
     return (
-        <h1>{name}</h1>
+        <h1 className={styles.test}>{name}</h1>
     )
 }
