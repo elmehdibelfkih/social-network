@@ -21,6 +21,12 @@ func InitDB() error {
 	}
 	defer DB.Close()
 
+	_, err = DB.Exec(config.FOREIGN_KEYS_ON)
+	if err != nil {
+		return err
+	}
+
+	// create schema_migrations to track version controll
 	instance, err := sqlite3.WithInstance(DB, &sqlite3.Config{})
 	if err != nil {
 		return err
@@ -41,7 +47,7 @@ func InitDB() error {
 }
 
 // for all write operation u should wrap them with this wrapper insert/update/delete
-func WrapWithTransaction(fn func(*sql.Tx) error) error{
+func WrapWithTransaction(fn func(*sql.Tx) error) error {
 	var err error
 	tx, err := DB.Begin()
 	if err != nil {
