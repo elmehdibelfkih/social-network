@@ -5,18 +5,20 @@ import (
 	"strings"
 )
 
-// todo: check the length of email, etc, ...
-// todo: trim spaces in email to
-// todo: return the trimmed element as a second param in success validation
-// todo: Use CamelCase for the naming of functions; the exported function must be CamelCase, and the local functions must be camelCase.
+func EmailValidation(mail string) (bool,string) {
+		
 
-func emailvalidation(mail string) bool {
+	n := strings.TrimSpace(mail)
+	if (len(mail)<256&&len(mail)>10) {
+		return false,""
+
+	}
+	
 	mailregex := regexp.MustCompile(`^[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,4}$`)
-	return mailregex.MatchString(mail)
+	return mailregex.MatchString(n),n
 }
 
-// passwordvalidation function
-func passwordvalidation(password string) (bool, string) {
+func PasswordValidation(password string) (bool, string) {
 	minMaxLength := `.{8,16}`
 	uppercaseLetter := `[A-Z]`
 	lowercaseLetter := `[a-z]`
@@ -51,14 +53,14 @@ func passwordvalidation(password string) (bool, string) {
 	return true, "Password is valid!"
 }
 
-func firstnamelastname(name string) bool {
+func FirstNameLastName(name string) (bool,string ) {
 	n := strings.TrimSpace(name)
 	nameRegex := regexp.MustCompile(`^[a-zA-Z]+(?:[-'\s][a-zA-Z]+)*$`)
-	return nameRegex.MatchString(n)
+	return nameRegex.MatchString(n),n
 }
 
 // for the date the validated format is "yyyy-mm-dd"
-func datevalidation(dste string) bool {
+func DateValidation(dste string) bool {
 	datePattern := regexp.MustCompile(`^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$`)
 	return datePattern.MatchString(dste)
 }
