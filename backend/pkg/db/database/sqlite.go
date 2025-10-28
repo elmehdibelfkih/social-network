@@ -3,9 +3,7 @@ package database
 import (
 	"database/sql"
 	"fmt"
-	config "social/config"
-
-	// config "social/backend/config"
+	config "social/pkg/config"
 
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/sqlite3"

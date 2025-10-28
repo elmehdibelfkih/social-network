@@ -4,7 +4,8 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"social/config"
+
+	config "social/pkg/config"
 	middleware "social/pkg/app/dependencies/middleware"
 	signals "social/pkg/app/dependencies/signals"
 )
