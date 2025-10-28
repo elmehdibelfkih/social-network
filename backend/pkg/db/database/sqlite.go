@@ -3,7 +3,7 @@ package database
 import (
 	"database/sql"
 	"fmt"
-	config "social/config"
+	config "social/pkg/config"
 
 	// config "social/backend/config"
 

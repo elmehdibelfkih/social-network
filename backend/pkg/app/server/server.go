@@ -4,15 +4,16 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"social/config"
+	api "social/pkg/api/v1"
 	middleware "social/pkg/app/dependencies/middleware"
 	signals "social/pkg/app/dependencies/signals"
+	"social/pkg/config"
 )
 
 func StartServer() {
 	server := &http.Server{
 		Addr:    config.PORT,
-		Handler: middleware.RateLimiterMiddleware(nil, 60, 120),
+		Handler: middleware.RateLimiterMiddleware(api.SocialMux(), 60, 120),
 	}
 
 	fmt.Println(config.SERVER_RUN_MESSAGE)

@@ -4,7 +4,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
-	config "social/config"
+	config "social/pkg/config"
 
 	"time"
 )

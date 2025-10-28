@@ -2,4 +2,6 @@
 .out
 .env
 .vscode/
+/data
+/logs
 # todo: add database etc 

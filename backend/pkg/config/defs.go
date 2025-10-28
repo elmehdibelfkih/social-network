@@ -15,7 +15,7 @@ const (
 
 // PATHS
 const (
-	MIGRATION_PATH        = "file://./db/migrations"
+	MIGRATION_PATH        = "file://./pkg/db/migrations"
 	DATABASE_PATH         = "../data/sqlite/social.db"
 	SQL_LOG_FILE_PATH     = "../logs/backend-sqlite.log"
 	BACKEND_LOG_FILE_PATH = "../logs/backend.log"

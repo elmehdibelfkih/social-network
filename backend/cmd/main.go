@@ -1,12 +1,13 @@
 package main
 
 import (
-	migration "social/db/database"
 	server "social/pkg/app/server"
+	migration "social/pkg/db/database"
 	errorLogger "social/pkg/utils"
 )
 
 func main() {
+
 	errorLogger.InitLogger()
 	err := migration.InitDB()
 	if err != nil {
