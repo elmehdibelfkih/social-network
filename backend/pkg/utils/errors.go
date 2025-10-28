@@ -4,6 +4,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	defs "social/pkg/app"
 	"time"
 )
 
@@ -19,8 +20,8 @@ var (
 func InitLogger() {
 	var err error
 
-	sqlitePath, _ = filepath.Abs("../logs/backend-sqlite.log")
-	backendPath, _ = filepath.Abs("../logs/backend.log")
+	sqlitePath, _ = filepath.Abs(defs.SQL_LOG_FILE_PATH)
+	backendPath, _ = filepath.Abs(defs.BACKEND_LOG_FILE_PATH)
 
 	sqliteFile, err = os.OpenFile(sqlitePath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
@@ -39,9 +40,11 @@ func InitLogger() {
 
 func CloseLogger() {
 	if sqliteFile != nil {
+		sqliteLog.Printf("Server shutdown.\n\n\n")
 		sqliteFile.Close()
 	}
 	if backendFile != nil {
+		backendLog.Printf("Server shutdown.\n\n\n")
 		backendFile.Close()
 	}
 }
@@ -53,7 +56,7 @@ func LogSQLiteError(err error, query string) {
 	}
 }
 
-func LogBackendError(context string, err error) {
+func LogBackendError(err error, context string) {
 	if err != nil {
 		backendLog.Printf("[%s] BACKEND ERROR in %s: %v | LogPath: %s\n",
 			time.Now().Format(time.RFC3339), context, err, backendPath)
@@ -68,9 +71,9 @@ func HandleSQLiteError(err error, query string) bool {
 	return false
 }
 
-func HandleBackendError(context string, err error) bool {
+func HandleBackendError(err error, context string) bool {
 	if err != nil {
-		LogBackendError(context, err)
+		LogBackendError(err, context)
 		return true
 	}
 	return false

@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	errorLogger "social/pkg/utils"
 	"syscall"
 	"time"
 )
@@ -26,6 +27,7 @@ func HandleSignals(server *http.Server) {
 		log.Printf("server shutdown error: %v", err)
 	}
 	// db.CloseDB() // todo:
+	errorLogger.CloseLogger()
 	println("\033[31mshutdowning... \033[0m")
 	fmt.Println("\033[32mExited cleanly.\033[31m")
 }

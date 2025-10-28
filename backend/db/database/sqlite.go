@@ -21,6 +21,7 @@ func InitDB() error {
 
 	_, err = config.DB.Exec(config.FOREIGN_KEYS_ON)
 	if err != nil {
+		println("ddldldl")
 		return err
 	}
 

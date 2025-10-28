@@ -1,15 +1,22 @@
 package app
 
-import "database/sql"
+import (
+	"database/sql"
+)
 
 var DB *sql.DB
 
 const (
-	// INTERNAL_SERVER_ERROR_LOG_PATH = ""
 	PORT               = ":8080"
 	SERVER_RUN_MESSAGE = "\033[2mServer running on http://localhost:8080\033[0m"
 	DATABASE_DRIVER    = "sqlite3"
-	DATABASE_PATH      = "../data/sqlite/social.db"
-	MIGRATION_PATH     = "file://./db/migrations"
 	FOREIGN_KEYS_ON    = "PRAGMA foreign_keys = ON;"
+)
+
+// PATHS
+const (
+	MIGRATION_PATH        = "file://./db/migrations"
+	DATABASE_PATH         = "../data/sqlite/social.db"
+	SQL_LOG_FILE_PATH     = "../logs/backend-sqlite.log"
+	BACKEND_LOG_FILE_PATH = "../logs/backend.log"
 )

@@ -5,17 +5,15 @@ import (
 	"strings"
 )
 
-func EmailValidation(mail string) (bool,string) {
-		
+// todo:
 
+func EmailValidation(mail string) (bool, string) {
 	n := strings.TrimSpace(mail)
-	if (len(mail)<256&&len(mail)>10) {
-		return false,""
-
+	if len(mail) < 256 && len(mail) > 10 {
+		return false, ""
 	}
-	
 	mailregex := regexp.MustCompile(`^[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,4}$`)
-	return mailregex.MatchString(n),n
+	return mailregex.MatchString(n), n
 }
 
 func PasswordValidation(password string) (bool, string) {
@@ -53,10 +51,10 @@ func PasswordValidation(password string) (bool, string) {
 	return true, "Password is valid!"
 }
 
-func FirstNameLastName(name string) (bool,string ) {
+func FirstNameLastName(name string) (bool, string) {
 	n := strings.TrimSpace(name)
 	nameRegex := regexp.MustCompile(`^[a-zA-Z]+(?:[-'\s][a-zA-Z]+)*$`)
-	return nameRegex.MatchString(n),n
+	return nameRegex.MatchString(n), n
 }
 
 // for the date the validated format is "yyyy-mm-dd"

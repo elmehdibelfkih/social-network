@@ -1,7 +1,6 @@
 package utils
 
 import (
-	"sort"
 	"sync"
 	"time"
 )
@@ -55,15 +54,4 @@ func GenerateID() uint64 {
 		sequence
 
 	return id
-}
-
-func SortIDs(ids []uint64) []uint64 {
-	sorted := make([]uint64, len(ids))
-	copy(sorted, ids)
-
-	sort.Slice(sorted, func(i, j int) bool {
-		return sorted[i] < sorted[j]
-	})
-
-	return sorted
 }
