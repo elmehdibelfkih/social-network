@@ -1,0 +1,18 @@
+2025/10/28 19:13:11 SQLite log initialized at: /home/ebelfkih/Desktop/zone 01 project/social-network/logs/backend-sqlite.log
+2025/10/28 19:14:52 Server shutdown.
+
+
+2025/10/28 19:17:31 SQLite log initialized at: /home/ebelfkih/Desktop/zone 01 project/social-network/logs/backend-sqlite.log
+2025/10/28 19:17:52 Server shutdown.
+
+
+2025/10/28 19:18:14 SQLite log initialized at: /home/ebelfkih/Desktop/zone 01 project/social-network/logs/backend-sqlite.log
+2025/10/28 19:18:22 Server shutdown.
+
+
+2025/10/28 19:23:07 SQLite log initialized at: /home/ebelfkih/Desktop/zone 01 project/social-network/logs/backend-sqlite.log
+2025/10/28 19:24:02 Server shutdown.
+
+
+2025/10/28 19:45:26 SQLite log initialized at: C:\Users\LARABI\Desktop\social-network\logs\backend-sqlite.log
+2025/10/28 19:45:26 [2025-10-28T19:45:26+01:00] SQLite ERROR: unable to open database file: The system cannot find the path specified. | Query: migration | LogPath: C:\Users\LARABI\Desktop\social-network\logs\backend-sqlite.log
