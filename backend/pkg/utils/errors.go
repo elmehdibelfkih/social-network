@@ -4,7 +4,8 @@ import (
 	"log"
 	"os"
 	"path/filepath"
-	defs "social/pkg/app"
+	config "social/config"
+
 	"time"
 )
 
@@ -20,8 +21,8 @@ var (
 func InitLogger() {
 	var err error
 
-	sqlitePath, _ = filepath.Abs(defs.SQL_LOG_FILE_PATH)
-	backendPath, _ = filepath.Abs(defs.BACKEND_LOG_FILE_PATH)
+	sqlitePath, _ = filepath.Abs(config.SQL_LOG_FILE_PATH)
+	backendPath, _ = filepath.Abs(config.BACKEND_LOG_FILE_PATH)
 
 	sqliteFile, err = os.OpenFile(sqlitePath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {

@@ -4,18 +4,18 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	defs "social/pkg/app"
+	"social/config"
 	middleware "social/pkg/app/dependencies/middleware"
 	signals "social/pkg/app/dependencies/signals"
 )
 
 func StartServer() {
 	server := &http.Server{
-		Addr:    defs.PORT,
+		Addr:    config.PORT,
 		Handler: middleware.RateLimiterMiddleware(nil, 60, 120),
 	}
 
-	fmt.Println(defs.SERVER_RUN_MESSAGE)
+	fmt.Println(config.SERVER_RUN_MESSAGE)
 
 	go func() {
 		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
