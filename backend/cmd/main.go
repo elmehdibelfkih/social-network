@@ -1,3 +1,7 @@
 package main
 
-// import "social/"
+import server "social/pkg/app/server"
+
+func main() {
+	server.StartServer()
+}
