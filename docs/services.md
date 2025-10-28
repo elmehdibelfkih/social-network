@@ -61,5 +61,3 @@ You can import everything from the index:
 ```ts
     import type { User, AuthResponse } from "@/types"
 ```
-
-mehdi
