@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-// todo:
+// todo: regex
 
 func EmailValidation(mail string) (bool, string) {
 	n := strings.TrimSpace(mail)
@@ -44,7 +44,7 @@ func PasswordValidation(password string) (bool, string) {
 		return false, "Password must contain at least one special character (e.g., !@#$%^&*)."
 	}
 
-	if regexp.MustCompile(noWhitespace).MatchString(password) == false {
+	if !regexp.MustCompile(noWhitespace).MatchString(password) {
 		return false, "Password must not contain any whitespace."
 	}
 
