@@ -2,7 +2,6 @@ package database
 
 import (
 	"database/sql"
-	"fmt"
 	config "social/pkg/config"
 
 	"github.com/golang-migrate/migrate/v4"
@@ -21,7 +20,6 @@ func InitDB() error {
 
 	_, err = config.DB.Exec(config.FOREIGN_KEYS_ON)
 	if err != nil {
-		println("ddldldl")
 		return err
 	}
 
@@ -38,7 +36,6 @@ func InitDB() error {
 
 	err = migration.Up()
 	if err != nil && err != migrate.ErrNoChange {
-		fmt.Println(err)
 		return err
 	}
 
