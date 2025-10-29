@@ -4,6 +4,12 @@ import (
 	"database/sql"
 )
 
+type contextKey string
+
+// context keys
+
+const USER_ID_KEY contextKey = "userId"
+
 var DB *sql.DB
 
 const (
@@ -20,3 +26,5 @@ const (
 	SQL_LOG_FILE_PATH     = "../logs/backend-sqlite.log"
 	BACKEND_LOG_FILE_PATH = "../logs/backend.log"
 )
+
+// types

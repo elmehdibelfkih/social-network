@@ -1,17 +1,52 @@
-2025/10/28 19:13:11 Backend log initialized at: /home/ebelfkih/Desktop/zone 01 project/social-network/logs/backend.log
-2025/10/28 19:14:52 Server shutdown.
+2025/10/29 13:56:09 [2025-10-29T13:56:09+01:00] C:/Users/LARABI/Desktop/social-network/backend/pkg/app/dependencies/middleware/context_injector.go:27: http: named cookie not present: UserContext
+2025/10/29 13:56:09 [2025-10-29T13:56:09+01:00] C:/Users/LARABI/Desktop/social-network/backend/pkg/app/dependencies/middleware/context_injector.go:27: http: named cookie not present: UserContext
+2025/10/29 13:59:42 Server shutdown.
 
 
-2025/10/28 19:17:31 Backend log initialized at: /home/ebelfkih/Desktop/zone 01 project/social-network/logs/backend.log
-2025/10/28 19:17:52 Server shutdown.
+2025/10/29 13:59:50 Backend log initialized at: C:\Users\LARABI\Desktop\social-network\logs\backend.log
+2025/10/29 13:59:53 [2025-10-29T13:59:53+01:00] C:/Users/LARABI/Desktop/social-network/backend/pkg/app/dependencies/middleware/context_injector.go:28: http: named cookie not present: UserContext
+2025/10/29 14:00:13 [2025-10-29T14:00:13+01:00] C:/Users/LARABI/Desktop/social-network/backend/pkg/app/dependencies/middleware/context_injector.go:28: http: named cookie not present: UserContext
+2025/10/29 14:00:13 [2025-10-29T14:00:13+01:00] C:/Users/LARABI/Desktop/social-network/backend/pkg/app/dependencies/middleware/context_injector.go:28: http: named cookie not present: UserContext
+2025/10/29 14:00:18 [2025-10-29T14:00:18+01:00] C:/Users/LARABI/Desktop/social-network/backend/pkg/app/dependencies/middleware/context_injector.go:28: http: named cookie not present: UserContext
+2025/10/29 14:00:24 [2025-10-29T14:00:24+01:00] C:/Users/LARABI/Desktop/social-network/backend/pkg/app/dependencies/middleware/context_injector.go:28: http: named cookie not present: UserContext
+2025/10/29 14:00:24 [2025-10-29T14:00:24+01:00] C:/Users/LARABI/Desktop/social-network/backend/pkg/app/dependencies/middleware/context_injector.go:28: http: named cookie not present: UserContext
+2025/10/29 14:00:39 [2025-10-29T14:00:39+01:00] C:/Users/LARABI/Desktop/social-network/backend/pkg/app/dependencies/middleware/context_injector.go:28: http: named cookie not present: UserContext
+2025/10/29 14:00:39 [2025-10-29T14:00:39+01:00] C:/Users/LARABI/Desktop/social-network/backend/pkg/app/dependencies/middleware/context_injector.go:28: http: named cookie not present: UserContext
+2025/10/29 14:00:46 [2025-10-29T14:00:46+01:00] C:/Users/LARABI/Desktop/social-network/backend/pkg/app/dependencies/middleware/context_injector.go:28: http: named cookie not present: UserContext
+2025/10/29 14:00:54 [2025-10-29T14:00:54+01:00] C:/Users/LARABI/Desktop/social-network/backend/pkg/app/dependencies/middleware/context_injector.go:28: http: named cookie not present: UserContext
+2025/10/29 14:00:54 [2025-10-29T14:00:54+01:00] C:/Users/LARABI/Desktop/social-network/backend/pkg/app/dependencies/middleware/context_injector.go:28: http: named cookie not present: UserContext
+2025/10/29 14:00:58 [2025-10-29T14:00:58+01:00] C:/Users/LARABI/Desktop/social-network/backend/pkg/app/dependencies/middleware/context_injector.go:28: http: named cookie not present: UserContext
+2025/10/29 14:01:21 [2025-10-29T14:01:21+01:00] C:/Users/LARABI/Desktop/social-network/backend/pkg/app/dependencies/middleware/context_injector.go:28: http: named cookie not present: UserContext
+2025/10/29 14:01:21 [2025-10-29T14:01:21+01:00] C:/Users/LARABI/Desktop/social-network/backend/pkg/app/dependencies/middleware/context_injector.go:28: http: named cookie not present: UserContext
+2025/10/29 14:01:27 [2025-10-29T14:01:27+01:00] C:/Users/LARABI/Desktop/social-network/backend/pkg/app/dependencies/middleware/context_injector.go:28: http: named cookie not present: UserContext
+2025/10/29 14:01:27 [2025-10-29T14:01:27+01:00] C:/Users/LARABI/Desktop/social-network/backend/pkg/app/dependencies/middleware/context_injector.go:28: http: named cookie not present: UserContext
+2025/10/29 14:02:56 Server shutdown.
 
 
-2025/10/28 19:18:14 Backend log initialized at: /home/ebelfkih/Desktop/zone 01 project/social-network/logs/backend.log
-2025/10/28 19:18:22 Server shutdown.
+2025/10/29 14:03:13 Backend log initialized at: C:\Users\LARABI\Desktop\social-network\logs\backend.log
+2025/10/29 14:03:16 [2025-10-29T14:03:16+01:00] C:/Users/LARABI/Desktop/social-network/backend/pkg/app/dependencies/middleware/context_injector.go:28: http: named cookie not present: UserContext
+2025/10/29 14:03:18 [2025-10-29T14:03:18+01:00] C:/Users/LARABI/Desktop/social-network/backend/pkg/app/dependencies/middleware/context_injector.go:28: http: named cookie not present: UserContext
+2025/10/29 14:03:18 [2025-10-29T14:03:18+01:00] C:/Users/LARABI/Desktop/social-network/backend/pkg/app/dependencies/middleware/context_injector.go:28: http: named cookie not present: UserContext
+2025/10/29 14:03:22 [2025-10-29T14:03:22+01:00] C:/Users/LARABI/Desktop/social-network/backend/pkg/app/dependencies/middleware/context_injector.go:28: http: named cookie not present: UserContext
+2025/10/29 14:03:24 [2025-10-29T14:03:24+01:00] C:/Users/LARABI/Desktop/social-network/backend/pkg/app/dependencies/middleware/context_injector.go:28: http: named cookie not present: UserContext
+2025/10/29 14:03:24 [2025-10-29T14:03:24+01:00] C:/Users/LARABI/Desktop/social-network/backend/pkg/app/dependencies/middleware/context_injector.go:28: http: named cookie not present: UserContext
+2025/10/29 14:03:34 [2025-10-29T14:03:34+01:00] C:/Users/LARABI/Desktop/social-network/backend/pkg/app/dependencies/middleware/context_injector.go:28: http: named cookie not present: UserContext
+2025/10/29 14:03:34 [2025-10-29T14:03:34+01:00] C:/Users/LARABI/Desktop/social-network/backend/pkg/app/dependencies/middleware/context_injector.go:28: http: named cookie not present: UserContext
+2025/10/29 14:24:34 Server shutdown.
 
 
-2025/10/28 19:23:07 Backend log initialized at: /home/ebelfkih/Desktop/zone 01 project/social-network/logs/backend.log
-2025/10/28 19:24:02 Server shutdown.
+2025/10/29 16:10:26 Backend log initialized at: C:\Users\LARABI\Desktop\social-network\logs\backend.log
+2025/10/29 16:10:37 [2025-10-29T16:10:37+01:00] C:/Users/LARABI/Desktop/social-network/backend/pkg/app/dependencies/middleware/context_injector.go:27: http: named cookie not present: UserContext
+2025/10/29 16:10:37 [2025-10-29T16:10:37+01:00] C:/Users/LARABI/Desktop/social-network/backend/pkg/app/dependencies/middleware/context_injector.go:27: http: named cookie not present: UserContext
+2025/10/29 16:10:55 [2025-10-29T16:10:55+01:00] C:/Users/LARABI/Desktop/social-network/backend/pkg/app/dependencies/middleware/context_injector.go:27: http: named cookie not present: UserContext
+2025/10/29 16:10:55 [2025-10-29T16:10:55+01:00] C:/Users/LARABI/Desktop/social-network/backend/pkg/app/dependencies/middleware/context_injector.go:27: http: named cookie not present: UserContext
+2025/10/29 16:10:59 [2025-10-29T16:10:59+01:00] C:/Users/LARABI/Desktop/social-network/backend/pkg/app/dependencies/middleware/context_injector.go:27: http: named cookie not present: UserContext
+2025/10/29 16:10:59 [2025-10-29T16:10:59+01:00] C:/Users/LARABI/Desktop/social-network/backend/pkg/app/dependencies/middleware/context_injector.go:27: http: named cookie not present: UserContext
+2025/10/29 16:11:01 [2025-10-29T16:11:01+01:00] C:/Users/LARABI/Desktop/social-network/backend/pkg/app/dependencies/middleware/context_injector.go:27: http: named cookie not present: UserContext
+2025/10/29 16:11:06 [2025-10-29T16:11:06+01:00] C:/Users/LARABI/Desktop/social-network/backend/pkg/app/dependencies/middleware/context_injector.go:27: http: named cookie not present: UserContext
+2025/10/29 16:11:06 [2025-10-29T16:11:06+01:00] C:/Users/LARABI/Desktop/social-network/backend/pkg/app/dependencies/middleware/context_injector.go:27: http: named cookie not present: UserContext
+2025/10/29 16:11:11 [2025-10-29T16:11:11+01:00] C:/Users/LARABI/Desktop/social-network/backend/pkg/app/dependencies/middleware/context_injector.go:27: http: named cookie not present: UserContext
+2025/10/29 16:11:11 [2025-10-29T16:11:11+01:00] C:/Users/LARABI/Desktop/social-network/backend/pkg/app/dependencies/middleware/context_injector.go:27: http: named cookie not present: UserContext
+2025/10/29 16:14:53 Server shutdown.
 
 
-2025/10/28 19:45:26 Backend log initialized at: C:\Users\LARABI\Desktop\social-network\logs\backend.log

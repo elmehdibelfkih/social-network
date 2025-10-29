@@ -11,7 +11,7 @@ func main() {
 	errorLogger.InitLogger()
 	err := migration.InitDB()
 	if err != nil {
-		errorLogger.HandleSQLiteError(err, "migration")
+		errorLogger.SQLiteErrorTarget(err, "migration")
 		return
 	}
 	server.StartServer()

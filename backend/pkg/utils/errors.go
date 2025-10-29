@@ -1,9 +1,11 @@
 package utils
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"path/filepath"
+	"runtime"
 	config "social/pkg/config"
 
 	"time"
@@ -52,15 +54,15 @@ func CloseLogger() {
 
 func LogSQLiteError(err error, query string) {
 	if err != nil {
-		sqliteLog.Printf("[%s] SQLite ERROR: %v | Query: %s | LogPath: %s\n",
-			time.Now().Format(time.RFC3339), err, query, sqlitePath)
+		sqliteLog.Printf("[%s] %v: %s",
+			time.Now().Format(time.RFC3339), err, query)
 	}
 }
 
 func LogBackendError(err error, context string) {
 	if err != nil {
-		backendLog.Printf("[%s] BACKEND ERROR in %s: %v | LogPath: %s\n",
-			time.Now().Format(time.RFC3339), context, err, backendPath)
+		backendLog.Printf("[%s] %v: %s",
+			time.Now().Format(time.RFC3339), err, context)
 	}
 }
 
@@ -78,4 +80,14 @@ func HandleBackendError(err error, context string) bool {
 		return true
 	}
 	return false
+}
+
+func SQLiteErrorTarget(err error, query string) {
+	_, file, line, _ := runtime.Caller(1)
+	HandleSQLiteError(fmt.Errorf("%s:%d: %w", file, line, err), query)
+}
+
+func BackendErrorTarget(err error, context string) {
+	_, file, line, _ := runtime.Caller(1)
+	HandleBackendError(fmt.Errorf("%s:%d: %w", file, line, err), context)
 }
