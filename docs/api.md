@@ -1000,7 +1000,8 @@ No need for a request body.
 {
   "fileName": "avatar.png",
   "fileType": "image/png",
-  "fileData": "base64-encoded-file-data"
+  "fileData": "base64-encoded-file-data",
+  "Purpose":  "avatar" // avatar/post/message/comment
 }
 
 ```

@@ -39,6 +39,15 @@ func NewHandler() *Handler {
 	return &Handler{}
 }
 
+// todo: the name of the exported functions must be pascalCase (not camelCase)
+// todo: a similar function to the WriteError function already exists  in the utils package (take a look at error.go)
+// todo: in the line 52 (userID, ok := r.Context().Value("userId").(uint64)) use USER_ID_KEY in config package
+// todo: move the WriteSuccess to the utils package to be shared with all services
+// todo: this file must contain only the handlers, move the other functions into service.go
+// todo: the error logers are SQLiteErrorTarget() and BackendErrorTarget() not LogBackendError() and LogSQLiteError
+
+// todo: there are 4 types of media: avatar/post/message/comment. (my bad)
+
 func (h *Handler) handleUploadMedia(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		WriteError(w, http.StatusMethodNotAllowed, "Method Not Allowed", "POST", "Only POST method is allowed for this endpoint.")
