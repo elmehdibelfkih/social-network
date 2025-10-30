@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS chat_participants (
   chat_id INTEGER NOT NULL,
   user_id INTEGER NOT NULL,
-  role TEXT NOT NULL DEFAULT 'member' CHECK(role IN ('member','admin','owner')),
+  role TEXT NOT NULL DEFAULT 'member' CHECK(role IN ('member', 'admin', 'owner')),
   unread_count INTEGER NOT NULL DEFAULT 0,
   joined_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,

@@ -6,7 +6,6 @@ CREATE TABLE IF NOT EXISTS users (
   first_name TEXT NOT NULL,
   last_name TEXT NOT NULL,
   date_of_birth TEXT NOT NULL,
-  -- ISO-8601 'YYYY-MM-DD'
   avatar_media_id INTEGER,
   about_me TEXT,
   privacy TEXT NOT NULL DEFAULT 'public' CHECK(privacy IN ('public', 'private')),

@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS counter_deltas (
-    id INTEGER PRIMARY KEY ,
+    id INTEGER PRIMARY KEY,
     entity_type TEXT NOT NULL,
     entity_id INTEGER NOT NULL,
     key TEXT NOT NULL,
