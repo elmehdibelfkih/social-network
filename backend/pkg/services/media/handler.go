@@ -45,8 +45,8 @@ func NewHandler() *Handler {
 // todo: move the WriteSuccess to the utils package to be shared with all services
 // todo: this file must contain only the handlers, move the other functions into service.go
 // todo: the error logers are SQLiteErrorTarget() and BackendErrorTarget() not LogBackendError() and LogSQLiteError
-
 // todo: there are 4 types of media: avatar/post/message/comment. (my bad)
+// todo: you cannot use the getMediaID function to retrieve the media_id, because the media_id is not a query param, it is a path param.
 
 func (h *Handler) handleUploadMedia(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
