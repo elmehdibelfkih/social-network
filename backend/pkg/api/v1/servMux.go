@@ -13,6 +13,14 @@ func SocialMux() *http.ServeMux {
 	// utils.MiddlewareChain(testHandler, middleware.UserContext, middleware.UserContext, middleware.UserContext)
 	socialMux.HandleFunc("/", utils.MiddlewareChain(testHandler, middleware.UserContext))
 
+	//auth_service
+	socialMux.HandleFunc("/api/v1/auth/register", utils.MiddlewareChain(testHandler, nil))
+	socialMux.HandleFunc("/api/v1/auth/login", utils.MiddlewareChain(testHandler, nil))
+	socialMux.HandleFunc("/api/v1/auth/logout", utils.MiddlewareChain(testHandler, nil))
+	socialMux.HandleFunc("/api/v1/auth/session", utils.MiddlewareChain(testHandler, nil))
+	socialMux.HandleFunc("/api/v1/sessions", utils.MiddlewareChain(testHandler, nil))
+	socialMux.HandleFunc("/api/v1/sessions/:session_id", utils.MiddlewareChain(testHandler, nil))
+
 	return socialMux
 }
 
