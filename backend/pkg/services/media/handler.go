@@ -16,6 +16,19 @@ import (
 	"social/pkg/utils"
 )
 
+func getStoragePathForContext(context string) string {
+	switch context {
+	case "avatar":
+		return filepath.Join("../data/uploads/avatars")
+	case "post":
+		return filepath.Join("../data/uploads/posts")
+	case "message":
+		return filepath.Join("../data/uploads/messages")
+	default:
+		return filepath.Join("../data/uploads/posts")
+	}
+}
+
 var AllowedMimeTypes = map[string]bool{
 	"image/jpeg": true,
 	"image/png":  true,
@@ -79,13 +92,16 @@ func (h *Handler) handleUploadMedia(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	context := r.URL.Query().Get("context")
+	purpose := getStoragePathForContext(context)
+
 	media := &Media{
 		ID:        mediaID,
 		OwnerId:   userID,
 		Path:      filePath,
 		Mime:      req.FileType,
 		Size:      uint64(len(data)),
-		Purpose:   req.Purpose,
+		Purpose:   purpose,
 		CreatedAt: time.Now(),
 	}
 
