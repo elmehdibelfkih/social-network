@@ -3,6 +3,7 @@ package utils
 import (
 	"fmt"
 	"log"
+	"net/http"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -52,31 +53,31 @@ func CloseLogger() {
 	}
 }
 
-func LogSQLiteError(err error, query string) {
+func logSQLiteError(err error, query string) {
 	if err != nil {
 		sqliteLog.Printf("[%s] %v: %s",
 			time.Now().Format(time.RFC3339), err, query)
 	}
 }
 
-func LogBackendError(err error, context string) {
+func logBackendError(err error, context string) {
 	if err != nil {
 		backendLog.Printf("[%s] %v: %s",
 			time.Now().Format(time.RFC3339), err, context)
 	}
 }
 
-func HandleSQLiteError(err error, query string) bool {
+func handleSQLiteError(err error, query string) bool {
 	if err != nil {
-		LogSQLiteError(err, query)
+		logSQLiteError(err, query)
 		return true
 	}
 	return false
 }
 
-func HandleBackendError(err error, context string) bool {
+func handleBackendError(err error, context string) bool {
 	if err != nil {
-		LogBackendError(err, context)
+		logBackendError(err, context)
 		return true
 	}
 	return false
@@ -84,10 +85,48 @@ func HandleBackendError(err error, context string) bool {
 
 func SQLiteErrorTarget(err error, query string) {
 	_, file, line, _ := runtime.Caller(1)
-	HandleSQLiteError(fmt.Errorf("%s:%d: %w", file, line, err), query)
+	handleSQLiteError(fmt.Errorf("%s:%d: %w", file, line, err), query)
 }
 
 func BackendErrorTarget(err error, context string) {
 	_, file, line, _ := runtime.Caller(1)
-	HandleBackendError(fmt.Errorf("%s:%d: %w", file, line, err), context)
+	handleBackendError(fmt.Errorf("%s:%d: %w", file, line, err), context)
+}
+
+func sendErrorResponse(w http.ResponseWriter, status int, errTitle, errMsg, errType string) {
+	JsonResponse(w, status, map[string]any{
+		"success": false,
+		"payload": errMsg,
+		"error": map[string]any{
+			"errorTitle":   errTitle,
+			"statusCode":   status,
+			"statusText":   http.StatusText(status),
+			"errorMessage": errMsg,
+			"errorType":    errType,
+		},
+	})
+}
+
+func NotFoundError(w http.ResponseWriter, message string) {
+	sendErrorResponse(w, http.StatusNotFound, "Resource Not Found", message, "redirect")
+}
+
+func MethodNotAllowed(w http.ResponseWriter, message string) {
+	sendErrorResponse(w, http.StatusMethodNotAllowed, "Method Not Allowed", message, "redirect")
+}
+
+func InternalServerError(w http.ResponseWriter) {
+	sendErrorResponse(w, http.StatusInternalServerError, "Oops! Internal Server Error", "An unexpected error occurred while processing your request.", "redirect")
+}
+
+func BadRequest(w http.ResponseWriter, message, errorType string) {
+	sendErrorResponse(w, http.StatusBadRequest, "Bad Request", message, errorType)
+}
+
+func Unauthorized(w http.ResponseWriter, message string) {
+	sendErrorResponse(w, http.StatusUnauthorized, "Unauthorized", message, "alert")
+}
+
+func TooManyRequests(w http.ResponseWriter, message string) {
+	sendErrorResponse(w, http.StatusTooManyRequests, "Too Many Requests", message, "redirect")
 }
