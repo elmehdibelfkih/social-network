@@ -10,5 +10,6 @@ local:
 	@mkdir -p "./data/uploads/avatars"
 	@mkdir -p "./data/uploads/posts"
 	@mkdir -p "./data/uploads/messages"
+	@mkdir -p "./data/uploads/comments"
 	
 	@cd "./backend/" && go run ./cmd/main.go
