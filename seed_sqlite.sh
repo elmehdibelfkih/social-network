@@ -163,7 +163,7 @@ for tbl, create_sql in tables:
 
     cols_to_insert = [c[1] for c in cols_info if not (has_rowid_pk and c[1] in pk_cols)]
     if not cols_to_insert:
-        print("  all autoincrement PK — skipping")
+        print("  all  PK — skipping")
         continue
 
     placeholders = ",".join("?" for _ in cols_to_insert)

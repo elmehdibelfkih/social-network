@@ -1,4 +1,4 @@
-package auth
+package media
 
 import "time"
 
@@ -43,25 +43,6 @@ type UploadMediaResponse struct {
 type DeleteMediaResponse struct {
 	Message string `json:"message"`
 	MediaID uint64 `json:"mediaId"`
-}
-
-type APISuccessResponse struct {
-	Success bool `json:"success"`
-	Payload any  `json:"payload"`
-}
-
-type APIErrrorResponse struct {
-	Success bool     `json:"success"`
-	Error   APIError `json:"error"`
-}
-
-type APIError struct {
-	StatusCode       int    `json:"statusCode"`
-	StatusText       string `json:"statusText"`
-	ErrorMessage     string `json:"errorMessage"`
-	ErrorTitle       string `json:"errorTitle"`
-	ErrorDescription string `json:"errorDescription"`
-	ErrorType        string `json:"errorType"`
 }
 
 const (

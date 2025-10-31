@@ -26,5 +26,3 @@ const (
 	SQL_LOG_FILE_PATH     = "../logs/backend-sqlite.log"
 	BACKEND_LOG_FILE_PATH = "../logs/backend.log"
 )
-
-// types

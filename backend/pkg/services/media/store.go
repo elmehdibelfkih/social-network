@@ -1,4 +1,4 @@
-package auth
+package media
 
 import (
 	"database/sql"
@@ -26,7 +26,7 @@ func (s *DBStore) CreateMedia(media *Media) error {
 		if e, ok := err.(sqlite3.Error); ok && e.Code == sqlite3.ErrConstraint {
 			return fmt.Errorf("constraint error: %w", err)
 		}
-		utils.LogSQLiteError(err, "CreateMedia")
+		utils.SQLiteErrorTarget(err, "CreateMedia")
 		return fmt.Errorf("failed to create media: %s", err)
 	}
 	return nil
@@ -46,7 +46,7 @@ func (s *DBStore) GetMediaByID(id uint64) (*Media, error) {
 		if err == sql.ErrNoRows {
 			return nil, err
 		}
-		utils.LogSQLiteError(err, "GetMediaByID")
+		utils.SQLiteErrorTarget(err, "GetMediaByID")
 		return nil, fmt.Errorf("failed to get media: %w", err)
 	}
 	return media, nil
@@ -58,7 +58,7 @@ func (s *DBStore) DeleteMedia(id uint64, userID uint64) (string, error) {
 
 	tx, err := s.db.Begin()
 	if err != nil {
-		utils.LogSQLiteError(err, "DeleteMedia (BeginTx)")
+		utils.SQLiteErrorTarget(err, "DeleteMedia (BeginTx)")
 		return "", err
 	}
 	defer tx.Rollback()
@@ -68,7 +68,7 @@ func (s *DBStore) DeleteMedia(id uint64, userID uint64) (string, error) {
 		if err == sql.ErrNoRows {
 			return "", sql.ErrNoRows
 		}
-		utils.LogSQLiteError(err, "DeleteMedia (QueryRow)")
+		utils.SQLiteErrorTarget(err, "DeleteMedia (QueryRow)")
 		return "", err
 	}
 
@@ -78,17 +78,17 @@ func (s *DBStore) DeleteMedia(id uint64, userID uint64) (string, error) {
 
 	_, err = tx.Exec(queryDeleteMedia, id, userID)
 	if err != nil {
-		utils.LogSQLiteError(err, "DeleteMedia (Exec)")
+		utils.SQLiteErrorTarget(err, "DeleteMedia (Exec)")
 		return "", err
 	}
 
 	if err := tx.Commit(); err != nil {
-		utils.LogSQLiteError(err, "DeleteMedia (Commit)")
+		utils.SQLiteErrorTarget(err, "DeleteMedia (Commit)")
 		return "", err
 	}
 
 	if err := os.Remove(path); err != nil {
-		utils.LogBackendError(err, fmt.Sprintf("failed to delete media file: %s", path))
+		utils.BackendErrorTarget(err, fmt.Sprintf("failed to delete media file: %s", path))
 	}
 
 	return path, nil
