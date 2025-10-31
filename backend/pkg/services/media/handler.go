@@ -3,7 +3,6 @@ package media
 import (
 	"database/sql"
 	"encoding/base64"
-	"encoding/json"
 	"fmt"
 	"mime"
 	"net/http"
@@ -40,8 +39,9 @@ func (h *Handler) HandleUploadMedia(w http.ResponseWriter, r *http.Request) {
 
 	var req UploadMediaRequest
 	r.Body = http.MaxBytesReader(w, r.Body, MaxMediaSize)
+	defer r.Body.Close()
 
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+	if err := utils.JsonRequest(r, req); err != nil {
 		utils.BadRequest(w, "The request body is not valid JSON.", err.Error())
 		return
 	}
