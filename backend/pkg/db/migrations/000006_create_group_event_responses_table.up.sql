@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS group_event_responses (
-  event_id INTEGER NOT,
+  event_id INTEGER NOT NULL,
   user_id INTEGER NOT NULL,
   response TEXT NOT NULL CHECK(response IN ('going', 'not_going')),
   responded_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
