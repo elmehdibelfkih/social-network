@@ -7,7 +7,6 @@ import (
 )
 
 func main() {
-
 	errorLogger.InitLogger()
 	err := migration.InitDB()
 	if err != nil {

@@ -29,6 +29,9 @@ var (
 	datacenterID  uint64 = 1
 )
 
+
+//todo: should return int64
+
 func GenerateID() uint64 {
 	mu.Lock()
 	defer mu.Unlock()
@@ -55,3 +58,4 @@ func GenerateID() uint64 {
 
 	return id
 }
+

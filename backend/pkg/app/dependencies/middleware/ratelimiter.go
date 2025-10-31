@@ -9,13 +9,11 @@ import (
 )
 
 type TokenBucketLimiter struct {
-	mu                sync.Mutex
-	tokens            uint64
-	fillRate          float64
-	capacity          uint64
-	lastTime          time.Time
-	staticTokens      uint64
-	lastStaticRequest time.Time // need implemention
+	mu       sync.Mutex
+	tokens   uint64
+	fillRate float64
+	capacity uint64
+	lastTime time.Time
 }
 
 func RateLimiterMiddleware(next http.Handler, limit float64, burst uint64) http.Handler {
