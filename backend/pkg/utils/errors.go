@@ -7,10 +7,9 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
-	config "social/pkg/config"
-	"social/pkg/utils"
-
 	"time"
+
+	config "social/pkg/config"
 )
 
 var (
@@ -94,11 +93,11 @@ func BackendErrorTarget(err error, context string) {
 	handleBackendError(fmt.Errorf("%s:%d: %w", file, line, err), context)
 }
 
-func ValidateJsonRequest(w http.ResponseWriter, r *http.Request, body any, content string) bool {
-	err := utils.JsonStaticDecode(r, &body)
+func ValidateJsonRequest(w http.ResponseWriter, r *http.Request, body any, context string) bool {
+	err := JsonStaticDecode(r, &body)
 	if err != nil {
-		utils.BackendErrorTarget(err, content)
-		utils.BadRequest(w, "request body invalid json format", "redirect")
+		BackendErrorTarget(err, context)
+		BadRequest(w, "request body invalid json format", "redirect")
 		return false
 	}
 	return true

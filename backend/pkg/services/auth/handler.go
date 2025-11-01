@@ -8,66 +8,57 @@ import (
 
 func PostRegister(w http.ResponseWriter, r *http.Request) {
 	// fmt.Println("Route hit:", r.URL.Path, r.Header.Get("User-Agent"))
-	var body RegisterRequestJson
-	var err error
 
+	//request response
+	var body RegisterRequestJson
+	var response RegisterResponseJson
+	//decoding r.body
 	if !utils.ValidateJsonRequest(w, r, &body, "register handler") {
 		return
 	}
-
-	err = GeneratePasswordHash(&body.Password)
-	if err != nil {
-		utils.BackendErrorTarget(err, "register handler")
-		utils.InternalServerError(w)
+	// hashing password
+	if !GeneratePasswordHash(w, &body, "register handler") {
+		return
 	}
-
-	response, err := InsertUserAccount(body)
-	if err != nil {
-		utils.BackendErrorTarget(err, "register handler")
-		utils.InternalServerError(w)
+	// db
+	response, check := RegisterUserAccount(w, r, &body, "register handler")
+	if !check {
+		return
 	}
-
-	var s = SessionResponseJson{
-		SessionId:    int64(utils.GenerateID()),
-		UserId:       response.UserId,
-		SessionToken: GenerateSessionToken(32),
-		IpAddress:    r.RemoteAddr,
-		Device:       r.Header.Get("User-Agent"),
-	}
-
-	err = InsertUserSession(s)
-	if err != nil {
-		utils.BackendErrorTarget(err, "register handler")
-		utils.InternalServerError(w)
-	}
-
-	http.SetCookie(w, &http.Cookie{
-		Name:  "session_token",
-		Value: GenerateSessionToken(32),
-		// Expires:  time.Now().Add(time.Hour * 1),
-		HttpOnly: true,
-		SameSite: http.SameSiteStrictMode,
-		Path:     "/",
-	})
-
-	//todo:maybe online broadcast
-
-	utils.JsonResponseEncode(w, http.StatusOK, map[string]any{
-		"success": true,
-		"payload": response,
-		"error":   map[string]any{},
-	})
+	// set cookie and send response
+	RegisterUserHttp(w, response)
 
 }
 
 func PostLogin(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("Route hit:", r.URL.Path, r.Header.Get("User-Agent"))
-	fmt.Fprintf(w, "login")
-
+	// fmt.Println("Route hit:", r.URL.Path, r.Header.Get("User-Agent"))
+	//request response
+	var body LoginRequestJson
+	var response LoginResponseJson
+	//decoding r.body
+	if !utils.ValidateJsonRequest(w, r, &body, "login handler") {
+		return
+	}
+	//match the password hash
+	if !CheckPasswordHash(w, &body, &response, "login handler") {
+		return
+	}
+	//create user session
+	if !LoginUserAccount(w, r, &body, &response, "login handler") {
+		return
+	}
+	//set cookie and send response
+	LoginUserHttp(w, response)
 }
 
 func PostLogout(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("Route hit:", r.URL.Path, r.Header.Get("User-Agent"))
+	// fmt.Println("Route hit:", r.URL.Path, r.Header.Get("User-Agent"))
+	var response LoginResponseJson
+
+	if !LogoutUserAccount(w, r, &response, "logout handler") {
+		return
+	}
+
 	fmt.Fprintf(w, "logout")
 }
 

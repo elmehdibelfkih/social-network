@@ -26,6 +26,7 @@ func SocialMux() *http.ServeMux {
 
 func testHandler(w http.ResponseWriter, r *http.Request) {
 	// fmt.Println(r.Header)
+	// fmt.Println(r.RemoteAddr)
 	fmt.Println("Route hit:", r.URL.Path, r.Header.Get("User-Agent"))
 	fmt.Fprintf(w, "hello")
 }

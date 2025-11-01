@@ -3,6 +3,7 @@ package auth
 //select
 
 const (
+	SELECT_PASSWORD_SESSION         = `SELECT id, password_hash FROM users WHERE email = ? or nickname = ? or id = ?`
 	SELECT_SESSION_TOKEN_BY_SESSION = `SELECT COUNt(*) FROM sessions WHERE session_token = ?`
 	SELECT_USER_BY_ID               = `SELECT id, email, first_name, last_name, date_of_birth, nickname, about_me, avatar_id
 	FROM users WHERE id = ?`
@@ -23,4 +24,6 @@ const ()
 
 //delete
 
-const ()
+const (
+	DELETE_USER_SESSION = `DELETE FROM session WHERE user_id = ?`
+)
