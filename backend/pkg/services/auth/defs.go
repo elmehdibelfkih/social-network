@@ -1,9 +1,7 @@
 package auth
 
 // all optional fields revieve a pointer
-
 // /api/v1/auth/register
-
 type RegisterRequestJson struct {
 	Email       string  `json:"email"`
 	Password    string  `json:"password"`
@@ -26,8 +24,7 @@ type RegisterResponseJson struct {
 	AvatarId    *int64  `json:"avatarId"`
 }
 
-//api/v1/auth/login
-
+// api/v1/auth/login
 type LoginRequestJson struct {
 	Identifier string `json:"email/userId/nickname"` // flexible login field
 	Password   string `json:"password"`
@@ -44,14 +41,12 @@ type LoginResponseJson struct {
 	AvatarId    *int64  `json:"avatarId"`
 }
 
-//api/v1/auth/logout
-
+// api/v1/auth/logout
 type LogoutResponseJson struct {
 	Message string `json:"message"`
 }
 
-//api/v1/auth/session
-
+// api/v1/auth/session
 type SessionResponseJson struct {
 	SessionId    int64  `json:"sessionId"`
 	UserId       int64  `json:"userId"`
@@ -62,8 +57,7 @@ type SessionResponseJson struct {
 	// ExpiresAt    string `json:"expiresAt"`
 }
 
-//api/v1/sessions
-
+// api/v1/sessions
 type SessionsResponseJson struct {
 	Sessions []SessionItemJson `json:"sessions"`
 }
@@ -77,8 +71,7 @@ type SessionItemJson struct {
 	// ExpiresAt string `json:"expiresAt"`
 }
 
-//api/v1/sessions/:session_id
-
+// api/v1/sessions/:session_id
 type RevokeSessionResponseJson struct {
 	Message string `json:"message"`
 }

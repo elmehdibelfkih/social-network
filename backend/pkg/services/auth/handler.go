@@ -7,31 +7,25 @@ import (
 )
 
 func PostRegister(w http.ResponseWriter, r *http.Request) {
-	// fmt.Println("Route hit:", r.URL.Path, r.Header.Get("User-Agent"))
 
-	//request response
 	var body RegisterRequestJson
 	var response RegisterResponseJson
-	//decoding r.body
 	if !utils.ValidateJsonRequest(w, r, &body, "register handler") {
 		return
 	}
-	// hashing password
 	if !GeneratePasswordHash(w, &body, "register handler") {
 		return
 	}
-	// db
 	response, check := RegisterUserAccount(w, r, &body, "register handler")
 	if !check {
 		return
 	}
-	// set cookie and send response
 	RegisterUserHttp(w, response)
 
 }
 
 func PostLogin(w http.ResponseWriter, r *http.Request) {
-	// fmt.Println("Route hit:", r.URL.Path, r.Header.Get("User-Agent"))
+
 	//request response
 	var body LoginRequestJson
 	var response LoginResponseJson
@@ -52,7 +46,6 @@ func PostLogin(w http.ResponseWriter, r *http.Request) {
 }
 
 func PostLogout(w http.ResponseWriter, r *http.Request) {
-	// fmt.Println("Route hit:", r.URL.Path, r.Header.Get("User-Agent"))
 	var response LoginResponseJson
 
 	if !LogoutUserAccount(w, r, &response, "logout handler") {
