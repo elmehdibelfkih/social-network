@@ -12,8 +12,10 @@ import (
 
 func StartServer() {
 	server := &http.Server{
-		Addr:    config.PORT,
-		Handler: middleware.RateLimiterMiddleware(api.SocialMux(), 60, 120),
+		Addr: config.PORT,
+		Handler: middleware.CORS(
+			middleware.RateLimiterMiddleware(api.SocialMux(), 60, 120),
+		),
 	}
 
 	fmt.Println(config.SERVER_RUN_MESSAGE)
