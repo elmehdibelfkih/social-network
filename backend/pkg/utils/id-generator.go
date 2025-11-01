@@ -24,12 +24,12 @@ const (
 var (
 	mu            sync.Mutex
 	lastTimestamp int64
-	sequence      uint64
-	workerID      uint64 = 1
-	datacenterID  uint64 = 1
+	sequence      int64
+	workerID      int64 = 1
+	datacenterID  int64 = 1
 )
 
-func GenerateID() uint64 {
+func GenerateID() int64 {
 	mu.Lock()
 	defer mu.Unlock()
 
@@ -48,7 +48,7 @@ func GenerateID() uint64 {
 
 	lastTimestamp = now
 
-	id := (uint64(now-epoch) << timestampShift) |
+	id := ((now - epoch) << timestampShift) |
 		(datacenterID << datacenterShift) |
 		(workerID << workerShift) |
 		sequence
