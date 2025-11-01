@@ -38,11 +38,11 @@ func (h *Handler) HandleUploadMedia(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var req UploadMediaRequest
-	r.Body = http.MaxBytesReader(w, r.Body, MaxMediaSize)
+	r.Body = http.MaxBytesReader(w, r.Body, MaxMediaSize*1.4)
 	defer r.Body.Close()
 
 	if err := utils.JsonRequest(r, req); err != nil {
-		utils.BadRequest(w, "The request body is not valid JSON.", err.Error())
+		utils.BadRequest(w, "The request body is not valid JSON.", utils.ErrorTypeAlert)
 		return
 	}
 
@@ -53,7 +53,7 @@ func (h *Handler) HandleUploadMedia(w http.ResponseWriter, r *http.Request) {
 
 	data, err := base64.StdEncoding.DecodeString(req.FileData)
 	if err != nil {
-		utils.BadRequest(w, "The provided file data is not valid base64.", err.Error())
+		utils.BadRequest(w, "The provided file data is not valid base64.", utils.ErrorTypeAlert)
 		return
 	}
 
@@ -116,7 +116,7 @@ func (h *Handler) HandleGetMedia(w http.ResponseWriter, r *http.Request) {
 
 	mediaID, err := getMediaID(r)
 	if err != nil {
-		utils.BadRequest(w, "Invalid Parameter", err.Error())
+		utils.BadRequest(w, "Invalid Parameter", utils.ErrorTypeAlert)
 		return
 	}
 
@@ -149,7 +149,7 @@ func (h *Handler) HandleDeleteMedia(w http.ResponseWriter, r *http.Request) {
 
 	mediaID, err := getMediaID(r)
 	if err != nil {
-		utils.BadRequest(w, "Invalid Parameter", err.Error())
+		utils.BadRequest(w, "Invalid Parameter", utils.ErrorTypeAlert)
 		return
 	}
 
@@ -159,7 +159,7 @@ func (h *Handler) HandleDeleteMedia(w http.ResponseWriter, r *http.Request) {
 			utils.NotFoundError(w, "No media file found with the specified ID.")
 			return
 		}
-		if strings.Contains(err.Error(), "Forbidden") {
+		if strings.Contains(err.Error(), "forbidden") {
 			utils.Unauthorized(w, "You do not have permission to delete this media.")
 			return
 		}

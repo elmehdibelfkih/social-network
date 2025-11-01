@@ -73,7 +73,7 @@ func (s *DBStore) DeleteMedia(id uint64, userID uint64) (string, error) {
 	}
 
 	if owner_id != userID {
-		return "", fmt.Errorf("Forbidden: media doesn't belong to this owner")
+		return "", fmt.Errorf("forbidden: media doesn't belong to this owner")
 	}
 
 	_, err = tx.Exec(queryDeleteMedia, id, userID)
