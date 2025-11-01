@@ -19,8 +19,6 @@ func SelectUserSessionCount(session string) (bool, error) {
 	return count > 0, nil
 }
 
-func SelectUserAccount()
-
 // write
 
 func InsertUserAccount(u RegisterRequestJson) (RegisterResponseJson, error) {
@@ -39,6 +37,11 @@ func InsertUserAccount(u RegisterRequestJson) (RegisterResponseJson, error) {
 			u.AboutMe,
 			u.AvatarId,
 		)
+
+		if err != nil {
+			utils.SQLiteErrorTarget(err, INSERT_USER_ACCOUNT)
+		}
+
 		err = tx.QueryRow(
 			SELECT_USER_BY_ID,
 			userId,
@@ -59,4 +62,22 @@ func InsertUserAccount(u RegisterRequestJson) (RegisterResponseJson, error) {
 		return err
 	})
 	return user, err
+}
+
+func InsertUserSession(s SessionResponseJson) error {
+	return database.WrapWithTransaction(func(tx *sql.Tx) error {
+		_, err := tx.Exec(
+			INSERT_USER_SESSION,
+			s.SessionId,
+			s.UserId,
+			s.SessionToken,
+			s.IpAddress,
+			s.Device,
+		)
+
+		if err != nil {
+			utils.SQLiteErrorTarget(err, INSERT_USER_ACCOUNT)
+		}
+		return err
+	})
 }

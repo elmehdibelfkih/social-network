@@ -54,6 +54,7 @@ type LogoutResponseJson struct {
 
 type SessionResponseJson struct {
 	SessionId    int64  `json:"sessionId"`
+	UserId       int64  `json:"userId"`
 	SessionToken string `json:"sessionToken"`
 	IpAddress    string `json:"ipAddress"`
 	Device       string `json:"device"`

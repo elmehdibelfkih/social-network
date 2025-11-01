@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"runtime"
 	config "social/pkg/config"
+	"social/pkg/utils"
 
 	"time"
 )
@@ -91,6 +92,16 @@ func SQLiteErrorTarget(err error, query string) {
 func BackendErrorTarget(err error, context string) {
 	_, file, line, _ := runtime.Caller(1)
 	handleBackendError(fmt.Errorf("%s:%d: %w", file, line, err), context)
+}
+
+func ValidateJsonRequest(w http.ResponseWriter, r *http.Request, body any, content string) bool {
+	err := utils.JsonStaticDecode(r, &body)
+	if err != nil {
+		utils.BackendErrorTarget(err, content)
+		utils.BadRequest(w, "request body invalid json format", "redirect")
+		return false
+	}
+	return true
 }
 
 func sendErrorResponse(w http.ResponseWriter, status int, errTitle, errMsg, errType string) {

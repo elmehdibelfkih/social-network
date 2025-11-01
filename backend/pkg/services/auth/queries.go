@@ -13,6 +13,8 @@ const (
 const (
 	INSERT_USER_ACCOUNT = `INSERT INTO users (id, email, password_hash, first_name, last_name, date_of_birth, nickname, about_me, avatar_id)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
+	INSERT_USER_SESSION = `INSERT INTO sessions (id, user_id, session_token, ip_address, device) VALUES (?, ?, ?, ?, ?)
+`
 )
 
 //update
