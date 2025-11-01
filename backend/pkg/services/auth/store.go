@@ -9,6 +9,48 @@ import (
 
 // read
 
+func SelectUserSessionsById(s *SessionsResponseJson, session string, userId int64) error {
+	rows, err := config.DB.Query(SELECT_SESSION_BY_ID, userId)
+	if err != nil {
+		utils.SQLiteErrorTarget(err, SELECT_SESSION_BY_ID)
+		return err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var sessionItem SessionItemJson
+		var session_token string
+		rows.Scan(
+			&sessionItem.SessionId,
+			&sessionItem.UserId,
+			&session_token,
+			&sessionItem.IpAddress,
+			&sessionItem.Device,
+			&sessionItem.CreatedAt,
+		)
+		if session_token == session {
+			sessionItem.Current = true
+		}
+		s.Sessions = append(s.Sessions, sessionItem)
+	}
+	return nil
+}
+
+func SelectUserSessionById(s *SessionResponseJson, session string, userId int64) error {
+	err := config.DB.QueryRow(SELECT_SESSION_BY_ID_AND_SESSION, userId, session).Scan(
+		&s.SessionId,
+		&s.UserId,
+		&s.SessionToken,
+		&s.IpAddress,
+		&s.Device,
+		&s.CreatedAt,
+	)
+	if err != nil {
+		utils.SQLiteErrorTarget(err, SELECT_SESSION_BY_ID_AND_SESSION)
+		return err
+	}
+	return nil
+}
+
 func SelectUserSessionCount(session string) (bool, error) {
 	var count int
 	err := config.DB.QueryRow(SELECT_SESSION_TOKEN_BY_SESSION, session).Scan(&count)
@@ -129,13 +171,13 @@ func InsertRegisterUserSession(s SessionResponseJson) error {
 	})
 }
 
-func DeleteUserSession(userId int64) error {
+func DeleteUserSession(session string, userId int64) error {
 	return database.WrapWithTransaction(func(tx *sql.Tx) error {
 		_, err := tx.Exec(
 			DELETE_USER_SESSION,
 			userId,
+			session,
 		)
-
 		if err != nil {
 			utils.SQLiteErrorTarget(err, INSERT_USER_ACCOUNT)
 		}

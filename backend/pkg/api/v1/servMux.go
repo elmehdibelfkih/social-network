@@ -11,14 +11,19 @@ import (
 
 func SocialMux() *router.Router {
 	socialMux := router.NewRouter()
-	socialMux.HandleFunc("POST", "/", utils.MiddlewareChain(testHandler, middleware.UserContext))
+	socialMux.HandleFunc("GET", "/", utils.MiddlewareChain(testHandler, auth.AuthMiddleware, middleware.UserContext))
 	socialMux.HandleFunc("DELETE", "/", utils.MiddlewareChain(testHandler, middleware.UserContext))
+
+	//auth
 	socialMux.HandleFunc("POST", "/api/v1/auth/register", utils.MiddlewareChain(auth.PostRegister))
 	socialMux.HandleFunc("POST", "/api/v1/auth/login", utils.MiddlewareChain(auth.PostLogin))
 	socialMux.HandleFunc("POST", "/api/v1/auth/logout", utils.MiddlewareChain(auth.PostLogout, auth.AuthMiddleware))
 	socialMux.HandleFunc("GET", "/api/v1/auth/session", utils.MiddlewareChain(auth.GetSession, auth.AuthMiddleware))
 	socialMux.HandleFunc("GET", "/api/v1/sessions", utils.MiddlewareChain(auth.GetSessions, auth.AuthMiddleware))
 	socialMux.HandleFunc("DELETE", "/api/v1/sessions/{session_id}", utils.MiddlewareChain(auth.DeleteSession, auth.AuthMiddleware))
+	
+	//
+
 	return socialMux
 }
 

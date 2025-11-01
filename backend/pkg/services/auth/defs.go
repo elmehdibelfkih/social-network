@@ -63,11 +63,12 @@ type SessionsResponseJson struct {
 }
 
 type SessionItemJson struct {
-	SessionId int64  `json:"sessionId"`
-	IpAddress string `json:"ipAddress"`
-	Device    string `json:"device"`
-	CreatedAt string `json:"createdAt"`
-	Current   bool   `json:"current"`
+	SessionId    int64  `json:"sessionId"`
+	UserId       int64  `json:"userId"`
+	IpAddress    string `json:"ipAddress"`
+	Device       string `json:"device"`
+	CreatedAt    string `json:"createdAt"`
+	Current      bool   `json:"current"`
 	// ExpiresAt string `json:"expiresAt"`
 }
 

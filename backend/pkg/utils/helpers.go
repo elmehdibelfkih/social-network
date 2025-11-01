@@ -4,7 +4,18 @@ import (
 	"encoding/json"
 	"net/http"
 	config "social/pkg/config"
+	"strconv"
 )
+
+func GetWildCardValue(w http.ResponseWriter, r *http.Request, key string) int64 {
+	slug := r.PathValue(key)
+	wildCard, err := strconv.ParseInt(slug, 10, 64)
+	if err != nil {
+		BackendErrorTarget(err, "UserContext")
+		InternalServerError(w)
+	}
+	return wildCard
+}
 
 func GetUserIdFromContext(r *http.Request) int64 {
 	var userId int64
@@ -12,6 +23,15 @@ func GetUserIdFromContext(r *http.Request) int64 {
 		userId = r.Context().Value(config.USER_ID_KEY).(int64)
 	}
 	return userId
+}
+
+func GetUserSession(w http.ResponseWriter, r *http.Request) string {
+	session, err := r.Cookie("session_token")
+	if err != nil {
+		BackendErrorTarget(err, "UserContext")
+		Unauthorized(w, "session value is empty")
+	}
+	return session.Value
 }
 
 // this function is used to recive a json with an undefined format

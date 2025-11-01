@@ -1,13 +1,11 @@
 package auth
 
 import (
-	"fmt"
 	"net/http"
 	"social/pkg/utils"
 )
 
 func PostRegister(w http.ResponseWriter, r *http.Request) {
-
 	var body RegisterRequestJson
 	var response RegisterResponseJson
 	if !utils.ValidateJsonRequest(w, r, &body, "register handler") {
@@ -21,51 +19,52 @@ func PostRegister(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	RegisterUserHttp(w, response)
-
 }
 
 func PostLogin(w http.ResponseWriter, r *http.Request) {
-
-	//request response
 	var body LoginRequestJson
 	var response LoginResponseJson
-	//decoding r.body
 	if !utils.ValidateJsonRequest(w, r, &body, "login handler") {
 		return
 	}
-	//match the password hash
 	if !CheckPasswordHash(w, &body, &response, "login handler") {
 		return
 	}
-	//create user session
 	if !LoginUserAccount(w, r, &body, &response, "login handler") {
 		return
 	}
-	//set cookie and send response
 	LoginUserHttp(w, response)
 }
 
 func PostLogout(w http.ResponseWriter, r *http.Request) {
-	var response LoginResponseJson
-
-	if !LogoutUserAccount(w, r, &response, "logout handler") {
+	var response LogoutResponseJson
+	if !LogoutUserAccount(w, r, "logout handler") {
 		return
 	}
-
-	fmt.Fprintf(w, "logout")
+	LogoutUserHttp(w, response)
 }
 
 func GetSession(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("Route hit:", r.URL.Path, r.Header.Get("User-Agent"))
-	fmt.Fprintf(w, "session")
+	var response SessionResponseJson
+	if !GetUserSession(w, r, &response, "session handler") {
+		return
+	}
+	GetUserSessionHttp(w, response)
 }
 
 func GetSessions(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("Route hit:", r.URL.Path, r.Header.Get("User-Agent"))
-	fmt.Fprintf(w, "sessions []")
+	var response SessionsResponseJson
+	if !GetUserSessions(w, r, &response, "sessions handler") {
+		return
+	}
+	GetUserSessionsHttp(w, response)
 }
 
 func DeleteSession(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("Route hit:", r.URL.Path, r.Header.Get("User-Agent"))
-	fmt.Fprintf(w, "delete session")
+	var response RevokeSessionResponseJson
+	sessionId := utils.GetWildCardValue(w, r, "session_id")
+	if !DeleteSessionBySessionId(w, r, sessionId, "logout handler") {
+		return
+	}
+	DeleteSessionHttp(w, response)
 }
