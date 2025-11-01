@@ -5,14 +5,14 @@ import (
 	"log"
 	"net/http"
 	"social/pkg/app/dependencies/middleware"
+	"social/pkg/app/dependencies/router"
 	"social/pkg/utils"
 )
 
-func SocialMux() *http.ServeMux {
-	socialMux := http.NewServeMux()
-	// utils.MiddlewareChain(testHandler, middleware.UserContext, middleware.UserContext, middleware.UserContext)
-	socialMux.HandleFunc("/", utils.MiddlewareChain(testHandler, middleware.UserContext))
-
+func SocialMux() *router.Router {
+	socialMux := router.NewRouter()
+	socialMux.HandleFunc("POST", "/", utils.MiddlewareChain(testHandler, middleware.UserContext))
+	socialMux.HandleFunc("DELETE", "/", utils.MiddlewareChain(testHandler, middleware.UserContext))
 	return socialMux
 }
 
