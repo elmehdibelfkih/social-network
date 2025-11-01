@@ -50,7 +50,7 @@ func GenerateID() int64 {
 
 	lastTimestamp = now
 
-	id := (int64(now-epoch) << timestampShift) |
+	id := ((now - epoch) << timestampShift) |
 		(datacenterID << datacenterShift) |
 		(workerID << workerShift) |
 		sequence

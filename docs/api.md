@@ -53,7 +53,7 @@
   "dateOfBirth": "01/01/2001",
   "nickname": "nickname",
   "aboutMe": "present who you are and what you do.",
-  "avatarId": 23456754324567, 
+  "avatarId": 23456754324567
 }
 ```
 
@@ -68,7 +68,7 @@
   "dateOfBirth": "01/01/2001",
   "nickname": "nickname", // optinal
   "aboutMe": "present who you are and what you do.", // optinal
-  "avatarId": 23456754324567, // optinal 
+  "avatarId": 23456754324567 // optinal 
 }
 ```
 
@@ -100,7 +100,7 @@
   "dateOfBirth": "01/01/2001",
   "nickname": "nickname",
   "aboutMe": "present who you are and what you do.",
-  "avatarId": 23456754324567,
+  "avatarId": 23456754324567
 }
 ```
 
@@ -240,7 +240,7 @@ No need for a request body.
   "aboutMe": "Cloud and DevOps engineer passionate about scalable systems.",
   "avatarId": 1289843874780,
   "dateOfBirth": "2001-01-01",
-  "email": "email@example.com",
+  "email": "email@example.com"
 }
 ```
 
@@ -248,7 +248,7 @@ No need for a request body.
 
 ``` json
 {
-  "message": "Updated successful.",
+  "message": "Updated successful."
 }
 ```
 
@@ -610,7 +610,7 @@ No need for a request body.
       "authorId": 1289843874339,
       "authorNickname": "charlie_dev",
       "content": "Working on a new distributed system...",
-      "mediaPaths": ["/media/posts/321_1.jpg"],
+      "mediaIds": [1234567890987],
       "privacy": "public",
       "createdAt": "2025-10-24T12:30:00Z",
       "updatedAt": "2025-10-24T12:30:00Z"
@@ -620,7 +620,7 @@ No need for a request body.
       "authorId": 1289843874339,
       "authorNickname": "charlie_dev",
       "content": "Private note only visible to followers.",
-      "mediaPaths": [],
+      "mediaIds": [],
       "privacy": "followers",
       "createdAt": "2025-10-23T17:05:00Z",
       "updatedAt": "2025-10-23T17:05:00Z"
@@ -873,7 +873,7 @@ No need for a request body.
       "authorId": 42,
       "authorNickname": "devops_mehdi",
       "content": "Great post! Learned a lot.",
-      "mediaPaths": ["/media/comments/501_1.png"],
+      "mediaIds": [23456789876567],
       "createdAt": "2025-10-24T20:45:00Z",
       "updatedAt": "2025-10-24T20:45:00Z"
     },
@@ -882,7 +882,7 @@ No need for a request body.
       "authorId": 55,
       "authorNickname": "charlie_dev",
       "content": "Thanks for sharing!",
-      "mediaPaths": [],
+      "mediaIds": [],
       "createdAt": "2025-10-24T21:10:00Z",
       "updatedAt": "2025-10-24T21:10:00Z"
     }
