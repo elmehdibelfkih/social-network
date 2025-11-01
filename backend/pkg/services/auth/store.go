@@ -129,7 +129,7 @@ func InsertRegisterUserSession(s SessionResponseJson) error {
 	})
 }
 
-func DeleteUserSession(userId *int64) error {
+func DeleteUserSession(userId int64) error {
 	return database.WrapWithTransaction(func(tx *sql.Tx) error {
 		_, err := tx.Exec(
 			DELETE_USER_SESSION,

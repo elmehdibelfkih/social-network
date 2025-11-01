@@ -9,16 +9,16 @@ type Handler struct {
 // NediaManager defines the interface for media DB operations
 type MediaManager interface {
 	CreateMedia(media *Media) error
-	GetMediaByID(id uint64) (*Media, error)
-	DeleteMedia(id, userID uint64) (string, error) // returns the path so the can delete it from the memory
+	GetMediaByID(id int64) (*Media, error)
+	DeleteMedia(id, userID int64) (string, error) // returns the path so the can delete it from the memory
 }
 
 type Media struct {
-	ID        uint64    `db:"id"`
-	OwnerId   uint64    `db:"owner_id"`
+	ID        int64     `db:"id"`
+	OwnerId   int64     `db:"owner_id"`
 	Path      string    `db:"path"`
 	Mime      string    `db:"mime"`
-	Size      uint64    `db:"size"`
+	Size      int64     `db:"size"`
 	Purpose   string    `db:"purpose"`
 	CreatedAt time.Time `db:"created_at"`
 }
@@ -33,7 +33,7 @@ type UploadMediaRequest struct {
 // for getting and uploading
 type UploadMediaResponse struct {
 	Message    string    `json:"message"`
-	MediaID    uint64    `json:"mediaId"`
+	MediaID    int64     `json:"mediaId"`
 	MediaPath  string    `json:"mediaPath"`
 	FileType   string    `json:"fileType"`
 	UploadedAt time.Time `json:"uploadedAt"`
@@ -42,7 +42,7 @@ type UploadMediaResponse struct {
 // for deleting
 type DeleteMediaResponse struct {
 	Message string `json:"message"`
-	MediaID uint64 `json:"mediaId"`
+	MediaID int64  `json:"mediaId"`
 }
 
 const (

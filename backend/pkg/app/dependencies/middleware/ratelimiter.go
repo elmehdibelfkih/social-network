@@ -10,13 +10,13 @@ import (
 
 type TokenBucketLimiter struct {
 	mu       sync.Mutex
-	tokens   uint64
+	tokens   int64
 	fillRate float64
-	capacity uint64
+	capacity int64
 	lastTime time.Time
 }
 
-func RateLimiterMiddleware(next http.Handler, limit float64, burst uint64) http.Handler {
+func RateLimiterMiddleware(next http.Handler, limit float64, burst int64) http.Handler {
 	ipLimiterMap := make(map[string]*TokenBucketLimiter)
 	var mu sync.Mutex
 
@@ -52,7 +52,7 @@ func getIP(r *http.Request) string {
 	return host
 }
 
-func newTokenBucketLimiter(f float64, b uint64) *TokenBucketLimiter {
+func newTokenBucketLimiter(f float64, b int64) *TokenBucketLimiter {
 	return &TokenBucketLimiter{
 		tokens:   b,
 		fillRate: f,
@@ -70,7 +70,7 @@ func (t *TokenBucketLimiter) allow() bool {
 	tokensToAdd := timePassed * t.fillRate
 
 	if tokensToAdd > 0 {
-		t.tokens = min(t.capacity, t.tokens+uint64(tokensToAdd))
+		t.tokens = min(t.capacity, t.tokens+int64(tokensToAdd))
 		t.lastTime = now
 	}
 

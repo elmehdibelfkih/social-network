@@ -11,7 +11,6 @@ import (
 	"strings"
 	"time"
 
-	"social/pkg/config"
 	"social/pkg/utils"
 )
 
@@ -26,23 +25,15 @@ func NewHandler() *Handler {
 }
 
 func (h *Handler) HandleUploadMedia(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		utils.MethodNotAllowed(w, "Only POST method is allowed for this endpoint.")
-		return
-	}
 
-	userID, ok := r.Context().Value(config.USER_ID_KEY).(uint64)
-	if !ok || userID == 0 {
-		utils.Unauthorized(w, "You must be logged in to upload media.")
-		return
-	}
+	userId := utils.GetUserIdFromContext(r)
 
 	var req UploadMediaRequest
 	r.Body = http.MaxBytesReader(w, r.Body, MaxMediaSize)
 	defer r.Body.Close()
 
-	if err := utils.JsonRequest(r, req); err != nil {
-		utils.BadRequest(w, "The request body is not valid JSON.", err.Error())
+	if err := utils.JsonStaticDecode(r, req); err != nil {
+		utils.BadRequest(w, "The request body is not valid JSON.", "redirect")
 		return
 	}
 
@@ -53,7 +44,7 @@ func (h *Handler) HandleUploadMedia(w http.ResponseWriter, r *http.Request) {
 
 	data, err := base64.StdEncoding.DecodeString(req.FileData)
 	if err != nil {
-		utils.BadRequest(w, "The provided file data is not valid base64.", err.Error())
+		utils.BadRequest(w, "The provided file data is not valid base64.", "redirect")
 		return
 	}
 
@@ -84,10 +75,10 @@ func (h *Handler) HandleUploadMedia(w http.ResponseWriter, r *http.Request) {
 
 	media := &Media{
 		ID:        mediaID,
-		OwnerId:   userID,
+		OwnerId:   userId,
 		Path:      filePath,
 		Mime:      req.FileType,
-		Size:      uint64(len(data)),
+		Size:      int64(len(data)),
 		Purpose:   purpose,
 		CreatedAt: time.Now(),
 	}
@@ -109,14 +100,10 @@ func (h *Handler) HandleUploadMedia(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) HandleGetMedia(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		utils.MethodNotAllowed(w, "Only GET method is allowed for this endpoint.")
-		return
-	}
 
 	mediaID, err := getMediaID(r)
 	if err != nil {
-		utils.BadRequest(w, "Invalid Parameter", err.Error())
+		utils.BadRequest(w, "Invalid Parameter", "redirect")
 		return
 	}
 
@@ -136,24 +123,15 @@ func (h *Handler) HandleGetMedia(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) HandleDeleteMedia(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodDelete {
-		utils.MethodNotAllowed(w, "Only DELETE method is allowed for this endpoint.")
-		return
-	}
-
-	userID, ok := r.Context().Value("userId").(uint64)
-	if !ok || userID == 0 {
-		utils.Unauthorized(w, "You must be logged in to delete media.")
-		return
-	}
+	userId := utils.GetUserIdFromContext(r)
 
 	mediaID, err := getMediaID(r)
 	if err != nil {
-		utils.BadRequest(w, "Invalid Parameter", err.Error())
+		utils.BadRequest(w, "Invalid Parameter", "redirect")
 		return
 	}
 
-	_, err = h.manager.DeleteMedia(mediaID, userID)
+	_, err = h.manager.DeleteMedia(mediaID, userId)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			utils.NotFoundError(w, "No media file found with the specified ID.")
