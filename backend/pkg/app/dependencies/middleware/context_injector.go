@@ -21,11 +21,11 @@ func UserContext(next http.HandlerFunc) http.HandlerFunc {
 	}
 }
 
-func checkSession(r *http.Request) (*int64, error) {
+func checkSession(r *http.Request) (int64, error) {
 	session, err := r.Cookie("session_token")
 	if err != nil {
 		utils.BackendErrorTarget(err, "UserContext")
-		return nil, nil
+		return 0, nil
 	}
 	userId, err := users.SelectUserIdBySession(session.Value)
 	return userId, err

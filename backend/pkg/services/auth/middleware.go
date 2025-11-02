@@ -28,7 +28,7 @@ func AuthMiddleware(next http.HandlerFunc) http.HandlerFunc {
 func checkSession(r *http.Request) (string, error) {
 	session, err := r.Cookie("session_token")
 	if err != nil {
-		utils.BackendErrorTarget(err, "UserContext")
+		utils.BackendErrorTarget(err, "auth")
 		return "", nil
 	}
 	return session.Value, err

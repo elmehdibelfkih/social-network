@@ -88,7 +88,7 @@ func matchSegments(pattern, req []string) bool {
 	}
 	for i := range pattern {
 		ps := pattern[i]
-		if strings.HasPrefix(ps, ":") {
+		if strings.HasPrefix(ps, "{") || strings.HasSuffix(ps, "}") {
 			continue
 		}
 		if ps != req[i] {

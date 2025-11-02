@@ -8,32 +8,34 @@ import (
 func PostRegister(w http.ResponseWriter, r *http.Request) {
 	var body RegisterRequestJson
 	var response RegisterResponseJson
+	var s SessionResponseJson
 	if !utils.ValidateJsonRequest(w, r, &body, "register handler") {
 		return
 	}
 	if !GeneratePasswordHash(w, &body, "register handler") {
 		return
 	}
-	response, check := RegisterUserAccount(w, r, &body, "register handler")
+	response, check := RegisterUserAccount(w, r, &body, &s, "register handler")
 	if !check {
 		return
 	}
-	RegisterUserHttp(w, response)
+	RegisterUserHttp(w, response, s)
 }
 
 func PostLogin(w http.ResponseWriter, r *http.Request) {
 	var body LoginRequestJson
 	var response LoginResponseJson
+	var s SessionResponseJson
 	if !utils.ValidateJsonRequest(w, r, &body, "login handler") {
 		return
 	}
 	if !CheckPasswordHash(w, &body, &response, "login handler") {
 		return
 	}
-	if !LoginUserAccount(w, r, &body, &response, "login handler") {
+	if !LoginUserAccount(w, r, &body, &response, &s, "login handler") {
 		return
 	}
-	LoginUserHttp(w, response)
+	LoginUserHttp(w, response, s)
 }
 
 func PostLogout(w http.ResponseWriter, r *http.Request) {

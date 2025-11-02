@@ -9,17 +9,17 @@ import (
 
 // read
 
-func SelectUserIdBySession(session string) (*int64, error) {
+func SelectUserIdBySession(session string) (int64, error) {
 	var userId int64
 	err := config.DB.QueryRow(SELECT_USERID_BY_SESSION, session).Scan(&userId)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return nil, nil
+			return userId, nil
 		}
 		utils.SQLiteErrorTarget(err, SELECT_USERID_BY_SESSION)
-		return nil, err
+		return userId, err
 	}
-	return &userId, nil
+	return userId, nil
 }
 
 // write

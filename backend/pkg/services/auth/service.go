@@ -11,7 +11,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-func RegisterUserAccount(w http.ResponseWriter, r *http.Request, body *RegisterRequestJson, context string) (RegisterResponseJson, bool) {
+func RegisterUserAccount(w http.ResponseWriter, r *http.Request, body *RegisterRequestJson, s *SessionResponseJson, context string) (RegisterResponseJson, bool) {
 	response, err := InsertUserAccount(*body)
 	if err != nil {
 		utils.BackendErrorTarget(err, context)
@@ -19,13 +19,11 @@ func RegisterUserAccount(w http.ResponseWriter, r *http.Request, body *RegisterR
 		return response, false
 	}
 
-	var s = SessionResponseJson{
-		SessionId:    utils.GenerateID(),
-		UserId:       response.UserId,
-		SessionToken: GenerateSessionToken(32),
-		IpAddress:    r.RemoteAddr,
-		Device:       r.Header.Get("User-Agent"),
-	}
+	s.SessionId = utils.GenerateID()
+	s.UserId = response.UserId
+	s.SessionToken = GenerateSessionToken(32)
+	s.IpAddress = r.RemoteAddr
+	s.Device = r.Header.Get("User-Agent")
 
 	err = InsertRegisterUserSession(s)
 	if err != nil {
@@ -37,11 +35,11 @@ func RegisterUserAccount(w http.ResponseWriter, r *http.Request, body *RegisterR
 	return response, true
 }
 
-func RegisterUserHttp(w http.ResponseWriter, response RegisterResponseJson) {
+func RegisterUserHttp(w http.ResponseWriter, response RegisterResponseJson, s SessionResponseJson) {
 	http.SetCookie(w, &http.Cookie{
 		Name:     "session_token",
-		Value:    GenerateSessionToken(32),
-		Expires:  time.Now().Add(time.Hour / 12),
+		Value:    s.SessionToken,
+		Expires:  time.Now().Add(time.Hour),
 		HttpOnly: true,
 		SameSite: http.SameSiteStrictMode,
 		Path:     "/",
@@ -55,30 +53,26 @@ func RegisterUserHttp(w http.ResponseWriter, response RegisterResponseJson) {
 	})
 }
 
-func LoginUserAccount(w http.ResponseWriter, r *http.Request, body *LoginRequestJson, response *LoginResponseJson, context string) bool {
-	var s = SessionResponseJson{
-		SessionId:    utils.GenerateID(),
-		UserId:       response.UserId,
-		SessionToken: GenerateSessionToken(32),
-		IpAddress:    r.RemoteAddr,
-		Device:       r.Header.Get("User-Agent"),
-	}
-
+func LoginUserAccount(w http.ResponseWriter, r *http.Request, body *LoginRequestJson, response *LoginResponseJson, s *SessionResponseJson, context string) bool {
+	s.SessionId = utils.GenerateID()
+	s.UserId = response.UserId
+	s.SessionToken = GenerateSessionToken(32)
+	s.IpAddress = r.RemoteAddr
+	s.Device = r.Header.Get("User-Agent")
 	err := InsertLoginUserSession(s, response)
 	if err != nil {
 		utils.BackendErrorTarget(err, context)
 		utils.InternalServerError(w)
 		return false
 	}
-
 	return true
 }
 
-func LoginUserHttp(w http.ResponseWriter, response LoginResponseJson) {
+func LoginUserHttp(w http.ResponseWriter, response LoginResponseJson, s SessionResponseJson) {
 	http.SetCookie(w, &http.Cookie{
 		Name:     "session_token",
-		Value:    GenerateSessionToken(32),
-		Expires:  time.Now().Add(time.Hour / 12),
+		Value:    s.SessionToken,
+		Expires:  time.Now().Add(time.Hour),
 		HttpOnly: true,
 		SameSite: http.SameSiteStrictMode,
 		Path:     "/",
@@ -95,11 +89,6 @@ func LoginUserHttp(w http.ResponseWriter, response LoginResponseJson) {
 func LogoutUserAccount(w http.ResponseWriter, r *http.Request, context string) bool {
 	userId := utils.GetUserIdFromContext(r)
 	session, err := utils.GetUserSession(w, r)
-	if err != nil {
-		utils.BackendErrorTarget(err, "UserContext")
-		utils.Unauthorized(w, "session value is empty")
-		return false
-	}
 	if err != nil {
 		utils.BackendErrorTarget(err, "UserContext")
 		utils.Unauthorized(w, "session value is empty")
@@ -182,6 +171,9 @@ func GetUserSessionsHttp(w http.ResponseWriter, response SessionsResponseJson) {
 }
 
 func DeleteSessionBySessionId(w http.ResponseWriter, r *http.Request, sessionId int64, context string) bool {
+	if sessionId == 0 {
+		return false
+	}
 	userId := utils.GetUserIdFromContext(r)
 	session, err := utils.GetUserSession(w, r)
 	if err != nil {
