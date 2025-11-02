@@ -22,7 +22,8 @@ func SocialMux() *router.Router {
 	socialMux.HandleFunc("GET", "/api/v1/sessions", utils.MiddlewareChain(auth.GetSessions, middleware.UserContext, middleware.AuthMiddleware))
 	socialMux.HandleFunc("DELETE", "/api/v1/sessions/{session_id}", utils.MiddlewareChain(auth.DeleteSession, middleware.UserContext, middleware.AuthMiddleware))
 
-	//
+	//Users_Profiles
+	// socialMux.HandleFunc("GET", "/api/v1/users/{user_id}/profile", utils.MiddlewareChain(auth.youhandller, middleware.UserContext, middleware.AuthMiddleware))
 
 	return socialMux
 }

@@ -4,7 +4,6 @@ import (
 	"crypto/rand"
 	"encoding/base64"
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 	config "social/pkg/config"
@@ -21,9 +20,7 @@ func OptionalJsonFields[T any](arg *T) any {
 }
 
 func GetWildCardValue(w http.ResponseWriter, r *http.Request, key string) int64 {
-	fmt.Println(r.URL.Path)
 	slug := r.PathValue(key)
-	fmt.Println(slug)
 	wildCard, err := strconv.ParseInt(slug, 10, 64)
 	if err != nil {
 		BackendErrorTarget(err, "UserContext")
