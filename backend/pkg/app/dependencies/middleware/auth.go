@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"context"
 	"net/http"
 	"social/pkg/config"
 	"social/pkg/services/auth"
@@ -15,13 +16,21 @@ func AuthMiddleware(next http.HandlerFunc) http.HandlerFunc {
 			return
 		}
 
-		hasSession, err := auth.SelectUserSessionCount(sessionValue)
-		if err != nil || !hasSession {
+		sessionItem, err := auth.SelectUserSessionCount(sessionValue)
+		if err != nil || sessionItem == nil {
 			utils.Unauthorized(w, config.ERROR_INVALID_SESSION)
 			return
 		}
 
+		if sessionItem.IsExpired() {
+			utils.Unauthorized(w, config.ERROR_INVALID_SESSION)
+			return
+		}
+
+		//todo:remeber-me-token logic
+
 		// user authenticated
-		next(w, r)
+		ctx := context.WithValue(r.Context(), config.USER_ID_KEY, sessionItem.UserId)
+		next(w, r.WithContext(ctx))
 	}
 }

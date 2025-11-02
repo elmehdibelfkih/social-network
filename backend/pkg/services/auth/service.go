@@ -7,26 +7,37 @@ import (
 )
 
 func RegisterUserAccount(w http.ResponseWriter, r *http.Request, body *RegisterRequestJson, s *SessionResponseJson, context string) (RegisterResponseJson, bool) {
-	response, err := InsertUserAccount(*body)
+	var response RegisterResponseJson
+	var err error
+	if body.AvatarId != nil {
+		valid, err := SelectAvatarMediaId(*body.AvatarId)
+		if err != nil {
+			utils.BackendErrorTarget(err, context)
+			utils.InternalServerError(w)
+			return response, false
+		}
+		if !valid {
+			return response, false
+		}
+	}
+	response, err = InsertUserAccount(*body)
 	if err != nil {
 		utils.BackendErrorTarget(err, context)
 		utils.InternalServerError(w)
 		return response, false
 	}
-
 	s.SessionId = utils.GenerateID()
 	s.UserId = response.UserId
 	s.SessionToken = utils.GenerateSessionToken(256)
 	s.IpAddress = r.RemoteAddr
 	s.Device = r.Header.Get("User-Agent")
-
+	s.ExpiresAt = time.Now().UTC().Add(24 * time.Hour).Format(time.RFC3339)
 	err = InsertRegisterUserSession(s)
 	if err != nil {
 		utils.BackendErrorTarget(err, context)
 		utils.InternalServerError(w)
 		return response, false
 	}
-
 	return response, true
 }
 
@@ -54,6 +65,7 @@ func LoginUserAccount(w http.ResponseWriter, r *http.Request, body *LoginRequest
 	s.SessionToken = utils.GenerateSessionToken(256)
 	s.IpAddress = r.RemoteAddr
 	s.Device = r.Header.Get("User-Agent")
+	s.ExpiresAt = time.Now().UTC().Add(24 * time.Hour).Format(time.RFC3339)
 	err := InsertLoginUserSession(s, response)
 	if err != nil {
 		utils.BackendErrorTarget(err, context)
@@ -89,7 +101,7 @@ func LogoutUserAccount(w http.ResponseWriter, r *http.Request, context string) b
 		utils.Unauthorized(w, "session value is empty")
 		return false
 	}
-	err = DeleteUserSession(session, userId)
+	err = DeleteUserSessionBySessionToken(session, userId)
 	if err != nil {
 		utils.BackendErrorTarget(err, context)
 		utils.InternalServerError(w)
@@ -170,13 +182,7 @@ func DeleteSessionBySessionId(w http.ResponseWriter, r *http.Request, sessionId 
 		return false
 	}
 	userId := utils.GetUserIdFromContext(r)
-	session, err := utils.GetUserSession(w, r)
-	if err != nil {
-		utils.BackendErrorTarget(err, "UserContext")
-		utils.Unauthorized(w, "session value is empty")
-		return false
-	}
-	err = DeleteUserSession(session, userId)
+	err := DeleteUserSessionBySessionId(sessionId, userId)
 	if err != nil {
 		utils.BackendErrorTarget(err, context)
 		utils.InternalServerError(w)
@@ -226,4 +232,17 @@ func CheckPasswordHash(w http.ResponseWriter, body *LoginRequestJson, response *
 		return false
 	}
 	return true
+}
+
+func (s *SessionItemJson) IsExpired() bool {
+	if s == nil {
+		return true
+	}
+	expiration, err := time.Parse(time.RFC3339, s.ExpiresAt)
+	if err != nil {
+		utils.BackendErrorTarget(err, "time parsing goes wrong")
+		return true
+	}
+	now := time.Now().UTC()
+	return now.After(expiration.UTC()) // same logic, clearer wording
 }
