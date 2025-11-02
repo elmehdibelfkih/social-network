@@ -71,11 +71,6 @@ func (s *DBStore) DeleteMedia(id int64, userID int64) (string, error) {
 		utils.SQLiteErrorTarget(err, "DeleteMedia (QueryRow)")
 		return "", err
 	}
-
-	if owner_id != userID {
-		return "", fmt.Errorf("forbidden: media doesn't belong to this owner")
-	}
-
 	_, err = tx.Exec(queryDeleteMedia, id, userID)
 	if err != nil {
 		utils.SQLiteErrorTarget(err, "DeleteMedia (Exec)")

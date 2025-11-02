@@ -77,9 +77,9 @@ func (h *Handler) HandleUploadMedia(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	storagDir := getStoragePathForContext(req.Purpose)
 	mediaName := fmt.Sprintf("%d%s", mediaID, extensions[0])
-	filePath := filepath.Join("../data/uploads", mediaName)
-	mediaPath := fmt.Sprintf("/media/%d", mediaID)
+	filePath := filepath.Join(storagDir, mediaName)
 
 	if err := os.WriteFile(filePath, data, 0o644); err != nil {
 		utils.BackendErrorTarget(err, "handleUploadMedia (WriteFile)")
@@ -107,7 +107,6 @@ func (h *Handler) HandleUploadMedia(w http.ResponseWriter, r *http.Request) {
 	utils.WriteSuccess(w, http.StatusCreated, UploadMediaResponse{
 		Message:    "Media uploaded successfully.",
 		MediaID:    mediaID,
-		MediaPath:  mediaPath,
 		FileType:   req.FileType,
 		UploadedAt: media.CreatedAt,
 	})

@@ -55,7 +55,6 @@ func canGetMedia(userID, mediaID uint64) bool {
 }
 
 func canDeleteMedia(userID, mediaID uint64) bool {
-	// if the user is the owner of the media can he delte it?
 	var media Media
 
 	err := config.DB.QueryRow(queryGetMedia, mediaID).Scan(&media)
