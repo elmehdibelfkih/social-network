@@ -2,13 +2,34 @@ package auth
 
 import (
 	"database/sql"
-	"fmt"
 	"social/pkg/config"
 	"social/pkg/db/database"
 	"social/pkg/utils"
 )
 
 // read
+
+func SelectAvatarMediaId(mediaId int64) (bool, error) {
+	var m AvatarMediaSqlRow
+	err := config.DB.QueryRow(SELECT_SESSION_BY_ID_AND_SESSION, mediaId).Scan(
+		&m.MediaId,
+		&m.OwnerId,
+		&m.Path,
+		&m.Mime,
+		&m.Size,
+		&m.Purpose,
+		&m.CreatedAt,
+	)
+	if err != nil {
+		utils.SQLiteErrorTarget(err, SELECT_SESSION_BY_ID_AND_SESSION)
+		return false, err
+	}
+	if m.OwnerId != 0 || m.Purpose != "avatar" {
+		return false, nil
+	}
+
+	return true, nil
+}
 
 func SelectUserSessionsById(s *SessionsResponseJson, session string, userId int64) error {
 	rows, err := config.DB.Query(SELECT_SESSION_BY_ID, userId)
@@ -37,7 +58,6 @@ func SelectUserSessionsById(s *SessionsResponseJson, session string, userId int6
 }
 
 func SelectUserSessionById(s *SessionResponseJson, session string, userId int64) error {
-	fmt.Println(session, userId)
 	err := config.DB.QueryRow(SELECT_SESSION_BY_ID_AND_SESSION, userId, session).Scan(
 		&s.SessionId,
 		&s.UserId,
@@ -53,14 +73,22 @@ func SelectUserSessionById(s *SessionResponseJson, session string, userId int64)
 	return nil
 }
 
-func SelectUserSessionCount(session string) (bool, error) {
-	var count int
-	err := config.DB.QueryRow(SELECT_SESSION_TOKEN_BY_SESSION, session).Scan(&count)
+func SelectUserSessionCount(session string) (*SessionItemJson, error) {
+	var s SessionItemJson
+	err := config.DB.QueryRow(SELECT_SESSION_BY_SESSION, session).Scan(
+		&s.SessionId,
+		&s.UserId,
+		&s.IpAddress,
+		&s.Device,
+		&s.CreatedAt,
+		&s.ExpiresAt,
+	)
 	if err != nil {
-		utils.SQLiteErrorTarget(err, SELECT_SESSION_TOKEN_BY_SESSION)
-		return false, err
+		utils.SQLiteErrorTarget(err, SELECT_SESSION_BY_SESSION)
+		return &s, err
 	}
-	return count > 0, nil
+	s.Current = true
+	return &s, nil
 }
 
 func SelectUserPasswordHash(l LoginRequestJson) (int64, string, error) {
@@ -176,15 +204,29 @@ func InsertRegisterUserSession(s *SessionResponseJson) error {
 	})
 }
 
-func DeleteUserSession(session string, userId int64) error {
+func DeleteUserSessionBySessionToken(session string, userId int64) error {
 	return database.WrapWithTransaction(func(tx *sql.Tx) error {
 		_, err := tx.Exec(
-			DELETE_USER_SESSION,
+			DELETE_USER_SESSION_BY_SESSION_TOKEN,
 			userId,
 			session,
 		)
 		if err != nil {
-			utils.SQLiteErrorTarget(err, DELETE_USER_SESSION)
+			utils.SQLiteErrorTarget(err, DELETE_USER_SESSION_BY_SESSION_TOKEN)
+		}
+		return err
+	})
+}
+
+func DeleteUserSessionBySessionId(sessionId int64, userId int64) error {
+	return database.WrapWithTransaction(func(tx *sql.Tx) error {
+		_, err := tx.Exec(
+			DELETE_USER_SESSION_BY_SESSION_ID,
+			userId,
+			sessionId,
+		)
+		if err != nil {
+			utils.SQLiteErrorTarget(err, DELETE_USER_SESSION_BY_SESSION_ID)
 		}
 		return err
 	})
