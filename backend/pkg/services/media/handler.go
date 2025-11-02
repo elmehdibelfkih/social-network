@@ -21,28 +21,18 @@ var AllowedMimeTypes = map[string]bool{
 	"image/gif":  true,
 }
 
-func NewHandler() *Handler {
+func NewMediaHandler() *Handler {
 	return &Handler{}
 }
 
 func (h *Handler) HandleUploadMedia(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		utils.MethodNotAllowed(w, "Only POST method is allowed for this endpoint.")
-		return
-	}
-
-	userID, ok := r.Context().Value(config.USER_ID_KEY).(uint64)
-	if !ok || userID == 0 {
-		utils.Unauthorized(w, "You must be logged in to upload media.")
-		return
-	}
+	userId := utils.GetUserIdFromContext(r)
 
 	var req UploadMediaRequest
 	r.Body = http.MaxBytesReader(w, r.Body, MaxMediaSize*1.4)
 	defer r.Body.Close()
 
-	if err := utils.JsonRequest(r, req); err != nil {
-		utils.BadRequest(w, "The request body is not valid JSON.", utils.ErrorTypeAlert)
+	if ok := utils.ValidateJsonRequest(w, r, r.Body, "Media upload"); !ok {
 		return
 	}
 
@@ -84,10 +74,10 @@ func (h *Handler) HandleUploadMedia(w http.ResponseWriter, r *http.Request) {
 
 	media := &Media{
 		ID:        mediaID,
-		OwnerId:   userID,
+		OwnerId:   userId,
 		Path:      filePath,
 		Mime:      req.FileType,
-		Size:      uint64(len(data)),
+		Size:      int64(len(data)),
 		Purpose:   purpose,
 		CreatedAt: time.Now(),
 	}
@@ -109,11 +99,10 @@ func (h *Handler) HandleUploadMedia(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) HandleGetMedia(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		utils.MethodNotAllowed(w, "Only GET method is allowed for this endpoint.")
-		return
+	userID, ok := r.Context().Value(config.USER_ID_KEY).(uint64)
+	if !ok {
+		utils.Unauthorized(w, "error getting the user")
 	}
-
 	mediaID, err := getMediaID(r)
 	if err != nil {
 		utils.BadRequest(w, "Invalid Parameter", utils.ErrorTypeAlert)
@@ -131,21 +120,16 @@ func (h *Handler) HandleGetMedia(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if media.Purpose == "message" && media.OwnerId != int64(userID) {
+		return
+	}
+
 	w.Header().Set("Content-Type", media.Mime)
 	http.ServeFile(w, r, media.Path)
 }
 
 func (h *Handler) HandleDeleteMedia(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodDelete {
-		utils.MethodNotAllowed(w, "Only DELETE method is allowed for this endpoint.")
-		return
-	}
-
-	userID, ok := r.Context().Value("userId").(uint64)
-	if !ok || userID == 0 {
-		utils.Unauthorized(w, "You must be logged in to delete media.")
-		return
-	}
+	userId := utils.GetUserIdFromContext(r)
 
 	mediaID, err := getMediaID(r)
 	if err != nil {
@@ -153,7 +137,7 @@ func (h *Handler) HandleDeleteMedia(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err = h.manager.DeleteMedia(mediaID, userID)
+	_, err = h.manager.DeleteMedia(mediaID, userId)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			utils.NotFoundError(w, "No media file found with the specified ID.")

@@ -3,22 +3,39 @@ package utils
 import (
 	"encoding/json"
 	"net/http"
-
-	"golang.org/x/crypto/bcrypt"
+	config "social/pkg/config"
+	"strconv"
 )
 
-func HashPassword(password string) (string, error) {
-	bytes, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
-	return string(bytes), err
+func GetWildCardValue(w http.ResponseWriter, r *http.Request, key string) int64 {
+	slug := r.PathValue(key)
+	wildCard, err := strconv.ParseInt(slug, 10, 64)
+	if err != nil {
+		BackendErrorTarget(err, "UserContext")
+		InternalServerError(w)
+	}
+	return wildCard
 }
 
-func CheckPassword(password, hash string) bool {
-	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
-	return err == nil
+func GetUserIdFromContext(r *http.Request) int64 {
+	var userId int64
+	if r.Context().Value(config.USER_ID_KEY) != nil {
+		userId = r.Context().Value(config.USER_ID_KEY).(int64)
+	}
+	return userId
+}
+
+func GetUserSession(w http.ResponseWriter, r *http.Request) string {
+	session, err := r.Cookie("session_token")
+	if err != nil {
+		BackendErrorTarget(err, "UserContext")
+		Unauthorized(w, "session value is empty")
+	}
+	return session.Value
 }
 
 // this function is used to recive a json with an undefined format
-func JsonDynamic(r *http.Request) (any, error) {
+func JsonDynamicDecode(r *http.Request) (any, error) {
 	var data any
 	decoder := json.NewDecoder(r.Body)
 	err := decoder.Decode(&data)
@@ -28,7 +45,7 @@ func JsonDynamic(r *http.Request) (any, error) {
 	return data, err
 }
 
-func JsonRequest(r *http.Request, v any) error {
+func JsonStaticDecode(r *http.Request, v any) error {
 	decoder := json.NewDecoder(r.Body)
 	err := decoder.Decode(&v)
 	if err != nil {
@@ -37,7 +54,7 @@ func JsonRequest(r *http.Request, v any) error {
 	return nil
 }
 
-func JsonResponse(w http.ResponseWriter, status int, data any) {
+func JsonResponseEncode(w http.ResponseWriter, status int, data any) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(status)
 	json.NewEncoder(w).Encode(data)

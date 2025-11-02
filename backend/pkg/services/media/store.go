@@ -32,7 +32,7 @@ func (s *DBStore) CreateMedia(media *Media) error {
 	return nil
 }
 
-func (s *DBStore) GetMediaByID(id uint64) (*Media, error) {
+func (s *DBStore) GetMediaByID(id int64) (*Media, error) {
 	media := &Media{}
 	err := s.db.QueryRow(queryGetMedia, id).Scan(
 		&media.ID,
@@ -52,9 +52,9 @@ func (s *DBStore) GetMediaByID(id uint64) (*Media, error) {
 	return media, nil
 }
 
-func (s *DBStore) DeleteMedia(id uint64, userID uint64) (string, error) {
+func (s *DBStore) DeleteMedia(id int64, userID int64) (string, error) {
 	var path string
-	var owner_id uint64
+	var owner_id int64
 
 	tx, err := s.db.Begin()
 	if err != nil {

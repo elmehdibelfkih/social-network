@@ -48,7 +48,7 @@ id := utils.GenerateID()
 **SortIDs(ids)** - Sort array of IDs
 
 ```go
-sorted := utils.SortIDs([]uint64{123, 456, 789})
+sorted := utils.SortIDs([]int64{123, 456, 789})
 ```
 
 ## Validation (`validation.go`)
