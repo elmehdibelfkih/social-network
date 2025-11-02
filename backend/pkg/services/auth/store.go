@@ -64,7 +64,7 @@ func SelectUserSessionCount(session string) (bool, error) {
 func SelectUserPasswordHash(l LoginRequestJson) (int64, string, error) {
 	var userId int64
 	var password_hash string
-	err := config.DB.QueryRow(SELECT_PASSWORD_SESSION, l.Identifier).Scan(&userId, &password_hash)
+	err := config.DB.QueryRow(SELECT_PASSWORD_SESSION, l.Identifier, l.Identifier, l.Identifier).Scan(&userId, &password_hash)
 	if err != nil {
 		utils.SQLiteErrorTarget(err, SELECT_PASSWORD_SESSION)
 		return userId, password_hash, err
@@ -79,6 +79,9 @@ func InsertUserAccount(u RegisterRequestJson) (RegisterResponseJson, error) {
 	var userId = utils.GenerateID()
 	var user RegisterResponseJson
 	err := database.WrapWithTransaction(func(tx *sql.Tx) error {
+		nickname := utils.OptionalJsonFields(u.Nickname)
+		aboutMe := utils.OptionalJsonFields(u.AboutMe)
+		avatarId := utils.OptionalJsonFields(u.AvatarId)
 		_, err := tx.Exec(
 			INSERT_USER_ACCOUNT,
 			userId,
@@ -87,9 +90,9 @@ func InsertUserAccount(u RegisterRequestJson) (RegisterResponseJson, error) {
 			u.FirstName,
 			u.LastName,
 			u.DateOfBirth,
-			u.Nickname,
-			u.AboutMe,
-			u.AvatarId,
+			nickname,
+			aboutMe,
+			avatarId,
 		)
 
 		if err != nil {

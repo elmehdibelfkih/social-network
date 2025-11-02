@@ -3,6 +3,7 @@ package database
 import (
 	"database/sql"
 	config "social/pkg/config"
+	"social/pkg/utils"
 
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/sqlite3"
@@ -16,7 +17,7 @@ func InitDB() error {
 	if err != nil {
 		return err
 	}
-	defer config.DB.Close()
+	// defer config.DB.Close()
 
 	_, err = config.DB.Exec(config.FOREIGN_KEYS_ON)
 	if err != nil {
@@ -52,6 +53,7 @@ func WrapWithTransaction(fn func(*sql.Tx) error) error {
 
 	err = fn(tx)
 	if err != nil {
+		utils.SQLiteErrorTarget(err, "transaction failed roll back")
 		tx.Rollback()
 		return err
 	}

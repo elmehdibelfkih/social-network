@@ -7,6 +7,13 @@ import (
 	"strconv"
 )
 
+func OptionalJsonFields[T any](arg *T) any {
+	if arg != nil {
+		return *arg
+	}
+	return nil
+}
+
 func GetWildCardValue(w http.ResponseWriter, r *http.Request, key string) int64 {
 	slug := r.PathValue(key)
 	wildCard, err := strconv.ParseInt(slug, 10, 64)
@@ -25,13 +32,12 @@ func GetUserIdFromContext(r *http.Request) int64 {
 	return userId
 }
 
-func GetUserSession(w http.ResponseWriter, r *http.Request) string {
-	session, err := r.Cookie("session_token")
+func GetUserSession(w http.ResponseWriter, r *http.Request) (string, error) {
+	cookie, err := r.Cookie("session_token")
 	if err != nil {
-		BackendErrorTarget(err, "UserContext")
-		Unauthorized(w, "session value is empty")
+		return "", err
 	}
-	return session.Value
+	return cookie.Value, err
 }
 
 // this function is used to recive a json with an undefined format

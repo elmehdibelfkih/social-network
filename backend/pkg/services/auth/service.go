@@ -20,7 +20,7 @@ func RegisterUserAccount(w http.ResponseWriter, r *http.Request, body *RegisterR
 	}
 
 	var s = SessionResponseJson{
-		SessionId:    int64(utils.GenerateID()),
+		SessionId:    utils.GenerateID(),
 		UserId:       response.UserId,
 		SessionToken: GenerateSessionToken(32),
 		IpAddress:    r.RemoteAddr,
@@ -57,7 +57,7 @@ func RegisterUserHttp(w http.ResponseWriter, response RegisterResponseJson) {
 
 func LoginUserAccount(w http.ResponseWriter, r *http.Request, body *LoginRequestJson, response *LoginResponseJson, context string) bool {
 	var s = SessionResponseJson{
-		SessionId:    int64(utils.GenerateID()),
+		SessionId:    utils.GenerateID(),
 		UserId:       response.UserId,
 		SessionToken: GenerateSessionToken(32),
 		IpAddress:    r.RemoteAddr,
@@ -94,8 +94,18 @@ func LoginUserHttp(w http.ResponseWriter, response LoginResponseJson) {
 
 func LogoutUserAccount(w http.ResponseWriter, r *http.Request, context string) bool {
 	userId := utils.GetUserIdFromContext(r)
-	session := utils.GetUserSession(w, r)
-	err := DeleteUserSession(session, userId)
+	session, err := utils.GetUserSession(w, r)
+	if err != nil {
+		utils.BackendErrorTarget(err, "UserContext")
+		utils.Unauthorized(w, "session value is empty")
+		return false
+	}
+	if err != nil {
+		utils.BackendErrorTarget(err, "UserContext")
+		utils.Unauthorized(w, "session value is empty")
+		return false
+	}
+	err = DeleteUserSession(session, userId)
 	if err != nil {
 		utils.BackendErrorTarget(err, context)
 		utils.InternalServerError(w)
@@ -123,8 +133,13 @@ func LogoutUserHttp(w http.ResponseWriter, response LogoutResponseJson) {
 
 func GetUserSession(w http.ResponseWriter, r *http.Request, response *SessionResponseJson, context string) bool {
 	userId := utils.GetUserIdFromContext(r)
-	session := utils.GetUserSession(w, r)
-	err := SelectUserSessionById(response, session, userId)
+	session, err := utils.GetUserSession(w, r)
+	if err != nil {
+		utils.BackendErrorTarget(err, "UserContext")
+		utils.Unauthorized(w, "session value is empty")
+		return false
+	}
+	err = SelectUserSessionById(response, session, userId)
 	if err != nil {
 		utils.BackendErrorTarget(err, context)
 		utils.InternalServerError(w)
@@ -143,8 +158,13 @@ func GetUserSessionHttp(w http.ResponseWriter, response SessionResponseJson) {
 
 func GetUserSessions(w http.ResponseWriter, r *http.Request, response *SessionsResponseJson, context string) bool {
 	userId := utils.GetUserIdFromContext(r)
-	session := utils.GetUserSession(w, r)
-	err := SelectUserSessionsById(response, session, userId)
+	session, err := utils.GetUserSession(w, r)
+	if err != nil {
+		utils.BackendErrorTarget(err, "UserContext")
+		utils.Unauthorized(w, "session value is empty")
+		return false
+	}
+	err = SelectUserSessionsById(response, session, userId)
 	if err != nil {
 		utils.BackendErrorTarget(err, context)
 		utils.InternalServerError(w)
@@ -163,8 +183,13 @@ func GetUserSessionsHttp(w http.ResponseWriter, response SessionsResponseJson) {
 
 func DeleteSessionBySessionId(w http.ResponseWriter, r *http.Request, sessionId int64, context string) bool {
 	userId := utils.GetUserIdFromContext(r)
-	session := utils.GetUserSession(w, r)
-	err := DeleteUserSession(session, userId)
+	session, err := utils.GetUserSession(w, r)
+	if err != nil {
+		utils.BackendErrorTarget(err, "UserContext")
+		utils.Unauthorized(w, "session value is empty")
+		return false
+	}
+	err = DeleteUserSession(session, userId)
 	if err != nil {
 		utils.BackendErrorTarget(err, context)
 		utils.InternalServerError(w)
