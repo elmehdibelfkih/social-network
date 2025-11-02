@@ -34,6 +34,11 @@ func (h *Handler) HandleUploadMedia(w http.ResponseWriter, r *http.Request) {
 		utils.UnsupportedMediaType(w)
 		return
 	}
+	//todo: MediaPurposes?
+	if !MediaPurposes[req.Purpose] {
+		utils.BadRequest(w, "Invalid purpose for the media", utils.ErrorTypeAlert)
+		return
+	}
 
 	data, err := base64.StdEncoding.DecodeString(req.FileData)
 	if err != nil {
@@ -46,8 +51,14 @@ func (h *Handler) HandleUploadMedia(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	detectedMediaType := http.DetectContentType(data)
+	if !AllowedMimeTypes[detectedMediaType] {
+		utils.UnsupportedMediaType(w)
+		return
+	}
+
 	mediaID := utils.GenerateID()
-	extensions, _ := mime.ExtensionsByType(req.FileType)
+	extensions, _ := mime.ExtensionsByType(detectedMediaType)
 	if len(extensions) == 0 {
 		utils.UnsupportedMediaType(w)
 		return
@@ -63,16 +74,13 @@ func (h *Handler) HandleUploadMedia(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	context := r.URL.Query().Get("context")
-	purpose := getStoragePathForContext(context)
-
 	media := &Media{
 		ID:        mediaID,
 		OwnerId:   userId,
 		Path:      filePath,
-		Mime:      req.FileType,
+		Mime:      detectedMediaType,
 		Size:      int64(len(data)),
-		Purpose:   purpose,
+		Purpose:   req.Purpose,
 		CreatedAt: time.Now(),
 	}
 
