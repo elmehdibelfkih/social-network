@@ -12,6 +12,7 @@ import (
 func SocialMux() *router.Router {
 	socialMux := router.NewRouter()
 	socialMux.HandleFunc("GET", "/", utils.MiddlewareChain(testHandler, middleware.AuthMiddleware, middleware.UserContext))
+	socialMux.HandleFunc("DELETE", "/", utils.MiddlewareChain(testHandler, middleware.UserContext))
 
 	//auth
 	socialMux.HandleFunc("POST", "/api/v1/auth/register", utils.MiddlewareChain(auth.PostRegister))
@@ -27,6 +28,8 @@ func SocialMux() *router.Router {
 }
 
 func testHandler(w http.ResponseWriter, r *http.Request) {
+	// fmt.Println(r.Header)
+	// fmt.Println(r.RemoteAddr)
 	fmt.Println("Route hit:", r.URL.Path, r.Header.Get("User-Agent"))
 	fmt.Fprintf(w, "hello")
 }
