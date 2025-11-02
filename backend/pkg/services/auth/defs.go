@@ -28,6 +28,7 @@ type RegisterResponseJson struct {
 type LoginRequestJson struct {
 	Identifier string `json:"email/userId/nickname"` // flexible login field
 	Password   string `json:"password"`
+	RememberMe bool   `json:"rememberMe"`
 }
 
 type LoginResponseJson struct {
@@ -54,7 +55,7 @@ type SessionResponseJson struct {
 	IpAddress    string `json:"ipAddress"`
 	Device       string `json:"device"`
 	CreatedAt    string `json:"createdAt"`
-	ExpiresAt    string `json:"expiresAt"`
+	ExpiresAt    string `json:"-"`
 }
 
 // api/v1/sessions
@@ -69,7 +70,7 @@ type SessionItemJson struct {
 	Device    string `json:"device"`
 	CreatedAt string `json:"createdAt"`
 	Current   bool   `json:"current"`
-	ExpiresAt string `json:"expiresAt"`
+	ExpiresAt string `json:"-"`
 }
 
 // api/v1/sessions/:session_id
