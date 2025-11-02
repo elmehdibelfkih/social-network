@@ -39,28 +39,28 @@ func getMediaID(r *http.Request) (int64, error) {
 	return id, nil
 }
 
-func canGetMedia(userID, mediaID uint64) bool {
+func canGetMedia(userID, mediaID int64) bool {
 	var media Media
 
-	err := config.DB.QueryRow(queryGetMedia, mediaID).Scan(&media)
+	err := config.DB.QueryRow(QUERY_GET_MEDIA, mediaID).Scan(&media)
 	if err != nil {
-		utils.SQLiteErrorTarget(err, queryGetMedia)
+		utils.SQLiteErrorTarget(err, QUERY_GET_MEDIA)
 		return false
 	}
 
-	if media.Purpose == "message" && media.OwnerId != int64(userID) {
+	if media.Purpose == "message" && media.OwnerId != userID {
 		return false
 	}
 	return true
 }
 
-func canDeleteMedia(userID, mediaID uint64) bool {
+func canDeleteMedia(userID, mediaID int64) bool {
 	// if the user is the owner of the media can he delte it?
 	var media Media
 
-	err := config.DB.QueryRow(queryGetMedia, mediaID).Scan(&media)
+	err := config.DB.QueryRow(QUERY_GET_MEDIA, mediaID).Scan(&media)
 	if err != nil {
-		utils.SQLiteErrorTarget(err, queryGetMedia)
+		utils.SQLiteErrorTarget(err, QUERY_GET_MEDIA)
 		return false
 	}
 

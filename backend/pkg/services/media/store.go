@@ -10,6 +10,11 @@ import (
 	"github.com/mattn/go-sqlite3"
 )
 
+//todo: the db *sql.DB alredy exist in the global config (3ndak database dyalk bo7dak hna la. 🙅)
+//todo: use the WrapWithTransaction from the database package to secure database operations
+// todo: the query names must follow the macros style
+//todo use GetUserIdFromContext from the utils package to get user id
+
 type DBStore struct {
 	db *sql.DB
 }
@@ -21,7 +26,7 @@ func NewDBStore(db *sql.DB) *DBStore {
 }
 
 func (s *DBStore) CreateMedia(media *Media) error {
-	_, err := s.db.Exec(queryCreateMedia, media.ID, media.OwnerId, media.Path, media.Mime, media.Purpose, media.CreatedAt)
+	_, err := s.db.Exec(QUERY_CREATE_MEDIA, media.ID, media.OwnerId, media.Path, media.Mime, media.Purpose, media.CreatedAt)
 	if err != nil {
 		if e, ok := err.(sqlite3.Error); ok && e.Code == sqlite3.ErrConstraint {
 			return fmt.Errorf("constraint error: %w", err)
@@ -34,7 +39,7 @@ func (s *DBStore) CreateMedia(media *Media) error {
 
 func (s *DBStore) GetMediaByID(id int64) (*Media, error) {
 	media := &Media{}
-	err := s.db.QueryRow(queryGetMedia, id).Scan(
+	err := s.db.QueryRow(QUERY_GET_MEDIA, id).Scan(
 		&media.ID,
 		&media.OwnerId,
 		&media.Path,
@@ -63,7 +68,7 @@ func (s *DBStore) DeleteMedia(id int64, userID int64) (string, error) {
 	}
 	defer tx.Rollback()
 
-	err = tx.QueryRow(queryGetMedia, id).Scan(&owner_id, &path)
+	err = tx.QueryRow(QUERY_GET_MEDIA, id).Scan(&owner_id, &path)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return "", sql.ErrNoRows
@@ -76,7 +81,7 @@ func (s *DBStore) DeleteMedia(id int64, userID int64) (string, error) {
 		return "", fmt.Errorf("forbidden: media doesn't belong to this owner")
 	}
 
-	_, err = tx.Exec(queryDeleteMedia, id, userID)
+	_, err = tx.Exec(QUERY_DELETE_MEDIA, id, userID)
 	if err != nil {
 		utils.SQLiteErrorTarget(err, "DeleteMedia (Exec)")
 		return "", err

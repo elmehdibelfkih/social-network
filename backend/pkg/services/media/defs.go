@@ -2,6 +2,12 @@ package media
 
 import "time"
 
+var AllowedMimeTypes = map[string]bool{
+	"image/jpeg": true,
+	"image/png":  true,
+	"image/gif":  true,
+}
+
 type Handler struct {
 	manager MediaManager
 }

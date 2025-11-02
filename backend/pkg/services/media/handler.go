@@ -15,12 +15,6 @@ import (
 	"social/pkg/utils"
 )
 
-var AllowedMimeTypes = map[string]bool{
-	"image/jpeg": true,
-	"image/png":  true,
-	"image/gif":  true,
-}
-
 func NewMediaHandler() *Handler {
 	return &Handler{}
 }
