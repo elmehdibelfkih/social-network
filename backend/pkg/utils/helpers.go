@@ -1,11 +1,16 @@
 package utils
 
 import (
+	"crypto/rand"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	config "social/pkg/config"
 	"strconv"
+
+	"golang.org/x/crypto/bcrypt"
 )
 
 func OptionalJsonFields[T any](arg *T) any {
@@ -76,4 +81,32 @@ func WriteSuccess(w http.ResponseWriter, code int, payload any) {
 		Success: true,
 		Payload: payload,
 	})
+}
+
+func GeneratePasswordHash(password *string) error {
+	bytes, err := bcrypt.GenerateFromPassword([]byte(*password), bcrypt.DefaultCost)
+	*password = string(bytes)
+	return err
+}
+
+func CheckPasswordHash(password, hash string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
+	return err == nil
+}
+
+func GenerateSessionToken(length int) string {
+	bytes := make([]byte, length)
+	if _, err := rand.Read(bytes); err != nil {
+		log.Fatalf("failed to generate token %v", err)
+	}
+	return base64.URLEncoding.EncodeToString(bytes)
+}
+
+func CheckSession(r *http.Request) (string, error) {
+	session, err := r.Cookie("session_token")
+	if err != nil {
+		BackendErrorTarget(err, "auth")
+		return "", nil
+	}
+	return session.Value, err
 }

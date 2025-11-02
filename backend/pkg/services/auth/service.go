@@ -1,14 +1,9 @@
 package auth
 
 import (
-	"crypto/rand"
-	"encoding/base64"
-	"log"
 	"net/http"
 	"social/pkg/utils"
 	"time"
-
-	"golang.org/x/crypto/bcrypt"
 )
 
 func RegisterUserAccount(w http.ResponseWriter, r *http.Request, body *RegisterRequestJson, s *SessionResponseJson, context string) (RegisterResponseJson, bool) {
@@ -21,7 +16,7 @@ func RegisterUserAccount(w http.ResponseWriter, r *http.Request, body *RegisterR
 
 	s.SessionId = utils.GenerateID()
 	s.UserId = response.UserId
-	s.SessionToken = GenerateSessionToken(32)
+	s.SessionToken = utils.GenerateSessionToken(256)
 	s.IpAddress = r.RemoteAddr
 	s.Device = r.Header.Get("User-Agent")
 
@@ -56,7 +51,7 @@ func RegisterUserHttp(w http.ResponseWriter, response RegisterResponseJson, s Se
 func LoginUserAccount(w http.ResponseWriter, r *http.Request, body *LoginRequestJson, response *LoginResponseJson, s *SessionResponseJson, context string) bool {
 	s.SessionId = utils.GenerateID()
 	s.UserId = response.UserId
-	s.SessionToken = GenerateSessionToken(32)
+	s.SessionToken = utils.GenerateSessionToken(256)
 	s.IpAddress = r.RemoteAddr
 	s.Device = r.Header.Get("User-Agent")
 	err := InsertLoginUserSession(s, response)
@@ -208,19 +203,13 @@ func DeleteSessionHttp(w http.ResponseWriter, response RevokeSessionResponseJson
 }
 
 func GeneratePasswordHash(w http.ResponseWriter, body *RegisterRequestJson, context string) bool {
-	err := generatePasswordHash(&body.Password)
+	err := utils.GeneratePasswordHash(&body.Password)
 	if err != nil {
 		utils.BackendErrorTarget(err, context)
 		utils.InternalServerError(w)
 		return false
 	}
 	return true
-}
-
-func generatePasswordHash(password *string) error {
-	bytes, err := bcrypt.GenerateFromPassword([]byte(*password), bcrypt.DefaultCost)
-	*password = string(bytes)
-	return err
 }
 
 func CheckPasswordHash(w http.ResponseWriter, body *LoginRequestJson, response *LoginResponseJson, context string) bool {
@@ -231,23 +220,10 @@ func CheckPasswordHash(w http.ResponseWriter, body *LoginRequestJson, response *
 		return false
 	}
 	response.UserId = userId
-	if !checkPasswordHash(body.Password, password_hash) {
+	if !utils.CheckPasswordHash(body.Password, password_hash) {
 		utils.BackendErrorTarget(err, context)
 		utils.InternalServerError(w)
 		return false
 	}
 	return true
-}
-
-func checkPasswordHash(password, hash string) bool {
-	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
-	return err == nil
-}
-
-func GenerateSessionToken(length int) string {
-	bytes := make([]byte, length)
-	if _, err := rand.Read(bytes); err != nil {
-		log.Fatalf("failed to generate token %v", err)
-	}
-	return base64.URLEncoding.EncodeToString(bytes)
 }
