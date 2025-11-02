@@ -54,7 +54,7 @@ type SessionResponseJson struct {
 	IpAddress    string `json:"ipAddress"`
 	Device       string `json:"device"`
 	CreatedAt    string `json:"createdAt"`
-	// ExpiresAt    string `json:"expiresAt"`
+	ExpiresAt    string `json:"expiresAt"`
 }
 
 // api/v1/sessions
@@ -63,16 +63,28 @@ type SessionsResponseJson struct {
 }
 
 type SessionItemJson struct {
-	SessionId    int64  `json:"sessionId"`
-	UserId       int64  `json:"userId"`
-	IpAddress    string `json:"ipAddress"`
-	Device       string `json:"device"`
-	CreatedAt    string `json:"createdAt"`
-	Current      bool   `json:"current"`
-	// ExpiresAt string `json:"expiresAt"`
+	SessionId int64  `json:"sessionId"`
+	UserId    int64  `json:"userId"`
+	IpAddress string `json:"ipAddress"`
+	Device    string `json:"device"`
+	CreatedAt string `json:"createdAt"`
+	Current   bool   `json:"current"`
+	ExpiresAt string `json:"expiresAt"`
 }
 
 // api/v1/sessions/:session_id
 type RevokeSessionResponseJson struct {
 	Message string `json:"message"`
+}
+
+// helpers
+
+type AvatarMediaSqlRow struct {
+	MediaId   int64
+	OwnerId   int64
+	Path      string
+	Mime      string
+	Size      int64
+	Purpose   string
+	CreatedAt string
 }
