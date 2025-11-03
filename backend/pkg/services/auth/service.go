@@ -13,7 +13,7 @@ func RegisterUserAccount(w http.ResponseWriter, r *http.Request, body *RegisterR
 		valid, err := SelectAvatarMediaId(*body.AvatarId)
 		if err != nil {
 			utils.BackendErrorTarget(err, context)
-			utils.BadRequest(w, "failed to insert media", "alert")
+			utils.IdentifySqlError(w, err)
 			return response, false
 		}
 		if !valid {
@@ -23,7 +23,7 @@ func RegisterUserAccount(w http.ResponseWriter, r *http.Request, body *RegisterR
 	response, err = InsertUserAccount(*body)
 	if err != nil {
 		utils.BackendErrorTarget(err, context)
-		utils.InternalServerError(w)
+		utils.IdentifySqlError(w, err)
 		return response, false
 	}
 	s.SessionId = utils.GenerateID()
@@ -35,7 +35,7 @@ func RegisterUserAccount(w http.ResponseWriter, r *http.Request, body *RegisterR
 	err = InsertRegisterUserSession(s)
 	if err != nil {
 		utils.BackendErrorTarget(err, context)
-		utils.InternalServerError(w)
+		utils.IdentifySqlError(w, err)
 		return response, false
 	}
 	return response, true
@@ -71,14 +71,14 @@ func LoginUserAccount(w http.ResponseWriter, r *http.Request, body *LoginRequest
 	err := InsertLoginUserSession(s, response)
 	if err != nil {
 		utils.BackendErrorTarget(err, context)
-		utils.InternalServerError(w)
+		utils.IdentifySqlError(w, err)
 		return false
 	}
 	if body.RememberMe {
 		err = UpdateRememberMeToken(remember, response.UserId)
 		if err != nil {
 			utils.BackendErrorTarget(err, context)
-			utils.InternalServerError(w)
+			utils.IdentifySqlError(w, err)
 			return false
 		}
 	}
@@ -86,23 +86,27 @@ func LoginUserAccount(w http.ResponseWriter, r *http.Request, body *LoginRequest
 }
 
 func LoginUserHttp(w http.ResponseWriter, response LoginResponseJson, s SessionResponseJson, remember RememberMeSqlRow) {
-	http.SetCookie(w, &http.Cookie{
-		Name:     "session_token",
-		Value:    s.SessionToken,
-		Expires:  time.Now().Add(time.Hour * 24),
-		HttpOnly: true,
-		SameSite: http.SameSiteStrictMode,
-		Path:     "/",
-	})
+	if s.SessionId != 0 {
+		http.SetCookie(w, &http.Cookie{
+			Name:     "session_token",
+			Value:    s.SessionToken,
+			Expires:  time.Now().Add(time.Hour * 24),
+			HttpOnly: true,
+			SameSite: http.SameSiteStrictMode,
+			Path:     "/",
+		})
+	}
 
-	http.SetCookie(w, &http.Cookie{
-		Name:     "remember_me_token",
-		Value:    remember.Selector + ":" + remember.Token,
-		Expires:  time.Now().Add(time.Hour * 24 * 90),
-		HttpOnly: true,
-		SameSite: http.SameSiteStrictMode,
-		Path:     "/",
-	})
+	if remember.RememberId != 0 {
+		http.SetCookie(w, &http.Cookie{
+			Name:     "remember_me_token",
+			Value:    remember.Selector + ":" + remember.Token,
+			Expires:  time.Now().Add(time.Hour * 24 * 90),
+			HttpOnly: true,
+			SameSite: http.SameSiteStrictMode,
+			Path:     "/",
+		})
+	}
 
 	//todo:maybe online broadcast
 	utils.JsonResponseEncode(w, http.StatusOK, map[string]any{
@@ -123,7 +127,7 @@ func LogoutUserAccount(w http.ResponseWriter, r *http.Request, context string) b
 	err = DeleteUserSessionBySessionToken(session, userId)
 	if err != nil {
 		utils.BackendErrorTarget(err, context)
-		utils.InternalServerError(w)
+		utils.IdentifySqlError(w, err)
 		return false
 	}
 	return true
@@ -136,7 +140,7 @@ func LogoutUserHttp(w http.ResponseWriter, response LogoutResponseJson) {
 		Expires:  time.Unix(0, 0),
 		HttpOnly: true,
 		SameSite: http.SameSiteStrictMode,
-		Path: "/",
+		Path:     "/",
 	})
 
 	http.SetCookie(w, &http.Cookie{
@@ -145,9 +149,9 @@ func LogoutUserHttp(w http.ResponseWriter, response LogoutResponseJson) {
 		Expires:  time.Unix(0, 0),
 		HttpOnly: true,
 		SameSite: http.SameSiteStrictMode,
-		Path: "/",
+		Path:     "/",
 	})
-	
+
 	response.Message = "Logout successful."
 	utils.JsonResponseEncode(w, http.StatusOK, map[string]any{
 		"success": true,
@@ -214,7 +218,7 @@ func DeleteSessionBySessionId(w http.ResponseWriter, r *http.Request, sessionId 
 	err := DeleteUserSessionBySessionId(sessionId, userId)
 	if err != nil {
 		utils.BackendErrorTarget(err, context)
-		utils.InternalServerError(w)
+		utils.IdentifySqlError(w, err)
 		return false
 	}
 	return true
@@ -251,13 +255,13 @@ func CheckPasswordHash(w http.ResponseWriter, body *LoginRequestJson, response *
 	userId, password_hash, err := SelectUserPasswordHash(*body)
 	if err != nil {
 		utils.BackendErrorTarget(err, context)
-		utils.InternalServerError(w)
+		utils.IdentifySqlError(w, err)
 		return false
 	}
 	response.UserId = userId
 	if !utils.CheckPasswordHash(body.Password, password_hash) {
 		utils.BackendErrorTarget(err, context)
-		utils.InternalServerError(w)
+		utils.IdentifySqlError(w, err)
 		return false
 	}
 	return true
