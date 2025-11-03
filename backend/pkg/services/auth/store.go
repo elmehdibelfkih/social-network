@@ -5,6 +5,8 @@ import (
 	"social/pkg/config"
 	"social/pkg/db/database"
 	"social/pkg/utils"
+	"strings"
+	"time"
 )
 
 // read
@@ -73,7 +75,7 @@ func SelectUserSessionById(s *SessionResponseJson, session string, userId int64)
 	return nil
 }
 
-func SelectUserSessionCount(session string) (*SessionItemJson, error) {
+func SelectUserSession(session string) (*SessionItemJson, error) {
 	var s SessionItemJson
 	err := config.DB.QueryRow(SELECT_SESSION_BY_SESSION, session).Scan(
 		&s.SessionId,
@@ -91,6 +93,22 @@ func SelectUserSessionCount(session string) (*SessionItemJson, error) {
 	return &s, nil
 }
 
+func SelectUserRememberMe(session string) (*RememberMeSqlRow, error) {
+	var r RememberMeSqlRow
+	err := config.DB.QueryRow(SELECT_REMEMBER_ME_BY_SELECTOR, strings.Split(session, ":")[0]).Scan(
+		&r.RememberId,
+		&r.UserId,
+		&r.Selector,
+		&r.Token,
+		&r.ExpiresAt,
+	)
+	if err != nil {
+		utils.SQLiteErrorTarget(err, SELECT_REMEMBER_ME_BY_SELECTOR)
+		return &r, err
+	}
+	return &r, nil
+}
+
 func SelectUserPasswordHash(l LoginRequestJson) (int64, string, error) {
 	var userId int64
 	var password_hash string
@@ -104,6 +122,8 @@ func SelectUserPasswordHash(l LoginRequestJson) (int64, string, error) {
 }
 
 // write
+
+//insert
 
 func InsertUserAccount(u RegisterRequestJson) (RegisterResponseJson, error) {
 	var userId = utils.GenerateID()
@@ -127,6 +147,7 @@ func InsertUserAccount(u RegisterRequestJson) (RegisterResponseJson, error) {
 
 		if err != nil {
 			utils.SQLiteErrorTarget(err, INSERT_USER_ACCOUNT)
+			return err
 		}
 
 		err = tx.QueryRow(
@@ -160,10 +181,12 @@ func InsertLoginUserSession(s *SessionResponseJson, l *LoginResponseJson) error 
 			s.SessionToken,
 			s.IpAddress,
 			s.Device,
+			s.ExpiresAt,
 		)
 
 		if err != nil {
 			utils.SQLiteErrorTarget(err, INSERT_USER_ACCOUNT)
+			return err
 		}
 		err = tx.QueryRow(
 			SELECT_USER_BY_ID,
@@ -204,6 +227,60 @@ func InsertRegisterUserSession(s *SessionResponseJson) error {
 		return err
 	})
 }
+
+//update
+
+func UpdateRememberMeToken(remember *RememberMeSqlRow, userId int64) error {
+	return database.WrapWithTransaction(func(tx *sql.Tx) error {
+		err := tx.QueryRow(SELECT_REMEMBER_ME_BY_ID, userId).Scan(
+			&remember.RememberId,
+			&remember.UserId,
+			&remember.Selector,
+			&remember.Token,
+			&remember.ExpiresAt,
+		)
+
+		if err != nil && err != sql.ErrNoRows {
+			utils.SQLiteErrorTarget(err, SELECT_REMEMBER_ME_BY_ID)
+			return err
+		}
+
+		// Always update expiry timestamp
+		remember.ExpiresAt = time.Now().UTC().Add(90 * 24 * time.Hour).Format(time.RFC3339)
+
+		if err == sql.ErrNoRows {
+			remember.RememberId = utils.GenerateID()
+			remember.UserId = userId
+			remember.Selector = utils.GenerateSessionToken(16)
+			remember.Token = utils.GenerateSessionToken(256)
+
+			if _, err := tx.Exec(
+				INSERT_REMEMBER_ME_TOKEN,
+				remember.RememberId,
+				remember.UserId,
+				remember.Selector,
+				remember.Token,
+				remember.ExpiresAt,
+			); err != nil {
+				utils.SQLiteErrorTarget(err, INSERT_REMEMBER_ME_TOKEN)
+				return err
+			}
+		} else {
+			_, err = tx.Exec(
+				UPDATE_REMEMBER_ME_TOKEN,
+				remember.ExpiresAt,
+				userId,
+			)
+			if err != nil {
+				utils.SQLiteErrorTarget(err, UPDATE_REMEMBER_ME_TOKEN)
+				return err
+			}
+		}
+		return nil
+	})
+}
+
+//delete
 
 func DeleteUserSessionBySessionToken(session string, userId int64) error {
 	return database.WrapWithTransaction(func(tx *sql.Tx) error {

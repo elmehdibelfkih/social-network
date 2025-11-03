@@ -7,9 +7,6 @@ CREATE TABLE
     device TEXT,
     created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
     session_expires_at TEXT NOT NULL,
-    -- remember_selector TEXT UNIQUE,
-    -- remember_token_hash TEXT,
-    -- remember_expires_at TEXT,
     FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
   );
 
