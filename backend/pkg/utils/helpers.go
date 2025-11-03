@@ -102,8 +102,8 @@ func GenerateSessionToken(length int) string {
 	return base64.URLEncoding.EncodeToString(bytes)
 }
 
-func CheckSession(r *http.Request) (string, error) {
-	session, err := r.Cookie("session_token")
+func CheckSession(name string, r *http.Request) (string, error) {
+	session, err := r.Cookie(name)
 	if err != nil {
 		BackendErrorTarget(err, "auth")
 		return "", nil

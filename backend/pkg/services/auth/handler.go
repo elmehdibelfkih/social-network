@@ -26,16 +26,17 @@ func PostLogin(w http.ResponseWriter, r *http.Request) {
 	var body LoginRequestJson
 	var response LoginResponseJson
 	var s SessionResponseJson
+	var remember RememberMeSqlRow
 	if !utils.ValidateJsonRequest(w, r, &body, "login handler") {
 		return
 	}
 	if !CheckPasswordHash(w, &body, &response, "login handler") {
 		return
 	}
-	if !LoginUserAccount(w, r, &body, &response, &s, "login handler") {
+	if !LoginUserAccount(w, r, &body, &response, &s, &remember, "login handler") {
 		return
 	}
-	LoginUserHttp(w, response, s)
+	LoginUserHttp(w, response, s, remember)
 }
 
 func PostLogout(w http.ResponseWriter, r *http.Request) {

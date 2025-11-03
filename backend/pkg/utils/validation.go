@@ -53,6 +53,6 @@ func FirstNameLastName(name string) (bool, string) {
 }
 
 // DateValidation validates date in "yyyy-mm-dd" format
-func DateValidation(dste string) bool {
-	return dateRegex.MatchString(dste)
+func DateValidation(date string) bool {
+	return dateRegex.MatchString(date)
 }
