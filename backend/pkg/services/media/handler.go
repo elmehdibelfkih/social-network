@@ -14,11 +14,7 @@ import (
 	"social/pkg/utils"
 )
 
-func NewMediaHandler() *Handler {
-	return &Handler{}
-}
-
-func (h *Handler) HandleUploadMedia(w http.ResponseWriter, r *http.Request) {
+func HandleUploadMedia(w http.ResponseWriter, r *http.Request) {
 	userId := utils.GetUserIdFromContext(r)
 
 	var req UploadMediaRequest
@@ -83,7 +79,7 @@ func (h *Handler) HandleUploadMedia(w http.ResponseWriter, r *http.Request) {
 		CreatedAt: time.Now(),
 	}
 
-	if err := h.manager.CreateMedia(media); err != nil {
+	if err := CreateMedia(media); err != nil {
 		os.Remove(filePath)
 		utils.SQLiteErrorTarget(err, "handleUploadMedia (CreateMedia)")
 		utils.InternalServerError(w)
@@ -98,10 +94,10 @@ func (h *Handler) HandleUploadMedia(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-func (h *Handler) HandleGetMedia(w http.ResponseWriter, r *http.Request) {
+func HandleGetMedia(w http.ResponseWriter, r *http.Request) {
 	mediaID := utils.GetWildCardValue(w, r, "media_id")
 
-	media, err := h.manager.GetMediaByID(mediaID)
+	media, err := GetMediaByID(mediaID)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			utils.NotFoundError(w, "No media file found with the specified ID.")
@@ -116,7 +112,7 @@ func (h *Handler) HandleGetMedia(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, media.Path)
 }
 
-func (h *Handler) HandleDeleteMedia(w http.ResponseWriter, r *http.Request) {
+func HandleDeleteMedia(w http.ResponseWriter, r *http.Request) {
 	userId := utils.GetUserIdFromContext(r)
 
 	mediaID, err := getMediaID(r)
@@ -125,7 +121,7 @@ func (h *Handler) HandleDeleteMedia(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err = h.manager.DeleteMedia(mediaID, userId)
+	_, err = DeleteMedia(mediaID, userId)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			utils.NotFoundError(w, "No media file found with the specified ID.")

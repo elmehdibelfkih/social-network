@@ -6,12 +6,13 @@ import (
 	"social/pkg/app/dependencies/middleware"
 	"social/pkg/app/dependencies/router"
 	"social/pkg/services/auth"
+	"social/pkg/services/media"
 	"social/pkg/utils"
 )
 
 func SocialMux() *router.Router {
 	socialMux := router.NewRouter()
-	socialMux.HandleFunc("GET", "/", utils.MiddlewareChain(testHandler, auth.AuthMiddleware, middleware.UserContext))
+	socialMux.HandleFunc("GET", "/", utils.MiddlewareChain(testHandler))
 	socialMux.HandleFunc("DELETE", "/", utils.MiddlewareChain(testHandler, middleware.UserContext))
 
 	//auth
@@ -21,8 +22,12 @@ func SocialMux() *router.Router {
 	socialMux.HandleFunc("GET", "/api/v1/auth/session", utils.MiddlewareChain(auth.GetSession, auth.AuthMiddleware))
 	socialMux.HandleFunc("GET", "/api/v1/sessions", utils.MiddlewareChain(auth.GetSessions, auth.AuthMiddleware))
 	socialMux.HandleFunc("DELETE", "/api/v1/sessions/{session_id}", utils.MiddlewareChain(auth.DeleteSession, auth.AuthMiddleware))
-	
-	//
+
+	//medi
+	socialMux.HandleFunc("POST", "/api/v1/media/upload", utils.MiddlewareChain(media.HandleUploadMedia, media.MediaMiddleware, auth.AuthMiddleware))
+	socialMux.HandleFunc("GET", "/api/v1/media/{media_id}", media.HandleGetMedia)
+	// socialMux.HandleFunc("GET", "/api/v1/media/{media_id}", utils.MiddlewareChain(media.HandleGetMedia, media.MediaMiddleware, auth.AuthMiddleware))
+	socialMux.HandleFunc("DELETE", "/api/v1/media/{media_id} ", utils.MiddlewareChain(media.HandleDeleteMedia, media.MediaMiddleware, auth.AuthMiddleware))
 
 	return socialMux
 }
