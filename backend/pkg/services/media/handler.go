@@ -11,22 +11,8 @@ import (
 	"strings"
 	"time"
 
-	"social/pkg/config"
 	"social/pkg/utils"
 )
-
-var AllowedMimeTypes = map[string]bool{
-	"image/jpeg": true,
-	"image/png":  true,
-	"image/gif":  true,
-}
-
-var MediaPurposes = map[string]bool{
-	"avatar":  true,
-	"comment": true,
-	"post":    true,
-	"message": true,
-}
 
 func NewMediaHandler() *Handler {
 	return &Handler{}
@@ -77,7 +63,7 @@ func (h *Handler) HandleUploadMedia(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	storagDir := getStoragePathForContext(req.Purpose)
+	storagDir := getStoragePathForPurpose(req.Purpose)
 	mediaName := fmt.Sprintf("%d%s", mediaID, extensions[0])
 	filePath := filepath.Join(storagDir, mediaName)
 
@@ -92,7 +78,7 @@ func (h *Handler) HandleUploadMedia(w http.ResponseWriter, r *http.Request) {
 		OwnerId:   userId,
 		Path:      filePath,
 		Mime:      detectedMediaType,
-		Size:      int64(len(data)),
+		Size:      len(data),
 		Purpose:   req.Purpose,
 		CreatedAt: time.Now(),
 	}
@@ -113,15 +99,7 @@ func (h *Handler) HandleUploadMedia(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) HandleGetMedia(w http.ResponseWriter, r *http.Request) {
-	userID, ok := r.Context().Value(config.USER_ID_KEY).(uint64)
-	if !ok {
-		utils.Unauthorized(w, "error getting the user")
-	}
-	mediaID, err := getMediaID(r)
-	if err != nil {
-		utils.BadRequest(w, "Invalid Parameter", utils.ErrorTypeAlert)
-		return
-	}
+	mediaID := utils.GetWildCardValue(w, r, "media_id")
 
 	media, err := h.manager.GetMediaByID(mediaID)
 	if err != nil {
@@ -131,10 +109,6 @@ func (h *Handler) HandleGetMedia(w http.ResponseWriter, r *http.Request) {
 		}
 		utils.SQLiteErrorTarget(err, "handleGetMedia (GetMediaByID)")
 		utils.InternalServerError(w)
-		return
-	}
-
-	if media.Purpose == "message" && media.OwnerId != int64(userID) {
 		return
 	}
 

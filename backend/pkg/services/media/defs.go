@@ -10,7 +10,7 @@ type Handler struct {
 type MediaManager interface {
 	CreateMedia(media *Media) error
 	GetMediaByID(id int64) (*Media, error)
-	DeleteMedia(id, userID int64) (string, error) // returns the path so the can delete it from the memory
+	DeleteMedia(id, userID int64) (string, error)
 }
 
 type Media struct {
@@ -18,7 +18,7 @@ type Media struct {
 	OwnerId   int64     `db:"owner_id"`
 	Path      string    `db:"path"`
 	Mime      string    `db:"mime"`
-	Size      int64     `db:"size"`
+	Size      int     `db:"size"`
 	Purpose   string    `db:"purpose"`
 	CreatedAt time.Time `db:"created_at"`
 }
@@ -48,3 +48,16 @@ type DeleteMediaResponse struct {
 const (
 	MaxMediaSize = 10485760 // 10 MB
 )
+
+var AllowedMimeTypes = map[string]bool{
+	"image/jpeg": true,
+	"image/png":  true,
+	"image/gif":  true,
+}
+
+var MediaPurposes = map[string]bool{
+	"avatar":  true,
+	"comment": true,
+	"post":    true,
+	"message": true,
+}

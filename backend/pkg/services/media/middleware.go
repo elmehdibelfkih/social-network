@@ -9,7 +9,7 @@ import (
 
 func MediaMiddleware(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		userID, ok := r.Context().Value(config.USER_ID_KEY).(uint64)
+		userID, ok := r.Context().Value(config.USER_ID_KEY).(int64)
 		if !ok {
 			utils.Unauthorized(w, "Invalid user")
 		}
@@ -20,13 +20,13 @@ func MediaMiddleware(next http.HandlerFunc) http.HandlerFunc {
 		}
 
 		if r.Method == http.MethodGet {
-			if ok := canGetMedia(userID, uint64(mediaID)); !ok {
+			if ok := canGetMedia(userID, mediaID); !ok {
 				utils.Unauthorized(w, "don't have the permission to get this media")
 				return
 			}
 		}
 		if r.Method == http.MethodDelete {
-			if ok := canDeleteMedia(userID, uint64(mediaID)); !ok {
+			if ok := canDeleteMedia(userID, mediaID); !ok {
 				utils.Unauthorized(w, "don't have the permission to delete this media")
 				return
 			}
