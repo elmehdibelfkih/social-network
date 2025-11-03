@@ -42,6 +42,7 @@ func InitLogger() {
 	backendLog.Printf("Backend log initialized at: %s\n", backendPath)
 }
 
+// todo:
 func CloseLogger() {
 	if sqliteFile != nil {
 		sqliteLog.Printf("Server shutdown.\n\n\n")
@@ -91,16 +92,6 @@ func SQLiteErrorTarget(err error, query string) {
 func BackendErrorTarget(err error, context string) {
 	_, file, line, _ := runtime.Caller(1)
 	handleBackendError(fmt.Errorf("%s:%d: %w", file, line, err), context)
-}
-
-func ValidateJsonRequest(w http.ResponseWriter, r *http.Request, body any, context string) bool {
-	err := JsonStaticDecode(r, &body)
-	if err != nil {
-		BackendErrorTarget(err, context)
-		BadRequest(w, "request body invalid json format", "redirect")
-		return false
-	}
-	return true
 }
 
 func sendErrorResponse(w http.ResponseWriter, status int, errTitle, errMsg, errType string) {

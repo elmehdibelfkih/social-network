@@ -1,20 +1,21 @@
 package utils
 
 import (
+	"net/http"
 	"regexp"
 	"strings"
 )
 
 var (
-	emailRegex     = regexp.MustCompile(`^[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,4}$`)
-	nameRegex      = regexp.MustCompile(`^[a-zA-Z]+(?:[-'\s][a-zA-Z]+)*$`)
-	dateRegex      = regexp.MustCompile(`^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$`)
-	passwordLength = regexp.MustCompile(`^.{8,16}$`)
-	passwordUpper  = regexp.MustCompile(`[A-Z]`)
-	passwordLower  = regexp.MustCompile(`[a-z]`)
-	passwordDigit  = regexp.MustCompile(`[0-9]`)
-	passwordSpecial= regexp.MustCompile(`[!@#$%^&*]`)
-	passwordNoSpace= regexp.MustCompile(`^\S+$`)
+	emailRegex      = regexp.MustCompile(`^[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,4}$`)
+	nameRegex       = regexp.MustCompile(`^[a-zA-Z]+(?:[-'\s][a-zA-Z]+)*$`)
+	dateRegex       = regexp.MustCompile(`^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$`)
+	passwordLength  = regexp.MustCompile(`^.{8,16}$`)
+	passwordUpper   = regexp.MustCompile(`[A-Z]`)
+	passwordLower   = regexp.MustCompile(`[a-z]`)
+	passwordDigit   = regexp.MustCompile(`[0-9]`)
+	passwordSpecial = regexp.MustCompile(`[!@#$%^&*]`)
+	passwordNoSpace = regexp.MustCompile(`^\S+$`)
 )
 
 func EmailValidation(mail string) (bool, string) {
@@ -55,4 +56,14 @@ func FirstNameLastName(name string) (bool, string) {
 // DateValidation validates date in "yyyy-mm-dd" format
 func DateValidation(dste string) bool {
 	return dateRegex.MatchString(dste)
+}
+
+func ValidateJsonRequest(w http.ResponseWriter, r *http.Request, body any, context string) bool {
+	err := JsonStaticDecode(r, &body)
+	if err != nil {
+		BackendErrorTarget(err, context)
+		BadRequest(w, "request body invalid json format", "redirect")
+		return false
+	}
+	return true
 }
