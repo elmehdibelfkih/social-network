@@ -11,7 +11,7 @@ import (
 
 func SelectAvatarMediaId(mediaId int64) (bool, error) {
 	var m AvatarMediaSqlRow
-	err := config.DB.QueryRow(SELECT_SESSION_BY_ID_AND_SESSION, mediaId).Scan(
+	err := config.DB.QueryRow(SELECT_MEDIA_BY_MEDIA_ID, mediaId).Scan(
 		&m.MediaId,
 		&m.OwnerId,
 		&m.Path,
@@ -21,7 +21,7 @@ func SelectAvatarMediaId(mediaId int64) (bool, error) {
 		&m.CreatedAt,
 	)
 	if err != nil {
-		utils.SQLiteErrorTarget(err, SELECT_SESSION_BY_ID_AND_SESSION)
+		utils.SQLiteErrorTarget(err, SELECT_MEDIA_BY_MEDIA_ID)
 		return false, err
 	}
 	if m.OwnerId != 0 || m.Purpose != "avatar" {
@@ -195,6 +195,7 @@ func InsertRegisterUserSession(s *SessionResponseJson) error {
 			s.SessionToken,
 			s.IpAddress,
 			s.Device,
+			s.ExpiresAt,
 		)
 
 		if err != nil {

@@ -13,7 +13,7 @@ func RegisterUserAccount(w http.ResponseWriter, r *http.Request, body *RegisterR
 		valid, err := SelectAvatarMediaId(*body.AvatarId)
 		if err != nil {
 			utils.BackendErrorTarget(err, context)
-			utils.InternalServerError(w)
+			utils.BadRequest(w,"failed to insert media","alert")
 			return response, false
 		}
 		if !valid {
