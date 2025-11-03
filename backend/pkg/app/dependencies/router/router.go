@@ -60,7 +60,7 @@ func (r *Router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	defer r.mu.RUnlock()
 
 	for _, entry := range r.patterns {
-		if matchSegments(entry.patternSegments, reqSegs) {
+		if matchSegments(entry.patternSegments, reqSegs, req) {
 			if h, ok := entry.methods[req.Method]; ok {
 				h.ServeHTTP(w, req)
 				return
@@ -82,13 +82,18 @@ func splitPath(p string) []string {
 	return strings.Split(p, "/")
 }
 
-func matchSegments(pattern, req []string) bool {
+func matchSegments(pattern, req []string, r *http.Request) bool {
 	if len(pattern) != len(req) {
 		return false
 	}
 	for i := range pattern {
 		ps := pattern[i]
-		if strings.HasPrefix(ps, ":") {
+		if strings.HasPrefix(ps, "{") && strings.HasSuffix(ps, "}") {
+			// fmt.Println(pattern[i])
+			// println("================")
+			// fmt.Println(req[1:i])
+			r.SetPathValue(strings.Trim(pattern[i], "{}"), req[i])
+
 			continue
 		}
 		if ps != req[i] {
