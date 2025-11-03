@@ -33,7 +33,7 @@ func (h *Handler) HandleUploadMedia(w http.ResponseWriter, r *http.Request) {
 		utils.UnsupportedMediaType(w)
 		return
 	}
-
+	//todo: MediaPurposes?
 	if !MediaPurposes[req.Purpose] {
 		utils.BadRequest(w, "Invalid purpose for the media", utils.ErrorTypeAlert)
 		return

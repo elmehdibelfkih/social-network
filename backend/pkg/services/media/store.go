@@ -12,6 +12,11 @@ import (
 	"github.com/mattn/go-sqlite3"
 )
 
+//todo: the db *sql.DB alredy exist in the global config (3ndak database dyalk bo7dak hna la. 🙅)
+//todo: use the WrapWithTransaction from the database package to secure database operations
+// todo: the query names must follow the macros style
+//todo use GetUserIdFromContext from the utils package to get user id
+
 type DBStore struct {
 	db *sql.DB
 }
