@@ -86,6 +86,7 @@
 {
   "email/userId/nickname": "email@example.com/1289843874339/nickname",
   "password": "Pa$$w0rd!",
+  "rememberMe":true
 }
 ```
 
