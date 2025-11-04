@@ -1,6 +1,12 @@
 package notifications
 
 const (
+	QUERY_GET_NOTIFICATION_OWNER = `
+		SELECT user_id
+		FROM notifications
+		WHERE id = ?;
+	`
+
 	QUERY_CREATE_NOTIFICATION = `
 		INSERT INTO notifications (id, user_id, type, reference_type, reference_id, content, is_read, created_at, read_at)
 		VALUES(?, ?, ?, ?, ?, ?, 0, CURRENT_TIMESTAMP, ?);

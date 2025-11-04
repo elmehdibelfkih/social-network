@@ -42,6 +42,16 @@ func GetNotifications(userID int64, limit, offset int) ([]*Notification, error) 
 	return notifications, nil
 }
 
+func GetNotificationOwner(notifID int64) int64 {
+	var ownerID int64
+	err := config.DB.QueryRow(QUERY_GET_NOTIFICATION_OWNER, notifID).Scan(&ownerID)
+	if err != nil {
+		utils.SQLiteErrorTarget(err, QUERY_GET_NOTIFICATION_OWNER)
+		return -1
+	}
+	return ownerID
+}
+
 func GetUnreadCount(userID int64) (int, error) {
 	var count int
 	err := config.DB.QueryRow(QUERY_GET_UNREAD_NOTIFICATION_COUNT, userID).Scan(&count)
@@ -54,22 +64,44 @@ func GetUnreadCount(userID int64) (int, error) {
 
 func MarkNotificationRead(userID, notificationID int64) error {
 	return database.WrapWithTransaction(func(tx *sql.Tx) error {
-		_, err := tx.Exec(QUERY_MARK_NOTIFICATION_AS_READ, notificationID, userID)
+		res, err := tx.Exec(QUERY_MARK_NOTIFICATION_AS_READ, notificationID, userID)
 		if err != nil {
 			utils.SQLiteErrorTarget(err, QUERY_MARK_NOTIFICATION_AS_READ)
 			return err
 		}
+
+		rowsAffected, err := res.RowsAffected()
+		if err != nil {
+			utils.SQLiteErrorTarget(err, "MarkNotificationRead (RowsAffected)")
+			return err
+		}
+
+		if rowsAffected == 0 {
+			return sql.ErrNoRows
+		}
+
 		return nil
 	})
 }
 
 func MarkAllNotificationsRead(userID int64) error {
 	return database.WrapWithTransaction(func(tx *sql.Tx) error {
-		_, err := tx.Exec(QUERY_MARK_ALL_NOTIFICATIONS_AS_READ, userID)
+		res, err := tx.Exec(QUERY_MARK_ALL_NOTIFICATIONS_AS_READ, userID)
 		if err != nil {
 			utils.SQLiteErrorTarget(err, QUERY_MARK_ALL_NOTIFICATIONS_AS_READ)
 			return err
 		}
+
+		rowsAffected, err := res.RowsAffected()
+		if err != nil {
+			utils.SQLiteErrorTarget(err, "MarkAllNotificationRead (RowsAffected)")
+			return err
+		}
+
+		if rowsAffected == 0 {
+			return sql.ErrNoRows
+		}
+
 		return nil
 	})
 }
