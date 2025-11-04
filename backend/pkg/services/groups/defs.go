@@ -194,3 +194,26 @@ type RSVPRequestJson struct {
 type RSVPResponseJson struct {
 	Message string `json:"message"`
 }
+
+// validators
+
+func (v *CreateGroupRequestJson)Validate() bool {
+	
+	return true
+}
+
+func (v *UpdateGroupRequestJson)Validate() bool {
+	return true
+}
+
+func (v *InviteUserRequestJson)Validate() bool {
+	return true
+}
+
+func (v *CreateEventRequestJson)Validate() bool {
+	return true
+}
+
+func (v *RSVPRequestJson)Validate() bool {
+	return true
+}
