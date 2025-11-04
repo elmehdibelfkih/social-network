@@ -2,6 +2,7 @@ package utils
 
 import (
 	"html"
+	"math"
 	"regexp"
 	"strings"
 	"time"
@@ -60,15 +61,23 @@ func DateValidation(dateStr string) bool {
 	return err == nil
 }
 
-func TextContentValidationEscape(content *string) (bool, string) {
+func TextContentValidationEscape(content *string, maxLen, minLen int) (bool, string) {
 	trimmed := strings.TrimSpace(*content)
 	if trimmed == "" {
 		return false, "Content cannot be empty"
 	}
-	if len(*content) > 4096 {
+	if len(*content) > maxLen && len(*content) < minLen {
 		return false, "content to big"
 	}
 	escaped := html.EscapeString(trimmed)
 	content = &escaped
 	return true, escaped
+}
+
+func IdValidation(id int64) bool {
+	return id > 0 && id < math.MaxInt64
+}
+
+func OptionValidation(option string) bool {
+	return option == "going" || option == "not_going"
 }

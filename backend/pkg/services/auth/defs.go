@@ -128,8 +128,13 @@ func (v *RegisterRequestJson) Validate() (bool, string) {
 		}
 	}
 	if v.AboutMe != nil {
-		if ok, str := utils.TextContentValidationEscape(v.AboutMe); !ok {
+		if ok, str := utils.TextContentValidationEscape(v.AboutMe, 5, 2048); !ok {
 			return false, str
+		}
+	}
+	if v.AvatarId != nil {
+		if !utils.IdValidation(*v.AvatarId) {
+			return false, "invalid int64 id"
 		}
 	}
 	return true, "OK"
@@ -153,3 +158,4 @@ func (v *LoginRequestJson) Validate() (bool, string) {
 	}
 	return true, "OK"
 }
+

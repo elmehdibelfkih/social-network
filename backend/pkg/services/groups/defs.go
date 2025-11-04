@@ -1,51 +1,53 @@
 package groups
 
+import "social/pkg/utils"
+
 //groups
 
 // /api/v1/groups (POST) => create group
 type CreateGroupRequestJson struct {
-	Title       string  `json:"title"`
-	Description string  `json:"description"`
-	AvatarId    *int64  `json:"avatarId"` // optional
+	Title       string `json:"title"`
+	Description string `json:"description"`
+	AvatarId    *int64 `json:"avatarId"` // optional
 }
 
 type CreateGroupResponseJson struct {
-	Message     string  `json:"message"`
-	GroupId     int64   `json:"groupId"`
-	CreatorId   int64   `json:"creatorId"`
-	Title       string  `json:"title"`
-	Description string  `json:"description"`
-	AvatarId    *int64  `json:"avatarId"` // optional
-	CreatedAt   string  `json:"createdAt"`
-	UpdatedAt   string  `json:"updatedAt"`
+	Message     string `json:"message"`
+	GroupId     int64  `json:"groupId"`
+	CreatorId   int64  `json:"creatorId"`
+	Title       string `json:"title"`
+	Description string `json:"description"`
+	AvatarId    *int64 `json:"avatarId"` // optional
+	CreatedAt   string `json:"createdAt"`
+	UpdatedAt   string `json:"updatedAt"`
 }
 
 // /api/v1/groups/:group_id (GET) => get group info
 type GetGroupResponseJson struct {
-	GroupId     int64   `json:"groupId"`
-	CreatorId   int64   `json:"creatorId"`
-	Title       string  `json:"title"`
-	Description string  `json:"description"`
-	MemberCount int64   `json:"memberCount"`
-	AvatarId    *int64  `json:"avatarId"` // optional
-	CreatedAt   string  `json:"createdAt"`
-	UpdatedAt   string  `json:"updatedAt"`
+	GroupId     int64  `json:"groupId"`
+	CreatorId   int64  `json:"creatorId"`
+	Title       string `json:"title"`
+	Description string `json:"description"`
+	MemberCount int64  `json:"memberCount"`
+	AvatarId    *int64 `json:"avatarId"` // optional
+	CreatedAt   string `json:"createdAt"`
+	UpdatedAt   string `json:"updatedAt"`
 }
 
 // /api/v1/groups/:group_id (PUT) => update group
 type UpdateGroupRequestJson struct {
-	Title       string  `json:"title"`
-	Description string  `json:"description"`
-	AvatarId    *int64  `json:"avatarId"` // optional
+	Title       string `json:"title"`
+	Description string `json:"description"`
+	AvatarId    *int64 `json:"avatarId"` // optional
 }
 
 type UpdateGroupResponseJson struct {
-	Message     string  `json:"message"`
-	GroupId     int64   `json:"groupId"`
-	Title       string  `json:"title"`
-	Description string  `json:"description"`
-	AvatarId    *int64  `json:"avatarId"` // optional
-	UpdatedAt   string  `json:"updatedAt"`
+	Message     string `json:"message"`
+	GroupId     int64  `json:"groupId"`
+	Title       string `json:"title"`
+	Description string `json:"description"`
+	AvatarId    *int64 `json:"avatarId"` // optional
+	UpdatedAt   string `json:"updatedAt"`
 }
 
 // /api/v1/groups/:group_id (DELETE) => delete group
@@ -56,19 +58,19 @@ type DeleteGroupResponseJson struct {
 
 // /api/v1/groups (GET) => browse/search groups
 type BrowseGroupsResponseJson struct {
-	Limit       int64            `json:"limit"`
-	TotalGroups int64            `json:"totalGroups"`
-	Groups      []GroupItemJson  `json:"groups"`
+	Limit       int64           `json:"limit"`
+	TotalGroups int64           `json:"totalGroups"`
+	Groups      []GroupItemJson `json:"groups"`
 }
 
 type GroupItemJson struct {
-	GroupId     int64   `json:"groupId"`
-	Title       string  `json:"title"`
-	Description string  `json:"description"`
-	AvatarId    *int64  `json:"avatarId"` // optional
-	CreatorId   int64   `json:"creatorId"`
-	MemberCount int64   `json:"memberCount"`
-	CreatedAt   string  `json:"createdAt"`
+	GroupId     int64  `json:"groupId"`
+	Title       string `json:"title"`
+	Description string `json:"description"`
+	AvatarId    *int64 `json:"avatarId"` // optional
+	CreatorId   int64  `json:"creatorId"`
+	MemberCount int64  `json:"memberCount"`
+	CreatedAt   string `json:"createdAt"`
 }
 
 // /api/v1/groups/:group_id/invite (POST)
@@ -110,9 +112,9 @@ type DeclineMemberResponseJson struct {
 
 // /api/v1/groups/:group_id/members (GET)
 type ListGroupMembersResponseJson struct {
-	GroupId    int64              `json:"group_id"`
-	Members    []GroupMemberJson  `json:"members"`
-	Pagination PaginationJson     `json:"pagination"`
+	GroupId    int64             `json:"group_id"`
+	Members    []GroupMemberJson `json:"members"`
+	Pagination PaginationJson    `json:"pagination"`
 }
 
 type GroupMemberJson struct {
@@ -153,7 +155,7 @@ type CreateEventResponseJson struct {
 
 // /api/v1/groups/:group_id/events (GET)
 type ListEventsResponseJson struct {
-	GroupId int64          `json:"group_id"`
+	GroupId int64           `json:"group_id"`
 	Events  []EventItemJson `json:"events"`
 }
 
@@ -197,23 +199,65 @@ type RSVPResponseJson struct {
 
 // validators
 
-func (v *CreateGroupRequestJson)Validate() bool {
-	
-	return true
+func (v *CreateGroupRequestJson) Validate() (bool, string) {
+	if ok, str := utils.TextContentValidationEscape(&v.Title, 32, 5); !ok {
+		return false, str
+	}
+	if ok, str := utils.TextContentValidationEscape(&v.Description, 4096, 5); !ok {
+		return false, str
+	}
+	if v.AvatarId != nil {
+		if !utils.IdValidation(*v.AvatarId) {
+			return false, "invalid int64 id"
+		}
+	}
+	return true, "OK"
 }
 
-func (v *UpdateGroupRequestJson)Validate() bool {
-	return true
+func (v *UpdateGroupRequestJson) Validate() (bool, string) {
+	if ok, str := utils.TextContentValidationEscape(&v.Title, 32, 5); !ok {
+		return false, str
+	}
+	if ok, str := utils.TextContentValidationEscape(&v.Description, 4096, 5); !ok {
+		return false, str
+	}
+	if v.AvatarId != nil {
+		if !utils.IdValidation(*v.AvatarId) {
+			return false, "invalid int64 id"
+		}
+	}
+	return true, "OK"
 }
 
-func (v *InviteUserRequestJson)Validate() bool {
-	return true
+func (v *InviteUserRequestJson) Validate() (bool, string) {
+	if !utils.IdValidation(v.UserId) {
+		return false, "invalid int64 id"
+	}
+	return true, "OK"
 }
 
-func (v *CreateEventRequestJson)Validate() bool {
-	return true
+func (v *CreateEventRequestJson) Validate() (bool, string) {
+	if ok, str := utils.TextContentValidationEscape(&v.Title, 32, 5); !ok {
+		return false, str
+	}
+	if ok, str := utils.TextContentValidationEscape(&v.Description, 4096, 5); !ok {
+		return false, str
+	}
+	if !utils.DateValidation(v.StartAt) {
+		return false, "invalid Date"
+	}
+	if !utils.DateValidation(v.EndAt) {
+		return false, "invalid Date"
+	}
+	if ok, str := utils.TextContentValidationEscape(&v.Location, 32, 5); !ok {
+		return false, str
+	}
+	return true, "OK"
 }
 
-func (v *RSVPRequestJson)Validate() bool {
-	return true
+func (v *RSVPRequestJson) Validate() (bool, string) {
+	if !utils.OptionValidation(v.Option) {
+		return false, "invalid option"
+	}
+	return true, "OK"
 }
