@@ -6,6 +6,7 @@ import (
 	"social/pkg/app/dependencies/middleware"
 	"social/pkg/app/dependencies/router"
 	"social/pkg/services/auth"
+	"social/pkg/services/users"
 	"social/pkg/utils"
 )
 
@@ -23,7 +24,14 @@ func SocialMux() *router.Router {
 	socialMux.HandleFunc("DELETE", "/api/v1/sessions/{session_id}", utils.MiddlewareChain(auth.DeleteSession, middleware.UserContext, middleware.AuthMiddleware))
 
 	//Users_Profiles
-	// socialMux.HandleFunc("GET", "/api/v1/users/{user_id}/profile", utils.MiddlewareChain(auth.youhandller, middleware.UserContext, middleware.AuthMiddleware))
+	// GET profile - public endpoint (no auth required, but UserContext for optional user info)
+	socialMux.HandleFunc("GET", "/api/v1/users/{user_id}/profile", utils.MiddlewareChain(users.GetProfile, middleware.UserContext))
+	// PUT profile - requires authentication
+	socialMux.HandleFunc("PUT", "/api/v1/users/{user_id}/profile", utils.MiddlewareChain(users.PutProfile, middleware.UserContext, middleware.AuthMiddleware))
+	// PATCH privacy - requires authentication
+	socialMux.HandleFunc("PATCH", "/api/v1/users/{user_id}/privacy", utils.MiddlewareChain(users.PatchProfile, middleware.UserContext, middleware.AuthMiddleware))
+	// GET stats - public endpoint
+	socialMux.HandleFunc("GET", "/api/v1/users/{user_id}/stats", utils.MiddlewareChain(users.GetStats, middleware.UserContext))
 
 	return socialMux
 }
