@@ -2,16 +2,38 @@ package utils
 
 import (
 	"crypto/rand"
+	"database/sql"
 	"encoding/base64"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
 	config "social/pkg/config"
 	"strconv"
 
+	"github.com/mattn/go-sqlite3"
 	"golang.org/x/crypto/bcrypt"
 )
+
+func IdentifySqlError(w http.ResponseWriter, err error) {
+	if errors.Is(err, sql.ErrNoRows) {
+		BadRequest(w, err.Error(), "alert")
+		return
+	}
+	var sqliteErr sqlite3.Error
+	if errors.As(err, &sqliteErr) {
+		switch sqliteErr.ExtendedCode {
+		case sqlite3.ErrConstraintUnique:
+			BadRequest(w, err.Error(), "alert")
+			return
+		case sqlite3.ErrConstraintForeignKey:
+			BadRequest(w, err.Error(), "alert")
+			return
+		}
+	}
+	InternalServerError(w)
+}
 
 func OptionalJsonFields[T any](arg *T) any {
 	if arg != nil {

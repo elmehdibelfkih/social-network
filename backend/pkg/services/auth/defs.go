@@ -2,6 +2,7 @@ package auth
 
 import (
 	"social/pkg/utils"
+	"strconv"
 	"strings"
 )
 
@@ -104,56 +105,51 @@ type RememberMeSqlRow struct {
 }
 
 // validators
+
 func (v *RegisterRequestJson) Validate() (bool, string) {
-	// Email
-	if ok, email := utils.EmailValidation(v.Email); !ok {
-		return false, "Invalid email address."
-	} else {
-		v.Email = email
+	if ok, str := utils.EmailValidation(v.Email); !ok {
+		return false, str
 	}
-
-	// Password
-	if ok, msg := utils.PasswordValidation(v.Password); !ok {
-		return false, msg
+	if ok, str := utils.PasswordValidation(v.Password); !ok {
+		return false, str
 	}
-
-	// First name
-	if ok, n := utils.FirstNameLastName(v.FirstName); !ok {
-		return false, "Invalid first name format."
-	} else {
-		v.FirstName = n
+	if ok, str := utils.FirstNameLastName(v.FirstName); !ok {
+		return false, str
 	}
-
-	// Last name
-	if ok, n := utils.FirstNameLastName(v.LastName); !ok {
-		return false, "Invalid last name format."
-	} else {
-		v.LastName = n
+	if ok, str := utils.FirstNameLastName(v.LastName); !ok {
+		return false, str
 	}
-
-	// Date of birth
 	if !utils.DateValidation(v.DateOfBirth) {
-		return false, "Invalid date of birth format. Expected yyyy-mm-dd."
+		return false, "invalid Date"
 	}
-
-	// Optional fields
 	if v.Nickname != nil {
-		nick := strings.TrimSpace(*v.Nickname)
-		if len(nick) < 3 || len(nick) > 32 {
-			return false, "Nickname must be between 3 and 32 characters."
+		if ok, str := utils.FirstNameLastName(*v.Nickname); !ok {
+			return false, str
 		}
-		v.Nickname = &nick
 	}
-
 	if v.AboutMe != nil {
-		about := strings.TrimSpace(*v.AboutMe)
-		if len(about) > 512 {
-			return false, "AboutMe cannot exceed 512 characters."
+		if ok, str := utils.TextContentValidationEscape(v.AboutMe); !ok {
+			return false, str
 		}
-		v.AboutMe = &about
 	}
+	return true, "OK"
+}
 
-	// AvatarId is optional – no validation needed
-
+func (v *LoginRequestJson) Validate() (bool, string) {
+	if v.Identifier == "" {
+		return false, "Identifier cannot be empty"
+	}
+	if strings.Contains(v.Identifier, "@") {
+		if ok, str := utils.EmailValidation(v.Identifier); !ok {
+			return false, str
+		}
+	} else if _, err := strconv.ParseInt(v.Identifier, 10, 64); err != nil {
+		if ok, str := utils.FirstNameLastName(v.Identifier); !ok {
+			return false, str
+		}
+	}
+	if ok, str := utils.PasswordValidation(v.Password); !ok {
+		return false, str
+	}
 	return true, "OK"
 }

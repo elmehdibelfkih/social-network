@@ -93,11 +93,10 @@ func BackendErrorTarget(err error, context string) {
 	handleBackendError(fmt.Errorf("%s:%d: %w", file, line, err), context)
 }
 
-func ValidateJsonRequest(w http.ResponseWriter, r *http.Request, body any, context string) bool {
+func ValidateJsonRequest(r *http.Request, body any, context string) bool {
 	err := JsonStaticDecode(r, &body)
 	if err != nil {
 		BackendErrorTarget(err, context)
-		BadRequest(w, "request body invalid json format", "redirect")
 		return false
 	}
 	return true
