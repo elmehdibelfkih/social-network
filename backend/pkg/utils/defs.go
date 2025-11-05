@@ -1,5 +1,10 @@
 package utils
 
+const (
+	ErrorTypeAlert    = "alert"
+	ErrorTypeRedirect = "redirect"
+)
+
 type APIError struct {
 	StatusCode       int    `json:"statusCode"`
 	StatusText       string `json:"statusText"`

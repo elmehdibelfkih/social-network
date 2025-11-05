@@ -94,6 +94,15 @@ func BackendErrorTarget(err error, context string) {
 	handleBackendError(fmt.Errorf("%s:%d: %w", file, line, err), context)
 }
 
+// func ValidateJsonRequest(r *http.Request, body any, context string) bool {
+// 	err := JsonStaticDecode(r, &body)
+// 	if err != nil {
+// 		BackendErrorTarget(err, context)
+// 		return false
+// 	}
+// 	return true
+// }
+
 func sendErrorResponse(w http.ResponseWriter, status int, errTitle, errMsg, errType string) {
 	JsonResponseEncode(w, status, map[string]any{
 		"success": false,

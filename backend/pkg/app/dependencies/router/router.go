@@ -25,6 +25,7 @@ func NewRouter() *Router {
 
 func (router *Router) Register(method, pattern string, h http.Handler) {
 	method = strings.ToUpper(method)
+	pattern = strings.TrimSpace(pattern)
 	if !strings.HasPrefix(pattern, "/") {
 		pattern = "/" + pattern
 	}
@@ -66,7 +67,7 @@ func (r *Router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 				return
 			}
 			allowed := allowedMethodsList(entry.methods)
-			utils.MethodNotAllowed(w, "allowd methods in this endpoint: "+strings.Join(allowed, ", "))
+			utils.MethodNotAllowed(w, "allowed methods in this endpoint: "+strings.Join(allowed, ", "))
 			return
 		}
 	}
@@ -79,7 +80,11 @@ func splitPath(p string) []string {
 	if p == "" {
 		return []string{}
 	}
-	return strings.Split(p, "/")
+	parts := strings.Split(p, "/")
+	for i := range parts {
+		parts[i] = strings.TrimSpace(parts[i])
+	}
+	return parts
 }
 
 func matchSegments(pattern, req []string, r *http.Request) bool {
@@ -89,11 +94,13 @@ func matchSegments(pattern, req []string, r *http.Request) bool {
 	for i := range pattern {
 		ps := pattern[i]
 		if strings.HasPrefix(ps, "{") && strings.HasSuffix(ps, "}") {
-			// fmt.Println(pattern[i])
-			// println("================")
-			// fmt.Println(req[1:i])
-			r.SetPathValue(strings.Trim(pattern[i], "{}"), req[i])
-
+			// extract param name without braces
+			name := strings.TrimSuffix(strings.TrimPrefix(ps, "{"), "}")
+			// preserve caller behavior if SetPathValue exists on *http.Request
+			// (assumes an extension method on *http.Request)
+			if setter, ok := interface{}(r).(interface{ SetPathValue(string, string) }); ok {
+				setter.SetPathValue(name, req[i])
+			}
 			continue
 		}
 		if ps != req[i] {
