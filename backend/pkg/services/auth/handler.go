@@ -9,7 +9,12 @@ func PostRegister(w http.ResponseWriter, r *http.Request) {
 	var body RegisterRequestJson
 	var response RegisterResponseJson
 	var s SessionResponseJson
-	if !utils.ValidateJsonRequest(w, r, &body, "register handler") {
+	if !utils.ValidateJsonRequest(r, &body, "register handler") {
+		utils.BadRequest(w, "request body invalid json format", "redirect")
+		return
+	}
+	if ok, str := body.Validate(); !ok {
+		utils.BadRequest(w, str, "alert")
 		return
 	}
 	if !GeneratePasswordHash(w, &body, "register handler") {
@@ -26,16 +31,22 @@ func PostLogin(w http.ResponseWriter, r *http.Request) {
 	var body LoginRequestJson
 	var response LoginResponseJson
 	var s SessionResponseJson
-	if !utils.ValidateJsonRequest(w, r, &body, "login handler") {
+	var remember RememberMeSqlRow
+	if !utils.ValidateJsonRequest(r, &body, "login handler") {
+		utils.BadRequest(w, "request body invalid json format", "redirect")
+		return
+	}
+	if ok, str := body.Validate(); !ok {
+		utils.BadRequest(w, str, "alert")
 		return
 	}
 	if !CheckPasswordHash(w, &body, &response, "login handler") {
 		return
 	}
-	if !LoginUserAccount(w, r, &body, &response, &s, "login handler") {
+	if !LoginUserAccount(w, r, &body, &response, &s, &remember, "login handler") {
 		return
 	}
-	LoginUserHttp(w, response, s)
+	LoginUserHttp(w, response, s, remember)
 }
 
 func PostLogout(w http.ResponseWriter, r *http.Request) {

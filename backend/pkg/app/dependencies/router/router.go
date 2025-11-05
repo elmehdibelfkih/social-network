@@ -25,6 +25,7 @@ func NewRouter() *Router {
 
 func (router *Router) Register(method, pattern string, h http.Handler) {
 	method = strings.ToUpper(method)
+	pattern = strings.TrimSpace(pattern)
 	if !strings.HasPrefix(pattern, "/") {
 		pattern = "/" + pattern
 	}
@@ -60,13 +61,13 @@ func (r *Router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	defer r.mu.RUnlock()
 
 	for _, entry := range r.patterns {
-		if matchSegments(entry.patternSegments, reqSegs) {
+		if matchSegments(entry.patternSegments, reqSegs, req) {
 			if h, ok := entry.methods[req.Method]; ok {
 				h.ServeHTTP(w, req)
 				return
 			}
 			allowed := allowedMethodsList(entry.methods)
-			utils.MethodNotAllowed(w, "allowd methods in this endpoint: "+strings.Join(allowed, ", "))
+			utils.MethodNotAllowed(w, "allowed methods in this endpoint: "+strings.Join(allowed, ", "))
 			return
 		}
 	}
@@ -79,16 +80,27 @@ func splitPath(p string) []string {
 	if p == "" {
 		return []string{}
 	}
-	return strings.Split(p, "/")
+	parts := strings.Split(p, "/")
+	for i := range parts {
+		parts[i] = strings.TrimSpace(parts[i])
+	}
+	return parts
 }
 
-func matchSegments(pattern, req []string) bool {
+func matchSegments(pattern, req []string, r *http.Request) bool {
 	if len(pattern) != len(req) {
 		return false
 	}
 	for i := range pattern {
 		ps := pattern[i]
-		if strings.HasPrefix(ps, ":") {
+		if strings.HasPrefix(ps, "{") && strings.HasSuffix(ps, "}") {
+			// extract param name without braces
+			name := strings.TrimSuffix(strings.TrimPrefix(ps, "{"), "}")
+			// preserve caller behavior if SetPathValue exists on *http.Request
+			// (assumes an extension method on *http.Request)
+			if setter, ok := interface{}(r).(interface{ SetPathValue(string, string) }); ok {
+				setter.SetPathValue(name, req[i])
+			}
 			continue
 		}
 		if ps != req[i] {
