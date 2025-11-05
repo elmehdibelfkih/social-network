@@ -23,7 +23,7 @@ func SocialMux() *router.Router {
 	socialMux.HandleFunc("GET", "/api/v1/sessions", utils.MiddlewareChain(auth.GetSessions, middleware.UserContext, middleware.AuthMiddleware))
 	socialMux.HandleFunc("DELETE", "/api/v1/sessions/{session_id}", utils.MiddlewareChain(auth.DeleteSession, middleware.UserContext, middleware.AuthMiddleware))
 
-	// //medi
+	//media
 	socialMux.HandleFunc("POST", "/api/v1/media/upload", media.HandleUploadMedia)
 	socialMux.HandleFunc("GET", "/api/v1/media/{media_id}", utils.MiddlewareChain(media.HandleGetMedia, media.MediaMiddleware, middleware.AuthMiddleware))
 	socialMux.HandleFunc("DELETE", "/api/v1/media/{media_id} ", utils.MiddlewareChain(media.HandleDeleteMedia, media.MediaMiddleware, middleware.AuthMiddleware))
@@ -32,8 +32,6 @@ func SocialMux() *router.Router {
 }
 
 func testHandler(w http.ResponseWriter, r *http.Request) {
-	// fmt.Println(r.Header)
-	// fmt.Println(r.RemoteAddr)
 	fmt.Println("Route hit:", r.URL.Path, r.Header.Get("User-Agent"))
 	fmt.Fprintf(w, "hello")
 }

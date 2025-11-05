@@ -50,7 +50,7 @@
   "password": "Pa$$w0rd!",
   "firstName": "first",
   "lastName": "last",
-  "dateOfBirth": "01/01/2001",
+  "dateOfBirth": "2001-01-01",
   "nickname": "nickname",
   "aboutMe": "present who you are and what you do.",
   "avatarId": 23456754324567
@@ -65,7 +65,7 @@
   "email": "email@example.com",
   "firstName": "first",
   "lastName": "last",
-  "dateOfBirth": "01/01/2001",
+  "dateOfBirth": "2001-01-01",
   "nickname": "nickname", // optinal
   "aboutMe": "present who you are and what you do.", // optinal
   "avatarId": 23456754324567 // optinal 
@@ -98,7 +98,7 @@
   "email": "email@example.com",
   "firstName": "first",
   "lastName": "last",
-  "dateOfBirth": "01/01/2001",
+  "dateOfBirth": "2001-01-01",
   "nickname": "nickname",
   "aboutMe": "present who you are and what you do.",
   "avatarId": 23456754324567
@@ -1102,12 +1102,6 @@ No need for a request body.
 
 ***status code in success: 200***
 
-- request
-
-```json
-No need for a request body.
-```
-
 - response payload
 
 ``` json
@@ -1654,13 +1648,19 @@ No need for a request body.
 
 ### GET `/api/v1/notifications` => list notifications (paginated)
 
+***pagination***
+
+> - example of use: GET /api/v1/notifications?page=2&limit=10&read=unread
+
+
+|Parameter| Type| Description|
+|----------|-------|--------------|
+|page| integer| Page number (default = 1)|
+|limit| integer| Number of items per page (default = 20)|
+|read| string| Optional filter: read / unread|
+|type| string| Optional filter: follow_request, post_liked, etc.|
+
 ***status code in success: 200***
-
-- request
-
-```json
-No need for a request body.
-```
 
 - response payload
 

@@ -21,7 +21,7 @@ func HandleUploadMedia(w http.ResponseWriter, r *http.Request) {
 	r.Body = http.MaxBytesReader(w, r.Body, MaxMediaSize*1.4)
 	defer r.Body.Close()
 
-	if ok := utils.ValidateJsonRequest(w, r, r.Body, "Media upload"); !ok {
+	if ok := utils.ValidateJsonRequest(r, r.Body, "Media upload"); !ok {
 		return
 	}
 
