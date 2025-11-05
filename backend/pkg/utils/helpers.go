@@ -49,7 +49,7 @@ func GetWildCardValue(w http.ResponseWriter, r *http.Request, key string) int64 
 	wildCard, err := strconv.ParseInt(slug, 10, 64)
 	if err != nil {
 		BackendErrorTarget(err, "UserContext")
-		InternalServerError(w)
+		BadRequest(w, "ParseInt failed wild card", "alert")
 	}
 	return wildCard
 }

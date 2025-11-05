@@ -30,22 +30,22 @@ func SocialMux() *router.Router {
 	//media
 
 	// groups
-	socialMux.HandleFunc("GET", "/api/v1/groups/{group_id}", utils.MiddlewareChain(groups.GetGroupInfo, middleware.AuthMiddleware))
-	socialMux.HandleFunc("GET", "/api/v1/groups", utils.MiddlewareChain(groups.GetGroupsInfo, middleware.AuthMiddleware))
-	socialMux.HandleFunc("GET", "/api/v1/groups/{group_id}/members", utils.MiddlewareChain(groups.GetGroupMembers, middleware.AuthMiddleware))
 	socialMux.HandleFunc("POST", "/api/v1/group", utils.MiddlewareChain(groups.PostCreateGroup, middleware.AuthMiddleware))
 	socialMux.HandleFunc("POST", "/api/v1/groups/{group_id}/invite", utils.MiddlewareChain(groups.PostInviteMember, middleware.AuthMiddleware))
 	socialMux.HandleFunc("POST", "/api/v1/groups/{group_id}/join", utils.MiddlewareChain(groups.PostJoinGroup, middleware.AuthMiddleware))
-	socialMux.HandleFunc("POST", "/api/v1/groups/{group_id}/members/:user_id/accept", utils.MiddlewareChain(groups.PostAcceptInvite, middleware.AuthMiddleware))
-	socialMux.HandleFunc("POST", "/api/v1/groups/{group_id}/members/:user_id/decline", utils.MiddlewareChain(groups.PostDeclineInvite, middleware.AuthMiddleware))
-	socialMux.HandleFunc("PUT", "/api/v1/groups/{group_id}", utils.MiddlewareChain(groups.PutUpdateGroup, middleware.AuthMiddleware))
+	socialMux.HandleFunc("POST", "/api/v1/groups/{group_id}/members/{user_id}/accept", utils.MiddlewareChain(groups.PostAcceptInvite, middleware.AuthMiddleware))
+	socialMux.HandleFunc("POST", "/api/v1/groups/{group_id}/members/{user_id}/decline", utils.MiddlewareChain(groups.PostDeclineInvite, middleware.AuthMiddleware))
+	socialMux.HandleFunc("PUT", "/api/v1/groups/{group_id}", utils.MiddlewareChain(groups.PutUpdateGroup, middleware.AuthMiddleware, groups.IsGroupOwner))
+	socialMux.HandleFunc("GET", "/api/v1/groups/{group_id}", utils.MiddlewareChain(groups.GetGroupInfo, middleware.AuthMiddleware))
+	socialMux.HandleFunc("GET", "/api/v1/groups", utils.MiddlewareChain(groups.GetGroupsInfo, middleware.AuthMiddleware))
+	socialMux.HandleFunc("GET", "/api/v1/groups/{group_id}/members", utils.MiddlewareChain(groups.GetGroupMembers, middleware.AuthMiddleware))
 	socialMux.HandleFunc("DELETE", "/api/v1/groups/{group_id}", utils.MiddlewareChain(groups.DeleteGroup, middleware.AuthMiddleware))
 
 	// events
-	socialMux.HandleFunc("GET", "/api/v1/groups/{group_id}/events", utils.MiddlewareChain(groups.GetGroupEvents, middleware.AuthMiddleware))
-	socialMux.HandleFunc("GET", "/api/v1/events/{event_id}", utils.MiddlewareChain(groups.GetEventInfo, middleware.AuthMiddleware))
 	socialMux.HandleFunc("POST", "/api/v1/groups/{group_id}/events", utils.MiddlewareChain(groups.PostCreateEvent, middleware.AuthMiddleware))
 	socialMux.HandleFunc("POST", "/api/v1/events/{event_id}/rsvp", utils.MiddlewareChain(groups.PostEventRSVP, middleware.AuthMiddleware))
+	socialMux.HandleFunc("GET", "/api/v1/groups/{group_id}/events", utils.MiddlewareChain(groups.GetGroupEvents, middleware.AuthMiddleware))
+	socialMux.HandleFunc("GET", "/api/v1/events/{event_id}", utils.MiddlewareChain(groups.GetEventInfo, middleware.AuthMiddleware))
 
 	//chat
 	// notifications

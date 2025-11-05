@@ -1,15 +1,24 @@
 package groups
 
 import (
-	"fmt"
 	"net/http"
 	"social/pkg/utils"
 )
 
-func GroupPricay(next http.HandlerFunc) http.HandlerFunc {
+func IsGroupOwner(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		userId := utils.GetUserIdFromContext(r)
 		groupId := utils.GetWildCardValue(w, r, "group_id")
-		fmt.Println(userId, groupId)
+		check, err := SelectGroupOwner(groupId, userId)
+		if err != nil {
+			utils.BackendErrorTarget(err, "is group owner")
+			utils.ForbiddenError(w, "you must be the owner of the group")
+			return
+		}
+		if !check {
+			utils.ForbiddenError(w, "you must be the owner of the group")
+			return
+		}
+		next(w, r)
 	}
 }

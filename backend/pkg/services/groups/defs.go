@@ -12,7 +12,6 @@ type CreateGroupRequestJson struct {
 }
 
 type CreateGroupResponseJson struct {
-	Message     string `json:"message"`
 	GroupId     int64  `json:"groupId"`
 	CreatorId   int64  `json:"creatorId"`
 	Title       string `json:"title"`

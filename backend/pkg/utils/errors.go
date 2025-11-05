@@ -147,3 +147,7 @@ func UnsupportedMediaType(w http.ResponseWriter) {
 func MediaTooLargeError(w http.ResponseWriter, message string) {
 	sendErrorResponse(w, http.StatusRequestEntityTooLarge, "File Too Large", message, "alert")
 }
+
+func ForbiddenError(w http.ResponseWriter, message string) {
+	sendErrorResponse(w, http.StatusForbidden, "Forbidden", message, "alert")
+}

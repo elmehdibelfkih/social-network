@@ -66,8 +66,8 @@ func TextContentValidationEscape(content *string, maxLen, minLen int) (bool, str
 	if trimmed == "" {
 		return false, "Content cannot be empty"
 	}
-	if len(*content) > maxLen && len(*content) < minLen {
-		return false, "content to big"
+	if len(*content) < minLen || len(*content) > maxLen {
+		return false, "wrong length"
 	}
 	escaped := html.EscapeString(trimmed)
 	content = &escaped

@@ -1,5 +1,5 @@
 CREATE TABLE
-    remember_me (
+    IF NOT EXISTS remember_me (
         id INTEGER PRIMARY KEY,
         user_id INTEGER NOT NULL,
         remember_selector TEXT UNIQUE NOT NULL,

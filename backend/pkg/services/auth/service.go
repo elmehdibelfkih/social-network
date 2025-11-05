@@ -261,7 +261,7 @@ func CheckPasswordHash(w http.ResponseWriter, body *LoginRequestJson, response *
 	response.UserId = userId
 	if !utils.CheckPasswordHash(body.Password, password_hash) {
 		utils.BackendErrorTarget(err, context)
-		utils.IdentifySqlError(w, err)
+		utils.BadRequest(w, "wrong password", "alert")
 		return false
 	}
 	return true

@@ -3,7 +3,7 @@ CREATE TABLE IF NOT EXISTS groups (
   creator_id INTEGER NOT NULL,
   title TEXT NOT NULL,
   description TEXT,
-  is_public INTEGER NOT NULL DEFAULT 1 CHECK(is_public IN (0, 1)),
+  -- is_public INTEGER NOT NULL DEFAULT 1 CHECK(is_public IN (0, 1)),
   avatar_media_id INTEGER,
   created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
