@@ -80,7 +80,7 @@ func PostDeclineInvite(w http.ResponseWriter, r *http.Request) {
 func PutUpdateGroup(w http.ResponseWriter, r *http.Request) {
 	var body UpdateGroupRequestJson
 	var response UpdateGroupResponseJson
-	if !utils.ValidateJsonRequest(r, &body, "CreateGroup handler") {
+	if !utils.ValidateJsonRequest(r, &body, "PutUpdateGroup handler") {
 		utils.BadRequest(w, "request body invalid json format", "redirect")
 		return
 	}
@@ -88,7 +88,7 @@ func PutUpdateGroup(w http.ResponseWriter, r *http.Request) {
 		utils.BadRequest(w, str, "alert")
 		return
 	}
-	if !GroupUpdate(w, r, &body, &response, "CreateGroup handler") {
+	if !GroupUpdate(w, r, &body, &response, "PutUpdateGroup handler") {
 		return
 	}
 	GroupUpdateHttp(w, response)
@@ -96,7 +96,7 @@ func PutUpdateGroup(w http.ResponseWriter, r *http.Request) {
 
 func GetGroupInfo(w http.ResponseWriter, r *http.Request) {
 	var response GetGroupResponseJson
-	if !GroupInfo(w, r, &response, "CreateGroup handler") {
+	if !GroupInfo(w, r, &response, "GetGroupInfo handler") {
 		return
 	}
 	GetGroupInfoHttp(w, response)
@@ -104,18 +104,26 @@ func GetGroupInfo(w http.ResponseWriter, r *http.Request) {
 
 func GetGroupsInfo(w http.ResponseWriter, r *http.Request) {
 	var response BrowseGroupsResponseJson
-	if !GroupsInfo(w, r, &response, "CreateGroup handler") {
+	if !GroupsInfo(w, r, &response, "GetGroupsInfo handler") {
 		return
 	}
 	GetGroupsInfoHttp(w, response)
 }
 
 func GetGroupMembers(w http.ResponseWriter, r *http.Request) {
-
+	var response ListGroupMembersResponseJson
+	if !GroupMembers(w, r, &response, "GetGroupMembers handler") {
+		return
+	}
+	GetGroupMembersHttp(w, response)
 }
 
 func DeleteGroup(w http.ResponseWriter, r *http.Request) {
-
+	var response DeleteGroupResponseJson
+	if !DeleteGroupService(w, r, &response, "GetGroupMembers handler") {
+		return
+	}
+	DeleteGroupHttp(w, response)
 }
 
 // events

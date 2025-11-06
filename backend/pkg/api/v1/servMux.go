@@ -40,7 +40,7 @@ func SocialMux() *router.Router {
 	socialMux.HandleFunc("GET", "/api/v1/groups/{group_id}", utils.MiddlewareChain(groups.GetGroupInfo, middleware.AuthMiddleware))
 	socialMux.HandleFunc("GET", "/api/v1/groups", utils.MiddlewareChain(groups.GetGroupsInfo, middleware.AuthMiddleware))
 	socialMux.HandleFunc("GET", "/api/v1/groups/{group_id}/members", utils.MiddlewareChain(groups.GetGroupMembers, middleware.AuthMiddleware))
-	socialMux.HandleFunc("DELETE", "/api/v1/groups/{group_id}", utils.MiddlewareChain(groups.DeleteGroup, middleware.AuthMiddleware))
+	socialMux.HandleFunc("DELETE", "/api/v1/groups/{group_id}", utils.MiddlewareChain(groups.DeleteGroup, middleware.AuthMiddleware, groups.IsGroupOwner))
 
 	// events
 	socialMux.HandleFunc("POST", "/api/v1/groups/{group_id}/events", utils.MiddlewareChain(groups.PostCreateEvent, middleware.AuthMiddleware))

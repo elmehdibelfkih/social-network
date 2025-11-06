@@ -111,9 +111,9 @@ type DeclineMemberResponseJson struct {
 
 // /api/v1/groups/:group_id/members (GET)
 type ListGroupMembersResponseJson struct {
-	GroupId    int64             `json:"group_id"`
-	Members    []GroupMemberJson `json:"members"`
-	Pagination PaginationJson    `json:"pagination"`
+	Limit   int64
+	GroupId int64             `json:"group_id"`
+	Members []GroupMemberJson `json:"members"`
 }
 
 type GroupMemberJson struct {

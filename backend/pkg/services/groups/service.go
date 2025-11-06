@@ -20,6 +20,12 @@ func CreateGroup(w http.ResponseWriter, r *http.Request,
 		utils.IdentifySqlError(w, err)
 		return false
 	}
+	err = UpdateMetaData(response.GroupId, 1)
+	if err != nil {
+		utils.BackendErrorTarget(err, context)
+		utils.IdentifySqlError(w, err)
+		return false
+	}
 	return true
 }
 
@@ -88,6 +94,14 @@ func MemberStatus(w http.ResponseWriter, r *http.Request,
 		utils.BackendErrorTarget(err, context)
 		utils.IdentifySqlError(w, err)
 		return false
+	}
+	if status == "accepted" {
+		err = UpdateMetaData(response.GroupId, 1)
+		if err != nil {
+			utils.BackendErrorTarget(err, context)
+			utils.IdentifySqlError(w, err)
+			return false
+		}
 	}
 	return true
 }
@@ -176,11 +190,52 @@ func GetGroupsInfoHttp(w http.ResponseWriter,
 	})
 }
 
-// func CreateGroup(w http.ResponseWriter, r *http.Request,
-// 	body *CreateGroupRequestJson, response *CreateGroupResponseJson, context string) bool {
+func GroupMembers(w http.ResponseWriter, r *http.Request,
+	response *ListGroupMembersResponseJson, context string) bool {
+	groupId := utils.GetWildCardValue(w, r, "group_id")
+	limit := utils.GetQuerryPramInt(r, "limit")
+	lastItemId := utils.GetQuerryPramInt(r, "lastItemId")
+	err := SelectGroupMembers(groupId, limit, lastItemId, response)
+	if err != nil {
+		utils.BackendErrorTarget(err, context)
+		utils.IdentifySqlError(w, err)
+		return false
+	}
+	return true
+}
 
-// 	return true
-// }
+func GetGroupMembersHttp(w http.ResponseWriter,
+	response ListGroupMembersResponseJson) {
+	utils.JsonResponseEncode(w, http.StatusOK, map[string]any{
+		"success": true,
+		"payload": response,
+		"error":   map[string]any{},
+	})
+}
+
+func DeleteGroupService(w http.ResponseWriter, r *http.Request,
+	response *DeleteGroupResponseJson, context string) bool {
+	groupId := utils.GetWildCardValue(w, r, "group_id")
+	userId := utils.GetUserIdFromContext(r)
+	err := DeleteGroupFromGroups(groupId, userId)
+	if err != nil {
+		utils.BackendErrorTarget(err, context)
+		utils.IdentifySqlError(w, err)
+		return false
+	}
+	return true
+}
+
+func DeleteGroupHttp(w http.ResponseWriter,
+	response DeleteGroupResponseJson) {
+	utils.JsonResponseEncode(w, http.StatusOK, map[string]any{
+		"success": true,
+		"payload": response,
+		"error":   map[string]any{},
+	})
+}
+
+// helpers
 
 func ValidRelationship(w http.ResponseWriter, r *http.Request,
 	body *InviteUserRequestJson, context string) bool {

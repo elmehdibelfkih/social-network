@@ -31,19 +31,18 @@ const (
 		LIMIT ?
 	`
 
-	// Count total groups (for pagination)
-	SELECT_GROUPS_COUNT = `SELECT COUNT(*) FROM groups;`
-
 	// Get members of a group with pagination
 	SELECT_GROUP_MEMBERS_BY_GROUP_ID = `
-		SELECT u.id AS user_id, u.first_name || ' ' || u.last_name AS full_name, 
-		gm.role, gm.joined_at
-		FROM group_members gm
-		INNER JOIN users u ON u.id = gm.user_id
-		WHERE gm.group_id = ? AND gm.status = 'accepted'
-		ORDER BY gm.joined_at ASC
-		LIMIT ? OFFSET ?;
+	SELECT 
+    gm.user_id, u.first_name, u.last_name, gm.role, gm.joined_at
+	FROM group_members AS gm
+	JOIN users AS u ON gm.user_id = u.id
+	WHERE group_id < ? AND status = 'accepted'
+	ORDER BY created_at DESC
+	LIMIT ?
 	`
+	// Count total groups (for pagination)
+	SELECT_GROUPS_COUNT = `SELECT COUNT(*) FROM groups;`
 
 	// Get event by event_id
 	SELECT_EVENT_BY_ID = `
@@ -118,15 +117,22 @@ const (
 		WHERE group_id = ? AND user_id = ?
 		RETURNING group_id, user_id, role;
 	`
+
+	UPDATE_GROUP_FOLLOWERS_COUNT = `
+	UPDATE counters
+	SET followers_count = followers_count + ?,
+    updated_at = CURRENT_TIMESTAMP
+	WHERE entity_id = ?;
+	`
 )
 
 // DELETE
 
 const (
 	// Delete a group
-	DELETE_GROUP_BY_ID = `
+	DELETE_GROUP_BY_ID_AND_CREATOR = `
 		DELETE FROM groups
-		WHERE id = ?
+		WHERE id = ? AND creator_id = ?
 		RETURNING id;
 	`
 

@@ -5,9 +5,38 @@ import (
 	"social/pkg/config"
 	"social/pkg/db/database"
 	"social/pkg/utils"
+	"strings"
 )
 
 // read
+
+func SelectGroupMembers(groupId, limit, lastItemId int64, l *ListGroupMembersResponseJson) error {
+	rows, err := config.DB.Query(SELECT_GROUP_MEMBERS_BY_GROUP_ID,
+		lastItemId,
+		limit,
+	)
+	if err != nil {
+		utils.SQLiteErrorTarget(err, SELECT_GROUP_MEMBERS_BY_GROUP_ID)
+		return err
+	}
+	defer rows.Close()
+	l.Limit = limit
+	var item GroupMemberJson
+	var first string
+	var last string
+	for rows.Next() {
+		rows.Scan(
+			&item.UserId,
+			&first,
+			&last,
+			&item.Role,
+			&item.JoinedAt,
+		)
+		item.FullName = strings.Join([]string{first, last}, " ")
+		l.Members = append(l.Members, item)
+	}
+	return err
+}
 
 func SelectGroupsById(limit, lastItemId int64, l *BrowseGroupsResponseJson) error {
 	rows, err := config.DB.Query(SELECT_BROWSE_GROUPS,
@@ -20,8 +49,8 @@ func SelectGroupsById(limit, lastItemId int64, l *BrowseGroupsResponseJson) erro
 	}
 	defer rows.Close()
 	l.Limit = limit
+	var item GroupItemJson
 	for rows.Next() {
-		var item GroupItemJson
 		rows.Scan(
 			&item.GroupId,
 			&item.Title,
@@ -201,4 +230,34 @@ func UpdateGroup(groupId, userId int64, u *UpdateGroupRequestJson, ur *UpdateGro
 	})
 }
 
+func UpdateMetaData(entityId int64, value int64) error {
+	return database.WrapWithTransaction(func(tx *sql.Tx) error {
+		_, err := tx.Exec(UPDATE_GROUP_FOLLOWERS_COUNT,
+			value,
+			entityId,
+		)
+		if err != nil {
+			utils.SQLiteErrorTarget(err, UPDATE_GROUP_FOLLOWERS_COUNT)
+			return err
+		}
+
+		return nil
+	})
+}
+
 //delete
+
+func DeleteGroupFromGroups(groupId, userId int64) error {
+	return database.WrapWithTransaction(func(tx *sql.Tx) error {
+		_, err := tx.Exec(
+			DELETE_GROUP_BY_ID_AND_CREATOR,
+			groupId,
+			userId,
+		)
+		if err != nil {
+			utils.SQLiteErrorTarget(err, DELETE_GROUP_BY_ID_AND_CREATOR)
+			return err
+		}
+		return err
+	})
+}
