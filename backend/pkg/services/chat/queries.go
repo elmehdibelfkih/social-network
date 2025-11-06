@@ -27,3 +27,45 @@ LEFT JOIN messages m ON m.id = (
 WHERE cp.user_id = ?
 ORDER BY c.updated_at DESC;
 `
+var GetmassageByP = `
+SELECT id AS message_id,
+       sender_id,
+       content AS text,
+       created_at
+FROM messages
+WHERE chat_id = ? 
+ORDER BY created_at DESC
+LIMIT ? OFFSET ?;
+
+`
+
+const checkChatParticipantQuery = `
+SELECT 1 FROM chat_participants WHERE chat_id = ? AND user_id = ?;
+`
+
+const insertMessageQuery = `
+INSERT INTO messages (chat_id, sender_id, content, created_at, updated_at)
+VALUES (?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+`
+
+const getLastInsertedMessageID = `SELECT last_insert_rowid();`
+
+const checkMessageOwnershipQuery = `
+SELECT 1 FROM messages WHERE id = ? AND sender_id = ? AND chat_id = ?;
+`
+
+const deleteMessageQuery = `
+DELETE FROM messages WHERE id = ? AND sender_id = ?;
+`
+
+const getParticipantsQuery = `
+SELECT 
+    cp.user_id,
+    u.nickname as username,
+    cp.role,
+    cp.last_seen_message_id,
+    cp.unread_count
+FROM chat_participants cp
+JOIN users u ON u.id = cp.user_id
+WHERE cp.chat_id = ?;
+`
