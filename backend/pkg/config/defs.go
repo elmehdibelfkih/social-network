@@ -4,11 +4,13 @@ import (
 	"database/sql"
 )
 
-type contextKey string
+type ContextKey string
 
 // context keys
 
-const USER_ID_KEY contextKey = "userId"
+const (
+	USER_ID_KEY      ContextKey = "userId"
+)
 
 var DB *sql.DB
 
