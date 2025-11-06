@@ -2,23 +2,13 @@ package media
 
 import "time"
 
-type Handler struct {
-	manager MediaManager
-}
-
 // NediaManager defines the interface for media DB operations
-type MediaManager interface {
-	CreateMedia(media *Media) error
-	GetMediaByID(id int64) (*Media, error)
-	DeleteMedia(id, userID int64) (string, error) // returns the path so the can delete it from the memory
-}
-
 type Media struct {
 	ID        int64     `db:"id"`
 	OwnerId   int64     `db:"owner_id"`
 	Path      string    `db:"path"`
 	Mime      string    `db:"mime"`
-	Size      int64     `db:"size"`
+	Size      int       `db:"size"`
 	Purpose   string    `db:"purpose"`
 	CreatedAt time.Time `db:"created_at"`
 }
@@ -48,3 +38,16 @@ type DeleteMediaResponse struct {
 const (
 	MaxMediaSize = 10485760 // 10 MB
 )
+
+var AllowedMimeTypes = map[string]bool{
+	"image/jpeg": true,
+	"image/png":  true,
+	"image/gif":  true,
+}
+
+var MediaPurposes = map[string]bool{
+	"avatar":  true,
+	"comment": true,
+	"post":    true,
+	"message": true,
+}

@@ -35,6 +35,20 @@ func IdentifySqlError(w http.ResponseWriter, err error) {
 	InternalServerError(w)
 }
 
+func GetQuerryPramInt(r *http.Request, key string) int64 {
+	queryParams := r.URL.Query()
+	n, err := strconv.ParseInt(queryParams.Get(key), 10, 64)
+	if err != nil {
+		return 0
+	}
+	return n
+}
+
+func GetQuerryPramString(r *http.Request, key string) string {
+	queryParams := r.URL.Query()
+	return queryParams.Get(key)
+}
+
 func OptionalJsonFields[T any](arg *T) any {
 	if arg != nil {
 		return *arg

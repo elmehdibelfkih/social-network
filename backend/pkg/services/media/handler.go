@@ -14,26 +14,14 @@ import (
 	"social/pkg/utils"
 )
 
-var AllowedMimeTypes = map[string]bool{
-	"image/jpeg": true,
-	"image/png":  true,
-	"image/gif":  true,
-}
-
-func NewHandler() *Handler {
-	return &Handler{}
-}
-
-func (h *Handler) HandleUploadMedia(w http.ResponseWriter, r *http.Request) {
-
+func HandleUploadMedia(w http.ResponseWriter, r *http.Request) {
 	userId := utils.GetUserIdFromContext(r)
 
 	var req UploadMediaRequest
-	r.Body = http.MaxBytesReader(w, r.Body, MaxMediaSize)
+	r.Body = http.MaxBytesReader(w, r.Body, MaxMediaSize*1.4)
 	defer r.Body.Close()
 
-	if err := utils.JsonStaticDecode(r, req); err != nil {
-		utils.BadRequest(w, "The request body is not valid JSON.", "redirect")
+	if ok := utils.ValidateJsonRequest(r, r.Body, "Media upload"); !ok {
 		return
 	}
 
@@ -41,10 +29,15 @@ func (h *Handler) HandleUploadMedia(w http.ResponseWriter, r *http.Request) {
 		utils.UnsupportedMediaType(w)
 		return
 	}
+	//todo: MediaPurposes?
+	if !MediaPurposes[req.Purpose] {
+		utils.BadRequest(w, "Invalid purpose for the media", utils.ErrorTypeAlert)
+		return
+	}
 
 	data, err := base64.StdEncoding.DecodeString(req.FileData)
 	if err != nil {
-		utils.BadRequest(w, "The provided file data is not valid base64.", "redirect")
+		utils.BadRequest(w, "The provided file data is not valid base64.", utils.ErrorTypeAlert)
 		return
 	}
 
@@ -53,16 +46,22 @@ func (h *Handler) HandleUploadMedia(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	detectedMediaType := http.DetectContentType(data)
+	if !AllowedMimeTypes[detectedMediaType] {
+		utils.UnsupportedMediaType(w)
+		return
+	}
+
 	mediaID := utils.GenerateID()
-	extensions, _ := mime.ExtensionsByType(req.FileType)
+	extensions, _ := mime.ExtensionsByType(detectedMediaType)
 	if len(extensions) == 0 {
 		utils.UnsupportedMediaType(w)
 		return
 	}
 
+	storagDir := getStoragePathForPurpose(req.Purpose)
 	mediaName := fmt.Sprintf("%d%s", mediaID, extensions[0])
-	filePath := filepath.Join("../data/uploads", mediaName)
-	mediaPath := fmt.Sprintf("/media/%d", mediaID)
+	filePath := filepath.Join(storagDir, mediaName)
 
 	if err := os.WriteFile(filePath, data, 0o644); err != nil {
 		utils.BackendErrorTarget(err, "handleUploadMedia (WriteFile)")
@@ -70,20 +69,17 @@ func (h *Handler) HandleUploadMedia(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	context := r.URL.Query().Get("context")
-	purpose := getStoragePathForContext(context)
-
 	media := &Media{
 		ID:        mediaID,
 		OwnerId:   userId,
 		Path:      filePath,
-		Mime:      req.FileType,
-		Size:      int64(len(data)),
-		Purpose:   purpose,
+		Mime:      detectedMediaType,
+		Size:      len(data),
+		Purpose:   req.Purpose,
 		CreatedAt: time.Now(),
 	}
 
-	if err := h.manager.CreateMedia(media); err != nil {
+	if err := CreateMedia(media); err != nil {
 		os.Remove(filePath)
 		utils.SQLiteErrorTarget(err, "handleUploadMedia (CreateMedia)")
 		utils.InternalServerError(w)
@@ -93,21 +89,15 @@ func (h *Handler) HandleUploadMedia(w http.ResponseWriter, r *http.Request) {
 	utils.WriteSuccess(w, http.StatusCreated, UploadMediaResponse{
 		Message:    "Media uploaded successfully.",
 		MediaID:    mediaID,
-		MediaPath:  mediaPath,
 		FileType:   req.FileType,
 		UploadedAt: media.CreatedAt,
 	})
 }
 
-func (h *Handler) HandleGetMedia(w http.ResponseWriter, r *http.Request) {
+func HandleGetMedia(w http.ResponseWriter, r *http.Request) {
+	mediaID := utils.GetWildCardValue(w, r, "media_id")
 
-	mediaID, err := getMediaID(r)
-	if err != nil {
-		utils.BadRequest(w, "Invalid Parameter", "redirect")
-		return
-	}
-
-	media, err := h.manager.GetMediaByID(mediaID)
+	media, err := GetMediaByID(mediaID)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			utils.NotFoundError(w, "No media file found with the specified ID.")
@@ -122,22 +112,22 @@ func (h *Handler) HandleGetMedia(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, media.Path)
 }
 
-func (h *Handler) HandleDeleteMedia(w http.ResponseWriter, r *http.Request) {
+func HandleDeleteMedia(w http.ResponseWriter, r *http.Request) {
 	userId := utils.GetUserIdFromContext(r)
 
 	mediaID, err := getMediaID(r)
 	if err != nil {
-		utils.BadRequest(w, "Invalid Parameter", "redirect")
+		utils.BadRequest(w, "Invalid Parameter", utils.ErrorTypeAlert)
 		return
 	}
 
-	_, err = h.manager.DeleteMedia(mediaID, userId)
+	_, err = DeleteMedia(mediaID, userId)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			utils.NotFoundError(w, "No media file found with the specified ID.")
 			return
 		}
-		if strings.Contains(err.Error(), "Forbidden") {
+		if strings.Contains(err.Error(), "forbidden") {
 			utils.Unauthorized(w, "You do not have permission to delete this media.")
 			return
 		}

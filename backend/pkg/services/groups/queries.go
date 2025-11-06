@@ -18,24 +18,17 @@ const (
 			SELECT 1 FROM groups WHERE id = ? AND creator_id = ?
 		);
 	`
-	SELECT_GROUP_WITH_MEMBER_COUNT = `
-		SELECT g.id, g.creator_id, g.title, g.description, g.avatar_media_id, 
-		COUNT(m.user_id) AS member_count, g.created_at, g.updated_at
-		FROM groups g
-		LEFT JOIN group_members m ON g.id = m.group_id AND m.status = 'accepted'
-		WHERE g.id = ?
-		GROUP BY g.id;
+	SELECT_GROUP_MEMBERS_COUNT = `
+		SELECT followers_count FROM counters WHERE entity_type = ? AND entity_id = ?
 	`
 
 	// List all groups with pagination
 	SELECT_BROWSE_GROUPS = `
-		SELECT g.id, g.title, g.description, g.avatar_media_id, g.creator_id,
-		COUNT(m.user_id) AS member_count, g.created_at
-		FROM groups g
-		LEFT JOIN group_members m ON g.id = m.group_id AND m.status = 'accepted'
-		GROUP BY g.id
-		ORDER BY g.created_at DESC
-		LIMIT ? OFFSET ?;
+		SELECT id, title, description, avatar_media_id, creator_id, created_at
+		FROM groups
+		WHERE id < ?
+		ORDER BY created_at DESC
+		LIMIT ?
 	`
 
 	// Count total groups (for pagination)
@@ -50,11 +43,6 @@ const (
 		WHERE gm.group_id = ? AND gm.status = 'accepted'
 		ORDER BY gm.joined_at ASC
 		LIMIT ? OFFSET ?;
-	`
-
-	// Count members in a group
-	SELECT_GROUP_MEMBERS_COUNT = `
-		SELECT COUNT(*) FROM group_members WHERE group_id = ? AND status = 'accepted';
 	`
 
 	// Get event by event_id

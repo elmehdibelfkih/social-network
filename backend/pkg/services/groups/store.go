@@ -9,21 +9,68 @@ import (
 
 // read
 
+func SelectGroupsById(limit, lastItemId int64, l *BrowseGroupsResponseJson) error {
+	rows, err := config.DB.Query(SELECT_BROWSE_GROUPS,
+		lastItemId,
+		limit,
+	)
+	if err != nil {
+		utils.SQLiteErrorTarget(err, SELECT_BROWSE_GROUPS)
+		return err
+	}
+	defer rows.Close()
+	l.Limit = limit
+	for rows.Next() {
+		var item GroupItemJson
+		rows.Scan(
+			&item.GroupId,
+			&item.Title,
+			&item.Description,
+			&item.AvatarId,
+			&item.CreatorId,
+			&item.CreatedAt,
+		)
+		err = config.DB.QueryRow(SELECT_GROUP_MEMBERS_COUNT,
+			"group",
+			item.GroupId,
+		).Scan(
+			item.MemberCount,
+		)
+		if err != nil {
+			utils.SQLiteErrorTarget(err, SELECT_GROUP_MEMBERS_COUNT)
+			return err
+		}
+		l.TotalGroups++
+		l.Groups = append(l.Groups, item)
+	}
+	return err
+}
+
 func SelectGroupById(groupId int64, g *GetGroupResponseJson) error {
-	err := config.DB.QueryRow(SELECT_GROUP_WITH_MEMBER_COUNT,
+	err := config.DB.QueryRow(SELECT_GROUP_BY_GROUP_ID,
 		groupId,
 	).Scan(
 		&g.GroupId,
 		&g.CreatorId,
 		&g.Title,
 		&g.Description,
-		&g.MemberCount,
 		&g.AvatarId,
 		&g.CreatedAt,
 		&g.UpdatedAt,
 	)
 	if err != nil {
-		utils.SQLiteErrorTarget(err, SELECT_GROUP_BY_OWNER)
+		utils.SQLiteErrorTarget(err, SELECT_GROUP_BY_GROUP_ID)
+		return err
+	}
+	err = config.DB.QueryRow(SELECT_GROUP_MEMBERS_COUNT,
+		"group",
+		groupId,
+	).Scan(
+		&g.MemberCount,
+	)
+	if err != nil {
+		utils.SQLiteErrorTarget(err, SELECT_GROUP_MEMBERS_COUNT)
+		return err
 	}
 	return err
 }

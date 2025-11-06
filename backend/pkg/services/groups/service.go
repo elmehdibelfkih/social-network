@@ -155,8 +155,10 @@ func GetGroupInfoHttp(w http.ResponseWriter,
 
 func GroupsInfo(w http.ResponseWriter, r *http.Request,
 	response *BrowseGroupsResponseJson, context string) bool {
-	groupId := utils.GetWildCardValue(w, r, "group_id")
-	err := SelectGroupById(groupId, response)
+	limit := utils.GetQuerryPramInt(r, "limit")
+	lastItemId := utils.GetQuerryPramInt(r, "lastItemId")
+
+	err := SelectGroupsById(limit, lastItemId, response)
 	if err != nil {
 		utils.BackendErrorTarget(err, context)
 		utils.IdentifySqlError(w, err)
