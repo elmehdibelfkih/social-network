@@ -56,6 +56,9 @@ func GetUnreadCount(userID int64) (int, error) {
 	var count int
 	err := config.DB.QueryRow(QUERY_GET_UNREAD_NOTIFICATION_COUNT, userID).Scan(&count)
 	if err != nil {
+		if err == sql.ErrNoRows {
+			return 0, nil
+		}
 		utils.SQLiteErrorTarget(err, QUERY_GET_UNREAD_NOTIFICATION_COUNT)
 		return 0, err
 	}
@@ -126,4 +129,32 @@ func DeleteAllNotifications(userID int64) error {
 		}
 		return nil
 	})
+}
+
+func ModularNotifisQuery(query string, args []any) ([]*Notification, error) {
+	rows, err := config.DB.Query(query, args...)
+	if err != nil {
+		utils.SQLiteErrorTarget(err, query)
+		return nil, err
+	}
+	defer rows.Close()
+
+	var notifications []*Notification
+
+	for rows.Next() {
+		var n Notification
+		err := rows.Scan(&n)
+		if err != nil {
+			utils.SQLiteErrorTarget(err, query)
+			return nil, err
+		}
+		notifications = append(notifications, &n)
+	}
+
+	if err = rows.Err(); err != nil {
+		utils.SQLiteErrorTarget(err, query)
+		return nil, err
+	}
+
+	return notifications, nil
 }

@@ -1,6 +1,10 @@
 package notifications
 
 const (
+	QUERY_GET_NOTIFICATION = `
+		SELECT id, user_id, type, reference_type, reference_id, content, is_read, created_at FROM notifications
+	`
+
 	QUERY_GET_NOTIFICATION_OWNER = `
 		SELECT user_id
 		FROM notifications
@@ -9,7 +13,7 @@ const (
 
 	QUERY_CREATE_NOTIFICATION = `
 		INSERT INTO notifications (id, user_id, type, reference_type, reference_id, content, is_read, created_at, read_at)
-		VALUES(?, ?, ?, ?, ?, ?, 0, CURRENT_TIMESTAMP, ?);
+		VALUES(?, ?, ?, ?, ?, ?, 0, CURRENT_TIMESTAMP, NULL);
 	`
 
 	QUERY_GET_ALL_NOTIFICATIONS = `
@@ -33,7 +37,7 @@ const (
 	`
 
 	QUERY_DELETE_NOTIFICATION = `
-		DELETE FROM notification
+		DELETE FROM notifications
 		WHERE id = ? AND user_id = ?;
 	`
 
@@ -54,5 +58,9 @@ const (
     	WHERE user_id = ?
     	ORDER BY created_at DESC
     	LIMIT ? OFFSET ?;
+	`
+
+	QUERY_GET_NOTIFICATIONS_BY_COUNT = `
+		SELECT COUNT (*) FROM notifications;
 	`
 )

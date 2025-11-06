@@ -2,6 +2,19 @@ package notifications
 
 import "database/sql"
 
+const (
+	MAX_NUM_OF_NOTIFICATIONS = 20
+)
+
+var validTypes = map[string]bool{
+	"post":    true,
+	"comment": true,
+	"group":   true,
+	"event":   true,
+	"user":    true,
+	"chat":    true,
+}
+
 type Notification struct {
 	ID            int64          `json:"notificationId" db:"id"`
 	UserID        int64          `json:"-" db:"user_id"`
