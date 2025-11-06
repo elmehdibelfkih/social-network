@@ -61,7 +61,7 @@ func DateValidation(dateStr string) bool {
 	return err == nil
 }
 
-func TextContentValidationEscape(content *string, maxLen, minLen int) (bool, string) {
+func TextContentValidationEscape(content *string, minLen, maxLen int) (bool, string) {
 	trimmed := strings.TrimSpace(*content)
 	if trimmed == "" {
 		return false, "Content cannot be empty"

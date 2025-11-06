@@ -32,5 +32,5 @@ const (
 
 const (
 	DELETE_USER_SESSION_BY_SESSION_TOKEN = `DELETE FROM sessions WHERE user_id = ? AND session_token = ?`
-	DELETE_USER_SESSION_BY_SESSION_ID    = `DELETE FROM sessions WHERE user_id = ? AND session_id = ?`
+	DELETE_USER_SESSION_BY_SESSION_ID    = `DELETE FROM sessions WHERE user_id = ? AND id = ?`
 )
