@@ -1,7 +1,6 @@
 package follow
 
 const (
-	// INSERT
 	FOLLOW_REQUEST_QUERY = `
 		INSERT INTO follows (follower_id, followed_id, status, created_at)
 	SELECT ?, ?, 
@@ -19,7 +18,6 @@ const (
 	ACCEPT_FOLLOW_REQUEST_QUERY  = ``
 	DECLINE_FOLLOW_REQUEST_QUERY = ``
 
-	// SELECT
 	FOLLOWERS_LIST_QUERY      = ``
 	FOLLOWEEES_LIST_QUERY     = ``
 	FOLLOW_REQUEST_LIST_QUERY = ``
@@ -58,7 +56,7 @@ const (
 	ORDER BY f.created_at DESC;`
 
 	INSERT_NOTIFICATION = `
-	INSERT INTO notifications (user_id, type, reference_id, content, created_at)
-			 VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)
+	INSERT INTO notifications (user_id, type, reference_type, reference_id, content, created_at)
+	VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP);
 	`
 )

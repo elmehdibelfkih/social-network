@@ -47,8 +47,7 @@ func FollowRequestMiddleWare(next http.HandlerFunc) http.HandlerFunc {
 			return
 		}
 
-		ctx := context.WithValue(r.Context(), REQUEST_STRUCT_KEY, request)
-		next(w, r.WithContext(ctx))
+		next(w, r)
 	}
 }
 
@@ -127,11 +126,6 @@ func FollowersFolloweesListMiddleWare(next http.HandlerFunc) http.HandlerFunc {
 
 // GET /api/v1/follow-requests => list received follow requests for current user
 //FIXME: mayby we dont need that function
-// func FollowRequestListMiddleWare(next http.HandlerFunc) http.HandlerFunc {
-// 	return func(w http.ResponseWriter, r *http.Request) {
-// 		next(w, r)
-// 	}
-// }
 
 // POST /api/v1/follow-requests/:user_id/accept => accept request
 func AcceptFollowRequestMiddleWare(next http.HandlerFunc) http.HandlerFunc {

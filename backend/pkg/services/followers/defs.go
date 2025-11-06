@@ -101,8 +101,10 @@ type DeclineResponseJson struct {
 }
 
 type Notification struct {
-	UserID      int64
-	Type        string
-	ReferenceID int64
-	Content     string
+	UserID        int64
+	Type          string
+	ReferenceType string
+	ReferenceId   int64
+	Content       string
+	status        string
 }

@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"errors"
 	"social/pkg/config"
+	"social/pkg/db/database"
 	"social/pkg/utils"
 	"time"
 )
@@ -150,4 +151,46 @@ func GetFolloweesByUserID(userID int64) ([]map[string]any, error) {
 	}
 
 	return followers, nil
+}
+
+func unfollowUser(followerId, followedId int64) error {
+	return database.WrapWithTransaction(func(tx *sql.Tx) error {
+		_, err := tx.Exec(UNFOLLOW_REQUEST_QUERY,
+			followerId, followedId,
+		)
+		if err != nil {
+			utils.SQLiteErrorTarget(err, UNFOLLOW_REQUEST_QUERY)
+			return err
+		}
+		//todo: update counters
+		return nil
+	})
+}
+
+func followUser(followerId, followedId int64) error {
+	return database.WrapWithTransaction(func(tx *sql.Tx) error {
+		_, err := tx.Exec(FOLLOW_REQUEST_QUERY,
+			followerId, followedId, followedId,
+		)
+		if err != nil {
+			utils.SQLiteErrorTarget(err, FOLLOW_REQUEST_QUERY)
+			return err
+		}
+
+		status, err := selectFollowStatus(followerId, followedId)
+		if err != nil {
+			return err
+		}
+
+		n := followNotification(followerId, followedId, status)
+		_, err = tx.Exec(INSERT_NOTIFICATION,
+			n.UserID, n.Type, n.ReferenceType, n.ReferenceId, n.Content,
+		)
+		if err != nil {
+			utils.SQLiteErrorTarget(err, INSERT_NOTIFICATION)
+			return err
+		}
+		//todo: update counters (check if the user profile public if yes increment the counter in not increment it when accept the request)
+		return nil
+	})
 }

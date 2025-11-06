@@ -9,14 +9,20 @@ import (
 func FollowRequest(w http.ResponseWriter, r *http.Request) {
 	userId := utils.GetUserIdFromContext(r)
 	targetUserId := utils.GetWildCardValue(w, r, "user_id")
-	followUser(userId, targetUserId)
+	err := followUser(userId, targetUserId)
+	if err != nil {
+		utils.InternalServerError(w)
+	}
 }
 
 // POST /api/v1/users/:user_id/unfollow => unfollow
 func UnfollowRequest(w http.ResponseWriter, r *http.Request) {
 	userId := utils.GetUserIdFromContext(r)
 	targetUserId := utils.GetWildCardValue(w, r, "user_id")
-	unfollowUser(userId, targetUserId)
+	err := unfollowUser(userId, targetUserId)
+	if err != nil {
+		utils.InternalServerError(w)
+	}
 }
 
 // GET /api/v1/users/:user_id/followers => list followers
