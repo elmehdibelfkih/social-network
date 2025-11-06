@@ -28,8 +28,7 @@ func GetProfile(w http.ResponseWriter, r *http.Request) {
 	utils.WriteSuccess(w, http.StatusOK, response)
 }
 
-// PutProfile handles PUT /api/v1/users/:user_id/profile
-// It updates the owner's profile fields. Authentication required.
+// It updates the owner's profile fields
 func PutProfile(w http.ResponseWriter, r *http.Request) {
 	// Extract user_id from URL path
 	profileUserId := utils.GetWildCardValue(w, r, "user_id")
@@ -53,12 +52,12 @@ func PutProfile(w http.ResponseWriter, r *http.Request) {
 
 	// Validate and parse JSON request body
 	var req UpdateProfileRequestJson
-	if !utils.ValidateJsonRequest(w, r, &req, "PutProfile handler") {
+	if !utils.ValidateJsonRequest(w, r, &req, "Put Profile handler") {
 		return
 	}
 
 	// Call service layer
-	response, ok := UpdateUserProfile(w, profileUserId, &req, "PutProfile handler")
+	response, ok := UpdateUserProfile(w, profileUserId, &req, "Put Profile handler")
 	if !ok {
 		return
 	}
@@ -68,7 +67,7 @@ func PutProfile(w http.ResponseWriter, r *http.Request) {
 }
 
 // PatchProfile handles PATCH /api/v1/users/:user_id/privacy
-// It toggles the profile privacy between "public" and "private". Authentication required.
+// It toggles the profile privacy between "public" and "private".
 func PatchProfile(w http.ResponseWriter, r *http.Request) {
 	// Extract user_id from URL path
 	profileUserId := utils.GetWildCardValue(w, r, "user_id")
@@ -117,7 +116,7 @@ func GetStats(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Call service layer
-	response, ok := GetUserStats(w, userId, "GetStats handler")
+	response, ok := GetUserStats(w, userId, "Get Stats handler")
 	if !ok {
 		return
 	}

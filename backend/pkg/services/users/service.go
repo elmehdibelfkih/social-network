@@ -111,7 +111,7 @@ func UpdateUserProfile(w http.ResponseWriter, userId int64, req *UpdateProfileRe
 		return response, false
 	}
 
-	// Prepare update values (use provided values or keep existing)
+	// Prepare update values
 	firstName := currentProfile.FirstName
 	lastName := currentProfile.LastName
 	nickname := currentProfile.Nickname

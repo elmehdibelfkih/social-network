@@ -24,13 +24,14 @@ func SocialMux() *router.Router {
 	socialMux.HandleFunc("DELETE", "/api/v1/sessions/{session_id}", utils.MiddlewareChain(auth.DeleteSession, middleware.UserContext, middleware.AuthMiddleware))
 
 	//Users_Profiles
-	// GET profile - public endpoint (no auth required, but UserContext for optional user info)
-	socialMux.HandleFunc("GET", "/api/v1/users/{user_id}/profile", utils.MiddlewareChain(users.GetProfile, middleware.UserContext))
-	// PUT profile - requires authentication
+	
+	// GET profile - Viewing profile
+	socialMux.HandleFunc("GET", "/api/v1/users/{user_id}/profile", utils.MiddlewareChain(users.GetProfile, middleware.UserContext, middleware.AuthMiddleware))
+	// PUT profile -- Editing profile
 	socialMux.HandleFunc("PUT", "/api/v1/users/{user_id}/profile", utils.MiddlewareChain(users.PutProfile, middleware.UserContext, middleware.AuthMiddleware))
-	// PATCH privacy - requires authentication
+	// PATCH privacy --- Changing privacy settings
 	socialMux.HandleFunc("PATCH", "/api/v1/users/{user_id}/privacy", utils.MiddlewareChain(users.PatchProfile, middleware.UserContext, middleware.AuthMiddleware))
-	// GET stats - public endpoint
+	// GET stats ---- Viewing profile stats
 	socialMux.HandleFunc("GET", "/api/v1/users/{user_id}/stats", utils.MiddlewareChain(users.GetStats, middleware.UserContext))
 
 	return socialMux
