@@ -2,17 +2,10 @@ package follow
 
 import (
 	"net/http"
-	"social/pkg/utils"
 )
 
 // POST /api/v1/users/:user_id/follow => send follow request or follow immediately if target is public
 func FollowRequest(w http.ResponseWriter, r *http.Request) {
-	var request FollowRequestJson
-	// var response FollowResponseJson
-
-	if !utils.ValidateJsonRequest(w, r, &request, "FollowRequest handler") {
-		return
-	}
 
 }
 

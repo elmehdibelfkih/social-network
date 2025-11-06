@@ -6,7 +6,6 @@ import (
 	"social/pkg/config"
 	"social/pkg/services/users"
 	"social/pkg/utils"
-	// "social/pkg/services/users"
 )
 
 func UserContext(next http.HandlerFunc) http.HandlerFunc {

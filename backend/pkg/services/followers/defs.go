@@ -1,5 +1,10 @@
 package follow
 
+type contextKey string
+
+// context keys
+const REQUEST_STRUCT_KEY contextKey = "requestStruct"
+
 // POST /api/v1/users/:user_id/follow
 // No need for a request body.
 type FollowRequestJson struct{}
@@ -23,7 +28,6 @@ type UnfollowResponseJson struct {
 
 // GET /api/v1/users/:user_id/followers
 // No request body.
-type FollowersListRequestJson struct{}
 type FollowersListResponseJson struct {
 	Followers []FollowerItem `json:"followers"`
 }
@@ -40,7 +44,6 @@ type FollowerItem struct {
 
 // GET /api/v1/users/:user_id/following
 // No request body.
-type FolloweesLisRequestJson struct{}
 
 type FolloweesLisResponseJson struct {
 	Following []FolloweeItem `json:"following"`
@@ -58,7 +61,6 @@ type FolloweeItem struct {
 
 // GET /api/v1/follow-requests
 // No request body.
-type FollowRequestRequestJson struct{}
 
 type FollowRequestResponseJson struct {
 	FollowRequests []FollowRequestItem `json:"followRequests"`

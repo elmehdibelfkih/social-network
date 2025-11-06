@@ -1,6 +1,7 @@
 package follow
 
 import (
+	"context"
 	"net/http"
 	"social/pkg/utils"
 )
@@ -9,15 +10,45 @@ import (
 func FollowRequestMiddleWare(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var request FollowRequestJson
+		userId := utils.GetUserIdFromContext(r)
+		targetUserId := utils.GetWildCardValue(w, r, "user_id")
 
-		if !utils.ValidateJsonRequest(w, r, &request, "Follow Request Middle Ware") {
+		if !utils.ValidateJsonRequest(w, r, &request, "Follow Request Middleware") {
 			return
 		}
 
-		// todo: check if the user try to send a request to hem self
-		// todo: check if the user already follow the user target
-		// todo: check if the user want to unfollow hem silf
+		isExist, err := userExists(targetUserId)
+		if err != nil {
+			utils.InternalServerError(w)
+			return
+		}
+		if !isExist {
+			utils.NotFoundError(w, "the tagret user is not exist")
+			return
+		}
 
+		if userId == targetUserId {
+			utils.BadRequest(w, "You cannot follow yourself.", "alert")
+			return
+		}
+
+		status, err := selectFollowStatus(userId, targetUserId)
+		if err != nil {
+			utils.InternalServerError(w)
+			return
+		}
+
+		switch status {
+		case "pending":
+			utils.BadRequest(w, "Follow request already sent.", "alert")
+			return
+		case "accepted":
+			utils.BadRequest(w, "You already follow this user.", "alert")
+			return
+		}
+
+		ctx := context.WithValue(r.Context(), REQUEST_STRUCT_KEY, request)
+		next(w, r.WithContext(ctx))
 	}
 }
 
@@ -25,14 +56,41 @@ func FollowRequestMiddleWare(next http.HandlerFunc) http.HandlerFunc {
 func UnfollowRequestMiddleWare(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var request UnfollowRequestJson
+		userId := utils.GetUserIdFromContext(r)
+		targetUserId := utils.GetWildCardValue(w, r, "user_id")
 
-		if !utils.ValidateJsonRequest(w, r, &request, "Follow Request Middle Ware") {
+		if !utils.ValidateJsonRequest(w, r, &request, "Follow Request Middleware") {
 			return
 		}
 
-		// todo: check if the user already follow the user target
-		// todo: check if the user want to follow hem silf
+		isExist, err := userExists(targetUserId)
+		if err != nil {
+			utils.InternalServerError(w)
+			return
+		}
+		if !isExist {
+			utils.NotFoundError(w, "the tagret user is not exist")
+			return
+		}
 
+		if userId == targetUserId {
+			utils.BadRequest(w, "You cannot follow yourself.", "alert")
+			return
+		}
+
+		status, err := selectFollowStatus(userId, targetUserId)
+		if err != nil {
+			utils.InternalServerError(w)
+			return
+		}
+
+		if status == "" || status == "decline" {
+			utils.BadRequest(w, "You are not follower of this user.", "alert")
+			return
+		}
+
+		ctx := context.WithValue(r.Context(), REQUEST_STRUCT_KEY, request)
+		next(w, r.WithContext(ctx))
 	}
 }
 
@@ -40,51 +98,117 @@ func UnfollowRequestMiddleWare(next http.HandlerFunc) http.HandlerFunc {
 // GET /api/v1/users/:user_id/following  => list followees
 func FollowersFolloweesListMiddleWare(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		//todo: check if the user want to get his own followers/followees
-		//todo: check if the target user have a public profile (if yes continue to the handler)
-		//todo: if not check if the current user one of the followers of the target user (if yes continue to the handler)
+		userId := utils.GetUserIdFromContext(r)
+		targetUserId := utils.GetWildCardValue(w, r, "user_id")
 
+		isExist, err := userExists(targetUserId)
+		if err != nil {
+			utils.InternalServerError(w)
+			return
+		}
+		if !isExist {
+			utils.NotFoundError(w, "the tagret user is not exist")
+			return
+		}
+
+		isPublic, err := isPublic(targetUserId)
+		status, err1 := selectFollowStatus(userId, targetUserId)
+		if err != nil || err1 != nil {
+			utils.InternalServerError(w)
+			return
+		}
+		if !isPublic && status != "accepted" {
+			utils.BadRequest(w, "This acoount is private", "alert")
+			return
+		}
+		next(w, r)
 	}
 }
-
-// func FolloweesListMiddleWare(next http.HandlerFunc) http.HandlerFunc {
-// 	return func(w http.ResponseWriter, r *http.Request) {
-
-// 	}
-// }
 
 // GET /api/v1/follow-requests => list received follow requests for current user
-func FollowRequestListMiddleWare(next http.HandlerFunc) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-
-	}
-}
+//FIXME: mayby we dont need that function
+// func FollowRequestListMiddleWare(next http.HandlerFunc) http.HandlerFunc {
+// 	return func(w http.ResponseWriter, r *http.Request) {
+// 		next(w, r)
+// 	}
+// }
 
 // POST /api/v1/follow-requests/:user_id/accept => accept request
 func AcceptFollowRequestMiddleWare(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var request AcceptFollowRequestJson
+		userId := utils.GetUserIdFromContext(r)
+		targetUserId := utils.GetWildCardValue(w, r, "user_id")
 
 		if !utils.ValidateJsonRequest(w, r, &request, "Follow Request Middle Ware") {
 			return
 		}
 
-		//todo: check if the user try accept an invetation from him self (i think is protected by default)
-		//todo: check if the current user have a follow request from the target user.
+		if userId == targetUserId {
+			utils.BadRequest(w, "You cannot accept an invitation from your yourself.", "alert")
+			return
+		}
 
+		isExist, err := userExists(targetUserId)
+		if err != nil {
+			utils.InternalServerError(w)
+			return
+		}
+		if !isExist {
+			utils.NotFoundError(w, "the tagret user is not exist")
+			return
+		}
+
+		status, err := selectFollowStatus(targetUserId, userId)
+		if err != nil {
+			utils.InternalServerError(w)
+			return
+		}
+
+		if status != "pending" {
+			utils.BadRequest(w, "You cannot accept an invitation dose not exist.", "alert")
+			return
+		}
+		next(w, r)
 	}
 }
 
 // POST /api/v1/follow-requests/:user_id/decline => decline request
 func DeclineFollowRequestMiddleWare(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var request DeclineRequestJson
+		var request AcceptFollowRequestJson
+		userId := utils.GetUserIdFromContext(r)
+		targetUserId := utils.GetWildCardValue(w, r, "user_id")
 
 		if !utils.ValidateJsonRequest(w, r, &request, "Follow Request Middle Ware") {
 			return
 		}
 
-		//todo: check if the user try decline an invetation from him self (i think is protected by default)
-		//todo: check if the current user have a follow request from the target user.
+		if userId == targetUserId {
+			utils.BadRequest(w, "You cannot decline an invitation from your yourself.", "alert")
+			return
+		}
+
+		isExist, err := userExists(targetUserId)
+		if err != nil {
+			utils.InternalServerError(w)
+			return
+		}
+		if !isExist {
+			utils.NotFoundError(w, "the tagret user is not exist")
+			return
+		}
+
+		status, err := selectFollowStatus(targetUserId, userId)
+		if err != nil {
+			utils.InternalServerError(w)
+			return
+		}
+
+		if status != "pending" {
+			utils.BadRequest(w, "You cannot decline an invitation dose not exist.", "alert")
+			return
+		}
+		next(w, r)
 	}
 }
