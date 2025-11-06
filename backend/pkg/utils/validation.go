@@ -86,6 +86,7 @@ func TextContentValidationEscape(content *string) (bool, string) {
 func ValidateJsonRequest(w http.ResponseWriter, r *http.Request, body any, context string) bool {
 	err := JsonStaticDecode(r, &body)
 	if err != nil {
+		println(err.Error())
 		BackendErrorTarget(err, context)
 		BadRequest(w, "request body invalid json format", "redirect")
 		return false

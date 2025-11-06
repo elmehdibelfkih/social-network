@@ -1,7 +1,6 @@
 package follow
 
 import (
-	"context"
 	"net/http"
 	"social/pkg/utils"
 )
@@ -9,13 +8,8 @@ import (
 // POST /api/v1/users/:user_id/follow => send follow request or follow immediately if target is public
 func FollowRequestMiddleWare(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var request FollowRequestJson
 		userId := utils.GetUserIdFromContext(r)
 		targetUserId := utils.GetWildCardValue(w, r, "user_id")
-
-		if !utils.ValidateJsonRequest(w, r, &request, "Follow Request Middleware") {
-			return
-		}
 
 		isExist, err := userExists(targetUserId)
 		if err != nil {
@@ -54,13 +48,8 @@ func FollowRequestMiddleWare(next http.HandlerFunc) http.HandlerFunc {
 // POST /api/v1/users/:user_id/unfollow => unfollow
 func UnfollowRequestMiddleWare(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var request UnfollowRequestJson
 		userId := utils.GetUserIdFromContext(r)
 		targetUserId := utils.GetWildCardValue(w, r, "user_id")
-
-		if !utils.ValidateJsonRequest(w, r, &request, "Follow Request Middleware") {
-			return
-		}
 
 		isExist, err := userExists(targetUserId)
 		if err != nil {
@@ -73,7 +62,7 @@ func UnfollowRequestMiddleWare(next http.HandlerFunc) http.HandlerFunc {
 		}
 
 		if userId == targetUserId {
-			utils.BadRequest(w, "You cannot follow yourself.", "alert")
+			utils.BadRequest(w, "You cannot unfollow yourself.", "alert")
 			return
 		}
 
@@ -88,8 +77,7 @@ func UnfollowRequestMiddleWare(next http.HandlerFunc) http.HandlerFunc {
 			return
 		}
 
-		ctx := context.WithValue(r.Context(), REQUEST_STRUCT_KEY, request)
-		next(w, r.WithContext(ctx))
+		next(w, r)
 	}
 }
 
@@ -130,13 +118,8 @@ func FollowersFolloweesListMiddleWare(next http.HandlerFunc) http.HandlerFunc {
 // POST /api/v1/follow-requests/:user_id/accept => accept request
 func AcceptFollowRequestMiddleWare(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var request AcceptFollowRequestJson
 		userId := utils.GetUserIdFromContext(r)
 		targetUserId := utils.GetWildCardValue(w, r, "user_id")
-
-		if !utils.ValidateJsonRequest(w, r, &request, "Follow Request Middle Ware") {
-			return
-		}
 
 		if userId == targetUserId {
 			utils.BadRequest(w, "You cannot accept an invitation from your yourself.", "alert")
@@ -170,13 +153,8 @@ func AcceptFollowRequestMiddleWare(next http.HandlerFunc) http.HandlerFunc {
 // POST /api/v1/follow-requests/:user_id/decline => decline request
 func DeclineFollowRequestMiddleWare(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var request AcceptFollowRequestJson
 		userId := utils.GetUserIdFromContext(r)
 		targetUserId := utils.GetWildCardValue(w, r, "user_id")
-
-		if !utils.ValidateJsonRequest(w, r, &request, "Follow Request Middle Ware") {
-			return
-		}
 
 		if userId == targetUserId {
 			utils.BadRequest(w, "You cannot decline an invitation from your yourself.", "alert")

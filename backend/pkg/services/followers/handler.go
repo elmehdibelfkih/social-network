@@ -13,6 +13,7 @@ func FollowRequest(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		utils.InternalServerError(w)
 	}
+	// todo: check notNound and supper flous error
 }
 
 // POST /api/v1/users/:user_id/unfollow => unfollow

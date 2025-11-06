@@ -6,7 +6,10 @@ import (
 	"social/pkg/config"
 	"social/pkg/db/database"
 	"social/pkg/utils"
+	"strings"
 	"time"
+
+	"github.com/mattn/go-sqlite3"
 )
 
 func selectFollowStatus(followerId, followedId int64) (string, error) {
@@ -21,6 +24,13 @@ func selectFollowStatus(followerId, followedId int64) (string, error) {
 		if errors.Is(err, sql.ErrNoRows) {
 			return "", nil
 		}
+
+		if sqliteErr, ok := err.(sqlite3.Error); ok && sqliteErr.Code == sqlite3.ErrError {
+			if strings.Contains(sqliteErr.Error(), "no such column") {
+				return "", nil
+			}
+		}
+
 		utils.SQLiteErrorTarget(err, SELECT_FOLLOW_STATUS_QUERY)
 		return "", err
 	}
