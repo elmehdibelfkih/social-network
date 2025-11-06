@@ -1,30 +1,21 @@
 package follow
 
-// POST /api/v1/users/:user_id/follow => send follow request or follow immediately if target is public
-// func FollowRequest(w http.ResponseWriter, r *http.Request)
-
-// POST /api/v1/users/:user_id/unfollow => unfollow
-// func UnfollowRequest(w http.ResponseWriter, r *http.Request)
-
-// GET /api/v1/users/:user_id/followers => list followers
-// func FollowersList(w http.ResponseWriter, r *http.Request)
-
-// GET /api/v1/users/:user_id/following  => list followees
-// func FolloweesList(w http.ResponseWriter, r *http.Request)
-
-// GET /api/v1/follow-requests => list received follow requests for current user
-// func FollowRequestList(w http.ResponseWriter, r *http.Request)
-
-// POST /api/v1/follow-requests/:user_id/accept => accept request
-// func AcceptFollowRequest(w http.ResponseWriter, r *http.Request)
-
-// POST /api/v1/follow-requests/:user_id/decline => decline request
-// func DeclineFollowRequest(w http.ResponseWriter, r *http.Request)
-
 const (
 	// INSERT
-	FOLLOW_REQUEST_QUERY         = ``
-	UNFOLLOW_REQUEST_QUERY       = ``
+	FOLLOW_REQUEST_QUERY = `
+		INSERT INTO follows (follower_id, followed_id, status, created_at)
+	SELECT ?, ?, 
+	       CASE WHEN is_public = 1 THEN 'accepted' ELSE 'pending' END,
+	       CURRENT_TIMESTAMP
+	FROM users
+	WHERE user_id = ?;
+	`
+
+	UNFOLLOW_REQUEST_QUERY = `
+	DELETE FROM follows 
+			WHERE follower_id = ? AND followed_id = ?;
+	`
+
 	ACCEPT_FOLLOW_REQUEST_QUERY  = ``
 	DECLINE_FOLLOW_REQUEST_QUERY = ``
 
@@ -65,4 +56,9 @@ const (
 	JOIN users u ON f.followed_id = u.user_id
 	WHERE f.follower_id = ?
 	ORDER BY f.created_at DESC;`
+
+	INSERT_NOTIFICATION = `
+	INSERT INTO notifications (user_id, type, reference_id, content, created_at)
+			 VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)
+	`
 )

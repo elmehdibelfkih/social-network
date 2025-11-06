@@ -73,7 +73,7 @@ type FollowRequestItem struct {
 	LastName    string `json:"lastName"`
 	AvatarId    int64  `json:"avatarId"`
 	RequestedAt string `json:"requestedAt"`
-	Status      string `json:"status"` // pending
+	Status      string `json:"status"`
 }
 
 // POST /api/v1/follow-requests/:user_id/accept
@@ -98,4 +98,11 @@ type DeclineResponseJson struct {
 	FollowedId int64  `json:"followedId"`
 	Status     string `json:"status"`
 	DeclinedAt string `json:"declinedAt"`
+}
+
+type Notification struct {
+	UserID      int64
+	Type        string
+	ReferenceID int64
+	Content     string
 }

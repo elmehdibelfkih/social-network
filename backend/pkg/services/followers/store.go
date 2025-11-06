@@ -41,7 +41,6 @@ func userExists(userId int64) (bool, error) {
 }
 
 func isPublic(userId int64) (bool, error) {
-
 	var isPublic bool
 	err := config.DB.QueryRow(
 		IS_USER_PROFILE_PUBLIC_QUERY,
@@ -49,7 +48,7 @@ func isPublic(userId int64) (bool, error) {
 	).Scan(&isPublic)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return false, nil // user not found → treat as private
+			return false, nil
 		}
 		utils.SQLiteErrorTarget(err, IS_USER_PROFILE_PUBLIC_QUERY)
 		return false, err
@@ -119,8 +118,8 @@ func GetFolloweesByUserID(userID int64) ([]map[string]any, error) {
 		var (
 			userId     int64
 			nickname   sql.NullString
-			firstName  sql.NullString
-			lastName   sql.NullString
+			firstName  string
+			lastName   string
 			avatarId   sql.NullInt64
 			followedAt time.Time
 			status     string
@@ -135,8 +134,8 @@ func GetFolloweesByUserID(userID int64) ([]map[string]any, error) {
 		follower := map[string]any{
 			"userId":     userId,
 			"nickname":   nickname.String,
-			"firstName":  firstName.String,
-			"lastName":   lastName.String,
+			"firstName":  firstName,
+			"lastName":   lastName,
 			"avatarId":   avatarId.Int64,
 			"followedAt": followedAt,
 			"status":     status,

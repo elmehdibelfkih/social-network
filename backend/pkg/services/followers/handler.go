@@ -2,16 +2,21 @@ package follow
 
 import (
 	"net/http"
+	"social/pkg/utils"
 )
 
 // POST /api/v1/users/:user_id/follow => send follow request or follow immediately if target is public
 func FollowRequest(w http.ResponseWriter, r *http.Request) {
-
+	userId := utils.GetUserIdFromContext(r)
+	targetUserId := utils.GetWildCardValue(w, r, "user_id")
+	followUser(userId, targetUserId)
 }
 
 // POST /api/v1/users/:user_id/unfollow => unfollow
 func UnfollowRequest(w http.ResponseWriter, r *http.Request) {
-
+	userId := utils.GetUserIdFromContext(r)
+	targetUserId := utils.GetWildCardValue(w, r, "user_id")
+	unfollowUser(userId, targetUserId)
 }
 
 // GET /api/v1/users/:user_id/followers => list followers
