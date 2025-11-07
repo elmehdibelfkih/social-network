@@ -63,6 +63,7 @@ func UnfollowRequestMiddleWare(next http.HandlerFunc) http.HandlerFunc {
 
 		if userId == targetUserId {
 			utils.BadRequest(w, "You cannot unfollow yourself.", "alert")
+			println("hani")
 			return
 		}
 

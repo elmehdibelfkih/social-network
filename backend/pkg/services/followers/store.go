@@ -7,7 +7,6 @@ import (
 	"social/pkg/db/database"
 	"social/pkg/utils"
 	"strings"
-	"time"
 
 	"github.com/mattn/go-sqlite3"
 )
@@ -84,7 +83,7 @@ func GetFollowersByUserID(userID int64) ([]map[string]any, error) {
 			firstName  sql.NullString
 			lastName   sql.NullString
 			avatarId   sql.NullInt64
-			followedAt time.Time
+			followedAt string
 			status     string
 		)
 
@@ -132,7 +131,7 @@ func GetFolloweesByUserID(userID int64) ([]map[string]any, error) {
 			firstName  string
 			lastName   string
 			avatarId   sql.NullInt64
-			followedAt time.Time
+			followedAt string
 			status     string
 		)
 
@@ -178,6 +177,7 @@ func unfollowUser(followerId, followedId int64) error {
 }
 
 func followUser(followerId, followedId int64) error {
+	//todo: check if already ixist a notification
 	return database.WrapWithTransaction(func(tx *sql.Tx) error {
 		_, err := tx.Exec(FOLLOW_REQUEST_QUERY,
 			followerId, followedId, followedId,
@@ -194,7 +194,7 @@ func followUser(followerId, followedId int64) error {
 
 		n := followNotification(followerId, followedId, status)
 		_, err = tx.Exec(INSERT_NOTIFICATION,
-			n.UserID, n.Type, n.ReferenceType, n.ReferenceId, n.Content,
+			n.id, n.UserId, n.Type, n.ReferenceType, n.ReferenceId, n.Content,
 		)
 		if err != nil {
 			utils.SQLiteErrorTarget(err, INSERT_NOTIFICATION)
@@ -203,4 +203,8 @@ func followUser(followerId, followedId int64) error {
 		//todo: update counters (check if the user profile public if yes increment the counter in not increment it when accept the request)
 		return nil
 	})
+}
+
+func followersList(userId int64) {
+
 }

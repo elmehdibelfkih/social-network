@@ -12,7 +12,7 @@ All timestamps follow the ISO-8601 format: `YYYY-MM-DD HH:MM:SS`.
 Stores all user profiles and account data.
 
 - Includes personal info, avatar, and privacy settings.
-- References: `avatar_media_id → media.id`
+- References: `avatar_id → media.id`
 
 ### **sessions**
 
@@ -129,7 +129,7 @@ Logs counter changes for analytics and synchronization.
 |-------------|---------|---|-----------|---------|
 | sessions | user_id | → | users | id |
 | media | owner_id | → | users | id |
-| users | avatar_media_id | → | media | id |
+| users | avatar_id | → | media | id |
 | posts | author_id | → | users | id |
 | posts | group_id | → | groups | id |
 | comments | post_id | → | posts | id |

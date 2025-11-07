@@ -24,11 +24,11 @@ const (
 
 	SELECT_FOLLOW_STATUS_QUERY   = `SELECT status FROM follows WHERE follower_id = ? AND followed_id = ?`
 	USER_EXISTS_QUERY            = `SELECT EXISTS(SELECT 1 FROM users WHERE id = ?)`
-	IS_USER_PROFILE_PUBLIC_QUERY = `SELECT EXISTS(SELECT 1 FROM users WHERE privacy = "public" AND user_id = ?)`
+	IS_USER_PROFILE_PUBLIC_QUERY = `SELECT EXISTS(SELECT 1 FROM users WHERE privacy = "public" AND id = ?)`
 
 	GET_FOLLOWERS_QUERY = `
 	SELECT 
-		u.user_id AS userId,
+		u.id AS userId,
 		u.nickname,
 		u.first_name AS firstName,
 		u.last_name AS lastName,
@@ -36,14 +36,14 @@ const (
 		f.followed_at AS followedAt,
 		f.status
 	FROM follows f
-	JOIN users u ON f.follower_id = u.user_id
+	JOIN users u ON f.follower_id = u.id
 	WHERE f.followed_id = ?
 	ORDER BY f.followed_at DESC;
 	`
 
 	GET_FOLLOWEES_QUERY = `
 	SELECT 
-	  u.user_id AS userId,
+	  u.id AS userId,
 	  u.nickname,
 	  u.first_name AS firstName,
 	  u.last_name AS lastName,
@@ -51,12 +51,18 @@ const (
 	  f.followed_at AS followedAt,
 	  f.status
 	FROM follows f
-	JOIN users u ON f.followed_id = u.user_id
+	JOIN users u ON f.followed_id = u.id
 	WHERE f.follower_id = ?
 	ORDER BY f.followed_at DESC;`
 
 	INSERT_NOTIFICATION = `
-	INSERT INTO notifications (user_id, type, reference_type, reference_id, content, created_at)
-	VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP);
+	INSERT INTO notifications (
+	    id,
+	    user_id,
+	    type,
+	    reference_type,
+	    reference_id,
+	    content
+	) VALUES (?, ?, ?, ?, ?, ?)
 	`
 )

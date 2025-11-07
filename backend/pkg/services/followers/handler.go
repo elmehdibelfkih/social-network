@@ -1,6 +1,7 @@
 package follow
 
 import (
+	"fmt"
 	"net/http"
 	"social/pkg/utils"
 )
@@ -28,12 +29,22 @@ func UnfollowRequest(w http.ResponseWriter, r *http.Request) {
 
 // GET /api/v1/users/:user_id/followers => list followers
 func FollowersList(w http.ResponseWriter, r *http.Request) {
-
+	targetUserId := utils.GetWildCardValue(w, r, "user_id")
+	res, err := GetFollowersByUserID(targetUserId)
+	if err != nil {
+		utils.InternalServerError(w)
+	}
+	fmt.Println(res)
 }
 
 // GET /api/v1/users/:user_id/following  => list followees
 func FolloweesList(w http.ResponseWriter, r *http.Request) {
-
+	targetUserId := utils.GetWildCardValue(w, r, "user_id")
+	res, err := GetFollowersByUserID(targetUserId)
+	if err != nil {
+		utils.InternalServerError(w)
+	}
+	fmt.Println(res)
 }
 
 // GET /api/v1/follow-requests => list received follow requests for current user

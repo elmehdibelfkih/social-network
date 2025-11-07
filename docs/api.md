@@ -362,7 +362,7 @@ No need for a request body.
 
 ``` json
 {
-  "followers": [
+  [
     {
       "userId": 1289843874323,
       "nickname": "alice123",
@@ -396,7 +396,7 @@ No need for a request body.
 
 ``` json
 {
-  "following": [
+  [
     {
       "userId": 1289843874323,
       "nickname": "alice123",
@@ -429,7 +429,7 @@ No need for a request body.
 
 ``` json
 {
-  "followRequests": [
+  [
     {
       "followerId": 6249843274333,
       "nickname": "alice123",

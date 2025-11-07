@@ -7,7 +7,6 @@ const REQUEST_STRUCT_KEY contextKey = "requestStruct"
 
 // POST /api/v1/users/:user_id/follow
 // No need for a request body.
-type FollowRequestJson struct{}
 type FollowResponseJson struct {
 	Message      string `json:"message"`
 	Status       string `json:"status"`
@@ -18,7 +17,6 @@ type FollowResponseJson struct {
 
 // POST /api/v1/users/:user_id/unfollow
 // No need for a request body.
-type UnfollowRequestJson struct{}
 type UnfollowResponseJson struct {
 	Message      string `json:"message"`
 	TargetUserId int64  `json:"targetUserId"`
@@ -39,7 +37,7 @@ type FollowerItem struct {
 	LastName   string `json:"lastName"`
 	AvatarId   int64  `json:"avatarId"`
 	FollowedAt string `json:"followedAt"`
-	Status     string `json:"status"` // pending/accepted/declined
+	Status     string `json:"status"`
 }
 
 // GET /api/v1/users/:user_id/following
@@ -78,7 +76,6 @@ type FollowRequestItem struct {
 
 // POST /api/v1/follow-requests/:user_id/accept
 // No request body.
-type AcceptFollowRequestJson struct{}
 
 type AcceptFollowResponseJson struct {
 	Message    string `json:"message"`
@@ -90,7 +87,6 @@ type AcceptFollowResponseJson struct {
 
 // POST /api/v1/follow-requests/:user_id/decline
 // No request body.
-type DeclineRequestJson struct{}
 
 type DeclineResponseJson struct {
 	Message    string `json:"message"`
@@ -101,7 +97,8 @@ type DeclineResponseJson struct {
 }
 
 type Notification struct {
-	UserID        int64
+	id            int64
+	UserId        int64
 	Type          string
 	ReferenceType string
 	ReferenceId   int64
