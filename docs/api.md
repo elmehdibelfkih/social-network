@@ -516,6 +516,11 @@ No need for a request body.
 
 ***status code in success: 200***
 
+|Parameter| Type| Description|
+|----------|-------|--------------|
+|page| integer| Page number (default = 1)|
+|limit| integer| Number of items per page (default = 20)|
+
 - response payload
 
 ``` json
