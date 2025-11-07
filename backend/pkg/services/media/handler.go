@@ -18,10 +18,17 @@ func HandleUploadMedia(w http.ResponseWriter, r *http.Request) {
 	userId := utils.GetUserIdFromContext(r)
 
 	var req UploadMediaRequest
-	r.Body = http.MaxBytesReader(w, r.Body, MaxMediaSize*1.4)
+	r.Body = http.MaxBytesReader(w, r.Body, MaxRequestSize)
 	defer r.Body.Close()
 
-	if ok := utils.ValidateJsonRequest(r, r.Body, "Media upload"); !ok {
+	err := utils.JsonStaticDecode(r, &req)
+	if err != nil {
+		if err.Error() == "http: request body too large" {
+			utils.BadRequest(w, "File is too large.", utils.ErrorTypeAlert)
+			return
+		}
+
+		utils.BadRequest(w, "There is some issue in the request", utils.ErrorTypeAlert)
 		return
 	}
 
@@ -29,7 +36,7 @@ func HandleUploadMedia(w http.ResponseWriter, r *http.Request) {
 		utils.UnsupportedMediaType(w)
 		return
 	}
-	//todo: MediaPurposes?
+
 	if !MediaPurposes[req.Purpose] {
 		utils.BadRequest(w, "Invalid purpose for the media", utils.ErrorTypeAlert)
 		return
@@ -40,6 +47,7 @@ func HandleUploadMedia(w http.ResponseWriter, r *http.Request) {
 		utils.BadRequest(w, "The provided file data is not valid base64.", utils.ErrorTypeAlert)
 		return
 	}
+	fmt.Println(len(data))
 
 	if len(data) > MaxMediaSize {
 		utils.MediaTooLargeError(w, fmt.Sprintf("File size cannot exceed %d MB.", MaxMediaSize/1024/1024))

@@ -24,7 +24,7 @@ type UploadMediaRequest struct {
 type UploadMediaResponse struct {
 	Message    string    `json:"message"`
 	MediaID    int64     `json:"mediaId"`
-	MediaPath  string    `json:"mediaPath"`
+	MediaPath  string    `json:"mediaPath,omitempty"`
 	FileType   string    `json:"fileType"`
 	UploadedAt time.Time `json:"uploadedAt"`
 }
@@ -37,6 +37,7 @@ type DeleteMediaResponse struct {
 
 const (
 	MaxMediaSize = 10485760 // 10 MB
+	MaxRequestSize = MaxMediaSize + 1048576
 )
 
 var AllowedMimeTypes = map[string]bool{
