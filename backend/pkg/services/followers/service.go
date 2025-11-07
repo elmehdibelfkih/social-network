@@ -1,6 +1,9 @@
 package follow
 
-import "social/pkg/utils"
+import (
+	"net/http"
+	"social/pkg/utils"
+)
 
 func followNotification(followerId, followedId int64, status string) Notification {
 	var notification Notification
@@ -17,4 +20,65 @@ func followNotification(followerId, followedId int64, status string) Notificatio
 	}
 	notification.status = status
 	return notification
+}
+
+func followResponse(w http.ResponseWriter, r *http.Request) {
+
+	userId := utils.GetUserIdFromContext(r)
+	targetUserId := utils.GetWildCardValue(w, r, "user_id")
+	var response FollowResponseJson
+
+	status, err := selectFollowStatus(userId, targetUserId)
+	if err != nil {
+		utils.InternalServerError(w)
+		return
+	}
+
+	switch status {
+	case "pending":
+		response.Message = "Follow request sent successfully."
+	case "accepted":
+		response.Message = "You are now following this user."
+	}
+	response.Status = status
+	response.TargetUserId = targetUserId
+	response.FollowerId = userId
+
+	utils.JsonResponseEncode(w, http.StatusOK, map[string]any{
+		"success": true,
+		"payload": response,
+		"error":   map[string]any{},
+	})
+}
+
+func unfollowResponse(w http.ResponseWriter, r *http.Request) {
+
+	userId := utils.GetUserIdFromContext(r)
+	targetUserId := utils.GetWildCardValue(w, r, "user_id")
+	var response FollowResponseJson
+
+	response.Message = "Unfollow successful."
+	response.TargetUserId = targetUserId
+	response.FollowerId = userId
+	utils.JsonResponseEncode(w, http.StatusOK, map[string]any{
+		"success": true,
+		"payload": response,
+		"error":   map[string]any{},
+	})
+}
+
+func FollowersListResponse(w http.ResponseWriter, response []map[string]any) {
+	utils.JsonResponseEncode(w, http.StatusOK, map[string]any{
+		"success": true,
+		"payload": response,
+		"error":   map[string]any{},
+	})
+}
+
+func FolloweesListResponse(w http.ResponseWriter, response []map[string]any) {
+	utils.JsonResponseEncode(w, http.StatusOK, map[string]any{
+		"success": true,
+		"payload": response,
+		"error":   map[string]any{},
+	})
 }

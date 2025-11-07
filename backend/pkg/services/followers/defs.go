@@ -12,7 +12,6 @@ type FollowResponseJson struct {
 	Status       string `json:"status"`
 	TargetUserId int64  `json:"targetUserId"`
 	FollowerId   int64  `json:"followerId"`
-	FollowedAt   string `json:"followedAt"`
 }
 
 // POST /api/v1/users/:user_id/unfollow
@@ -21,7 +20,6 @@ type UnfollowResponseJson struct {
 	Message      string `json:"message"`
 	TargetUserId int64  `json:"targetUserId"`
 	FollowerId   int64  `json:"followerId"`
-	UnfollowedAt string `json:"unfollowedAt"`
 }
 
 // GET /api/v1/users/:user_id/followers

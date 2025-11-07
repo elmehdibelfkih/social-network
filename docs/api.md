@@ -319,7 +319,6 @@ No need for a request body.
   "status": "pending",
   "targetUserId": 1289843874339,
   "followerId": 1289843874336,
-  "followedAt": "2025-10-24T18:20:00Z"
 }
 ```
 
@@ -348,7 +347,6 @@ No need for a request body.
   "message": "You have unfollowed this user.",
   "targetUserId": 1289843874339,
   "followerrId": 1289843874336,
-  "unfollowedAt": "2025-10-24T18:25:00Z"
 }
 ```
 
@@ -1595,8 +1593,6 @@ No need for a request body.
   "message": "Message deleted successfully."
 }
 ```
-
----
 
 ### GET `/api/v1/chats/:chat_id/participants` => list participants
 
