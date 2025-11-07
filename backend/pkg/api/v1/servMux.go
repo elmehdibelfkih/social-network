@@ -6,6 +6,7 @@ import (
 	"social/pkg/app/dependencies/middleware"
 	"social/pkg/app/dependencies/router"
 	"social/pkg/services/auth"
+	"social/pkg/services/chat"
 	"social/pkg/services/groups"
 	"social/pkg/services/media"
 	"social/pkg/utils"
@@ -23,12 +24,6 @@ func SocialMux() *router.Router {
 	socialMux.HandleFunc("GET", "/api/v1/auth/session", utils.MiddlewareChain(auth.GetSession, middleware.UserContext, middleware.AuthMiddleware))
 	socialMux.HandleFunc("GET", "/api/v1/sessions", utils.MiddlewareChain(auth.GetSessions, middleware.UserContext, middleware.AuthMiddleware))
 	socialMux.HandleFunc("DELETE", "/api/v1/sessions/{session_id}", utils.MiddlewareChain(auth.DeleteSession, middleware.UserContext, middleware.AuthMiddleware))
-
-	//users
-	//followers
-	//feed
-	//posts
-	//media
 
 	// groups
 	socialMux.HandleFunc("POST", "/api/v1/group", utils.MiddlewareChain(groups.PostCreateGroup, middleware.AuthMiddleware))
@@ -49,7 +44,13 @@ func SocialMux() *router.Router {
 	socialMux.HandleFunc("GET", "/api/v1/events/{event_id}", utils.MiddlewareChain(groups.GetEventInfo, middleware.AuthMiddleware))
 
 	//chat
+	socialMux.HandleFunc("GET", "/api/v1/chats", utils.MiddlewareChain(chat.GetUserChats, middleware.UserContext, middleware.AuthMiddleware))
+	socialMux.HandleFunc("GET", "/api/v1/chats/{chat_id}/messages", utils.MiddlewareChain(chat.GetmassageByPagination, middleware.UserContext, middleware.AuthMiddleware))
+	socialMux.HandleFunc("POST", "/api/v1/chats/{chat_id}/messages", utils.MiddlewareChain(chat.SendMessageHandler, middleware.UserContext, middleware.AuthMiddleware))
+	socialMux.HandleFunc("DELETE", "/api/v1/chats/{chat_id}/messages/{msg_id}", utils.MiddlewareChain(chat.DeleteMessageHandler, middleware.UserContext, middleware.AuthMiddleware))
+	socialMux.HandleFunc("GET", "/api/v1/chats/{chat_id}/participants", utils.MiddlewareChain(chat.GetParticipantsHandler, middleware.UserContext, middleware.AuthMiddleware))
 	// notifications
+
 	//media
 	socialMux.HandleFunc("POST", "/api/v1/media/upload", media.HandleUploadMedia)
 	socialMux.HandleFunc("GET", "/api/v1/media/{media_id}", utils.MiddlewareChain(media.HandleGetMedia, media.MediaMiddleware, middleware.AuthMiddleware))

@@ -58,7 +58,6 @@
 ```
 
 - response payload
-
 ``` json
 {
   "userId": 1289843874339,
