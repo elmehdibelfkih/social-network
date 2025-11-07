@@ -19,12 +19,12 @@ const (
 
 	QUERY_GET_SEARCH_POST = `
 		SELECT
-			p.id
-			p.author_id
-			p.content
-			p.created_at
-			u.id 
-			u.nickname AS author_nickname
+			p.id,
+			p.author_id,
+			p.content,
+			p.created_at,
+			u.id,
+			u.nickname AS author_nickname,
 			m.path AS avatar_path
 		FROM posts p
 		JOIN users u ON p.author_id = u.id
@@ -32,7 +32,7 @@ const (
 		LEFT JOIN post_allowed_viewers pav ON p.id = pav.post_id AND pav.user_id = ?
 		LEFT JOIN media m ON u.avatar_id = m.id
 		WHERE
-			p.content LIKE ?
+			p.content LIKE ? OR u.nickname LIKE ? OR u.first_name LIKE ? OR u.last_name LIKE ?
 			AND (
 				p.visibility = 'public'
 				OR p.author_id = ?

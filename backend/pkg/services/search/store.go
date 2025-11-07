@@ -54,7 +54,7 @@ func SearchGroups(q string) ([]any, error) {
 func SearchPosts(q string, searcherID int64) ([]any, error) {
 	contentSearch := "%" + q + "%"
 
-	rows, err := config.DB.Query(QUERY_GET_SEARCH_GROUP, searcherID, searcherID, contentSearch, searcherID)
+	rows, err := config.DB.Query(QUERY_GET_SEARCH_GROUP, searcherID, searcherID, contentSearch, contentSearch, contentSearch, contentSearch, searcherID)
 	if err != nil {
 		utils.SQLiteErrorTarget(err, QUERY_GET_SEARCH_GROUP)
 		return nil, err
