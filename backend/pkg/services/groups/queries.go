@@ -18,6 +18,16 @@ const (
 			SELECT 1 FROM groups WHERE id = ? AND creator_id = ?
 		);
 	`
+	SELECT_GROUP_MEMBER_BY_ID = `
+		SELECT EXISTS (
+			SELECT 1 FROM group_members WHERE group_id = ? AND user_id = ? AND status IN ('pending', 'accepted');
+		);
+	`
+	SELECT_GROUP_MEMBER_PENDING = `
+		SELECT EXISTS (
+			SELECT 1 FROM group_members WHERE group_id = ? AND user_id = ? AND status = 'pending';
+		);
+	`
 	SELECT_GROUP_MEMBERS_COUNT = `
 		SELECT followers_count FROM counters WHERE entity_type = ? AND entity_id = ?
 	`
@@ -72,8 +82,10 @@ const (
 	`
 	INSERT_GROUP_MEMBER_BY_GROUP_ID = `
 		INSERT INTO group_members (group_id, user_id, status, role)
-		VALUES (?, ?, ?)
-		RETURNING group_id, user_id, status, role, created_at;
+		VALUES (?, ?, ?, ?)
+		ON CONFLICT(group_id, user_id)
+		DO UPDATE SET  status = excluded.status, role = excluded.role, updated_at = CURRENT_TIMESTAMP	
+		RETURNING group_id, user_id, status, created_at;
 	`
 
 	// Create an event for a group
@@ -106,7 +118,7 @@ const (
 	UPDATE_GROUP_MEMBER_STATUS = `
 		UPDATE group_members
 		SET status = ?, updated_at = CURRENT_TIMESTAMP
-		WHERE group_id = ? AND user_id = ?
+		WHERE group_id = ? AND user_id = ? AND status = 'pending'
 		RETURNING group_id, user_id, status, role;
 	`
 
@@ -119,10 +131,12 @@ const (
 	`
 
 	UPDATE_GROUP_FOLLOWERS_COUNT = `
-	UPDATE counters
-	SET followers_count = followers_count + ?,
-    updated_at = CURRENT_TIMESTAMP
-	WHERE entity_id = ?;
+	INSERT INTO counters (entity_type, entity_id, followers_count)
+	VALUES (?, ?, ?)
+	ON CONFLICT(entity_type, entity_id)
+	DO UPDATE SET
+  	followers_count = counters.followers_count + excluded.followers_count,
+	updated_at = CURRENT_TIMESTAMP;	
 	`
 )
 

@@ -14,13 +14,13 @@ func CreateGroup(w http.ResponseWriter, r *http.Request,
 		utils.IdentifySqlError(w, err)
 		return false
 	}
-	err = InsertNewGroupMember(response.GroupId, response.CreatorId, "accepted", "owner", nil)
+	err = InsertNewGroupOwner(response.GroupId, response.CreatorId, "accepted", "owner")
 	if err != nil {
 		utils.BackendErrorTarget(err, context)
 		utils.IdentifySqlError(w, err)
 		return false
 	}
-	err = UpdateMetaData(response.GroupId, 1)
+	err = UpdateMetaData("group", response.GroupId, 1)
 	if err != nil {
 		utils.BackendErrorTarget(err, context)
 		utils.IdentifySqlError(w, err)
@@ -40,9 +40,9 @@ func CreateGroupHttp(w http.ResponseWriter,
 
 func InviteMember(w http.ResponseWriter, r *http.Request,
 	body *InviteUserRequestJson, response *InviteUserResponseJson, context string) bool {
-	if !ValidRelationship(w, r, body, context) {
-		return false
-	}
+	// if !ValidRelationship(w, r, body, context) {
+	// 	return false
+	// }
 	groupId := utils.GetWildCardValue(w, r, "group_id")
 	err := InsertNewGroupMember(groupId, body.UserId, "pending", "member", response)
 	if err != nil {
@@ -87,22 +87,41 @@ func JoinGroupHttp(w http.ResponseWriter,
 	})
 }
 
-func MemberStatus(w http.ResponseWriter, r *http.Request,
+func MemberStatusAccepted(w http.ResponseWriter, r *http.Request,
 	groupId, userId int64, status string, response *AcceptMemberResponseJson, context string) bool {
-	err := UpdateMemberStatus(groupId, userId, status, response)
+	err := UpdateMemberStatusAccepted(groupId, userId, response)
 	if err != nil {
 		utils.BackendErrorTarget(err, context)
 		utils.IdentifySqlError(w, err)
 		return false
 	}
-	if status == "accepted" {
-		err = UpdateMetaData(response.GroupId, 1)
-		if err != nil {
-			utils.BackendErrorTarget(err, context)
-			utils.IdentifySqlError(w, err)
-			return false
-		}
+
+	err = UpdateMetaData("group", response.GroupId, 1)
+	if err != nil {
+		utils.BackendErrorTarget(err, context)
+		utils.IdentifySqlError(w, err)
+		return false
 	}
+
+	return true
+}
+
+func MemberStatusDeclined(w http.ResponseWriter, r *http.Request,
+	groupId, userId int64, status string, response *DeclineMemberResponseJson, context string) bool {
+	err := UpdateMemberStatusDeclined(groupId, userId, response)
+	if err != nil {
+		utils.BackendErrorTarget(err, context)
+		utils.IdentifySqlError(w, err)
+		return false
+	}
+
+	err = UpdateMetaData("group", response.GroupId, 1)
+	if err != nil {
+		utils.BackendErrorTarget(err, context)
+		utils.IdentifySqlError(w, err)
+		return false
+	}
+
 	return true
 }
 

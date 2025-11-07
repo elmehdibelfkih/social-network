@@ -55,7 +55,7 @@ func PostAcceptInvite(w http.ResponseWriter, r *http.Request) {
 	var response AcceptMemberResponseJson
 	groupId := utils.GetWildCardValue(w, r, "group_id")
 	userId := utils.GetWildCardValue(w, r, "user_id")
-	if !MemberStatus(w, r, groupId, userId, "accepted", &response, "PostAcceptInvite handler") {
+	if !MemberStatusAccepted(w, r, groupId, userId, "accepted", &response, "PostAcceptInvite handler") {
 		return
 	}
 	response.Message = "User has been added to the group."
@@ -64,15 +64,11 @@ func PostAcceptInvite(w http.ResponseWriter, r *http.Request) {
 
 func PostDeclineInvite(w http.ResponseWriter, r *http.Request) {
 	var response DeclineMemberResponseJson
-	var placeHolder AcceptMemberResponseJson
 	groupId := utils.GetWildCardValue(w, r, "group_id")
 	userId := utils.GetWildCardValue(w, r, "user_id")
-	if !MemberStatus(w, r, groupId, userId, "declined", &placeHolder, "PostDeclineInvite handler") {
+	if !MemberStatusDeclined(w, r, groupId, userId, "declined", &response, "PostDeclineInvite handler") {
 		return
 	}
-	response.GroupId = placeHolder.GroupId
-	response.UserId = placeHolder.UserId
-	response.Status = placeHolder.Status
 	response.Message = "Group join request declined."
 	DeclineInviteHttp(w, response)
 }
@@ -128,18 +124,18 @@ func DeleteGroup(w http.ResponseWriter, r *http.Request) {
 
 // events
 
-func GetGroupEvents(w http.ResponseWriter, r *http.Request) {
-
-}
-
-func GetEventInfo(w http.ResponseWriter, r *http.Request) {
-
-}
-
 func PostCreateEvent(w http.ResponseWriter, r *http.Request) {
 
 }
 
 func PostEventRSVP(w http.ResponseWriter, r *http.Request) {
+
+}
+
+func GetGroupEvents(w http.ResponseWriter, r *http.Request) {
+
+}
+
+func GetEventInfo(w http.ResponseWriter, r *http.Request) {
 
 }

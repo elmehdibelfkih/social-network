@@ -32,8 +32,8 @@ func SocialMux() *router.Router {
 
 	// groups
 	socialMux.HandleFunc("POST", "/api/v1/group", utils.MiddlewareChain(groups.PostCreateGroup, middleware.AuthMiddleware))
-	socialMux.HandleFunc("POST", "/api/v1/groups/{group_id}/invite", utils.MiddlewareChain(groups.PostInviteMember, middleware.AuthMiddleware))
-	socialMux.HandleFunc("POST", "/api/v1/groups/{group_id}/join", utils.MiddlewareChain(groups.PostJoinGroup, middleware.AuthMiddleware))
+	socialMux.HandleFunc("POST", "/api/v1/groups/{group_id}/invite/{user_id}", utils.MiddlewareChain(groups.PostInviteMember, middleware.AuthMiddleware, groups.InvitationAvailable))
+	socialMux.HandleFunc("POST", "/api/v1/groups/{group_id}/join", utils.MiddlewareChain(groups.PostJoinGroup, middleware.AuthMiddleware, groups.IsNotMemeber))
 	socialMux.HandleFunc("POST", "/api/v1/groups/{group_id}/members/{user_id}/accept", utils.MiddlewareChain(groups.PostAcceptInvite, middleware.AuthMiddleware))
 	socialMux.HandleFunc("POST", "/api/v1/groups/{group_id}/members/{user_id}/decline", utils.MiddlewareChain(groups.PostDeclineInvite, middleware.AuthMiddleware))
 	socialMux.HandleFunc("PUT", "/api/v1/groups/{group_id}", utils.MiddlewareChain(groups.PutUpdateGroup, middleware.AuthMiddleware, groups.IsGroupOwner))

@@ -199,10 +199,10 @@ type RSVPResponseJson struct {
 // validators
 
 func (v *CreateGroupRequestJson) Validate() (bool, string) {
-	if ok, str := utils.TextContentValidationEscape(&v.Title, 32, 5); !ok {
+	if ok, str := utils.TextContentValidationEscape(&v.Title, 5, 32); !ok {
 		return false, str
 	}
-	if ok, str := utils.TextContentValidationEscape(&v.Description, 4096, 5); !ok {
+	if ok, str := utils.TextContentValidationEscape(&v.Description, 5, 4096); !ok {
 		return false, str
 	}
 	if v.AvatarId != nil {

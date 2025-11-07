@@ -104,6 +104,18 @@ func SelectGroupById(groupId int64, g *GetGroupResponseJson) error {
 	return err
 }
 
+func SelectGroupMember(groupId, userId int64) (bool, error) {
+	var exist bool
+	_, err := config.DB.Query(SELECT_GROUP_MEMBER_BY_ID,
+		groupId,
+		userId,
+	)
+	if err != nil {
+		utils.SQLiteErrorTarget(err, SELECT_GROUP_MEMBER_BY_ID)
+	}
+	return exist, err
+}
+
 func SelectGroupOwner(groupId, userId int64) (bool, error) {
 	var exist bool
 	err := config.DB.QueryRow(SELECT_GROUP_BY_OWNER,
@@ -114,6 +126,20 @@ func SelectGroupOwner(groupId, userId int64) (bool, error) {
 	)
 	if err != nil {
 		utils.SQLiteErrorTarget(err, SELECT_GROUP_BY_OWNER)
+	}
+	return exist, err
+}
+
+func SelectGoupMemberPending(groupId, userId int64) (bool, error) {
+	var exist bool
+	err := config.DB.QueryRow(SELECT_GROUP_MEMBER_PENDING,
+		groupId,
+		userId,
+	).Scan(
+		&exist,
+	)
+	if err != nil {
+		utils.SQLiteErrorTarget(err, SELECT_GROUP_MEMBER_PENDING)
 	}
 	return exist, err
 }
@@ -161,6 +187,23 @@ func InsertNewGroup(cg *CreateGroupRequestJson, g *CreateGroupResponseJson, user
 	})
 }
 
+func InsertNewGroupOwner(groupId, userId int64, status, role string) error {
+	return database.WrapWithTransaction(func(tx *sql.Tx) error {
+		_, err := tx.Exec(INSERT_GROUP_MEMBER_BY_GROUP_ID,
+			groupId,
+			userId,
+			status,
+			role,
+		)
+		if err != nil {
+			utils.SQLiteErrorTarget(err, INSERT_GROUP_MEMBER_BY_GROUP_ID)
+			return err
+		}
+
+		return nil
+	})
+}
+
 func InsertNewGroupMember(groupId, userId int64, status, role string, m *InviteUserResponseJson) error {
 	return database.WrapWithTransaction(func(tx *sql.Tx) error {
 		err := tx.QueryRow(INSERT_GROUP_MEMBER_BY_GROUP_ID,
@@ -185,17 +228,37 @@ func InsertNewGroupMember(groupId, userId int64, status, role string, m *InviteU
 
 //update
 
-func UpdateMemberStatus(groupId, userId int64, status string, a *AcceptMemberResponseJson) error {
+func UpdateMemberStatusAccepted(groupId, userId int64, a *AcceptMemberResponseJson) error {
 	return database.WrapWithTransaction(func(tx *sql.Tx) error {
 		err := tx.QueryRow(UPDATE_GROUP_MEMBER_STATUS,
 			groupId,
 			userId,
-			status,
+			"accepted",
 		).Scan(
 			&a.GroupId,
 			&a.UserId,
 			&a.Status,
 			&a.Role,
+		)
+		if err != nil {
+			utils.SQLiteErrorTarget(err, UPDATE_GROUP_MEMBER_STATUS)
+			return err
+		}
+
+		return nil
+	})
+}
+
+func UpdateMemberStatusDeclined(groupId, userId int64, d *DeclineMemberResponseJson) error {
+	return database.WrapWithTransaction(func(tx *sql.Tx) error {
+		err := tx.QueryRow(UPDATE_GROUP_MEMBER_STATUS,
+			groupId,
+			userId,
+			"declined",
+		).Scan(
+			&d.GroupId,
+			&d.UserId,
+			&d.Status,
 		)
 		if err != nil {
 			utils.SQLiteErrorTarget(err, UPDATE_GROUP_MEMBER_STATUS)
@@ -230,17 +293,17 @@ func UpdateGroup(groupId, userId int64, u *UpdateGroupRequestJson, ur *UpdateGro
 	})
 }
 
-func UpdateMetaData(entityId int64, value int64) error {
+func UpdateMetaData(entityType string, entityId int64, value int64) error {
 	return database.WrapWithTransaction(func(tx *sql.Tx) error {
 		_, err := tx.Exec(UPDATE_GROUP_FOLLOWERS_COUNT,
-			value,
+			entityType,
 			entityId,
+			value,
 		)
 		if err != nil {
 			utils.SQLiteErrorTarget(err, UPDATE_GROUP_FOLLOWERS_COUNT)
 			return err
 		}
-
 		return nil
 	})
 }
