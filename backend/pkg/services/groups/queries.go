@@ -23,6 +23,11 @@ const (
 			SELECT 1 FROM group_members WHERE group_id = ? AND user_id = ? AND status IN ('pending', 'accepted');
 		);
 	`
+	SELECT_GROUP_MEMBER_ACCEPTED = `
+		SELECT EXISTS (
+			SELECT 1 FROM group_members WHERE group_id = ? AND user_id = ? AND status = 'accepted';
+		);
+	`
 	SELECT_GROUP_MEMBER_PENDING = `
 		SELECT EXISTS (
 			SELECT 1 FROM group_members WHERE group_id = ? AND user_id = ? AND status = 'pending';
@@ -51,24 +56,22 @@ const (
 	ORDER BY created_at DESC
 	LIMIT ?
 	`
-	// Count total groups (for pagination)
-	SELECT_GROUPS_COUNT = `SELECT COUNT(*) FROM groups;`
 
-	// Get event by event_id
 	SELECT_EVENT_BY_ID = `
-		SELECT e.id, e.group_id, e.title, e.description, e.start_at, e.end_at, e.location,
-		u.id AS created_by_id, u.nickname AS created_by_username, e.created_at
-		FROM group_events e
-		INNER JOIN users u ON u.id = e.created_by
-		WHERE e.id = ?;
+		SELECT 
+		ge.id, ge.group_id, ge.creator_id, ge.title, ge.description, ge.location, ge.event_start_date, ge.event_end_date, ge.created_at,
+		u.first_name, u.last_name
+		FROM group_events AS ge
+		JOIN users AS u
+    	ON ge.creator_id = u.id
+		WHERE ge.id = ? AND ge.group_id = ? AND u.id = ?;
 	`
-
 	// List all events for a group
 	SELECT_EVENTS_BY_GROUP_ID = `
-		SELECT id, title, description, start_at, end_at, location, created_by, created_at
+		SELECT id, creator_id, title, description, location, event_start_date, event_end_date, created_at,
 		FROM group_events
 		WHERE group_id = ?
-		ORDER BY start_at ASC;
+		ORDER BY created_at ASC;
 	`
 )
 
@@ -88,11 +91,10 @@ const (
 		RETURNING group_id, user_id, status, created_at;
 	`
 
-	// Create an event for a group
 	INSERT_GROUP_EVENT = `
-		INSERT INTO group_events (id, group_id, title, description, start_at, end_at, location, created_by)
+		INSERT INTO group_events (id, group_id, creator_id, title, description, location, event_start_date, event_end_date )
 		VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-		RETURNING id, group_id, title, description, start_at, end_at, location, created_by, created_at;
+		RETURNING id, group_id, title, description, start_at, end_at, location, creator_id, created_at;
 	`
 
 	// RSVP to an event

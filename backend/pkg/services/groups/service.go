@@ -254,6 +254,96 @@ func DeleteGroupHttp(w http.ResponseWriter,
 	})
 }
 
+// events
+
+func CreateEvent(w http.ResponseWriter, r *http.Request,
+	body *CreateEventRequestJson, response *CreateEventResponseJson, context string) bool {
+	userId := utils.GetUserIdFromContext(r)
+	groupId := utils.GetWildCardValue(w, r, "group_id")
+	err := insertNewGroupEvent(userId, groupId, body, response)
+	if err != nil {
+		utils.BackendErrorTarget(err, context)
+		utils.IdentifySqlError(w, err)
+		return false
+	}
+	return true
+}
+
+func PostCreateEventHttp(w http.ResponseWriter,
+	response CreateEventResponseJson) {
+	utils.JsonResponseEncode(w, http.StatusOK, map[string]any{
+		"success": true,
+		"payload": response,
+		"error":   map[string]any{},
+	})
+}
+
+func EventRSVP(w http.ResponseWriter, r *http.Request,
+	body *RSVPRequestJson, response *RSVPResponseJson, context string) bool {
+	userId := utils.GetUserIdFromContext(r)
+	eventId := utils.GetWildCardValue(w, r, "event_id")
+	err := UpdateRsvp(eventId, userId, body, response)
+	if err != nil {
+		utils.BackendErrorTarget(err, context)
+		utils.IdentifySqlError(w, err)
+		return false
+	}
+	return true
+}
+
+func PostEventRSVPHttp(w http.ResponseWriter,
+	response RSVPResponseJson) {
+	utils.JsonResponseEncode(w, http.StatusOK, map[string]any{
+		"success": true,
+		"payload": response,
+		"error":   map[string]any{},
+	})
+}
+
+func EventInfo(w http.ResponseWriter, r *http.Request,
+	response *GetEventResponseJson, context string) bool {
+	userId := utils.GetUserIdFromContext(r)
+	groupId := utils.GetWildCardValue(w, r, "group_id")
+	eventId := utils.GetWildCardValue(w, r, "event_id")
+	err := SelectGoupEvent(groupId, eventId, userId, response)
+	if err != nil {
+		utils.BackendErrorTarget(err, context)
+		utils.IdentifySqlError(w, err)
+		return false
+	}
+	return true
+}
+
+func GetEventInfoHttp(w http.ResponseWriter,
+	response GetEventResponseJson) {
+	utils.JsonResponseEncode(w, http.StatusOK, map[string]any{
+		"success": true,
+		"payload": response,
+		"error":   map[string]any{},
+	})
+}
+
+func EventsInfo(w http.ResponseWriter, r *http.Request,
+	response *ListEventsResponseJson, context string) bool {
+	groupId := utils.GetWildCardValue(w, r, "group_id")
+	err := SelectAllGoupEvent(groupId, response)
+	if err != nil {
+		utils.BackendErrorTarget(err, context)
+		utils.IdentifySqlError(w, err)
+		return false
+	}
+	return true
+}
+
+func GetEventsInfoHttp(w http.ResponseWriter,
+	response ListEventsResponseJson) {
+	utils.JsonResponseEncode(w, http.StatusOK, map[string]any{
+		"success": true,
+		"payload": response,
+		"error":   map[string]any{},
+	})
+}
+
 // helpers
 
 func ValidRelationship(w http.ResponseWriter, r *http.Request,
