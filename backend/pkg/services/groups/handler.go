@@ -127,7 +127,7 @@ func DeleteGroup(w http.ResponseWriter, r *http.Request) {
 func PostCreateEvent(w http.ResponseWriter, r *http.Request) {
 	var body CreateEventRequestJson
 	var response CreateEventResponseJson
-	if !utils.ValidateJsonRequest(r, &body, "PutUpdateGroup handler") {
+	if !utils.ValidateJsonRequest(r, &body, "PostCreateEvent handler") {
 		utils.BadRequest(w, "request body invalid json format", "redirect")
 		return
 	}
@@ -135,7 +135,7 @@ func PostCreateEvent(w http.ResponseWriter, r *http.Request) {
 		utils.BadRequest(w, str, "alert")
 		return
 	}
-	if !CreateEvent(w, r, &body, &response, "PutUpdateGroup handler") {
+	if !CreateEvent(w, r, &body, &response, "PostCreateEvent handler") {
 		return
 	}
 	PostCreateEventHttp(w, response)
@@ -144,7 +144,7 @@ func PostCreateEvent(w http.ResponseWriter, r *http.Request) {
 func PostEventRSVP(w http.ResponseWriter, r *http.Request) {
 	var body RSVPRequestJson
 	var response RSVPResponseJson
-	if !utils.ValidateJsonRequest(r, &body, "PutUpdateGroup handler") {
+	if !utils.ValidateJsonRequest(r, &body, "PostEventRSVP handler") {
 		utils.BadRequest(w, "request body invalid json format", "redirect")
 		return
 	}
@@ -152,7 +152,7 @@ func PostEventRSVP(w http.ResponseWriter, r *http.Request) {
 		utils.BadRequest(w, str, "alert")
 		return
 	}
-	if !EventRSVP(w, r, &body, &response, "PutUpdateGroup handler") {
+	if !EventRSVP(w, r, &body, &response, "PostEventRSVP handler") {
 		return
 	}
 	PostEventRSVPHttp(w, response)
@@ -160,7 +160,7 @@ func PostEventRSVP(w http.ResponseWriter, r *http.Request) {
 
 func GetEventInfo(w http.ResponseWriter, r *http.Request) {
 	var response GetEventResponseJson
-	if !EventInfo(w, r, &response, "GetGroupMembers handler") {
+	if !EventInfo(w, r, &response, "GetEventInfo handler") {
 		return
 	}
 	GetEventInfoHttp(w, response)
@@ -168,9 +168,8 @@ func GetEventInfo(w http.ResponseWriter, r *http.Request) {
 
 func GetGroupEvents(w http.ResponseWriter, r *http.Request) {
 	var response ListEventsResponseJson
-	if !EventsInfo(w, r, &response, "GetGroupMembers handler") {
+	if !EventsInfo(w, r, &response, "GetEventInfo handler") {
 		return
 	}
 	GetEventsInfoHttp(w, response)
 }
-

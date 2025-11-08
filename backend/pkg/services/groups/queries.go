@@ -37,7 +37,6 @@ const (
 		SELECT followers_count FROM counters WHERE entity_type = ? AND entity_id = ?
 	`
 
-	// List all groups with pagination
 	SELECT_BROWSE_GROUPS = `
 		SELECT id, title, description, avatar_media_id, creator_id, created_at
 		FROM groups
@@ -46,7 +45,6 @@ const (
 		LIMIT ?
 	`
 
-	// Get members of a group with pagination
 	SELECT_GROUP_MEMBERS_BY_GROUP_ID = `
 	SELECT 
     gm.user_id, u.first_name, u.last_name, gm.role, gm.joined_at
@@ -66,7 +64,7 @@ const (
     	ON ge.creator_id = u.id
 		WHERE ge.id = ? AND ge.group_id = ? AND u.id = ?;
 	`
-	// List all events for a group
+
 	SELECT_EVENTS_BY_GROUP_ID = `
 		SELECT id, creator_id, title, description, location, event_start_date, event_end_date, created_at,
 		FROM group_events
@@ -97,7 +95,6 @@ const (
 		RETURNING id, group_id, title, description, start_at, end_at, location, creator_id, created_at;
 	`
 
-	// RSVP to an event
 	INSERT_EVENT_RSVP = `
 		INSERT INTO event_rsvps (event_id, user_id, option)
 		VALUES (?, ?, ?)
@@ -109,7 +106,7 @@ const (
 // UPDATE
 
 const (
-	// Update a group’s info
+
 	UPDATE_GROUP_BY_ID = `
 		UPDATE groups
 		SET title = ?, description = ?, avatar_media_id = ?, updated_at = CURRENT_TIMESTAMP
@@ -122,14 +119,6 @@ const (
 		SET status = ?, updated_at = CURRENT_TIMESTAMP
 		WHERE group_id = ? AND user_id = ? AND status = 'pending'
 		RETURNING group_id, user_id, status, role;
-	`
-
-	// Promote or demote member role (optional future feature)
-	UPDATE_GROUP_MEMBER_ROLE = `
-		UPDATE group_members
-		SET role = ?, updated_at = CURRENT_TIMESTAMP
-		WHERE group_id = ? AND user_id = ?
-		RETURNING group_id, user_id, role;
 	`
 
 	UPDATE_GROUP_FOLLOWERS_COUNT = `
@@ -145,7 +134,7 @@ const (
 // DELETE
 
 const (
-	// Delete a group
+
 	DELETE_GROUP_BY_ID_AND_CREATOR = `
 		DELETE FROM groups
 		WHERE id = ? AND creator_id = ?

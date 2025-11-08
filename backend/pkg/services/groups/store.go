@@ -25,13 +25,17 @@ func SelectGroupMembers(groupId, limit, lastItemId int64, l *ListGroupMembersRes
 	var first string
 	var last string
 	for rows.Next() {
-		rows.Scan(
+		err = rows.Scan(
 			&item.UserId,
 			&first,
 			&last,
 			&item.Role,
 			&item.JoinedAt,
 		)
+		if err != nil {
+			utils.SQLiteErrorTarget(err, SELECT_GROUP_MEMBERS_BY_GROUP_ID)
+			return err
+		}
 		item.FullName = strings.Join([]string{first, last}, " ")
 		l.Members = append(l.Members, item)
 	}
@@ -51,7 +55,7 @@ func SelectGroupsById(limit, lastItemId int64, l *BrowseGroupsResponseJson) erro
 	l.Limit = limit
 	var item GroupItemJson
 	for rows.Next() {
-		rows.Scan(
+		err = rows.Scan(
 			&item.GroupId,
 			&item.Title,
 			&item.Description,
@@ -59,6 +63,10 @@ func SelectGroupsById(limit, lastItemId int64, l *BrowseGroupsResponseJson) erro
 			&item.CreatorId,
 			&item.CreatedAt,
 		)
+		if err != nil {
+			utils.SQLiteErrorTarget(err, SELECT_BROWSE_GROUPS)
+			return err
+		}
 		err = config.DB.QueryRow(SELECT_GROUP_MEMBERS_COUNT,
 			"group",
 			item.GroupId,
@@ -174,7 +182,8 @@ func SelectGoupEvent(groupId, eventId, userId int64, e *GetEventResponseJson) er
 	err := config.DB.QueryRow(SELECT_EVENT_BY_ID,
 		eventId,
 		groupId,
-		userId).Scan(
+		userId,
+	).Scan(
 		&e.EventId,
 		&e.GroupId,
 		&e.Title,
@@ -201,7 +210,7 @@ func SelectAllGoupEvent(groupId int64, l *ListEventsResponseJson) error {
 	l.GroupId = groupId
 	var e EventItemJson
 	for rows.Next() {
-		rows.Scan(
+		err = rows.Scan(
 			&e.EventId,
 			&e.CreatedBy,
 			&e.Title,
@@ -211,6 +220,10 @@ func SelectAllGoupEvent(groupId int64, l *ListEventsResponseJson) error {
 			&e.EndAt,
 			&e.CreatedAt,
 		)
+		if err != nil {
+			utils.SQLiteErrorTarget(err, SELECT_EVENTS_BY_GROUP_ID)
+			return err
+		}
 		l.Events = append(l.Events, e)
 	}
 	return err
@@ -239,7 +252,6 @@ func InsertNewGroup(cg *CreateGroupRequestJson, g *CreateGroupResponseJson, user
 		)
 		if err != nil {
 			utils.SQLiteErrorTarget(err, INSERT_GROUP_BY_USER_ID)
-			return err
 		}
 		return err
 	})
@@ -255,10 +267,8 @@ func InsertNewGroupOwner(groupId, userId int64, status, role string) error {
 		)
 		if err != nil {
 			utils.SQLiteErrorTarget(err, INSERT_GROUP_MEMBER_BY_GROUP_ID)
-			return err
 		}
-
-		return nil
+		return err
 	})
 }
 
@@ -277,10 +287,8 @@ func InsertNewGroupMember(groupId, userId int64, status, role string, m *InviteU
 		)
 		if err != nil {
 			utils.SQLiteErrorTarget(err, INSERT_GROUP_MEMBER_BY_GROUP_ID)
-			return err
 		}
-
-		return nil
+		return err
 	})
 }
 
@@ -308,6 +316,9 @@ func insertNewGroupEvent(userId, groupId int64, e *CreateEventRequestJson, er *C
 			&er.CreatedBy,
 			&er.CreatedAt,
 		)
+		if err != nil {
+			utils.SQLiteErrorTarget(err, INSERT_GROUP_EVENT)
+		}
 		return err
 	})
 }
@@ -328,10 +339,8 @@ func UpdateMemberStatusAccepted(groupId, userId int64, a *AcceptMemberResponseJs
 		)
 		if err != nil {
 			utils.SQLiteErrorTarget(err, UPDATE_GROUP_MEMBER_STATUS)
-			return err
 		}
-
-		return nil
+		return err
 	})
 }
 
@@ -348,10 +357,8 @@ func UpdateMemberStatusDeclined(groupId, userId int64, d *DeclineMemberResponseJ
 		)
 		if err != nil {
 			utils.SQLiteErrorTarget(err, UPDATE_GROUP_MEMBER_STATUS)
-			return err
 		}
-
-		return nil
+		return err
 	})
 }
 
@@ -371,11 +378,9 @@ func UpdateGroup(groupId, userId int64, u *UpdateGroupRequestJson, ur *UpdateGro
 			&ur.UpdatedAt,
 		)
 		if err != nil {
-			utils.SQLiteErrorTarget(err, UPDATE_GROUP_MEMBER_STATUS)
-			return err
+			utils.SQLiteErrorTarget(err, UPDATE_GROUP_BY_ID)
 		}
-
-		return nil
+		return err
 	})
 }
 
@@ -388,9 +393,8 @@ func UpdateMetaData(entityType string, entityId int64, value int64) error {
 		)
 		if err != nil {
 			utils.SQLiteErrorTarget(err, UPDATE_GROUP_FOLLOWERS_COUNT)
-			return err
 		}
-		return nil
+		return err
 	})
 }
 
@@ -403,10 +407,9 @@ func UpdateRsvp(eventId, userId int64, r *RSVPRequestJson, rs *RSVPResponseJson)
 		)
 		rs.Message = "RSVP updated successfully."
 		if err != nil {
-			utils.SQLiteErrorTarget(err, UPDATE_GROUP_MEMBER_STATUS)
-			return err
+			utils.SQLiteErrorTarget(err, INSERT_EVENT_RSVP)
 		}
-		return nil
+		return err
 	})
 }
 
@@ -421,7 +424,6 @@ func DeleteGroupFromGroups(groupId, userId int64) error {
 		)
 		if err != nil {
 			utils.SQLiteErrorTarget(err, DELETE_GROUP_BY_ID_AND_CREATOR)
-			return err
 		}
 		return err
 	})
