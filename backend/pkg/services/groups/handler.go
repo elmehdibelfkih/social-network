@@ -25,17 +25,8 @@ func PostCreateGroup(w http.ResponseWriter, r *http.Request) {
 }
 
 func PostInviteMember(w http.ResponseWriter, r *http.Request) {
-	var body InviteUserRequestJson
 	var response InviteUserResponseJson
-	if !utils.ValidateJsonRequest(r, &body, "CreateGroup handler") {
-		utils.BadRequest(w, "request body invalid json format", "redirect")
-		return
-	}
-	if ok, str := body.Validate(); !ok {
-		utils.BadRequest(w, str, "alert")
-		return
-	}
-	if !InviteMember(w, r, &body, &response, "InviteMember handler") {
+	if !InviteMember(w, r, &response, "InviteMember handler") {
 		return
 	}
 	InviteMemberHttp(w, response)

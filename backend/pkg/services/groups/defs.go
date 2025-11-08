@@ -72,11 +72,6 @@ type GroupItemJson struct {
 	CreatedAt   string `json:"createdAt"`
 }
 
-// /api/v1/groups/:group_id/invite (POST)
-type InviteUserRequestJson struct {
-	UserId int64 `json:"userId"`
-}
-
 type InviteUserResponseJson struct {
 	Message       string `json:"message"`
 	GroupId       int64  `json:"groupId"`
@@ -224,13 +219,6 @@ func (v *UpdateGroupRequestJson) Validate() (bool, string) {
 		if !utils.IdValidation(*v.AvatarId) {
 			return false, "invalid int64 id"
 		}
-	}
-	return true, "OK"
-}
-
-func (v *InviteUserRequestJson) Validate() (bool, string) {
-	if !utils.IdValidation(v.UserId) {
-		return false, "invalid int64 id"
 	}
 	return true, "OK"
 }

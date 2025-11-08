@@ -9,7 +9,6 @@ import (
 )
 
 // read
-
 func SelectGroupMembers(groupId, limit, lastItemId int64, l *ListGroupMembersResponseJson) error {
 	rows, err := config.DB.Query(SELECT_GROUP_MEMBERS_BY_GROUP_ID,
 		lastItemId,
@@ -272,11 +271,11 @@ func InsertNewGroupOwner(groupId, userId int64, status, role string) error {
 	})
 }
 
-func InsertNewGroupMember(groupId, userId int64, status, role string, m *InviteUserResponseJson) error {
+func InsertNewGroupMember(targetId, groupId int64, status, role, notificationType string, m *InviteUserResponseJson) error {
 	return database.WrapWithTransaction(func(tx *sql.Tx) error {
 		err := tx.QueryRow(INSERT_GROUP_MEMBER_BY_GROUP_ID,
 			groupId,
-			userId,
+			targetId,
 			status,
 			role,
 		).Scan(
@@ -287,13 +286,36 @@ func InsertNewGroupMember(groupId, userId int64, status, role string, m *InviteU
 		)
 		if err != nil {
 			utils.SQLiteErrorTarget(err, INSERT_GROUP_MEMBER_BY_GROUP_ID)
+			return err
+		}
+		if notificationType == "group_join" {
+			err = tx.QueryRow(
+				SELECT_GROUP_OWNER,
+				groupId,
+			).Scan(
+				&targetId,
+			)
+			if err != nil {
+				utils.SQLiteErrorTarget(err, INSERT_GROUP_MEMBER_BY_GROUP_ID)
+				return err
+			}
+		}
+		_, err = tx.Exec(INSERT_NOTIFICATION,
+			utils.GenerateID(),
+			targetId,
+			notificationType,
+			"group",
+			groupId,
+			"you have been invated to group",
+		)
+		if err != nil {
+			utils.SQLiteErrorTarget(err, INSERT_NOTIFICATION)
 		}
 		return err
 	})
 }
 
 func insertNewGroupEvent(userId, groupId int64, e *CreateEventRequestJson, er *CreateEventResponseJson) error {
-
 	return database.WrapWithTransaction(func(tx *sql.Tx) error {
 		err := tx.QueryRow(
 			INSERT_GROUP_EVENT,
@@ -318,6 +340,37 @@ func insertNewGroupEvent(userId, groupId int64, e *CreateEventRequestJson, er *C
 		)
 		if err != nil {
 			utils.SQLiteErrorTarget(err, INSERT_GROUP_EVENT)
+			return err
+		}
+		rows, err := tx.Query(
+			SELECT_GROUP_MEMBERS_BY_GROUP,
+			groupId,
+			userId,
+		)
+		if err != nil {
+			utils.SQLiteErrorTarget(err, SELECT_GROUP_MEMBERS_BY_GROUP)
+			return err
+		}
+		defer rows.Close()
+		var groupUser int64
+		for rows.Next() {
+			err = rows.Scan(
+				&groupUser,
+			)
+			if err != nil {
+				utils.SQLiteErrorTarget(err, INSERT_NOTIFICATION)
+			}
+			_, err = tx.Exec(INSERT_NOTIFICATION,
+				utils.GenerateID(),
+				groupUser,
+				"event_created",
+				"event",
+				er.EventId,
+				"An event has been created",
+			)
+			if err != nil {
+				utils.SQLiteErrorTarget(err, INSERT_NOTIFICATION)
+			}
 		}
 		return err
 	})

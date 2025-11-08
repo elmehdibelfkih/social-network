@@ -3,6 +3,9 @@ package groups
 // SELECT
 
 const (
+	SELECT_GROUP_OWNER = `
+		SELECT creator_id FROM groups WHERE id = ?
+	`
 	SELECT_GROUP_BY_GROUP_ID = `
 		SELECT id, creator_id, title, description, avatar_media_id, created_at, updated_at
 		FROM groups
@@ -54,6 +57,11 @@ const (
 	ORDER BY created_at DESC
 	LIMIT ?
 	`
+	SELECT_GROUP_MEMBERS_BY_GROUP = `
+	SELECT user_id
+	FROM group_members
+	WHERE group_id = ? AND user_id <> ? AND status = 'accepted' 
+	`
 
 	SELECT_EVENT_BY_ID = `
 		SELECT 
@@ -101,12 +109,15 @@ const (
 		ON CONFLICT(event_id, user_id)
 		DO UPDATE SET option = excluded.option;
 	`
+	INSERT_NOTIFICATION = `
+	INSERT INTO notifications (id, user_id, type, reference_type, reference_id, content) 
+	VALUES (?, ?, ?, ?, ?, ?)
+	`
 )
 
 // UPDATE
 
 const (
-
 	UPDATE_GROUP_BY_ID = `
 		UPDATE groups
 		SET title = ?, description = ?, avatar_media_id = ?, updated_at = CURRENT_TIMESTAMP
@@ -134,7 +145,6 @@ const (
 // DELETE
 
 const (
-
 	DELETE_GROUP_BY_ID_AND_CREATOR = `
 		DELETE FROM groups
 		WHERE id = ? AND creator_id = ?
