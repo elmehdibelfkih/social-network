@@ -24,16 +24,8 @@ func PostCreateGroup(w http.ResponseWriter, r *http.Request) {
 }
 
 func PostInviteMember(w http.ResponseWriter, r *http.Request) {
-	var body InviteUserRequestJson
 	var response InviteUserResponseJson
-	if !utils.ValidateJsonRequest(w, r, &body, "CreateGroup handler") {
-		return
-	}
-	if ok, str := body.Validate(); !ok {
-		utils.BadRequest(w, str, "alert")
-		return
-	}
-	if !InviteMember(w, r, &body, &response, "InviteMember handler") {
+	if !InviteMember(w, r, &response, "InviteMember handler") {
 		return
 	}
 	InviteMemberHttp(w, response)
@@ -122,17 +114,51 @@ func DeleteGroup(w http.ResponseWriter, r *http.Request) {
 // events
 
 func PostCreateEvent(w http.ResponseWriter, r *http.Request) {
-
+	var body CreateEventRequestJson
+	var response CreateEventResponseJson
+	if !utils.ValidateJsonRequest(r, &body, "PostCreateEvent handler") {
+		utils.BadRequest(w, "request body invalid json format", "redirect")
+		return
+	}
+	if ok, str := body.Validate(); !ok {
+		utils.BadRequest(w, str, "alert")
+		return
+	}
+	if !CreateEvent(w, r, &body, &response, "PostCreateEvent handler") {
+		return
+	}
+	PostCreateEventHttp(w, response)
 }
 
 func PostEventRSVP(w http.ResponseWriter, r *http.Request) {
-
-}
-
-func GetGroupEvents(w http.ResponseWriter, r *http.Request) {
-
+	var body RSVPRequestJson
+	var response RSVPResponseJson
+	if !utils.ValidateJsonRequest(r, &body, "PostEventRSVP handler") {
+		utils.BadRequest(w, "request body invalid json format", "redirect")
+		return
+	}
+	if ok, str := body.Validate(); !ok {
+		utils.BadRequest(w, str, "alert")
+		return
+	}
+	if !EventRSVP(w, r, &body, &response, "PostEventRSVP handler") {
+		return
+	}
+	PostEventRSVPHttp(w, response)
 }
 
 func GetEventInfo(w http.ResponseWriter, r *http.Request) {
+	var response GetEventResponseJson
+	if !EventInfo(w, r, &response, "GetEventInfo handler") {
+		return
+	}
+	GetEventInfoHttp(w, response)
+}
 
+func GetGroupEvents(w http.ResponseWriter, r *http.Request) {
+	var response ListEventsResponseJson
+	if !EventsInfo(w, r, &response, "GetEventInfo handler") {
+		return
+	}
+	GetEventsInfoHttp(w, response)
 }

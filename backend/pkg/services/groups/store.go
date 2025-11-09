@@ -9,7 +9,6 @@ import (
 )
 
 // read
-
 func SelectGroupMembers(groupId, limit, lastItemId int64, l *ListGroupMembersResponseJson) error {
 	rows, err := config.DB.Query(SELECT_GROUP_MEMBERS_BY_GROUP_ID,
 		lastItemId,
@@ -25,13 +24,17 @@ func SelectGroupMembers(groupId, limit, lastItemId int64, l *ListGroupMembersRes
 	var first string
 	var last string
 	for rows.Next() {
-		rows.Scan(
+		err = rows.Scan(
 			&item.UserId,
 			&first,
 			&last,
 			&item.Role,
 			&item.JoinedAt,
 		)
+		if err != nil {
+			utils.SQLiteErrorTarget(err, SELECT_GROUP_MEMBERS_BY_GROUP_ID)
+			return err
+		}
 		item.FullName = strings.Join([]string{first, last}, " ")
 		l.Members = append(l.Members, item)
 	}
@@ -51,7 +54,7 @@ func SelectGroupsById(limit, lastItemId int64, l *BrowseGroupsResponseJson) erro
 	l.Limit = limit
 	var item GroupItemJson
 	for rows.Next() {
-		rows.Scan(
+		err = rows.Scan(
 			&item.GroupId,
 			&item.Title,
 			&item.Description,
@@ -59,6 +62,10 @@ func SelectGroupsById(limit, lastItemId int64, l *BrowseGroupsResponseJson) erro
 			&item.CreatorId,
 			&item.CreatedAt,
 		)
+		if err != nil {
+			utils.SQLiteErrorTarget(err, SELECT_BROWSE_GROUPS)
+			return err
+		}
 		err = config.DB.QueryRow(SELECT_GROUP_MEMBERS_COUNT,
 			"group",
 			item.GroupId,
@@ -116,6 +123,18 @@ func SelectGroupMember(groupId, userId int64) (bool, error) {
 	return exist, err
 }
 
+func SelectGroupAcceptedMember(groupId, userId int64) (bool, error) {
+	var exist bool
+	_, err := config.DB.Query(SELECT_GROUP_MEMBER_ACCEPTED,
+		groupId,
+		userId,
+	)
+	if err != nil {
+		utils.SQLiteErrorTarget(err, SELECT_GROUP_MEMBER_ACCEPTED)
+	}
+	return exist, err
+}
+
 func SelectGroupOwner(groupId, userId int64) (bool, error) {
 	var exist bool
 	err := config.DB.QueryRow(SELECT_GROUP_BY_OWNER,
@@ -158,6 +177,57 @@ func SelectFollows(follower, followed int64) (bool, error) {
 	return exist, err
 }
 
+func SelectGoupEvent(groupId, eventId, userId int64, e *GetEventResponseJson) error {
+	err := config.DB.QueryRow(SELECT_EVENT_BY_ID,
+		eventId,
+		groupId,
+		userId,
+	).Scan(
+		&e.EventId,
+		&e.GroupId,
+		&e.Title,
+		&e.Description,
+		&e.Location,
+		&e.StartAt,
+		&e.EndAt,
+		&e.CreatedAt,
+		&e.CreatedBy.UserId,
+		&e.CreatedBy.Username,
+	)
+	if err != nil {
+		utils.SQLiteErrorTarget(err, SELECT_EVENT_BY_ID)
+	}
+	return err
+}
+
+func SelectAllGoupEvent(groupId int64, l *ListEventsResponseJson) error {
+	rows, err := config.DB.Query(SELECT_EVENTS_BY_GROUP_ID, groupId)
+	if err != nil {
+		utils.SQLiteErrorTarget(err, SELECT_EVENTS_BY_GROUP_ID)
+	}
+	defer rows.Close()
+	l.GroupId = groupId
+	var e EventItemJson
+	for rows.Next() {
+		err = rows.Scan(
+			&e.EventId,
+			&e.CreatedBy,
+			&e.Title,
+			&e.Description,
+			&e.Location,
+			&e.StartAt,
+			&e.EndAt,
+			&e.CreatedAt,
+		)
+		if err != nil {
+			utils.SQLiteErrorTarget(err, SELECT_EVENTS_BY_GROUP_ID)
+			return err
+		}
+		l.Events = append(l.Events, e)
+	}
+	return err
+}
+
 // write
 
 //insert
@@ -181,7 +251,6 @@ func InsertNewGroup(cg *CreateGroupRequestJson, g *CreateGroupResponseJson, user
 		)
 		if err != nil {
 			utils.SQLiteErrorTarget(err, INSERT_GROUP_BY_USER_ID)
-			return err
 		}
 		return err
 	})
@@ -197,18 +266,16 @@ func InsertNewGroupOwner(groupId, userId int64, status, role string) error {
 		)
 		if err != nil {
 			utils.SQLiteErrorTarget(err, INSERT_GROUP_MEMBER_BY_GROUP_ID)
-			return err
 		}
-
-		return nil
+		return err
 	})
 }
 
-func InsertNewGroupMember(groupId, userId int64, status, role string, m *InviteUserResponseJson) error {
+func InsertNewGroupMember(targetId, groupId int64, status, role, notificationType string, m *InviteUserResponseJson) error {
 	return database.WrapWithTransaction(func(tx *sql.Tx) error {
 		err := tx.QueryRow(INSERT_GROUP_MEMBER_BY_GROUP_ID,
 			groupId,
-			userId,
+			targetId,
 			status,
 			role,
 		).Scan(
@@ -221,8 +288,91 @@ func InsertNewGroupMember(groupId, userId int64, status, role string, m *InviteU
 			utils.SQLiteErrorTarget(err, INSERT_GROUP_MEMBER_BY_GROUP_ID)
 			return err
 		}
+		if notificationType == "group_join" {
+			err = tx.QueryRow(
+				SELECT_GROUP_OWNER,
+				groupId,
+			).Scan(
+				&targetId,
+			)
+			if err != nil {
+				utils.SQLiteErrorTarget(err, INSERT_GROUP_MEMBER_BY_GROUP_ID)
+				return err
+			}
+		}
+		_, err = tx.Exec(INSERT_NOTIFICATION,
+			utils.GenerateID(),
+			targetId,
+			notificationType,
+			"group",
+			groupId,
+			"you have been invated to group",
+		)
+		if err != nil {
+			utils.SQLiteErrorTarget(err, INSERT_NOTIFICATION)
+		}
+		return err
+	})
+}
 
-		return nil
+func insertNewGroupEvent(userId, groupId int64, e *CreateEventRequestJson, er *CreateEventResponseJson) error {
+	return database.WrapWithTransaction(func(tx *sql.Tx) error {
+		err := tx.QueryRow(
+			INSERT_GROUP_EVENT,
+			utils.GenerateID(),
+			groupId,
+			userId,
+			e.Title,
+			e.Description,
+			e.Location,
+			e.StartAt,
+			e.EndAt,
+		).Scan(
+			&er.EventId,
+			&er.GroupId,
+			&er.Title,
+			&er.Description,
+			&er.StartAt,
+			&er.EndAt,
+			&er.Location,
+			&er.CreatedBy,
+			&er.CreatedAt,
+		)
+		if err != nil {
+			utils.SQLiteErrorTarget(err, INSERT_GROUP_EVENT)
+			return err
+		}
+		rows, err := tx.Query(
+			SELECT_GROUP_MEMBERS_BY_GROUP,
+			groupId,
+			userId,
+		)
+		if err != nil {
+			utils.SQLiteErrorTarget(err, SELECT_GROUP_MEMBERS_BY_GROUP)
+			return err
+		}
+		defer rows.Close()
+		var groupUser int64
+		for rows.Next() {
+			err = rows.Scan(
+				&groupUser,
+			)
+			if err != nil {
+				utils.SQLiteErrorTarget(err, INSERT_NOTIFICATION)
+			}
+			_, err = tx.Exec(INSERT_NOTIFICATION,
+				utils.GenerateID(),
+				groupUser,
+				"event_created",
+				"event",
+				er.EventId,
+				"An event has been created",
+			)
+			if err != nil {
+				utils.SQLiteErrorTarget(err, INSERT_NOTIFICATION)
+			}
+		}
+		return err
 	})
 }
 
@@ -242,10 +392,8 @@ func UpdateMemberStatusAccepted(groupId, userId int64, a *AcceptMemberResponseJs
 		)
 		if err != nil {
 			utils.SQLiteErrorTarget(err, UPDATE_GROUP_MEMBER_STATUS)
-			return err
 		}
-
-		return nil
+		return err
 	})
 }
 
@@ -262,10 +410,8 @@ func UpdateMemberStatusDeclined(groupId, userId int64, d *DeclineMemberResponseJ
 		)
 		if err != nil {
 			utils.SQLiteErrorTarget(err, UPDATE_GROUP_MEMBER_STATUS)
-			return err
 		}
-
-		return nil
+		return err
 	})
 }
 
@@ -285,11 +431,9 @@ func UpdateGroup(groupId, userId int64, u *UpdateGroupRequestJson, ur *UpdateGro
 			&ur.UpdatedAt,
 		)
 		if err != nil {
-			utils.SQLiteErrorTarget(err, UPDATE_GROUP_MEMBER_STATUS)
-			return err
+			utils.SQLiteErrorTarget(err, UPDATE_GROUP_BY_ID)
 		}
-
-		return nil
+		return err
 	})
 }
 
@@ -302,9 +446,23 @@ func UpdateMetaData(entityType string, entityId int64, value int64) error {
 		)
 		if err != nil {
 			utils.SQLiteErrorTarget(err, UPDATE_GROUP_FOLLOWERS_COUNT)
-			return err
 		}
-		return nil
+		return err
+	})
+}
+
+func UpdateRsvp(eventId, userId int64, r *RSVPRequestJson, rs *RSVPResponseJson) error {
+	return database.WrapWithTransaction(func(tx *sql.Tx) error {
+		_, err := tx.Exec(INSERT_EVENT_RSVP,
+			eventId,
+			userId,
+			r.Option,
+		)
+		rs.Message = "RSVP updated successfully."
+		if err != nil {
+			utils.SQLiteErrorTarget(err, INSERT_EVENT_RSVP)
+		}
+		return err
 	})
 }
 
@@ -319,7 +477,6 @@ func DeleteGroupFromGroups(groupId, userId int64) error {
 		)
 		if err != nil {
 			utils.SQLiteErrorTarget(err, DELETE_GROUP_BY_ID_AND_CREATOR)
-			return err
 		}
 		return err
 	})

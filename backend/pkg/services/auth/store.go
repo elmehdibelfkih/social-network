@@ -43,7 +43,7 @@ func SelectUserSessionsById(s *SessionsResponseJson, session string, userId int6
 	for rows.Next() {
 		var sessionItem SessionItemJson
 		var session_token string
-		rows.Scan(
+		err = rows.Scan(
 			&sessionItem.SessionId,
 			&sessionItem.UserId,
 			&session_token,
@@ -51,6 +51,10 @@ func SelectUserSessionsById(s *SessionsResponseJson, session string, userId int6
 			&sessionItem.Device,
 			&sessionItem.CreatedAt,
 		)
+		if err != nil {
+			utils.SQLiteErrorTarget(err, SELECT_SESSION_BY_ID)
+			return err
+		}
 		if session_token == session {
 			sessionItem.Current = true
 		}
