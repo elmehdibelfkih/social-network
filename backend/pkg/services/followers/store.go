@@ -65,6 +65,76 @@ func isPublic(userId int64) (bool, error) {
 	}
 	return isPublic, nil
 }
+func followUser(followerId, followedId int64) error {
+	//todo: check if already ixist a notification
+	return database.WrapWithTransaction(func(tx *sql.Tx) error {
+		_, err := tx.Exec(FOLLOW_REQUEST_QUERY,
+			followerId, followedId, followedId,
+		)
+		if err != nil {
+			utils.SQLiteErrorTarget(err, FOLLOW_REQUEST_QUERY)
+			return err
+		}
+
+		status, err := selectFollowStatus(followerId, followedId)
+		if err != nil {
+			return err
+		}
+
+		n := followNotification(followerId, followedId, status)
+		_, err = tx.Exec(INSERT_NOTIFICATION,
+			n.id, n.UserId, n.Type, n.ReferenceType, n.ReferenceId, n.Content,
+		)
+		if err != nil {
+			utils.SQLiteErrorTarget(err, INSERT_NOTIFICATION)
+			return err
+		}
+
+		isPublic, err := isPublic(followedId)
+
+		if err != nil {
+			utils.SQLiteErrorTarget(err, INSERT_NOTIFICATION)
+			return err
+		}
+
+		if !isPublic {
+			return nil
+		}
+
+		counter := followUnfollowUpdateCounterStruct(database.USER_ENTITY_TYPE, followedId, database.FOLLOWERS_ENTITY_NAME, "increment")
+
+		err = database.UpdateCounter(tx, counter)
+
+		if err != nil {
+			utils.SQLiteErrorTarget(err, UNFOLLOW_REQUEST_QUERY)
+			return err
+		}
+		return nil
+	})
+}
+
+func unfollowUser(followerId, followedId int64) error {
+	return database.WrapWithTransaction(func(tx *sql.Tx) error {
+		_, err := tx.Exec(UNFOLLOW_REQUEST_QUERY,
+			followerId, followedId,
+		)
+		if err != nil {
+			utils.SQLiteErrorTarget(err, UNFOLLOW_REQUEST_QUERY)
+			return err
+		}
+
+		counter := followUnfollowUpdateCounterStruct(database.USER_ENTITY_TYPE, followedId, database.FOLLOWERS_ENTITY_NAME, "decrement")
+
+		err = database.UpdateCounter(tx, counter)
+
+		if err != nil {
+			utils.SQLiteErrorTarget(err, UNFOLLOW_REQUEST_QUERY)
+			return err
+		}
+
+		return nil
+	})
+}
 
 func GetFollowersByUserID(userID int64) ([]map[string]any, error) {
 	rows, err := config.DB.Query(GET_FOLLOWERS_QUERY, userID)
@@ -210,49 +280,6 @@ func GetFollowRequestByUserID(userID int64) ([]map[string]any, error) {
 	return followers, nil
 }
 
-func unfollowUser(followerId, followedId int64) error {
-	return database.WrapWithTransaction(func(tx *sql.Tx) error {
-		_, err := tx.Exec(UNFOLLOW_REQUEST_QUERY,
-			followerId, followedId,
-		)
-		if err != nil {
-			utils.SQLiteErrorTarget(err, UNFOLLOW_REQUEST_QUERY)
-			return err
-		}
-		//todo: update counters
-		return nil
-	})
-}
-
-func followUser(followerId, followedId int64) error {
-	//todo: check if already ixist a notification
-	return database.WrapWithTransaction(func(tx *sql.Tx) error {
-		_, err := tx.Exec(FOLLOW_REQUEST_QUERY,
-			followerId, followedId, followedId,
-		)
-		if err != nil {
-			utils.SQLiteErrorTarget(err, FOLLOW_REQUEST_QUERY)
-			return err
-		}
-
-		status, err := selectFollowStatus(followerId, followedId)
-		if err != nil {
-			return err
-		}
-
-		n := followNotification(followerId, followedId, status)
-		_, err = tx.Exec(INSERT_NOTIFICATION,
-			n.id, n.UserId, n.Type, n.ReferenceType, n.ReferenceId, n.Content,
-		)
-		if err != nil {
-			utils.SQLiteErrorTarget(err, INSERT_NOTIFICATION)
-			return err
-		}
-		//todo: update counters (check if the user profile public if yes increment the counter in not increment it when accept the request)
-		return nil
-	})
-}
-
 func acceptFollowRequest(followerId, followedId int64) error {
 	return database.WrapWithTransaction(func(tx *sql.Tx) error {
 		_, err := tx.Exec(ACCEPT_FOLLOW_REQUEST_QUERY,
@@ -262,8 +289,17 @@ func acceptFollowRequest(followerId, followedId int64) error {
 			utils.SQLiteErrorTarget(err, ACCEPT_FOLLOW_REQUEST_QUERY)
 			return err
 		}
+
+		counter := followUnfollowUpdateCounterStruct(database.USER_ENTITY_TYPE, followedId, database.FOLLOWERS_ENTITY_NAME, "increment")
+
+		err = database.UpdateCounter(tx, counter)
+
+		if err != nil {
+			utils.SQLiteErrorTarget(err, UNFOLLOW_REQUEST_QUERY)
+			return err
+		}
+
 		return nil
-		// todo: don't forget update the counters
 	})
 }
 
@@ -277,6 +313,5 @@ func declineFollowRequest(followerId, followedId int64) error {
 			return err
 		}
 		return nil
-		// todo: don't forget update the counters
 	})
 }

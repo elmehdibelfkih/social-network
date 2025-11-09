@@ -11,7 +11,6 @@ const (
 	ON CONFLICT(follower_id, followed_id) DO UPDATE
 	  SET status = excluded.status,
 	      followed_at = excluded.followed_at;
-	
 	`
 
 	UNFOLLOW_REQUEST_QUERY = `
@@ -34,10 +33,6 @@ const (
 	  AND followed_id = ?
 	  AND status = 'pending';
 	`
-
-	FOLLOWERS_LIST_QUERY      = ``
-	FOLLOWEEES_LIST_QUERY     = ``
-	FOLLOW_REQUEST_LIST_QUERY = ``
 
 	SELECT_FOLLOW_STATUS_QUERY   = `SELECT status FROM follows WHERE follower_id = ? AND followed_id = ?`
 	USER_EXISTS_QUERY            = `SELECT EXISTS(SELECT 1 FROM users WHERE id = ?)`
@@ -96,16 +91,4 @@ const (
 	    content
 	) VALUES (?, ?, ?, ?, ?, ?)
 	`
-	// (entity_type = user, entity_id = 33, column = followers )
-	// UPDATE_COUNT = `
-	// UPDATE counters SET (
-	// 	followers_count,
-	// 	posts_count = posts_count + 1 CASE entity_type = 3?"user"
-	// 	comments_count,
-	// 	reactions_count,
-	// 	shares_count,
-	// 	updated_at,
-	// )
-	// `
-
 )

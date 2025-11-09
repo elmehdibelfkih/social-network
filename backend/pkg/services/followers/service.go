@@ -2,6 +2,7 @@ package follow
 
 import (
 	"net/http"
+	"social/pkg/db/database"
 	"social/pkg/utils"
 )
 
@@ -20,6 +21,17 @@ func followNotification(followerId, followedId int64, status string) Notificatio
 	}
 	notification.status = status
 	return notification
+}
+
+func followUnfollowUpdateCounterStruct(entityType string, entityID int64, counterName string, action string) database.DBCounter {
+	var counter database.DBCounter
+
+	counter.CounterName = counterName
+	counter.EntityType = entityType
+	counter.EntityID = entityID
+	counter.Action = action
+
+	return counter
 }
 
 func followResponse(w http.ResponseWriter, r *http.Request) {

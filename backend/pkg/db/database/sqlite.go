@@ -10,15 +10,21 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-const USER_ENTITY = `user`
-const POST_ENTITY = `post`
-const GROUP_ENTITY = `group`
-const COMMENT_ENTITY = `comment`
+const USER_ENTITY_TYPE = `user`
+const POST_ENTITY_TYPE = `post`
+const GROUP_ENTITY_TYPE = `group`
+const COMMENT_ENTITY_TYPE = `comment`
+
+const FOLLOWERS_ENTITY_NAME = "followers"
+const POSTS_ENTITY_NAME = "posts"
+const COMMENTS_ENTITY_NAME = "comments"
+const REACTIONS_ENTITY_NAME = "reactions"
+const SHARSE_ENTITY_TYPE = "shares"
 
 type DBCounter struct {
 	CounterName string
 	EntityType  string
-	EntityID    string
+	EntityID    int64
 	Action      string
 }
 
@@ -112,7 +118,7 @@ func WrapWithTransaction(fn func(*sql.Tx) error) error {
 	return tx.Commit()
 }
 
-func IncrementCounter(tx *sql.Tx, counter DBCounter) error {
+func UpdateCounter(tx *sql.Tx, counter DBCounter) error {
 	_, err := tx.Exec(UPDATE_COUNT, counter.CounterName, counter.EntityType, counter.EntityID, counter.Action)
 	return err
 }
