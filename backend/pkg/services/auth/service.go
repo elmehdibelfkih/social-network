@@ -32,6 +32,7 @@ func RegisterUserAccount(w http.ResponseWriter, r *http.Request, body *RegisterR
 	s.IpAddress = r.RemoteAddr
 	s.Device = r.Header.Get("User-Agent")
 	s.ExpiresAt = time.Now().UTC().Add(24 * time.Hour).Format(time.RFC3339)
+	s.ExpiresAt = time.Now().UTC().Add(24 * time.Hour).Format(time.RFC3339)
 	err = InsertRegisterUserSession(s)
 	if err != nil {
 		utils.BackendErrorTarget(err, context)
@@ -67,6 +68,7 @@ func LoginUserAccount(w http.ResponseWriter, r *http.Request, body *LoginRequest
 	s.SessionToken = utils.GenerateSessionToken(256)
 	s.IpAddress = r.RemoteAddr
 	s.Device = r.Header.Get("User-Agent")
+	s.ExpiresAt = time.Now().UTC().Add(24 * time.Hour).Format(time.RFC3339)
 	s.ExpiresAt = time.Now().UTC().Add(24 * time.Hour).Format(time.RFC3339)
 	err := InsertLoginUserSession(s, response)
 	if err != nil {
@@ -124,6 +126,7 @@ func LogoutUserAccount(w http.ResponseWriter, r *http.Request, context string) b
 		utils.Unauthorized(w, "session value is empty")
 		return false
 	}
+	err = DeleteUserSessionBySessionToken(session, userId)
 	err = DeleteUserSessionBySessionToken(session, userId)
 	if err != nil {
 		utils.BackendErrorTarget(err, context)

@@ -11,5 +11,7 @@ CREATE TABLE
   );
 
 CREATE INDEX IF NOT EXISTS idx_sessions_user_id ON sessions (user_id);
+CREATE INDEX IF NOT EXISTS idx_sessions_user_id ON sessions (user_id);
 
+CREATE UNIQUE INDEX IF NOT EXISTS ux_sessions_token ON sessions (session_token);
 CREATE UNIQUE INDEX IF NOT EXISTS ux_sessions_token ON sessions (session_token);

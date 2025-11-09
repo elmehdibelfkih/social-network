@@ -116,8 +116,7 @@ func DeleteGroup(w http.ResponseWriter, r *http.Request) {
 func PostCreateEvent(w http.ResponseWriter, r *http.Request) {
 	var body CreateEventRequestJson
 	var response CreateEventResponseJson
-	if !utils.ValidateJsonRequest(r, &body, "PostCreateEvent handler") {
-		utils.BadRequest(w, "request body invalid json format", "redirect")
+	if !utils.ValidateJsonRequest(w, r, &body, "PostCreateEvent handler") {
 		return
 	}
 	if ok, str := body.Validate(); !ok {
@@ -133,8 +132,7 @@ func PostCreateEvent(w http.ResponseWriter, r *http.Request) {
 func PostEventRSVP(w http.ResponseWriter, r *http.Request) {
 	var body RSVPRequestJson
 	var response RSVPResponseJson
-	if !utils.ValidateJsonRequest(r, &body, "PostEventRSVP handler") {
-		utils.BadRequest(w, "request body invalid json format", "redirect")
+	if !utils.ValidateJsonRequest(w, r, &body, "PostEventRSVP handler") {
 		return
 	}
 	if ok, str := body.Validate(); !ok {

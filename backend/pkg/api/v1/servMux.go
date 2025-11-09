@@ -10,6 +10,7 @@ import (
 	follow "social/pkg/services/followers"
 	"social/pkg/services/groups"
 	"social/pkg/services/media"
+	"social/pkg/services/users"
 	"social/pkg/utils"
 )
 
@@ -54,7 +55,6 @@ func SocialMux() *router.Router {
 	socialMux.HandleFunc("POST", "/api/v1/chats/{chat_id}/messages", utils.MiddlewareChain(chat.SendMessageHandler, middleware.UserContext, middleware.AuthMiddleware))
 	socialMux.HandleFunc("DELETE", "/api/v1/chats/{chat_id}/messages/{msg_id}", utils.MiddlewareChain(chat.DeleteMessageHandler, middleware.UserContext, middleware.AuthMiddleware))
 	socialMux.HandleFunc("GET", "/api/v1/chats/{chat_id}/participants", utils.MiddlewareChain(chat.GetParticipantsHandler, middleware.UserContext, middleware.AuthMiddleware))
-	// notifications
 
 	//media
 	socialMux.HandleFunc("POST", "/api/v1/media/upload", media.HandleUploadMedia)
@@ -70,6 +70,12 @@ func SocialMux() *router.Router {
 	socialMux.HandleFunc("POST", "/api/v1/follow-requests/{user_id}/accept", utils.MiddlewareChain(follow.AcceptFollowHandler, middleware.AuthMiddleware, follow.AcceptFollowRequestMiddleWare))
 	socialMux.HandleFunc("POST", "/api/v1/follow-requests/{user_id}/decline", utils.MiddlewareChain(follow.DeclineFollowHandler, middleware.AuthMiddleware, follow.DeclineFollowRequestMiddleWare))
 	//todo: cancel follow request
+
+	//Users_Profiles
+	socialMux.HandleFunc("GET", "/api/v1/users/{user_id}/profile", utils.MiddlewareChain(users.GetProfile, middleware.UserContext, middleware.AuthMiddleware))
+	socialMux.HandleFunc("PUT", "/api/v1/users/{user_id}/profile", utils.MiddlewareChain(users.PutProfile, middleware.UserContext, middleware.AuthMiddleware))
+	socialMux.HandleFunc("PATCH", "/api/v1/users/{user_id}/privacy", utils.MiddlewareChain(users.PatchProfile, middleware.UserContext, middleware.AuthMiddleware))
+	socialMux.HandleFunc("GET", "/api/v1/users/{user_id}/stats", utils.MiddlewareChain(users.GetStats, middleware.UserContext))
 
 	return socialMux
 }

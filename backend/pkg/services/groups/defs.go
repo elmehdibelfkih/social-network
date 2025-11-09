@@ -200,11 +200,12 @@ func (v *CreateGroupRequestJson) Validate() (bool, string) {
 	if ok, str := utils.TextContentValidationEscape(&v.Description, 5, 4096); !ok {
 		return false, str
 	}
-	if v.AvatarId != nil {
-		if !utils.IdValidation(*v.AvatarId) {
-			return false, "invalid int64 id"
-		}
-	}
+	// FIXME
+	// if v.AvatarId != nil {
+	// 	if !utils.IdValidation(*v.AvatarId) {
+	// 		return false, "invalid int64 id"
+	// 	}
+	// }
 	return true, "OK"
 }
 
@@ -215,11 +216,13 @@ func (v *UpdateGroupRequestJson) Validate() (bool, string) {
 	if ok, str := utils.TextContentValidationEscape(&v.Description, 4096, 5); !ok {
 		return false, str
 	}
-	if v.AvatarId != nil {
-		if !utils.IdValidation(*v.AvatarId) {
-			return false, "invalid int64 id"
-		}
-	}
+	// FIXME
+
+	// if v.AvatarId != nil {
+	// 	if !utils.IdValidation(*v.AvatarId) {
+	// 		return false, "invalid int64 id"
+	// 	}
+	// }
 	return true, "OK"
 }
 
@@ -242,9 +245,11 @@ func (v *CreateEventRequestJson) Validate() (bool, string) {
 	return true, "OK"
 }
 
+// FIXME
+
 func (v *RSVPRequestJson) Validate() (bool, string) {
-	if !utils.OptionValidation(v.Option) {
-		return false, "invalid option"
-	}
+	// if !utils.OptionValidation(v.Option) {
+	// 	return false, "invalid option"
+	// }
 	return true, "OK"
 }

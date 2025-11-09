@@ -290,6 +290,7 @@ func DeleteUserSessionBySessionToken(session string, userId int64) error {
 	return database.WrapWithTransaction(func(tx *sql.Tx) error {
 		_, err := tx.Exec(
 			DELETE_USER_SESSION_BY_SESSION_TOKEN,
+			DELETE_USER_SESSION_BY_SESSION_TOKEN,
 			userId,
 			session,
 		)
