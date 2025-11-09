@@ -6,10 +6,8 @@ import (
 
 type ContextKey string
 
-// context keys
-
 const (
-	USER_ID_KEY      ContextKey = "userId"
+	USER_ID_KEY ContextKey = "userId"
 )
 
 var DB *sql.DB
@@ -21,7 +19,6 @@ const (
 	FOREIGN_KEYS_ON    = "PRAGMA foreign_keys = ON;"
 )
 
-// PATHS
 const (
 	MIGRATION_PATH        = "file://./pkg/db/migrations"
 	DATABASE_PATH         = "../data/sqlite/social.db"

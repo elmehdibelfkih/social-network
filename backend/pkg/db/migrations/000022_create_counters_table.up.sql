@@ -10,4 +10,13 @@ CREATE TABLE IF NOT EXISTS counters (
   PRIMARY KEY (entity_type, entity_id)
 );
 
-CREATE INDEX IF NOT EXISTS idx_counters_entity ON counters(entity_type, entity_id);
+CREATE INDEX IF NOT EXISTS idx_counters_entity ON counters(entity_type, entity_id);	// UPDATE_COUNT = `
+	// UPDATE counters SET (
+	// 	followers_count,
+	// 	posts_count = posts_count + 1 CASE entity_type = 3?"user" 
+	// 	comments_count,
+	// 	reactions_count,
+	// 	shares_count,
+	// 	updated_at,	
+	// )
+	// `

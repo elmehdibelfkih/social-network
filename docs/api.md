@@ -317,8 +317,7 @@ No need for a request body.
   "message": "Follow request sent successfully.",
   "status": "pending",
   "targetUserId": 1289843874339,
-  "followerUserId": 1289843874336,
-  "createdAt": "2025-10-24T18:20:00Z"
+  "followerId": 1289843874336,
 }
 ```
 
@@ -346,8 +345,7 @@ No need for a request body.
 {
   "message": "You have unfollowed this user.",
   "targetUserId": 1289843874339,
-  "followerUserId": 1289843874336,
-  "unfollowedAt": "2025-10-24T18:25:00Z"
+  "followerrId": 1289843874336,
 }
 ```
 
@@ -361,8 +359,7 @@ No need for a request body.
 
 ``` json
 {
-  "userId": 1289843874339,
-  "followers": [
+  [
     {
       "userId": 1289843874323,
       "nickname": "alice123",
@@ -392,24 +389,17 @@ No need for a request body.
 
 ***status code in success: 200***
 
-- request
-
-```json
-No need for a request body.
-```
-
 - response payload
 
 ``` json
 {
-  "userId": 1289843874339,
-  "following": [
+  [
     {
       "userId": 1289843874323,
       "nickname": "alice123",
       "firstName": "Alice",
       "lastName": "Johnson",
-      "avatarPath": "/media/avatars/1289843874323.png",
+      "avatarId": 5956843825683,
       "followedAt": "2025-10-10T12:00:00Z",
       "status": "accepted" // pending/accepted/declined
     },
@@ -418,7 +408,7 @@ No need for a request body.
       "nickname": "bob_dev",
       "firstName": "Bob",
       "lastName": "Smith",
-      "avatarPath": "/media/avatars/1289843874334.png",
+      "avatarId": 5956843825683,
       "followedAt": "2025-10-12T15:30:00Z",
       "status": "accepted" // pending/accepted/declined
     }
@@ -436,24 +426,23 @@ No need for a request body.
 
 ``` json
 {
-  "userId": 1289843874339,
-  "followRequests": [
+  [
     {
-      "followerId": 6249843274333,
+      "userId": 6249843274333,
       "nickname": "alice123",
       "firstName": "Alice",
       "lastName": "Johnson",
-      "avatarPath": "/media/avatars/6249843274333.png",
-      "requestedAt": "2025-10-20T14:30:00Z",
+      "avatarId": 5956843825683,
+      "followedAt": "2025-10-20T14:30:00Z",
       "status": "pending"
     },
     {
-      "followerId": 3489443834339,
+      "userId": 3489443834339,
       "nickname": "bob_dev",
       "firstName": "Bob",
       "lastName": "Smith",
-      "avatarPath": "/media/avatars/3489443834339.png",
-      "requestedAt": "2025-10-21T10:15:00Z",
+      "avatarId": 5956843825683,
+      "followedAt": "2025-10-21T10:15:00Z",
       "status": "pending"
     }
   ]
@@ -480,7 +469,6 @@ No need for a request body.
   "followerId": 5389143874311,
   "followedId": 1289843874339, // the current user
   "status": "accepted",
-  "acceptedAt": "2025-10-24T18:50:00Z"
 }
 ```
 
@@ -504,7 +492,6 @@ No need for a request body.
   "followerId": 5389143874311,
   "followedId": 1289843874339, // the current user,
   "status": "declined",
-  "declinedAt": "2025-10-24T18:55:00Z"
 }
 ```
 
@@ -525,11 +512,7 @@ No need for a request body.
 
 ``` json
 {
-  "userId": 1289843874339,
-  "page": 1,
-  "limit": 20,
-  "totalPosts": 135,
-  "posts": [
+  [
     {
       "postId": 3389843874075,
       "authorId": 1289843874339,
@@ -539,7 +522,7 @@ No need for a request body.
       "privacy": "followers",
       "createdAt": "2025-10-24T15:00:00Z",
       "updatedAt": "2025-10-24T15:00:00Z",
-      "groupId": null
+      "groupId": 98765789765789
     },
     {
       "postId": 8689843874069,
@@ -1608,8 +1591,6 @@ No need for a request body.
   "message": "Message deleted successfully."
 }
 ```
-
----
 
 ### GET `/api/v1/chats/:chat_id/participants` => list participants
 

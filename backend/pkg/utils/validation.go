@@ -2,22 +2,31 @@ package utils
 
 import (
 	"html"
-	"math"
+	"net/http"
 	"regexp"
 	"strings"
 	"time"
 )
 
 var (
-	emailRegex = regexp.MustCompile(`^[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,4}$`)
-	nameRegex  = regexp.MustCompile(`^[a-zA-Z]+(?:[-'\s][a-zA-Z]+)*$`)
-	// dateRegex       = regexp.MustCompile(`^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$`)
+	emailRegex      = regexp.MustCompile(`^[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,4}$`)
+	nameRegex       = regexp.MustCompile(`^[a-zA-Z]+(?:[-'\s][a-zA-Z]+)*$`)
+	dateRegex       = regexp.MustCompile(`^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$`)
 	passwordLength  = regexp.MustCompile(`^.{8,16}$`)
 	passwordUpper   = regexp.MustCompile(`[A-Z]`)
 	passwordLower   = regexp.MustCompile(`[a-z]`)
 	passwordDigit   = regexp.MustCompile(`[0-9]`)
 	passwordSpecial = regexp.MustCompile(`[!@#$%^&*]`)
 	passwordNoSpace = regexp.MustCompile(`^\S+$`)
+	// emailRegex      = regexp.MustCompile(`^[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,4}$`)
+	// nameRegex       = regexp.MustCompile(`^[a-zA-Z]+(?:[-'\s][a-zA-Z]+)*$`)
+	// // dateRegex       = regexp.MustCompile(`^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$`)
+	// passwordLength  = regexp.MustCompile(`^.{8,16}$`)
+	// passwordUpper   = regexp.MustCompile(`[A-Z]`)
+	// passwordLower   = regexp.MustCompile(`[a-z]`)
+	// passwordDigit   = regexp.MustCompile(`[0-9]`)
+	// passwordSpecial = regexp.MustCompile(`[!@#$%^&*]`)
+	// passwordNoSpace = regexp.MustCompile(`^\S+$`)
 )
 
 func EmailValidation(mail string) (bool, string) {
@@ -74,10 +83,13 @@ func TextContentValidationEscape(content *string, minLen, maxLen int) (bool, str
 	return true, escaped
 }
 
-func IdValidation(id int64) bool {
-	return id > 0 && id < math.MaxInt64
-}
-
-func OptionValidation(option string) bool {
-	return option == "going" || option == "not_going"
+func ValidateJsonRequest(w http.ResponseWriter, r *http.Request, body any, context string) bool {
+	err := JsonStaticDecode(r, &body)
+	if err != nil {
+		println(err.Error())
+		BackendErrorTarget(err, context)
+		BadRequest(w, "request body invalid json format", "redirect")
+		return false
+	}
+	return true
 }

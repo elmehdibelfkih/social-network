@@ -21,14 +21,7 @@ func HandleUploadMedia(w http.ResponseWriter, r *http.Request) {
 	r.Body = http.MaxBytesReader(w, r.Body, MaxRequestSize)
 	defer r.Body.Close()
 
-	err := utils.JsonStaticDecode(r, &req)
-	if err != nil {
-		if err.Error() == "http: request body too large" {
-			utils.BadRequest(w, "File is too large.", utils.ErrorTypeAlert)
-			return
-		}
-
-		utils.BadRequest(w, "There is some issue in the request", utils.ErrorTypeAlert)
+	if ok := utils.ValidateJsonRequest(w, r, r.Body, "Media upload"); !ok {
 		return
 	}
 
