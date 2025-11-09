@@ -1,5 +1,4 @@
 package chat
-package chat
 
 var GetUserChatsQuery = `
 SELECT

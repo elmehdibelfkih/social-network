@@ -10,8 +10,7 @@ import (
 func PostCreateGroup(w http.ResponseWriter, r *http.Request) {
 	var body CreateGroupRequestJson
 	var response CreateGroupResponseJson
-	if !utils.ValidateJsonRequest(r, &body, "CreateGroup handler") {
-		utils.BadRequest(w, "request body invalid json format", "redirect")
+	if !utils.ValidateJsonRequest(w, r, &body, "CreateGroup handler") {
 		return
 	}
 	if ok, str := body.Validate(); !ok {
@@ -27,8 +26,7 @@ func PostCreateGroup(w http.ResponseWriter, r *http.Request) {
 func PostInviteMember(w http.ResponseWriter, r *http.Request) {
 	var body InviteUserRequestJson
 	var response InviteUserResponseJson
-	if !utils.ValidateJsonRequest(r, &body, "CreateGroup handler") {
-		utils.BadRequest(w, "request body invalid json format", "redirect")
+	if !utils.ValidateJsonRequest(w, r, &body, "CreateGroup handler") {
 		return
 	}
 	if ok, str := body.Validate(); !ok {
@@ -76,8 +74,7 @@ func PostDeclineInvite(w http.ResponseWriter, r *http.Request) {
 func PutUpdateGroup(w http.ResponseWriter, r *http.Request) {
 	var body UpdateGroupRequestJson
 	var response UpdateGroupResponseJson
-	if !utils.ValidateJsonRequest(r, &body, "PutUpdateGroup handler") {
-		utils.BadRequest(w, "request body invalid json format", "redirect")
+	if !utils.ValidateJsonRequest(w, r, &body, "PutUpdateGroup handler") {
 		return
 	}
 	if ok, str := body.Validate(); !ok {
