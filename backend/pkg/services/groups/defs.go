@@ -200,12 +200,6 @@ func (v *CreateGroupRequestJson) Validate() (bool, string) {
 	if ok, str := utils.TextContentValidationEscape(&v.Description, 5, 4096); !ok {
 		return false, str
 	}
-	// FIXME
-	// if v.AvatarId != nil {
-	// 	if !utils.IdValidation(*v.AvatarId) {
-	// 		return false, "invalid int64 id"
-	// 	}
-	// }
 	return true, "OK"
 }
 
@@ -216,13 +210,7 @@ func (v *UpdateGroupRequestJson) Validate() (bool, string) {
 	if ok, str := utils.TextContentValidationEscape(&v.Description, 4096, 5); !ok {
 		return false, str
 	}
-	// FIXME
 
-	// if v.AvatarId != nil {
-	// 	if !utils.IdValidation(*v.AvatarId) {
-	// 		return false, "invalid int64 id"
-	// 	}
-	// }
 	return true, "OK"
 }
 
