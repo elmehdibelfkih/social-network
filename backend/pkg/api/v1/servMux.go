@@ -7,7 +7,7 @@ import (
 	"social/pkg/app/dependencies/router"
 	"social/pkg/services/auth"
 	"social/pkg/services/chat"
-	follow "social/pkg/services/followers"
+	"social/pkg/services/followers"
 	"social/pkg/services/groups"
 	"social/pkg/services/media"
 	"social/pkg/services/users"
