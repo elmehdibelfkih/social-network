@@ -25,7 +25,7 @@ type DBCounter struct {
 	CounterName string
 	EntityType  string
 	EntityID    int64
-	Action      string
+	Action      string //++ or --
 }
 
 const UPDATE_COUNT = `

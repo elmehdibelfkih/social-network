@@ -22,7 +22,7 @@ func FollowRequestMiddleWare(next http.HandlerFunc) http.HandlerFunc {
 		}
 
 		if userId == targetUserId {
-			utils.BadRequest(w, "You cannot follow yourself.", "alert")
+		POST /api/v1/users/:user_id/follow 	utils.BadRequest(w, "You cannot follow yourself.", "alert")
 			return
 		}
 
