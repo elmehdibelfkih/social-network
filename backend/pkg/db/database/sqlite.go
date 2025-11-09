@@ -29,44 +29,31 @@ type DBCounter struct {
 }
 
 const UPDATE_COUNT = `
-	INSERT INTO counters (
-	  entity_type,
-	  entity_id,
-	  followers_count,
-	  posts_count,
-	  comments_count,
-	  reactions_count,
-	  shares_count
-	)
-	VALUES (
-	  ?2,
-	  ?3,
-	  CASE WHEN ?1 = 'followers' AND ?4 = 'decrement' THEN -1 ELSE 0 END,
-	  CASE WHEN ?1 = 'posts'     AND ?4 = 'decrement' THEN -1 ELSE 0 END,
-	  CASE WHEN ?1 = 'comments'  AND ?4 = 'decrement' THEN -1 ELSE 0 END,
-	  CASE WHEN ?1 = 'reactions' AND ?4 = 'decrement' THEN -1 ELSE 0 END,
-	  CASE WHEN ?1 = 'shares'    AND ?4 = 'decrement' THEN -1 ELSE 0 END,
-
-	  CASE WHEN ?1 = 'followers' AND ?4 = 'increment' THEN 1 ELSE 0 END,
-	  CASE WHEN ?1 = 'posts'     AND ?4 = 'increment' THEN 1 ELSE 0 END,
-	  CASE WHEN ?1 = 'comments'  AND ?4 = 'increment' THEN 1 ELSE 0 END,
-	  CASE WHEN ?1 = 'reactions' AND ?4 = 'increment' THEN 1 ELSE 0 END,
-	  CASE WHEN ?1 = 'shares'    AND ?4 = 'increment' THEN 1 ELSE 0 END
-	)
-	ON CONFLICT(entity_type, entity_id) DO UPDATE SET
-	  followers_count = followers_count + CASE WHEN ?1 = 'followers' AND ?4 = 'decrement' THEN 1 ELSE 0 END,
-	  posts_count     = posts_count     + CASE WHEN ?1 = 'posts'     AND ?4 = 'decrement' THEN 1 ELSE 0 END,
-	  comments_count  = comments_count  + CASE WHEN ?1 = 'comments'  AND ?4 = 'decrement' THEN 1 ELSE 0 END,
-	  reactions_count = reactions_count + CASE WHEN ?1 = 'reactions' AND ?4 = 'decrement' THEN 1 ELSE 0 END,
-	  shares_count    = shares_count    + CASE WHEN ?1 = 'shares'    AND ?4 = 'decrement' THEN 1 ELSE 0 END,
-
-	  followers_count = followers_count + CASE WHEN ?1 = 'followers' AND ?4 = 'increment' THEN 1 ELSE 0 END,
-	  posts_count     = posts_count     + CASE WHEN ?1 = 'posts'     AND ?4 = 'increment' THEN 1 ELSE 0 END,
-	  comments_count  = comments_count  + CASE WHEN ?1 = 'comments'  AND ?4 = 'increment' THEN 1 ELSE 0 END,
-	  reactions_count = reactions_count + CASE WHEN ?1 = 'reactions' AND ?4 = 'increment' THEN 1 ELSE 0 END,
-	  shares_count    = shares_count    + CASE WHEN ?1 = 'shares'    AND ?4 = 'increment' THEN 1 ELSE 0 END,
-	  
-	  updated_at = CURRENT_TIMESTAMP;
+    INSERT INTO counters (
+      entity_type,
+      entity_id,
+      followers_count,
+      posts_count,
+      comments_count,
+      reactions_count,
+      shares_count
+    )
+    VALUES (
+      ?2, -- entity_type
+      ?3, -- entity_id
+      CASE WHEN ?1 = 'followers' THEN (CASE WHEN ?4 = 'increment' THEN 1 ELSE -1 END) ELSE 0 END,
+      CASE WHEN ?1 = 'posts'     THEN (CASE WHEN ?4 = 'increment' THEN 1 ELSE -1 END) ELSE 0 END,
+      CASE WHEN ?1 = 'comments'  THEN (CASE WHEN ?4 = 'increment' THEN 1 ELSE -1 END) ELSE 0 END,
+      CASE WHEN ?1 = 'reactions' THEN (CASE WHEN ?4 = 'increment' THEN 1 ELSE -1 END) ELSE 0 END,
+      CASE WHEN ?1 = 'shares'    THEN (CASE WHEN ?4 = 'increment' THEN 1 ELSE -1 END) ELSE 0 END
+    )
+    ON CONFLICT (entity_type, entity_id) DO UPDATE SET
+      followers_count = followers_count + CASE WHEN ?1 = 'followers' THEN (CASE WHEN ?4 = 'increment' THEN 1 ELSE -1 END) ELSE 0 END,
+      posts_count     = posts_count     + CASE WHEN ?1 = 'posts'     THEN (CASE WHEN ?4 = 'increment' THEN 1 ELSE -1 END) ELSE 0 END,
+      comments_count  = comments_count  + CASE WHEN ?1 = 'comments'  THEN (CASE WHEN ?4 = 'increment' THEN 1 ELSE -1 END) ELSE 0 END,
+      reactions_count = reactions_count + CASE WHEN ?1 = 'reactions' THEN (CASE WHEN ?4 = 'increment' THEN 1 ELSE -1 END) ELSE 0 END,
+      shares_count    = shares_count    + CASE WHEN ?1 = 'shares'    THEN (CASE WHEN ?4 = 'increment' THEN 1 ELSE -1 END) ELSE 0 END,
+      updated_at = CURRENT_TIMESTAMP;
 `
 
 func InitDB() error {

@@ -14,7 +14,7 @@ CREATE TABLE
       )
     ),
     reference_type TEXT NOT NULL CHECK (
-      type IN (
+      reference_type IN (
         'post',
         'comment',
         'group',

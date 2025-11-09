@@ -106,7 +106,7 @@ func followUser(followerId, followedId int64) error {
 		err = database.UpdateCounter(tx, counter)
 
 		if err != nil {
-			utils.SQLiteErrorTarget(err, UNFOLLOW_REQUEST_QUERY)
+			utils.SQLiteErrorTarget(err, database.USER_ENTITY_TYPE)
 			return err
 		}
 		return nil
