@@ -5,8 +5,7 @@ import (
 	"social/pkg/utils"
 )
 
-// GetProfile handles GET /api/v1/users/:user_id/profile
-// It returns the public or private view of a user's profile based on privacy rules.
+// return profile based on privacy rules (public / private)
 func GetProfile(w http.ResponseWriter, r *http.Request) {
 	// Extract user_id from URL path
 	profileUserId := utils.GetWildCardValue(w, r, "user_id")
@@ -14,7 +13,6 @@ func GetProfile(w http.ResponseWriter, r *http.Request) {
 		utils.BadRequest(w, "Invalid user ID.", "redirect")
 		return
 	}
-
 	// Get current user from context (may be 0 if not logged in)
 	viewerUserId := utils.GetUserIdFromContext(r)
 
@@ -28,7 +26,7 @@ func GetProfile(w http.ResponseWriter, r *http.Request) {
 	utils.WriteSuccess(w, http.StatusOK, response)
 }
 
-// It updates the owner's profile fields
+// updates the owner's profile fields
 func PutProfile(w http.ResponseWriter, r *http.Request) {
 	// Extract user_id from URL path
 	profileUserId := utils.GetWildCardValue(w, r, "user_id")
@@ -66,8 +64,7 @@ func PutProfile(w http.ResponseWriter, r *http.Request) {
 	utils.WriteSuccess(w, http.StatusOK, response)
 }
 
-// PatchProfile handles PATCH /api/v1/users/:user_id/privacy
-// It toggles the profile privacy between "public" and "private".
+//  toggles the profile privacy between "public" and "private".
 func PatchProfile(w http.ResponseWriter, r *http.Request) {
 	// Extract user_id from URL path
 	profileUserId := utils.GetWildCardValue(w, r, "user_id")
@@ -105,7 +102,6 @@ func PatchProfile(w http.ResponseWriter, r *http.Request) {
 	utils.WriteSuccess(w, http.StatusOK, response)
 }
 
-// GetStats handles GET /api/v1/users/:user_id/stats
 // It returns counters like posts, followers, following, likes, comments.
 func GetStats(w http.ResponseWriter, r *http.Request) {
 	// Extract user_id from URL path

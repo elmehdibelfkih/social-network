@@ -9,7 +9,7 @@ const (
 	SELECT_USER_PROFILE_BY_ID = `
 		SELECT 
 			id, email, nickname, first_name, last_name, 
-			date_of_birth, avatar_media_id, about_me, privacy, created_at
+			date_of_birth, avatar_id, about_me, privacy, created_at
 		FROM users 
 		WHERE id = ?`
 
@@ -91,7 +91,7 @@ const (
 			last_name = ?,
 			nickname = ?,
 			about_me = ?,
-			avatar_media_id = ?,
+			avatar_id = ?,
 			date_of_birth = ?,
 			email = ?,
 			updated_at = CURRENT_TIMESTAMP

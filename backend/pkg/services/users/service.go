@@ -95,7 +95,7 @@ func GetUserProfile(w http.ResponseWriter, profileUserId, viewerUserId int64, co
 	return response, true
 }
 
-// UpdateUserProfile updates a user's profile
+// updates a user's profile
 func UpdateUserProfile(w http.ResponseWriter, userId int64, req *UpdateProfileRequestJson, context string) (UpdateProfileResponseJson, bool) {
 	var response UpdateProfileResponseJson
 
