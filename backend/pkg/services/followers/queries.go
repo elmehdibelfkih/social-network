@@ -2,12 +2,16 @@ package follow
 
 const (
 	FOLLOW_REQUEST_QUERY = `
-		INSERT INTO follows (follower_id, followed_id, status, followed_at)
+	INSERT INTO follows (follower_id, followed_id, status, followed_at)
 	SELECT ?, ?, 
-	       CASE WHEN privacy = "public" THEN 'accepted' ELSE 'pending' END,
+	       CASE WHEN u.privacy = 'public' THEN 'accepted' ELSE 'pending' END,
 	       CURRENT_TIMESTAMP
-	FROM users
-	WHERE id = ?;
+	FROM users u
+	WHERE u.id = ?
+	ON CONFLICT(follower_id, followed_id) DO UPDATE
+	  SET status = excluded.status,
+	      followed_at = excluded.followed_at;
+	
 	`
 
 	UNFOLLOW_REQUEST_QUERY = `
@@ -15,8 +19,21 @@ const (
 			WHERE follower_id = ? AND followed_id = ?;
 	`
 
-	ACCEPT_FOLLOW_REQUEST_QUERY  = ``
-	DECLINE_FOLLOW_REQUEST_QUERY = ``
+	ACCEPT_FOLLOW_REQUEST_QUERY = `
+	UPDATE follows
+	SET status = 'accepted'
+	WHERE follower_id = ?
+	  AND followed_id = ?
+	  AND status = 'pending';
+`
+
+	DECLINE_FOLLOW_REQUEST_QUERY = `
+	UPDATE follows
+	SET status = 'declined'
+	WHERE follower_id = ?
+	  AND followed_id = ?
+	  AND status = 'pending';
+	`
 
 	FOLLOWERS_LIST_QUERY      = ``
 	FOLLOWEEES_LIST_QUERY     = ``
@@ -37,7 +54,7 @@ const (
 		f.status
 	FROM follows f
 	JOIN users u ON f.follower_id = u.id
-	WHERE f.followed_id = ?
+	WHERE f.followed_id = ? AND status = "accepted"
 	ORDER BY f.followed_at DESC;
 	`
 
@@ -52,8 +69,22 @@ const (
 	  f.status
 	FROM follows f
 	JOIN users u ON f.followed_id = u.id
-	WHERE f.follower_id = ?
+	WHERE f.follower_id = ? AND status = "accepted"
 	ORDER BY f.followed_at DESC;`
+
+	GET_FOLLOW_REQUEST_QUERY = `
+	SELECT
+	  f.follower_id            AS userId,
+	  u.nickname               AS nickname,
+	  u.first_name             AS firstName,
+	  u.last_name              AS lastName,
+	  u.avatar_id              AS avatarId,
+	  f.followed_at            AS followedAt,
+	  f.status                 AS status
+	FROM follows f
+	JOIN users u ON u.id = f.follower_id
+	WHERE f.followed_id = ? AND f.status = 'pending'
+	ORDER BY f.followed_at DESC`
 
 	INSERT_NOTIFICATION = `
 	INSERT INTO notifications (
@@ -65,4 +96,16 @@ const (
 	    content
 	) VALUES (?, ?, ?, ?, ?, ?)
 	`
+	// (entity_type = user, entity_id = 33, column = followers )
+	// UPDATE_COUNT = `
+	// UPDATE counters SET (
+	// 	followers_count,
+	// 	posts_count = posts_count + 1 CASE entity_type = 3?"user"
+	// 	comments_count,
+	// 	reactions_count,
+	// 	shares_count,
+	// 	updated_at,
+	// )
+	// `
+
 )

@@ -1,7 +1,6 @@
 package follow
 
 import (
-	"fmt"
 	"net/http"
 	"social/pkg/utils"
 )
@@ -39,32 +38,52 @@ func FollowersListHandler(w http.ResponseWriter, r *http.Request) {
 		utils.InternalServerError(w)
 		return
 	}
-	FollowersListResponse(w, res)
-	fmt.Println(res)
+	FollowersFollowingFollowRequestListResponse(w, res)
 }
 
 // GET /api/v1/users/:user_id/following  => list followees
 func FolloweesListHandler(w http.ResponseWriter, r *http.Request) {
 	targetUserId := utils.GetWildCardValue(w, r, "user_id")
-	res, err := GetFollowersByUserID(targetUserId)
+	res, err := GetFolloweesByUserID(targetUserId)
 	if err != nil {
 		utils.InternalServerError(w)
+		return
 	}
-	FolloweesListResponse(w, res)
-	fmt.Println(res)
+	FollowersFollowingFollowRequestListResponse(w, res)
 }
 
 // GET /api/v1/follow-requests => list received follow requests for current user
+// todo: wa9ila 9albhom khas yjib limsiftin lih
 func FollowRequestListHandler(w http.ResponseWriter, r *http.Request) {
-
+	userId := utils.GetUserIdFromContext(r)
+	res, err := GetFollowRequestByUserID(userId)
+	if err != nil {
+		utils.InternalServerError(w)
+		return
+	}
+	FollowersFollowingFollowRequestListResponse(w, res)
 }
 
 // POST /api/v1/follow-requests/:user_id/accept => accept request
 func AcceptFollowHandler(w http.ResponseWriter, r *http.Request) {
-
+	userId := utils.GetUserIdFromContext(r)
+	targetUserId := utils.GetWildCardValue(w, r, "user_id")
+	err := acceptFollowRequest(targetUserId, userId)
+	if err != nil {
+		utils.InternalServerError(w)
+		return
+	}
+	acceptFollowResponse(w, r)
 }
 
 // POST /api/v1/follow-requests/:user_id/decline => decline request
 func DeclineFollowHandler(w http.ResponseWriter, r *http.Request) {
-
+	userId := utils.GetUserIdFromContext(r)
+	targetUserId := utils.GetWildCardValue(w, r, "user_id")
+	err := declineFollowRequest(targetUserId, userId)
+	if err != nil {
+		utils.InternalServerError(w)
+		return
+	}
+	declineFollowResponse(w, r)
 }

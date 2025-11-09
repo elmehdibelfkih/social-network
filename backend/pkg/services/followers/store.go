@@ -162,6 +162,54 @@ func GetFolloweesByUserID(userID int64) ([]map[string]any, error) {
 	return followers, nil
 }
 
+func GetFollowRequestByUserID(userID int64) ([]map[string]any, error) {
+	rows, err := config.DB.Query(GET_FOLLOW_REQUEST_QUERY, userID)
+	if err != nil {
+		utils.SQLiteErrorTarget(err, GET_FOLLOW_REQUEST_QUERY)
+		return nil, err
+	}
+	defer rows.Close()
+
+	var followers []map[string]any
+
+	for rows.Next() {
+		var (
+			userId     int64
+			nickname   sql.NullString
+			firstName  string
+			lastName   string
+			avatarId   sql.NullInt64
+			followedAt string
+			status     string
+		)
+
+		err = rows.Scan(&userId, &nickname, &firstName, &lastName, &avatarId, &followedAt, &status)
+		if err != nil {
+			utils.SQLiteErrorTarget(err, GET_FOLLOW_REQUEST_QUERY)
+			return nil, err
+		}
+
+		follower := map[string]any{
+			"userId":     userId,
+			"nickname":   nickname.String,
+			"firstName":  firstName,
+			"lastName":   lastName,
+			"avatarId":   avatarId.Int64,
+			"followedAt": followedAt,
+			"status":     status,
+		}
+
+		followers = append(followers, follower)
+	}
+
+	if err = rows.Err(); err != nil {
+		utils.SQLiteErrorTarget(err, GET_FOLLOW_REQUEST_QUERY)
+		return nil, err
+	}
+
+	return followers, nil
+}
+
 func unfollowUser(followerId, followedId int64) error {
 	return database.WrapWithTransaction(func(tx *sql.Tx) error {
 		_, err := tx.Exec(UNFOLLOW_REQUEST_QUERY,
@@ -205,6 +253,30 @@ func followUser(followerId, followedId int64) error {
 	})
 }
 
-func followersList(userId int64) {
+func acceptFollowRequest(followerId, followedId int64) error {
+	return database.WrapWithTransaction(func(tx *sql.Tx) error {
+		_, err := tx.Exec(ACCEPT_FOLLOW_REQUEST_QUERY,
+			followerId, followedId,
+		)
+		if err != nil {
+			utils.SQLiteErrorTarget(err, ACCEPT_FOLLOW_REQUEST_QUERY)
+			return err
+		}
+		return nil
+		// todo: don't forget update the counters
+	})
+}
 
+func declineFollowRequest(followerId, followedId int64) error {
+	return database.WrapWithTransaction(func(tx *sql.Tx) error {
+		_, err := tx.Exec(DECLINE_FOLLOW_REQUEST_QUERY,
+			followerId, followedId,
+		)
+		if err != nil {
+			utils.SQLiteErrorTarget(err, DECLINE_FOLLOW_REQUEST_QUERY)
+			return err
+		}
+		return nil
+		// todo: don't forget update the counters
+	})
 }

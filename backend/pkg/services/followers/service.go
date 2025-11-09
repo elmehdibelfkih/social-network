@@ -67,7 +67,15 @@ func unfollowResponse(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-func FollowersListResponse(w http.ResponseWriter, response []map[string]any) {
+func acceptFollowResponse(w http.ResponseWriter, r *http.Request) {
+	userId := utils.GetUserIdFromContext(r)
+	targetUserId := utils.GetWildCardValue(w, r, "user_id")
+	var response AcceptFollowResponseJson
+
+	response.Message = "Follow request accepted successfully."
+	response.FollowerId = userId
+	response.FollowedId = targetUserId
+	response.Status = "accepted"
 	utils.JsonResponseEncode(w, http.StatusOK, map[string]any{
 		"success": true,
 		"payload": response,
@@ -75,7 +83,23 @@ func FollowersListResponse(w http.ResponseWriter, response []map[string]any) {
 	})
 }
 
-func FolloweesListResponse(w http.ResponseWriter, response []map[string]any) {
+func declineFollowResponse(w http.ResponseWriter, r *http.Request) {
+	userId := utils.GetUserIdFromContext(r)
+	targetUserId := utils.GetWildCardValue(w, r, "user_id")
+	var response AcceptFollowResponseJson
+
+	response.Message = "Follow request declined successfully."
+	response.FollowerId = userId
+	response.FollowedId = targetUserId
+	response.Status = "declined"
+	utils.JsonResponseEncode(w, http.StatusOK, map[string]any{
+		"success": true,
+		"payload": response,
+		"error":   map[string]any{},
+	})
+}
+
+func FollowersFollowingFollowRequestListResponse(w http.ResponseWriter, response []map[string]any) {
 	utils.JsonResponseEncode(w, http.StatusOK, map[string]any{
 		"success": true,
 		"payload": response,

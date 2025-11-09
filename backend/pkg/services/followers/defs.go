@@ -22,30 +22,7 @@ type UnfollowResponseJson struct {
 	FollowerId   int64  `json:"followerId"`
 }
 
-// GET /api/v1/users/:user_id/followers
-// No request body.
-type FollowersListResponseJson struct {
-	Followers []FollowerItem `json:"followers"`
-}
-
-type FollowerItem struct {
-	UserId     int64  `json:"userId"`
-	Nickname   string `json:"nickname"`
-	FirstName  string `json:"firstName"`
-	LastName   string `json:"lastName"`
-	AvatarId   int64  `json:"avatarId"`
-	FollowedAt string `json:"followedAt"`
-	Status     string `json:"status"`
-}
-
-// GET /api/v1/users/:user_id/following
-// No request body.
-
-type FolloweesLisResponseJson struct {
-	Following []FolloweeItem `json:"following"`
-}
-
-type FolloweeItem struct {
+type UserFollowItem struct {
 	UserId     int64  `json:"userId"`
 	Nickname   string `json:"nickname"`
 	FirstName  string `json:"firstName"`
@@ -55,21 +32,24 @@ type FolloweeItem struct {
 	Status     string `json:"status"` // pending/accepted/declined
 }
 
+// GET /api/v1/users/:user_id/followers
+// No request body.
+type FollowersListResponseJson struct {
+	Followers []UserFollowItem `json:"followers"`
+}
+
+// GET /api/v1/users/:user_id/following
+// No request body.
+
+type FolloweesLisResponseJson struct {
+	Following []UserFollowItem `json:"following"`
+}
+
 // GET /api/v1/follow-requests
 // No request body.
 
 type FollowRequestResponseJson struct {
-	FollowRequests []FollowRequestItem `json:"followRequests"`
-}
-
-type FollowRequestItem struct {
-	FollowerId  int64  `json:"followerId"`
-	Nickname    string `json:"nickname"`
-	FirstName   string `json:"firstName"`
-	LastName    string `json:"lastName"`
-	AvatarId    int64  `json:"avatarId"`
-	RequestedAt string `json:"requestedAt"`
-	Status      string `json:"status"`
+	FollowRequests []UserFollowItem `json:"followRequests"`
 }
 
 // POST /api/v1/follow-requests/:user_id/accept
@@ -80,7 +60,6 @@ type AcceptFollowResponseJson struct {
 	FollowerId int64  `json:"followerId"`
 	FollowedId int64  `json:"followedId"`
 	Status     string `json:"status"`
-	AcceptedAt string `json:"acceptedAt"`
 }
 
 // POST /api/v1/follow-requests/:user_id/decline
@@ -91,9 +70,7 @@ type DeclineResponseJson struct {
 	FollowerId int64  `json:"followerId"`
 	FollowedId int64  `json:"followedId"`
 	Status     string `json:"status"`
-	DeclinedAt string `json:"declinedAt"`
 }
-
 type Notification struct {
 	id            int64
 	UserId        int64
