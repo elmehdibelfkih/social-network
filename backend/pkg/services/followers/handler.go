@@ -53,7 +53,6 @@ func FolloweesListHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // GET /api/v1/follow-requests => list received follow requests for current user
-// todo: wa9ila 9albhom khas yjib limsiftin lih
 func FollowRequestListHandler(w http.ResponseWriter, r *http.Request) {
 	userId := utils.GetUserIdFromContext(r)
 	res, err := GetFollowRequestByUserID(userId)
