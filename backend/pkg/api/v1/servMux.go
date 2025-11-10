@@ -3,6 +3,7 @@ package v1
 import (
 	"fmt"
 	"net/http"
+
 	"social/pkg/app/dependencies/middleware"
 	"social/pkg/app/dependencies/router"
 	"social/pkg/services/auth"
@@ -11,6 +12,7 @@ import (
 	"social/pkg/services/groups"
 	"social/pkg/services/media"
 	"social/pkg/services/users"
+	"social/pkg/services/notifications"
 	"social/pkg/utils"
 )
 
@@ -19,7 +21,7 @@ func SocialMux() *router.Router {
 	socialMux.HandleFunc("GET", "/", utils.MiddlewareChain(testHandler, middleware.AuthMiddleware, middleware.UserContext))
 	socialMux.HandleFunc("DELETE", "/", utils.MiddlewareChain(testHandler, middleware.UserContext))
 
-	//auth
+	// auth
 	socialMux.HandleFunc("POST", "/api/v1/auth/register", utils.MiddlewareChain(auth.PostRegister))
 	socialMux.HandleFunc("POST", "/api/v1/auth/login", utils.MiddlewareChain(auth.PostLogin))
 	socialMux.HandleFunc("POST", "/api/v1/auth/logout", utils.MiddlewareChain(auth.PostLogout, middleware.AuthMiddleware))
@@ -56,7 +58,7 @@ func SocialMux() *router.Router {
 	socialMux.HandleFunc("DELETE", "/api/v1/chats/{chat_id}/messages/{msg_id}", utils.MiddlewareChain(chat.DeleteMessageHandler, middleware.UserContext, middleware.AuthMiddleware))
 	socialMux.HandleFunc("GET", "/api/v1/chats/{chat_id}/participants", utils.MiddlewareChain(chat.GetParticipantsHandler, middleware.UserContext, middleware.AuthMiddleware))
 
-	//media
+	// media
 	socialMux.HandleFunc("POST", "/api/v1/media/upload", media.HandleUploadMedia)
 	socialMux.HandleFunc("GET", "/api/v1/media/{media_id}", utils.MiddlewareChain(media.HandleGetMedia, media.MediaMiddleware, middleware.AuthMiddleware))
 	socialMux.HandleFunc("DELETE", "/api/v1/media/{media_id}", utils.MiddlewareChain(media.HandleDeleteMedia, media.MediaMiddleware, middleware.AuthMiddleware))
@@ -75,6 +77,14 @@ func SocialMux() *router.Router {
 	socialMux.HandleFunc("PUT", "/api/v1/users/{user_id}/profile", utils.MiddlewareChain(users.PutProfile, middleware.AuthMiddleware))
 	socialMux.HandleFunc("PATCH", "/api/v1/users/{user_id}/privacy", utils.MiddlewareChain(users.PatchProfile, middleware.AuthMiddleware))
 	socialMux.HandleFunc("GET", "/api/v1/users/{user_id}/stats", utils.MiddlewareChain(users.GetStats, middleware.AuthMiddleware))
+	socialMux.HandleFunc("DELETE", "/api/v1/media/{media_id} ", utils.MiddlewareChain(media.HandleDeleteMedia, media.MediaMiddleware, middleware.AuthMiddleware))
+
+	// notifications
+	// notifications
+	socialMux.HandleFunc("GET", "/api/v1/notifications", utils.MiddlewareChain(notifications.HandleGetNotifications, middleware.AuthMiddleware))
+	socialMux.HandleFunc("GET", "/api/v1/notifications/unread-count", utils.MiddlewareChain(notifications.HandleGetUnreadCount, middleware.AuthMiddleware))
+	socialMux.HandleFunc("POST", "/api/v1/notifications/mark-all-read", utils.MiddlewareChain(notifications.HandleMarkAllNotifAsRead, middleware.AuthMiddleware))
+	socialMux.HandleFunc("POST", "/api/v1/notifications/{id}/mark-read", utils.MiddlewareChain(notifications.HandleMarkNotifAsRead, middleware.AuthMiddleware, notifications.NotifMiddleware))
 
 	return socialMux
 }

@@ -19,5 +19,6 @@ func NotifMiddleware(next http.HandlerFunc) http.HandlerFunc {
 				return
 			}
 		}
+		next(w, r)
 	}
 }
