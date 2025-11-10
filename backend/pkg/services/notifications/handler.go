@@ -14,14 +14,23 @@ func HandleGetNotifications(w http.ResponseWriter, r *http.Request) {
 	userID := utils.GetUserIdFromContext(r)
 
 	page, err := getIntQueryParam(r, "page")
-	if err != nil || page < 1 {
+	if err != nil {
 		utils.BadRequest(w, err.Error(), utils.ErrorTypeAlert)
 		return
 	}
 
+	if page < 1 {
+		utils.BadRequest(w, "incorrect page parameter", utils.ErrorTypeAlert)
+		return
+	}
+
 	limit, err := getIntQueryParam(r, "limit")
-	if err != nil || limit > MAX_NUM_OF_NOTIFICATIONS || limit < 1 {
+	if err != nil {
 		utils.BadRequest(w, err.Error(), utils.ErrorTypeAlert)
+		return
+	}
+	if limit > MAX_NUM_OF_NOTIFICATIONS || limit < 1 {
+		utils.BadRequest(w, "limit parameter must be "+strconv.Itoa(MAX_NUM_OF_NOTIFICATIONS), utils.ErrorTypeAlert)
 		return
 	}
 
