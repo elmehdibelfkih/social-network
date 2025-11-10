@@ -1337,10 +1337,11 @@ No need for a request body.
 
   [
     {
-      "user_id": 57687684648746,
-      "full_name": "Example User",
+      "userId": 57687684648746,
+      "UserNickname": "charlie_dev",
+      "UserlastName": "alice",
       "role": "member",
-      "joined_at": "2025-10-24T13:40:00Z"
+      "joinedAt": "2025-10-24T13:40:00Z"
     }
   ]
 
@@ -1360,8 +1361,8 @@ No need for a request body.
 {
   "title": "Weekly Study Meetup",
   "description": "Discussion about system design topics.",
-  "start_at": "2025-11-02T18:00:00Z",
-  "end_at": "2025-11-02T20:00:00Z",
+  "startAt": "2025-11-02T18:00:00Z",
+  "endAt": "2025-11-02T20:00:00Z",
   "location": "Group voice room"
 }
 ```
@@ -1370,15 +1371,15 @@ No need for a request body.
 
 ``` json
 {
-  "event_id": 65765764678564,
-  "group_id": 65768886543363,
+  "eventId": 65765764678564,
+  "groupId": 65768886543363,
   "title": "Weekly Study Meetup",
   "description": "Discussion about system design topics.",
-  "start_at": "2025-11-02T18:00:00Z",
-  "end_at": "2025-11-02T20:00:00Z",
+  "startAt": "2025-11-02T18:00:00Z",
+  "endAt": "2025-11-02T20:00:00Z",
   "location": "Group voice room",
-  "created_by": 67373777367373,
-  "created_at": "2025-10-26T12:33:10Z"
+  "createdBy": 67373777367373,
+  "createdAt": "2025-10-26T12:33:10Z"
 }
 
 ```
@@ -1401,24 +1402,24 @@ No need for a request body.
 ``` json
   [
     {
-      "event_id": 7635676576587654,
+      "eventId": 7635676576587654,
       "title": "Weekly Study Meetup",
       "description": "Discussion about system design topics.",
-      "start_at": "2025-11-02T18:00:00Z",
-      "end_at": "2025-11-02T20:00:00Z",
+      "startAt": "2025-11-02T18:00:00Z",
+      "endAt": "2025-11-02T20:00:00Z",
       "location": "Group voice room",
-      "created_by": 674657536765756,
-      "created_at": "2025-10-26T12:33:10Z"
+      "createdBy": 674657536765756,
+      "createdAt": "2025-10-26T12:33:10Z"
     },
     {
-      "event_id": 35673657657653,
+      "eventId": 35673657657653,
       "title": "Reading Club",
       "description": "Chapter 3 & 4 deep dive.",
-      "start_at": "2025-11-05T18:00:00Z",
-      "end_at": "2025-11-05T19:30:00Z",
+      "startAt": "2025-11-05T18:00:00Z",
+      "endAt": "2025-11-05T19:30:00Z",
       "location": "Discord stage",
-      "created_by": 657567835675673,
-      "created_at": "2025-10-27T10:20:11Z"
+      "createdAy": 657567835675673,
+      "createdAt": "2025-10-27T10:20:11Z"
     }
   ]
 
@@ -1435,18 +1436,18 @@ No need for a request body.
 
 ``` json
 {
-  "event_id": 76763576576577777,
-  "group_id": 56756373567373567,
+  "eventId": 76763576576577777,
+  "groupId": 56756373567373567,
   "title": "Weekly Study Meetup",
   "description": "Discussion about system design topics.",
-  "start_at": "2025-11-02T18:00:00Z",
-  "end_at": "2025-11-02T20:00:00Z",
+  "startAt": "2025-11-02T18:00:00Z",
+  "endAt": "2025-11-02T20:00:00Z",
   "location": "Group voice room",
-  "created_by": {
-    "user_id": 6537657373737665,
+  "createdBy": {
+    "userId": 6537657373737665,
     "username": "sam_dev"
   },
-  "created_at": "2025-10-26T12:33:10Z"
+  "createdAt": "2025-10-26T12:33:10Z"
 }
 
 ```
