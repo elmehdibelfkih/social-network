@@ -449,7 +449,7 @@ No need for a request body.
 
 ---
 
-### POST `/api/v1/follow-requests/:user_id/accept` => accept request // todo
+### POST `/api/v1/follow-requests/:user_id/accept` => accept request
 
 ***status code in success: 200***
 
@@ -517,17 +517,21 @@ No need for a request body.
       "postId": 3389843874075,
       "authorId": 1289843874339,
       "authorNickname": "charlie_dev", // or null
+      "authorlastName": "alice",
+      "authorFirstName": "khalifa",
       "content": "Deploying a new Go microservice!",
-      "mediaIds": [23456543456787654],
+      "mediaIds": [23456543456787654], // or null
       "privacy": "followers",
       "createdAt": "2025-10-24T15:00:00Z",
       "updatedAt": "2025-10-24T15:00:00Z",
-      "groupId": 98765789765789
+      "groupId": 98765789765789 // or null
     },
     {
       "postId": 8689843874069,
       "authorId": 1289843874339,
       "authorNickname": "diana_ops",
+      "authorlastName": "alice",
+      "authorFirstName": "khalifa",
       "content": "Cloud architecture tips.",
       "mediaIds": null,
       "privacy": "public",
@@ -560,6 +564,8 @@ No need for a request body.
       "postId": 1289843874332,
       "authorId": 1289843874339,
       "authorNickname": "charlie_dev",
+      "authorlastName": "alice",
+      "authorFirstName": "khalifa",
       "content": "Working on a new distributed system...",
       "mediaIds": null,
       "privacy": "public",
@@ -570,6 +576,8 @@ No need for a request body.
       "postId": 1289843874658,
       "authorId": 1289843874339,
       "authorNickname": "charlie_dev",
+      "authorlastName": "alice",
+      "authorFirstName": "khalifa",
       "content": "Private note only visible to followers.",
       "mediaIds": null,
       "privacy": "followers",
@@ -601,6 +609,8 @@ No need for a request body.
       "postId": 1289843874332,
       "authorId": 1289843874339,
       "authorNickname": "charlie_dev",
+      "authorlastName": "alice",
+      "authorFirstName": "khalifa",
       "content": "Working on a new distributed system...",
       "mediaIds": [1234567890987],
       "privacy": "public",
@@ -611,6 +621,8 @@ No need for a request body.
       "postId": 1289843874658,
       "authorId": 1289843874339,
       "authorNickname": "charlie_dev",
+      "authorlastName": "alice",
+      "authorFirstName": "khalifa",
       "content": "Private note only visible to followers.",
       "mediaIds": null,
       "privacy": "followers",
@@ -671,9 +683,11 @@ No need for a request body.
 {
   "postId": 128984387246925,
   "authorId": 128984387246929,
-  "authorNickname": "devops_mehdi",
+  "authorNickname": "devops_mehdi", // or null
+  "authorlastName": "alice",
+  "authorFirstName": "khalifa",
   "content": "Hello world — launching my new service today!",
-  "mediaIds": [1289843874657, 1289843872746],
+  "mediaIds": [1289843874657, 1289843872746], // or null
   "privacy": "public",
   "groupId": null,
   "allowedList": null,
@@ -769,9 +783,12 @@ No need for a request body.
       "postId": 128984387246923,
       "authorId": 128984387246925,
       "authorNickname": "charlie_dev", // or null
+      "authorlastName": "alice",
+      "authorFirstName": "khalifa",
       "content": "Working on a new distributed system...",
       "mediaIds": [1289843874657, 1289843872746], // or null
       "privacy": "public",
+      "allowedList": null,
       "createdAt": "2025-10-24T12:30:00Z",
       "updatedAt": "2025-10-24T12:30:00Z"
     },
@@ -779,9 +796,12 @@ No need for a request body.
       "postId": 128984387246922,
       "authorId": 128984387246925,
       "authorNickname": "charlie_dev",
+      "authorlastName": "alice",
+      "authorFirstName": "khalifa",
       "content": "Private note only visible to followers.",
       "mediaIds": [1289843872746],
-      "privacy": "followers",
+      "privacy": "restricted",
+      "allowedList": [128984387246925, 128984387246925], // or null if the privacy not restricted
       "createdAt": "2025-10-23T17:05:00Z",
       "updatedAt": "2025-10-23T17:05:00Z"
     }
@@ -847,6 +867,8 @@ No need for a request body.
       "commentId": 43765876897987,
       "authorId": 787598687987987,
       "authorNickname": "devops_mehdi",
+      "authorlastName": "alice",
+      "authorFirstName": "khalifa",
       "content": "Great post! Learned a lot.",
       "mediaIds": [23456789876567],
       "createdAt": "2025-10-24T20:45:00Z",
@@ -856,6 +878,8 @@ No need for a request body.
       "commentId": 879875987698998,
       "authorId": 787989968686,
       "authorNickname": "charlie_dev",
+      "authorlastName": "alice",
+      "authorFirstName": "khalifa",
       "content": "Thanks for sharing!",
       "mediaIds": null,
       "createdAt": "2025-10-24T21:10:00Z",
@@ -933,7 +957,7 @@ No need for a request body.
 
 ---
 
-<!-- ### POST `/api/v1/posts/:post_id/share` => share/repost todo: later
+<!-- ### POST `/api/v1/posts/:post_id/share` => share/repost
 
 ***status code in success: 200***
 
@@ -986,8 +1010,8 @@ No need for a request body.
 ``` json
 {
   "message": "Media uploaded successfully.",
-  "mediaId": 789,
-  "mediaPath": "/media/uploads/789_avatar.png",
+  "mediaId": 4576543456789,
+  "mediaPath": "/media/uploads/4576543456789_avatar.png",
   "fileType": "image/png",
   "uploadedAt": "2025-10-24T22:30:00Z"
 }
@@ -1029,7 +1053,7 @@ No need for a request body.
 ``` json
 {
   "message": "Media deleted successfully.",
-  "mediaId": 789
+  "mediaId": 4567890985745
 }
 
 ```
@@ -1058,8 +1082,8 @@ No need for a request body.
 ``` json
 {
   "message": "Group created successfully.",
-  "groupId": 101,
-  "creatorId": 42,
+  "groupId": 865435678765435,
+  "creatorId": 456789087654678,
   "title": "Go Developers",
   "description": "A group for sharing Go programming tips and projects.",
   "avatarId": 657543234567865, // optinal
@@ -1080,8 +1104,8 @@ No need for a request body.
 
 ``` json
 {
-  "groupId": 101,
-  "creatorId": 42,
+  "groupId": 34567897656789,
+  "creatorId": 45678987654678,
   "title": "Go Developers",
   "description": "A group for sharing Go programming tips and projects.",
   "memberCount": 25,
@@ -1114,7 +1138,7 @@ No need for a request body.
 ``` json
 {
   "message": "Group updated successfully.",
-  "groupId": 101,
+  "groupId": 324567865435678,
   "title": "Advanced Go Developers",
   "description": "A group for advanced Go programming discussions and projects.",
   "avatarId": 657543234567865, // optinal
@@ -1140,7 +1164,7 @@ No need for a request body.
 ``` json
 {
   "message": "Group deleted successfully.",
-  "groupId": 101
+  "groupId": 456789087657890
 }
 
 ```
@@ -1167,30 +1191,26 @@ No need for a request body.
 - response payload
 
 ``` json
-{
-  "limit": 20,
-  "totalGroups": 48,
-  "groups": [
+ [
     {
-      "groupId": 101,
+      "groupId": 345678908765,
       "title": "Go Developers",
       "description": "A group for sharing Go programming tips and projects.",
       "avatarId": 657543234567865, // optinal
-      "creatorId": 42,
-      "memberCount": 25,
+      "creatorId": 567890987654,
+      "memberCount": 456789098765,
       "createdAt": "2025-10-24T23:15:00Z"
     },
     {
-      "groupId": 102,
+      "groupId": 6574876987567647,
       "title": "Advanced Go",
       "description": "Advanced topics and projects in Go.",
       "avatarId": 657543234567865, // optinal
-      "creatorId": 55,
-      "memberCount": 12,
+      "creatorId": 766587689658658,
+      "memberCount": 76876876846876,
       "createdAt": "2025-10-24T23:45:00Z"
     }
   ]
-}
 
 ```
 
@@ -1211,8 +1231,8 @@ No need for a request body.
 ``` json
 {
   "message": "User invited to group successfully.",
-  "groupId": 101,
-  "invitedUserId": 55,
+  "groupId": 56757876867876,
+  "invitedUserId": 76876980547648,
   "status": "pending",
   "createdAt": "2025-10-25T10:12:00Z"
 }
@@ -1236,7 +1256,7 @@ No need for a request body.
 ``` json
 {
   "message": "Join request submitted.",
-  "groupId": 101,
+  "groupId": 7686786787567678,
   "status": "pending"
 }
 
@@ -1259,8 +1279,8 @@ No need for a request body.
 ``` json
 {
   "message": "User has been added to the group.",
-  "groupId": 101,
-  "userId": 55,
+  "groupId": 658745768769784676,
+  "userId": 78768979585799966,
   "status": "accepted",
   "role": "member"
 }
@@ -1284,8 +1304,8 @@ No need for a request body.
 ``` json
 {
   "message": "Group join request declined.",
-  "groupId": 101,
-  "userId": 55,
+  "groupId": 787684563876876666,
+  "userId": 678674687686777777,
   "status": "declined"
 }
 
@@ -1302,7 +1322,7 @@ No need for a request body.
 |page| integer| Page number (default = 1)|
 |limit| integer| Number of items per page (default = 20)|
 
-> - example of use: GET /api/v1/groups/:group_id/members`?page=2&limit
+> - example of use: GET /api/v1/groups/:group_id/members?page=2&limit
 > - Note⚠️: check the limit before using it.
 
 - request
@@ -1317,7 +1337,7 @@ No need for a request body.
 
   [
     {
-      "user_id": 101,
+      "user_id": 57687684648746,
       "full_name": "Example User",
       "role": "member",
       "joined_at": "2025-10-24T13:40:00Z"
@@ -1350,14 +1370,14 @@ No need for a request body.
 
 ``` json
 {
-  "event_id": 987,
-  "group_id": 45,
+  "event_id": 65765764678564,
+  "group_id": 65768886543363,
   "title": "Weekly Study Meetup",
   "description": "Discussion about system design topics.",
   "start_at": "2025-11-02T18:00:00Z",
   "end_at": "2025-11-02T20:00:00Z",
   "location": "Group voice room",
-  "created_by": 123,
+  "created_by": 67373777367373,
   "created_at": "2025-10-26T12:33:10Z"
 }
 
@@ -1381,23 +1401,23 @@ No need for a request body.
 ``` json
   [
     {
-      "event_id": 987,
+      "event_id": 7635676576587654,
       "title": "Weekly Study Meetup",
       "description": "Discussion about system design topics.",
       "start_at": "2025-11-02T18:00:00Z",
       "end_at": "2025-11-02T20:00:00Z",
       "location": "Group voice room",
-      "created_by": 123,
+      "created_by": 674657536765756,
       "created_at": "2025-10-26T12:33:10Z"
     },
     {
-      "event_id": 988,
+      "event_id": 35673657657653,
       "title": "Reading Club",
       "description": "Chapter 3 & 4 deep dive.",
       "start_at": "2025-11-05T18:00:00Z",
       "end_at": "2025-11-05T19:30:00Z",
       "location": "Discord stage",
-      "created_by": 123,
+      "created_by": 657567835675673,
       "created_at": "2025-10-27T10:20:11Z"
     }
   ]
@@ -1415,15 +1435,15 @@ No need for a request body.
 
 ``` json
 {
-  "event_id": 987,
-  "group_id": 45,
+  "event_id": 76763576576577777,
+  "group_id": 56756373567373567,
   "title": "Weekly Study Meetup",
   "description": "Discussion about system design topics.",
   "start_at": "2025-11-02T18:00:00Z",
   "end_at": "2025-11-02T20:00:00Z",
   "location": "Group voice room",
   "created_by": {
-    "user_id": 123,
+    "user_id": 6537657373737665,
     "username": "sam_dev"
   },
   "created_at": "2025-10-26T12:33:10Z"
@@ -1491,11 +1511,11 @@ No need for a request body.
 ``` json
   [
     {
-      "chatId": 789,
+      "chatId": 5654635465465,
       "groupId": 2345678765456, // can be null
       "name": "John Doe",
       "lastMessage": {
-        "id": 4521,
+        "id": 654645645564,
         "text": "See you tomorrow!",
         "createdAt": "2025-10-26T12:45:00Z"
       },
@@ -1503,11 +1523,11 @@ No need for a request body.
       "updatedAt": "2025-10-26T12:45:00Z"
     },
     {
-      "chatId": 101,
+      "chatId": 5654654765756,
       "groupId": 8765456787656, // can be null
       "name": "DevOps Study Group",
       "lastMessage": {
-        "id": 9981,
+        "id": 456546456456,
         "text": "Server deployment successful.",
         "createdAt": "2025-10-26T09:32:10Z"
       },
@@ -1527,7 +1547,7 @@ No need for a request body.
 
 |Parameter| Type| Description|
 |----------|-------|--------------|
-|last-message-d| integer| the last conversations id default 0|
+|last-message-id| integer| the last conversations id default 0|
 |limit| integer| Number of items per page (default = 20)|
 
 > - Note⚠️: check the limit before using it.
@@ -1537,14 +1557,14 @@ No need for a request body.
 ``` json
  [
     {
-      "messageId": 4521,
-      "senderId": 123,
+      "messageId": 564645654645,
+      "senderId": 456546456546,
       "text": "See you tomorrow!",
       "createdAt": "2025-10-26T12:45:00Z"
     },
     {
-      "messageId": 4520,
-      "senderId": 456,
+      "messageId": 6546567365454,
+      "senderId": 6456546455644,
       "text": "Okay cool.",
       "createdAt": "2025-10-26T12:44:10Z"
     }
@@ -1571,9 +1591,9 @@ No need for a request body.
 
 ``` json
 {
-  "messageId": 9921,
-  "chatId": 789,
-  "senderId": 123,
+  "messageId": 6345476657563765,
+  "chatId": 454576457457457,
+  "senderId": 754574574574574,
   "text": "Hello, how are you?",
   "createdAt": "2025-10-26T13:15:22Z"
 }
@@ -1615,17 +1635,17 @@ No need for a request body.
 ``` json
   [
     {
-      "userId": 123,
+      "userId": 5464574574545,
       "username": "alice_dev",
       "role": "owner",
-      "lastSeenMessageId": 4521,
+      "lastSeenMessageId": 457645674566546,
       "unreadCount": 0
     },
     {
-      "userId": 456,
+      "userId": 456745645645745,
       "username": "bob_ops",
       "role": "member",
-      "lastSeenMessageId": 4519,
+      "lastSeenMessageId": 4574576457474744,
       "unreadCount": 2
     }
   ]
@@ -1657,17 +1677,17 @@ No need for a request body.
 ``` json
  [
     {
-      "notificationId": 987,
+      "notificationId": 457547457457457,
       "type": "follow_request",
-      "referenceId": 123,
+      "referenceId": 4745745547568565,
       "content": "Alice has sent you a follow request.",
       "read": "unread",
       "createdAt": "2025-10-26T12:55:00Z"
     },
     {
-      "notificationId": 988,
+      "notificationId": 4324278547856,
       "type": "post_liked",
-      "referenceId": 4521,
+      "referenceId": 452657356573661,
       "content": "Bob liked your post.",
       "read": "read",
       "createdAt": "2025-10-26T11:45:00Z"
@@ -1759,18 +1779,18 @@ No need for a request body.
 ``` json
  [
     {
-      "id": 123,
+      "id": 4657634346334,
       "username": "alice_dev",
       "firstName": "Alice",
       "lastName": "Smith",
-      "avatarPath": "/media/avatars/1289843874339.png"
+      "avatarId": 32456788986756444
     },
     {
-      "id": 456,
+      "id": 43646547547547456,
       "username": "bob_ops",
       "firstName": "Bob",
       "lastName": "Johnson",
-      "avatarPath": "/media/avatars/1289843874340.png"
+      "avatarId": 32456788986756446
     }
   ]
 
