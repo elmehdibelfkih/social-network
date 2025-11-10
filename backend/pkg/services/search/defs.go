@@ -25,7 +25,7 @@ type PostSearchResult struct {
 	ID        int64      `json:"id" db:"id"`
 	Content   string     `json:"content" db:"content"`
 	CreatedAt string     `json:"createdAt" db:"created_at"`
-	Author    PostAuthor `json:"author" db:"author_id"`
+	Author    PostAuthor `json:"author"`
 }
 
 type PostAuthor struct {
