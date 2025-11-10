@@ -1767,6 +1767,8 @@ No need for a request body.
 
 |Parameter| Type| Description|
 |----------|-------|--------------|
+|q| string| the search keyword|
+|type| string| users or groups or posts |
 |page| integer| Page number (default = 1)|
 |limit| integer| Number of items per page (default = 20)|
 

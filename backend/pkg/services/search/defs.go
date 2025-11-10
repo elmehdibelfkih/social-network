@@ -1,5 +1,9 @@
 package search
 
+const(
+	MAX_RESULTS_NUM = 20
+)
+
 type SearchResponse struct {
 	Query   string `json:"query"`
 	Type    string `json:"type"`

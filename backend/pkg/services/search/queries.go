@@ -6,7 +6,7 @@ const (
 		FROM users u
 		LEFT JOIN media m ON u.avatar_id = m.id
 		WHERE u.nickname LIKE ? OR u.firstname LIKE ? OR u.lastname LIKE ?
-		LIMIT 10;
+		LIMIT ? OFFSET ?;
 	`
 
 	QUERY_GET_SEARCH_GROUP = `
@@ -14,7 +14,7 @@ const (
 		FROM groups g
 		JOIN media m ON g.avatar_id = m.id
 		WHERE g.title LIKE ? OR g.description LIKE ?
-		LIMIT 10;
+		LIMIT ? OFFSET ?;
 	`
 
 	QUERY_GET_SEARCH_POST = `
@@ -40,7 +40,7 @@ const (
 			)
 		GROUP BY p.id
 		ORDER BY p.created_at DESC
-		LIMIT 10;
+		LIMIT ? OFFSET ?;
 	`
 )
 

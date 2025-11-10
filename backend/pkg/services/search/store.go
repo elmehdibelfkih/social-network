@@ -5,9 +5,9 @@ import (
 	"social/pkg/utils"
 )
 
-func SearchUsers(q string) ([]any, error) {
+func SearchUsers(q string, limit, offset int) ([]any, error) {
 	searchKeyword := "%" + q + "%"
-	rows, err := config.DB.Query(QUERY_GET_SEARCH_USER, searchKeyword, searchKeyword, searchKeyword)
+	rows, err := config.DB.Query(QUERY_GET_SEARCH_USER, searchKeyword, searchKeyword, searchKeyword, limit, offset)
 	if err != nil {
 		utils.SQLiteErrorTarget(err, QUERY_GET_SEARCH_USER)
 		return nil, err
@@ -28,9 +28,9 @@ func SearchUsers(q string) ([]any, error) {
 	return results, nil
 }
 
-func SearchGroups(q string) ([]any, error) {
+func SearchGroups(q string, limit, offset int) ([]any, error) {
 	searchTerm := "%" + q + "%"
-	rows, err := config.DB.Query(QUERY_GET_SEARCH_GROUP, searchTerm, searchTerm)
+	rows, err := config.DB.Query(QUERY_GET_SEARCH_GROUP, searchTerm, searchTerm, limit, offset)
 	if err != nil {
 		utils.SQLiteErrorTarget(err, QUERY_GET_SEARCH_GROUP)
 		return nil, err
@@ -51,10 +51,10 @@ func SearchGroups(q string) ([]any, error) {
 	return results, nil
 }
 
-func SearchPosts(q string, searcherID int64) ([]any, error) {
+func SearchPosts(q string, searcherID int64, limit, offset int) ([]any, error) {
 	contentSearch := "%" + q + "%"
 
-	rows, err := config.DB.Query(QUERY_GET_SEARCH_POST, searcherID, searcherID, contentSearch, contentSearch, contentSearch, contentSearch, searcherID)
+	rows, err := config.DB.Query(QUERY_GET_SEARCH_POST, searcherID, searcherID, contentSearch, contentSearch, contentSearch, contentSearch, searcherID, limit, offset)
 	if err != nil {
 		utils.SQLiteErrorTarget(err, QUERY_GET_SEARCH_POST)
 		return nil, err
