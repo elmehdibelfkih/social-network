@@ -9,8 +9,10 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	config "social/pkg/config"
 	"strconv"
+	"strings"
+
+	config "social/pkg/config"
 
 	"github.com/mattn/go-sqlite3"
 	"golang.org/x/crypto/bcrypt"
@@ -131,4 +133,16 @@ func CheckSession(name string, r *http.Request) (string, error) {
 		return "", nil
 	}
 	return session.Value, err
+}
+
+func GetIntQueryParam(r *http.Request, param string) (int, error) {
+	paramValue := r.URL.Query().Get(param)
+	if strings.Trim(paramValue, " ") == "" {
+		return -1, fmt.Errorf("%s parameter can't be empty", param)
+	}
+	intParam, err := strconv.Atoi(paramValue)
+	if err != nil {
+		return -1, err
+	}
+	return intParam, nil
 }

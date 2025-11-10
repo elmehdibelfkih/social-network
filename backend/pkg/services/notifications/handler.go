@@ -2,10 +2,8 @@ package notifications
 
 import (
 	"database/sql"
-	"fmt"
 	"net/http"
 	"strconv"
-	"strings"
 
 	"social/pkg/utils"
 )
@@ -13,7 +11,7 @@ import (
 func HandleGetNotifications(w http.ResponseWriter, r *http.Request) {
 	userID := utils.GetUserIdFromContext(r)
 
-	page, err := getIntQueryParam(r, "page")
+	page, err := utils.GetIntQueryParam(r, "page")
 	if err != nil {
 		utils.BadRequest(w, err.Error(), utils.ErrorTypeAlert)
 		return
@@ -24,7 +22,7 @@ func HandleGetNotifications(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	limit, err := getIntQueryParam(r, "limit")
+	limit, err := utils.GetIntQueryParam(r, "limit")
 	if err != nil {
 		utils.BadRequest(w, err.Error(), utils.ErrorTypeAlert)
 		return
@@ -56,18 +54,6 @@ func HandleGetNotifications(w http.ResponseWriter, r *http.Request) {
 		Limit:         limit,
 		Notifications: notifs,
 	})
-}
-
-func getIntQueryParam(r *http.Request, param string) (int, error) {
-	paramValue := r.URL.Query().Get(param)
-	if strings.Trim(paramValue, " ") == "" {
-		return -1, fmt.Errorf("%s parameter can't be empty", param)
-	}
-	intParam, err := strconv.Atoi(paramValue)
-	if err != nil {
-		return -1, err
-	}
-	return intParam, nil
 }
 
 func HandleMarkNotifAsRead(w http.ResponseWriter, r *http.Request) {
