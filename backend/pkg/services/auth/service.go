@@ -127,7 +127,6 @@ func LogoutUserAccount(w http.ResponseWriter, r *http.Request, context string) b
 		return false
 	}
 	err = DeleteUserSessionBySessionToken(session, userId)
-	err = DeleteUserSessionBySessionToken(session, userId)
 	if err != nil {
 		utils.BackendErrorTarget(err, context)
 		utils.IdentifySqlError(w, err)
@@ -236,6 +235,16 @@ func DeleteSessionHttp(w http.ResponseWriter, response RevokeSessionResponseJson
 		// SameSite: http.SameSiteStrictMode,
 		Path: "/",
 	})
+
+	http.SetCookie(w, &http.Cookie{
+		Name:     "remember_me_token",
+		Value:    "",
+		Expires:  time.Unix(0, 0),
+		HttpOnly: true,
+		SameSite: http.SameSiteStrictMode,
+		Path:     "/",
+	})
+
 	response.Message = "Logout successful."
 	utils.JsonResponseEncode(w, http.StatusOK, map[string]any{
 		"success": true,
