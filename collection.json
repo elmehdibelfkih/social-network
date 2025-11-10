@@ -80,7 +80,7 @@
                   "let index = parseInt(pm.environment.get('currentIndex'));",
                   "",
                   "// Define expected status per test case (200 for valid, 400 for invalid)",
-                  "const expectedStatuses = [200, 200, 200, 200, 200, 400];",
+                  "const expectedStatuses = [200, 200, 200, 200, 400, 400];",
                   "",
                   "// Test status code",
                   "pm.test('Check response status', function() {",
