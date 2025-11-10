@@ -2,7 +2,6 @@ package media
 
 import "time"
 
-// NediaManager defines the interface for media DB operations
 type Media struct {
 	ID        int64     `db:"id"`
 	OwnerId   int64     `db:"owner_id"`
