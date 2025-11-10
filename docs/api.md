@@ -1418,7 +1418,7 @@ No need for a request body.
       "startAt": "2025-11-05T18:00:00Z",
       "endAt": "2025-11-05T19:30:00Z",
       "location": "Discord stage",
-      "createdAy": 657567835675673,
+      "createdBy": 657567835675673,
       "createdAt": "2025-10-27T10:20:11Z"
     }
   ]
@@ -1443,10 +1443,7 @@ No need for a request body.
   "startAt": "2025-11-02T18:00:00Z",
   "endAt": "2025-11-02T20:00:00Z",
   "location": "Group voice room",
-  "createdBy": {
-    "userId": 6537657373737665,
-    "username": "sam_dev"
-  },
+  "createdBy": 657567835675673,
   "createdAt": "2025-10-26T12:33:10Z"
 }
 
@@ -1502,7 +1499,7 @@ No need for a request body.
 
 |Parameter| Type| Description|
 |----------|-------|--------------|
-|last-conversation-d| integer| the last conversations id default 0|
+|last-conversation-id| integer| the last conversations id default 0|
 |limit| integer| Number of items per page (default = 20)|
 
 > - Note⚠️: check the limit before using it.
