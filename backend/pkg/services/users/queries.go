@@ -23,7 +23,7 @@ const (
 	SELECT_FOLLOW_STATUS = `
 		SELECT COUNT(*) 
 		FROM follows 
-		WHERE follower_id = ? AND following_id = ?`
+		WHERE follower_id = ? AND followed_id = ?`
 
 	// Get user privacy setting
 	SELECT_USER_PRIVACY = `
@@ -41,7 +41,7 @@ const (
 	SELECT_FOLLOWERS_COUNT = `
 		SELECT COUNT(*) 
 		FROM follows 
-		WHERE following_id = ?`
+		WHERE followed_id = ?`
 
 	// Count following
 	SELECT_FOLLOWING_COUNT = `

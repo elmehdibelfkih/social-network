@@ -41,7 +41,7 @@ func GetUserProfile(w http.ResponseWriter, profileUserId, viewerUserId int64, co
 		}
 	}
 
-	// Get follow status (only if viewer is logged in and not viewing own profile)
+	// Get follow status (is follow || unfollow )
 	var followStatus string = "follow"
 	if viewerUserId > 0 && viewerUserId != profileUserId {
 		isFollowing, err := SelectFollowStatus(viewerUserId, profileUserId)
@@ -79,7 +79,7 @@ func GetUserProfile(w http.ResponseWriter, profileUserId, viewerUserId int64, co
 
 	// Build response
 	response.UserId = profile.Id
-	response.Status = followStatus
+	if (viewerUserId == profileUserId) { response.Status = nil }else{ response.Status = &followStatus  }
 	response.Nickname = profile.Nickname
 	response.FirstName = profile.FirstName
 	response.LastName = profile.LastName

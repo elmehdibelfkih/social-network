@@ -18,7 +18,7 @@ type UpdatePrivacyRequestJson struct {
 // Response structs
 type UserProfileResponseJson struct {
 	UserId      int64                 `json:"userId"`
-	Status      string                `json:"status"` // "follow" or "unfollow"
+	Status      *string                `json:"status"` // "follow" or "unfollow" or NULL
 	Nickname    *string               `json:"nickname"`
 	FirstName   string                `json:"firstName"`
 	LastName    string                `json:"lastName"`

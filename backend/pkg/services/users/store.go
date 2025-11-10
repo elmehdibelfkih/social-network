@@ -63,9 +63,9 @@ func SelectUserBasicById(userId int64) (int64, string, error) {
 }
 
 // SelectFollowStatus returns whether followerId is following followingId.
-func SelectFollowStatus(followerId, followingId int64) (bool, error) {
+func SelectFollowStatus(followerId, followed int64) (bool, error) {
 	var count int64
-	err := config.DB.QueryRow(SELECT_FOLLOW_STATUS, followerId, followingId).Scan(&count)
+	err := config.DB.QueryRow(SELECT_FOLLOW_STATUS, followerId, followed).Scan(&count)
 	if err != nil {
 		utils.SQLiteErrorTarget(err, SELECT_FOLLOW_STATUS)
 		return false, err

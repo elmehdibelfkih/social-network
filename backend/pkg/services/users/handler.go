@@ -75,11 +75,12 @@ func PatchProfile(w http.ResponseWriter, r *http.Request) {
 
 	// Get current user from context
 	currentUserId := utils.GetUserIdFromContext(r)
-	if currentUserId == 0 {
+	if currentUserId == -1 {
 		utils.Unauthorized(w, "You must be logged in to update your profile privacy.")
 		return
 	}
-
+		
+	//  var currentUserId int64 = 55
 	// Validate user owns the profile
 	if currentUserId != profileUserId {
 		utils.Unauthorized(w, "You can only update your own profile privacy.")
@@ -91,7 +92,6 @@ func PatchProfile(w http.ResponseWriter, r *http.Request) {
 	if !utils.ValidateJsonRequest(w, r, &req, "PatchProfile handler") {
 		return
 	}
-
 	// Call service layer
 	response, ok := UpdateUserPrivacy(w, profileUserId, &req, "PatchProfile handler")
 	if !ok {
