@@ -20,7 +20,7 @@ func HandleGetNotifications(w http.ResponseWriter, r *http.Request) {
 	}
 
 	limit, err := getIntQueryParam(r, "limit")
-	if err != nil || limit != MAX_NUM_OF_NOTIFICATIONS {
+	if err != nil || limit > MAX_NUM_OF_NOTIFICATIONS || limit < 1 {
 		utils.BadRequest(w, err.Error(), utils.ErrorTypeAlert)
 		return
 	}
