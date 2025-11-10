@@ -4,7 +4,7 @@ const (
 	QUERY_GET_SEARCH_USER = `
 		SELECT u.id, u.nickname, u.first_name, u.last_name, m.path AS avatar_path 
 		FROM users u
-		JOIN media m ON u.avatar_id = m.id
+		LEFT JOIN media m ON u.avatar_id = m.id
 		WHERE u.nickname LIKE ? OR u.firstname LIKE ? OR u.lastname LIKE ?
 		LIMIT 10;
 	`
@@ -23,7 +23,6 @@ const (
 			p.author_id,
 			p.content,
 			p.created_at,
-			u.id,
 			u.nickname AS author_nickname,
 			m.path AS avatar_path
 		FROM posts p
@@ -49,4 +48,3 @@ const (
 // => Add the posts that are allowed for the searcher to see by his friend.
 // This gives us a combination of all possible posts but the posts are duplicated
 // We gonna select only the ones that are public or it's his own posts, or of a friend or private but one of the allowed friends to see it
-

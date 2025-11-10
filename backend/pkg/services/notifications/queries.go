@@ -2,7 +2,7 @@ package notifications
 
 const (
 	QUERY_GET_NOTIFICATION = `
-		SELECT id, user_id, type, reference_type, reference_id, content, is_read, created_at FROM notifications
+		SELECT id, user_id, type, reference_type, reference_id, content, is_read, created_at, read_at FROM notifications
 	`
 
 	QUERY_GET_NOTIFICATION_OWNER = `

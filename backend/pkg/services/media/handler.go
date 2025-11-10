@@ -21,11 +21,12 @@ func HandleUploadMedia(w http.ResponseWriter, r *http.Request) {
 	r.Body = http.MaxBytesReader(w, r.Body, MaxRequestSize)
 	defer r.Body.Close()
 
-	if ok := utils.ValidateJsonRequest(w, r, r.Body, "Media upload"); !ok {
+	if ok := utils.ValidateJsonRequest(w, r, &req, "Media upload"); !ok {
 		return
 	}
 
 	if !AllowedMimeTypes[req.FileType] {
+		println(req.FileType)
 		utils.UnsupportedMediaType(w)
 		return
 	}
@@ -49,6 +50,7 @@ func HandleUploadMedia(w http.ResponseWriter, r *http.Request) {
 
 	detectedMediaType := http.DetectContentType(data)
 	if !AllowedMimeTypes[detectedMediaType] {
+		println("2")
 		utils.UnsupportedMediaType(w)
 		return
 	}
