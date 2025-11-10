@@ -275,7 +275,7 @@
           ]
         },
         {
-          "name": "Revoke All Other Sessions",
+          "name": "Revoke Session by ID",
           "request": {
             "method": "DELETE",
             "url": {
@@ -293,39 +293,17 @@
           },
           "event": [
             {
-              "listen": "prerequest",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "// Get all sessions from environment variable",
-                  "let sessions = JSON.parse(pm.environment.get('allSessions') || '[]');",
-                  "",
-                  "pm.environment.unset('sessionId');"
-                ]
-              }
-            },
-            {
               "listen": "test",
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "// Check success status",
-                  "pm.test('Status code 200', function() {",
+                  "// ✅ Expect success",
+                  "pm.test('Status code is 200', function() {",
                   "    pm.response.to.have.status(200);",
                   "});",
                   "",
-                  "// Remove revoked session from allSessions",
-                  "let sessions = JSON.parse(pm.environment.get('allSessions') || '[]');",
-                  "let sessionId = pm.environment.get('sessionId');",
-                  "sessions = sessions.filter(s => s.sessionId != sessionId);",
-                  "pm.environment.set('allSessions', JSON.stringify(sessions));",
-                  "",
-                  "// Continue revoking next session if any",
-                  "if (sessions.length > 0) {",
-                  "    postman.setNextRequest('Revoke All Other Sessions');",
-                  "} else {",
-                  "    pm.environment.unset('sessionId');",
-                  "}"
+                  "// Optional: clear the sessionId after deletion",
+                  "pm.environment.unset('sessionId');"
                 ]
               }
             }
@@ -336,6 +314,151 @@
     {
       "name": "Users / Profiles",
       "item": [
+        {
+          "name": "Register User Test Variants",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{{currentUser}}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/register",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "register"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Initialize index",
+                  "if (!pm.environment.get('currentIndex')) {",
+                  "    pm.environment.set('currentIndex', 0);",
+                  "}",
+                  "// Array of test cases",
+                  "const testCases = [",
+                  "  {\"email\":\"user1@example.com\",\"password\":\"Pa$$w0rd!\",\"firstName\":\"John\",\"lastName\":\"Doe\",\"dateOfBirth\":\"2000-01-01\"},",
+                  "  {\"email\":\"user2@example.com\",\"password\":\"Pa$$w0rd!\",\"firstName\":\"Jane\",\"lastName\":\"Smith\",\"dateOfBirth\":\"2000-02-02\"},",
+                  "  {\"email\":\"user3@example.com\",\"password\":\"Pa$$w0rd!\",\"firstName\":\"Alice\",\"lastName\":\"Brown\",\"dateOfBirth\":\"2000-03-03\"},",
+                  "  {\"email\":\"user4@example.com\",\"password\":\"Pa$$w0rd!\",\"firstName\":\"Bob\",\"lastName\":\"White\",\"dateOfBirth\":\"2000-04-04\"},",
+                  "  {\"email\":\"avatar@example.com\",\"password\":\"Pa$$w0rd!\",\"firstName\":\"Avatar\",\"lastName\":\"User\",\"dateOfBirth\":\"1999-05-05\",\"nickname\":\"avuser\",\"aboutMe\":\"I have an avatar\",\"avatarId\":999999},",
+                  "  {\"email\":\"invalid-email\",\"password\":\"123\",\"firstName\":\"Bad\",\"lastName\":\"Data\",\"dateOfBirth\":\"2000-01-01\"},",
+                  "];",
+                  "// Set current test case",
+                  "let index = parseInt(pm.environment.get('currentIndex'));",
+                  "pm.environment.set('currentUser', JSON.stringify(testCases[index]));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Capture response",
+                  "const response = pm.response.json();",
+                  "const status = pm.response.code;",
+                  "",
+                  "// Get current test case index",
+                  "let index = parseInt(pm.environment.get('currentIndex'));",
+                  "",
+                  "// Define expected status per test case (200 for valid, 400 for invalid)",
+                  "const expectedStatuses = [200, 200, 200, 200, 400, 400];",
+                  "",
+                  "// Test status code",
+                  "pm.test('Check response status', function() {",
+                  "    if (status === 500) {",
+                  "        pm.environment.set('requestWith500', index);",
+                  "        pm.expect.fail(`Request at index ${index} returned 500`);",
+                  "    } else {",
+                  "        pm.expect(status).to.eql(expectedStatuses[index]);",
+                  "    }",
+                  "});",
+                  "",
+                  "// Save userId/email for valid responses (status 200)",
+                  "if (status === 200) {",
+                  "    pm.environment.set(`userId_${index}`, response.userId);",
+                  "    pm.environment.set(`email_${index}`, response.email);",
+                  "    pm.environment.set(`password_${index}`, response.password);",
+                  "}",
+                  "",
+                  "// Loop to next request",
+                  "index++;",
+                  "if (index < expectedStatuses.length) {",
+                  "    pm.environment.set('currentIndex', index);",
+                  "    postman.setNextRequest('Register User Test Variants');",
+                  "} else {",
+                  "    pm.environment.unset('currentIndex');",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login User1",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email/userId/nickname\": \"{{email_0}}\",\n  \"password\": \"{{password_0}}\",\n  \"rememberMe\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Ensure login was successful",
+                  "pm.test('Login status 200', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "// Capture token or session info if returned",
+                  "const response = pm.response.json();",
+                  "if (response.token) {",
+                  "    pm.environment.set('sessionToken', response.token);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
         {
           "name": "Get User Profile",
           "request": {
@@ -520,6 +643,103 @@
       "name": "Follow Request Flow",
       "item": [
         {
+          "name": "Register User Test Variants",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{{currentUser}}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/register",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "register"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Initialize index",
+                  "if (!pm.environment.get('currentIndex')) {",
+                  "    pm.environment.set('currentIndex', 0);",
+                  "}",
+                  "// Array of test cases",
+                  "const testCases = [",
+                  "  {\"email\":\"user1@example.com\",\"password\":\"Pa$$w0rd!\",\"firstName\":\"John\",\"lastName\":\"Doe\",\"dateOfBirth\":\"2000-01-01\"},",
+                  "  {\"email\":\"user2@example.com\",\"password\":\"Pa$$w0rd!\",\"firstName\":\"Jane\",\"lastName\":\"Smith\",\"dateOfBirth\":\"2000-02-02\"},",
+                  "  {\"email\":\"user3@example.com\",\"password\":\"Pa$$w0rd!\",\"firstName\":\"Alice\",\"lastName\":\"Brown\",\"dateOfBirth\":\"2000-03-03\"},",
+                  "  {\"email\":\"user4@example.com\",\"password\":\"Pa$$w0rd!\",\"firstName\":\"Bob\",\"lastName\":\"White\",\"dateOfBirth\":\"2000-04-04\"},",
+                  "  {\"email\":\"avatar@example.com\",\"password\":\"Pa$$w0rd!\",\"firstName\":\"Avatar\",\"lastName\":\"User\",\"dateOfBirth\":\"1999-05-05\",\"nickname\":\"avuser\",\"aboutMe\":\"I have an avatar\",\"avatarId\":999999},",
+                  "  {\"email\":\"invalid-email\",\"password\":\"123\",\"firstName\":\"Bad\",\"lastName\":\"Data\",\"dateOfBirth\":\"2000-01-01\"},",
+                  "];",
+                  "// Set current test case",
+                  "let index = parseInt(pm.environment.get('currentIndex'));",
+                  "pm.environment.set('currentUser', JSON.stringify(testCases[index]));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Capture response",
+                  "const response = pm.response.json();",
+                  "const status = pm.response.code;",
+                  "",
+                  "// Get current test case index",
+                  "let index = parseInt(pm.environment.get('currentIndex'));",
+                  "",
+                  "// Define expected status per test case (200 for valid, 400 for invalid)",
+                  "const expectedStatuses = [200, 200, 200, 200, 400, 400];",
+                  "",
+                  "// Test status code",
+                  "pm.test('Check response status', function() {",
+                  "    if (status === 500) {",
+                  "        pm.environment.set('requestWith500', index);",
+                  "        pm.expect.fail(`Request at index ${index} returned 500`);",
+                  "    } else {",
+                  "        pm.expect(status).to.eql(expectedStatuses[index]);",
+                  "    }",
+                  "});",
+                  "",
+                  "// Save userId/email for valid responses (status 200)",
+                  "if (status === 200) {",
+                  "    pm.environment.set(`userId_${index}`, response.userId);",
+                  "    pm.environment.set(`email_${index}`, response.email);",
+                  "    pm.environment.set(`password_${index}`, response.password);",
+                  "}",
+                  "",
+                  "// Loop to next request",
+                  "index++;",
+                  "if (index < expectedStatuses.length) {",
+                  "    pm.environment.set('currentIndex', index);",
+                  "    postman.setNextRequest('Register User Test Variants');",
+                  "} else {",
+                  "    pm.environment.unset('currentIndex');",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
           "name": "Login User1",
           "request": {
             "method": "POST",
@@ -680,6 +900,136 @@
       "name": "Groups",
       "item": [
         {
+          "name": "Register User Test Variants",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{{currentUser}}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/register",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "register"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Initialize index",
+                  "if (!pm.environment.get('currentIndex')) {",
+                  "    pm.environment.set('currentIndex', 0);",
+                  "}",
+                  "// Array of test cases",
+                  "const testCases = [",
+                  "  {\"email\":\"user1@example.com\",\"password\":\"Pa$$w0rd!\",\"firstName\":\"John\",\"lastName\":\"Doe\",\"dateOfBirth\":\"2000-01-01\"},",
+                  "  {\"email\":\"user2@example.com\",\"password\":\"Pa$$w0rd!\",\"firstName\":\"Jane\",\"lastName\":\"Smith\",\"dateOfBirth\":\"2000-02-02\"},",
+                  "  {\"email\":\"user3@example.com\",\"password\":\"Pa$$w0rd!\",\"firstName\":\"Alice\",\"lastName\":\"Brown\",\"dateOfBirth\":\"2000-03-03\"},",
+                  "  {\"email\":\"user4@example.com\",\"password\":\"Pa$$w0rd!\",\"firstName\":\"Bob\",\"lastName\":\"White\",\"dateOfBirth\":\"2000-04-04\"},",
+                  "  {\"email\":\"avatar@example.com\",\"password\":\"Pa$$w0rd!\",\"firstName\":\"Avatar\",\"lastName\":\"User\",\"dateOfBirth\":\"1999-05-05\",\"nickname\":\"avuser\",\"aboutMe\":\"I have an avatar\",\"avatarId\":999999},",
+                  "  {\"email\":\"invalid-email\",\"password\":\"123\",\"firstName\":\"Bad\",\"lastName\":\"Data\",\"dateOfBirth\":\"2000-01-01\"},",
+                  "];",
+                  "// Set current test case",
+                  "let index = parseInt(pm.environment.get('currentIndex'));",
+                  "pm.environment.set('currentUser', JSON.stringify(testCases[index]));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Capture response",
+                  "const response = pm.response.json();",
+                  "const status = pm.response.code;",
+                  "",
+                  "// Get current test case index",
+                  "let index = parseInt(pm.environment.get('currentIndex'));",
+                  "",
+                  "// Define expected status per test case (200 for valid, 400 for invalid)",
+                  "const expectedStatuses = [200, 200, 200, 200, 400, 400];",
+                  "",
+                  "// Test status code",
+                  "pm.test('Check response status', function() {",
+                  "    if (status === 500) {",
+                  "        pm.environment.set('requestWith500', index);",
+                  "        pm.expect.fail(`Request at index ${index} returned 500`);",
+                  "    } else {",
+                  "        pm.expect(status).to.eql(expectedStatuses[index]);",
+                  "    }",
+                  "});",
+                  "",
+                  "// Save userId/email for valid responses (status 200)",
+                  "if (status === 200) {",
+                  "    pm.environment.set(`userId_${index}`, response.userId);",
+                  "    pm.environment.set(`email_${index}`, response.email);",
+                  "    pm.environment.set(`password_${index}`, response.password);",
+                  "}",
+                  "",
+                  "// Loop to next request",
+                  "index++;",
+                  "if (index < expectedStatuses.length) {",
+                  "    pm.environment.set('currentIndex', index);",
+                  "    postman.setNextRequest('Register User Test Variants');",
+                  "} else {",
+                  "    pm.environment.unset('currentIndex');",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login User1",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"email\":\"{{email_0}}\",\"password\":\"{{password_0}}\",\"rememberMe\":true}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/login"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// capture cookie automatically, Postman handles this",
+                  "pm.test('Login User1 should be 200', function() {",
+                  "    pm.expect(pm.response.code).to.eql(200);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
           "name": "Create Group",
           "request": {
             "method": "POST",
@@ -763,7 +1113,7 @@
         {
           "name": "Update Group",
           "request": {
-            "method": "PUT",
+            "method": "PATCH",
             "header": [
               {
                 "key": "Content-Type",
@@ -847,6 +1197,182 @@
     {
       "name": "Group Events",
       "item": [
+        {
+          "name": "Register User Test Variants",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{{currentUser}}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/register",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "register"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Initialize index",
+                  "if (!pm.environment.get('currentIndex')) {",
+                  "    pm.environment.set('currentIndex', 0);",
+                  "}",
+                  "// Array of test cases",
+                  "const testCases = [",
+                  "  {\"email\":\"user1@example.com\",\"password\":\"Pa$$w0rd!\",\"firstName\":\"John\",\"lastName\":\"Doe\",\"dateOfBirth\":\"2000-01-01\"},",
+                  "  {\"email\":\"user2@example.com\",\"password\":\"Pa$$w0rd!\",\"firstName\":\"Jane\",\"lastName\":\"Smith\",\"dateOfBirth\":\"2000-02-02\"},",
+                  "  {\"email\":\"user3@example.com\",\"password\":\"Pa$$w0rd!\",\"firstName\":\"Alice\",\"lastName\":\"Brown\",\"dateOfBirth\":\"2000-03-03\"},",
+                  "  {\"email\":\"user4@example.com\",\"password\":\"Pa$$w0rd!\",\"firstName\":\"Bob\",\"lastName\":\"White\",\"dateOfBirth\":\"2000-04-04\"},",
+                  "  {\"email\":\"avatar@example.com\",\"password\":\"Pa$$w0rd!\",\"firstName\":\"Avatar\",\"lastName\":\"User\",\"dateOfBirth\":\"1999-05-05\",\"nickname\":\"avuser\",\"aboutMe\":\"I have an avatar\",\"avatarId\":999999},",
+                  "  {\"email\":\"invalid-email\",\"password\":\"123\",\"firstName\":\"Bad\",\"lastName\":\"Data\",\"dateOfBirth\":\"2000-01-01\"},",
+                  "];",
+                  "// Set current test case",
+                  "let index = parseInt(pm.environment.get('currentIndex'));",
+                  "pm.environment.set('currentUser', JSON.stringify(testCases[index]));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Capture response",
+                  "const response = pm.response.json();",
+                  "const status = pm.response.code;",
+                  "",
+                  "// Get current test case index",
+                  "let index = parseInt(pm.environment.get('currentIndex'));",
+                  "",
+                  "// Define expected status per test case (200 for valid, 400 for invalid)",
+                  "const expectedStatuses = [200, 200, 200, 200, 400, 400];",
+                  "",
+                  "// Test status code",
+                  "pm.test('Check response status', function() {",
+                  "    if (status === 500) {",
+                  "        pm.environment.set('requestWith500', index);",
+                  "        pm.expect.fail(`Request at index ${index} returned 500`);",
+                  "    } else {",
+                  "        pm.expect(status).to.eql(expectedStatuses[index]);",
+                  "    }",
+                  "});",
+                  "",
+                  "// Save userId/email for valid responses (status 200)",
+                  "if (status === 200) {",
+                  "    pm.environment.set(`userId_${index}`, response.userId);",
+                  "    pm.environment.set(`email_${index}`, response.email);",
+                  "    pm.environment.set(`password_${index}`, response.password);",
+                  "}",
+                  "",
+                  "// Loop to next request",
+                  "index++;",
+                  "if (index < expectedStatuses.length) {",
+                  "    pm.environment.set('currentIndex', index);",
+                  "    postman.setNextRequest('Register User Test Variants');",
+                  "} else {",
+                  "    pm.environment.unset('currentIndex');",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login User1",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"email\":\"{{email_0}}\",\"password\":\"{{password_0}}\",\"rememberMe\":true}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/login"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// capture cookie automatically, Postman handles this",
+                  "pm.test('Login User1 should be 200', function() {",
+                  "    pm.expect(pm.response.code).to.eql(200);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create Group",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Go Developers\",\n  \"description\": \"A group for sharing Go programming tips and projects.\",\n  \"avatarId\": 657543234567865\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/groups",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "groups"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Group creation returns 200', function() {",
+                  "    pm.expect(pm.response.code).to.eql(200);",
+                  "});",
+                  "",
+                  "pm.test('Store group_id', function() {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.environment.set('groupId', jsonData.groupId);",
+                  "    pm.expect(jsonData.groupId).to.exist;",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
         {
           "name": "Create Event",
           "request": {
@@ -1017,6 +1543,136 @@
       "name": "Posts / Comments / Reactions",
       "item": [
         {
+          "name": "Register User Test Variants",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{{currentUser}}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/register",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "register"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Initialize index",
+                  "if (!pm.environment.get('currentIndex')) {",
+                  "    pm.environment.set('currentIndex', 0);",
+                  "}",
+                  "// Array of test cases",
+                  "const testCases = [",
+                  "  {\"email\":\"user1@example.com\",\"password\":\"Pa$$w0rd!\",\"firstName\":\"John\",\"lastName\":\"Doe\",\"dateOfBirth\":\"2000-01-01\"},",
+                  "  {\"email\":\"user2@example.com\",\"password\":\"Pa$$w0rd!\",\"firstName\":\"Jane\",\"lastName\":\"Smith\",\"dateOfBirth\":\"2000-02-02\"},",
+                  "  {\"email\":\"user3@example.com\",\"password\":\"Pa$$w0rd!\",\"firstName\":\"Alice\",\"lastName\":\"Brown\",\"dateOfBirth\":\"2000-03-03\"},",
+                  "  {\"email\":\"user4@example.com\",\"password\":\"Pa$$w0rd!\",\"firstName\":\"Bob\",\"lastName\":\"White\",\"dateOfBirth\":\"2000-04-04\"},",
+                  "  {\"email\":\"avatar@example.com\",\"password\":\"Pa$$w0rd!\",\"firstName\":\"Avatar\",\"lastName\":\"User\",\"dateOfBirth\":\"1999-05-05\",\"nickname\":\"avuser\",\"aboutMe\":\"I have an avatar\",\"avatarId\":999999},",
+                  "  {\"email\":\"invalid-email\",\"password\":\"123\",\"firstName\":\"Bad\",\"lastName\":\"Data\",\"dateOfBirth\":\"2000-01-01\"},",
+                  "];",
+                  "// Set current test case",
+                  "let index = parseInt(pm.environment.get('currentIndex'));",
+                  "pm.environment.set('currentUser', JSON.stringify(testCases[index]));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Capture response",
+                  "const response = pm.response.json();",
+                  "const status = pm.response.code;",
+                  "",
+                  "// Get current test case index",
+                  "let index = parseInt(pm.environment.get('currentIndex'));",
+                  "",
+                  "// Define expected status per test case (200 for valid, 400 for invalid)",
+                  "const expectedStatuses = [200, 200, 200, 200, 400, 400];",
+                  "",
+                  "// Test status code",
+                  "pm.test('Check response status', function() {",
+                  "    if (status === 500) {",
+                  "        pm.environment.set('requestWith500', index);",
+                  "        pm.expect.fail(`Request at index ${index} returned 500`);",
+                  "    } else {",
+                  "        pm.expect(status).to.eql(expectedStatuses[index]);",
+                  "    }",
+                  "});",
+                  "",
+                  "// Save userId/email for valid responses (status 200)",
+                  "if (status === 200) {",
+                  "    pm.environment.set(`userId_${index}`, response.userId);",
+                  "    pm.environment.set(`email_${index}`, response.email);",
+                  "    pm.environment.set(`password_${index}`, response.password);",
+                  "}",
+                  "",
+                  "// Loop to next request",
+                  "index++;",
+                  "if (index < expectedStatuses.length) {",
+                  "    pm.environment.set('currentIndex', index);",
+                  "    postman.setNextRequest('Register User Test Variants');",
+                  "} else {",
+                  "    pm.environment.unset('currentIndex');",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login User1",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"email\":\"{{email_0}}\",\"password\":\"{{password_0}}\",\"rememberMe\":true}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/login"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// capture cookie automatically, Postman handles this",
+                  "pm.test('Login User1 should be 200', function() {",
+                  "    pm.expect(pm.response.code).to.eql(200);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
           "name": "Create Post",
           "request": {
             "method": "POST",
@@ -1041,7 +1697,30 @@
                 "posts"
               ]
             }
-          }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// ✅ Check success",
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "// ✅ Parse and store postId",
+                  "let json = pm.response.json();",
+                  "if (json.postId) {",
+                  "    pm.environment.set('postId', json.postId);",
+                  "    console.log('Stored postId:', json.postId);",
+                  "} else {",
+                  "    console.warn('⚠️ postId not found in response');",
+                  "}"
+                ]
+              }
+            }
+          ]
         },
         {
           "name": "Get Single Post",
@@ -1049,7 +1728,7 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{base_url}}/api/v1/posts/:post_id",
+              "raw": "{{base_url}}/api/v1/posts/{{postId}}",
               "host": [
                 "{{base_url}}"
               ],
@@ -1057,7 +1736,7 @@
                 "api",
                 "v1",
                 "posts",
-                ":post_id"
+                "{{postId}}"
               ]
             }
           }
@@ -1077,7 +1756,7 @@
               "raw": "{\n  \"content\": \"Great post! Learned a lot.\",\n  \"mediaIds\": [901, 902]\n}"
             },
             "url": {
-              "raw": "{{base_url}}/api/v1/posts/:post_id/comments",
+              "raw": "{{base_url}}/api/v1/posts/{{postId}}/comments",
               "host": [
                 "{{base_url}}"
               ],
@@ -1085,7 +1764,7 @@
                 "api",
                 "v1",
                 "posts",
-                ":post_id",
+                "{{postId}}",
                 "comments"
               ]
             }
@@ -1097,7 +1776,7 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{base_url}}/api/v1/posts/:post_id/comments",
+              "raw": "{{base_url}}/api/v1/posts/{{postId}}/comments",
               "host": [
                 "{{base_url}}"
               ],
@@ -1105,7 +1784,7 @@
                 "api",
                 "v1",
                 "posts",
-                ":post_id",
+                "{{postId}}",
                 "comments"
               ]
             }
@@ -1117,7 +1796,7 @@
             "method": "POST",
             "header": [],
             "url": {
-              "raw": "{{base_url}}/api/v1/posts/:post_id/like",
+              "raw": "{{base_url}}/api/v1/posts/{{postId}}/like",
               "host": [
                 "{{base_url}}"
               ],
@@ -1125,7 +1804,7 @@
                 "api",
                 "v1",
                 "posts",
-                ":post_id",
+                "{{postId}}",
                 "like"
               ]
             }
@@ -1137,7 +1816,7 @@
             "method": "DELETE",
             "header": [],
             "url": {
-              "raw": "{{base_url}}/api/v1/posts/:post_id/like",
+              "raw": "{{base_url}}/api/v1/posts/{{postId}}/like",
               "host": [
                 "{{base_url}}"
               ],
@@ -1145,7 +1824,7 @@
                 "api",
                 "v1",
                 "posts",
-                ":post_id",
+                "{{postId}}",
                 "like"
               ]
             }
@@ -1156,6 +1835,182 @@
     {
       "name": "Feed",
       "item": [
+        {
+          "name": "Register User Test Variants",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{{currentUser}}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/register",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "register"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Initialize index",
+                  "if (!pm.environment.get('currentIndex')) {",
+                  "    pm.environment.set('currentIndex', 0);",
+                  "}",
+                  "// Array of test cases",
+                  "const testCases = [",
+                  "  {\"email\":\"user1@example.com\",\"password\":\"Pa$$w0rd!\",\"firstName\":\"John\",\"lastName\":\"Doe\",\"dateOfBirth\":\"2000-01-01\"},",
+                  "  {\"email\":\"user2@example.com\",\"password\":\"Pa$$w0rd!\",\"firstName\":\"Jane\",\"lastName\":\"Smith\",\"dateOfBirth\":\"2000-02-02\"},",
+                  "  {\"email\":\"user3@example.com\",\"password\":\"Pa$$w0rd!\",\"firstName\":\"Alice\",\"lastName\":\"Brown\",\"dateOfBirth\":\"2000-03-03\"},",
+                  "  {\"email\":\"user4@example.com\",\"password\":\"Pa$$w0rd!\",\"firstName\":\"Bob\",\"lastName\":\"White\",\"dateOfBirth\":\"2000-04-04\"},",
+                  "  {\"email\":\"avatar@example.com\",\"password\":\"Pa$$w0rd!\",\"firstName\":\"Avatar\",\"lastName\":\"User\",\"dateOfBirth\":\"1999-05-05\",\"nickname\":\"avuser\",\"aboutMe\":\"I have an avatar\",\"avatarId\":999999},",
+                  "  {\"email\":\"invalid-email\",\"password\":\"123\",\"firstName\":\"Bad\",\"lastName\":\"Data\",\"dateOfBirth\":\"2000-01-01\"},",
+                  "];",
+                  "// Set current test case",
+                  "let index = parseInt(pm.environment.get('currentIndex'));",
+                  "pm.environment.set('currentUser', JSON.stringify(testCases[index]));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Capture response",
+                  "const response = pm.response.json();",
+                  "const status = pm.response.code;",
+                  "",
+                  "// Get current test case index",
+                  "let index = parseInt(pm.environment.get('currentIndex'));",
+                  "",
+                  "// Define expected status per test case (200 for valid, 400 for invalid)",
+                  "const expectedStatuses = [200, 200, 200, 200, 400, 400];",
+                  "",
+                  "// Test status code",
+                  "pm.test('Check response status', function() {",
+                  "    if (status === 500) {",
+                  "        pm.environment.set('requestWith500', index);",
+                  "        pm.expect.fail(`Request at index ${index} returned 500`);",
+                  "    } else {",
+                  "        pm.expect(status).to.eql(expectedStatuses[index]);",
+                  "    }",
+                  "});",
+                  "",
+                  "// Save userId/email for valid responses (status 200)",
+                  "if (status === 200) {",
+                  "    pm.environment.set(`userId_${index}`, response.userId);",
+                  "    pm.environment.set(`email_${index}`, response.email);",
+                  "    pm.environment.set(`password_${index}`, response.password);",
+                  "}",
+                  "",
+                  "// Loop to next request",
+                  "index++;",
+                  "if (index < expectedStatuses.length) {",
+                  "    pm.environment.set('currentIndex', index);",
+                  "    postman.setNextRequest('Register User Test Variants');",
+                  "} else {",
+                  "    pm.environment.unset('currentIndex');",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login User1",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"email\":\"{{email_0}}\",\"password\":\"{{password_0}}\",\"rememberMe\":true}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/login"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// capture cookie automatically, Postman handles this",
+                  "pm.test('Login User1 should be 200', function() {",
+                  "    pm.expect(pm.response.code).to.eql(200);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create Group",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Go Developers\",\n  \"description\": \"A group for sharing Go programming tips and projects.\",\n  \"avatarId\": 657543234567865\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/groups",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "groups"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Group creation returns 200', function() {",
+                  "    pm.expect(pm.response.code).to.eql(200);",
+                  "});",
+                  "",
+                  "pm.test('Store group_id', function() {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.environment.set('groupId', jsonData.groupId);",
+                  "    pm.expect(jsonData.groupId).to.exist;",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
         {
           "name": "Get Personal Feed",
           "request": {
@@ -1323,7 +2178,30 @@
                 "upload"
               ]
             }
-          }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// ✅ Check success response",
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "// ✅ Parse JSON response and store mediaId in environment",
+                  "let json = pm.response.json();",
+                  "if (json.mediaId) {",
+                  "    pm.environment.set('mediaId', json.mediaId);",
+                  "    console.log('Stored mediaId:', json.mediaId);",
+                  "} else {",
+                  "    console.warn('⚠️ mediaId not found in response');",
+                  "}"
+                ]
+              }
+            }
+          ]
         },
         {
           "name": "Get Media",
@@ -1331,7 +2209,7 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{base_url}}/api/v1/media/:media_id",
+              "raw": "{{base_url}}/api/v1/media/{{mediaId}}",
               "host": [
                 "{{base_url}}"
               ],
@@ -1339,7 +2217,7 @@
                 "api",
                 "v1",
                 "media",
-                ":media_id"
+                "{{mediaId}}"
               ]
             }
           }
@@ -1350,7 +2228,7 @@
             "method": "DELETE",
             "header": [],
             "url": {
-              "raw": "{{base_url}}/api/v1/media/:media_id",
+              "raw": "{{base_url}}/api/v1/media/{{mediaId}}",
               "host": [
                 "{{base_url}}"
               ],
@@ -1358,7 +2236,7 @@
                 "api",
                 "v1",
                 "media",
-                ":media_id"
+                "{{mediaId}}"
               ]
             }
           }
@@ -1368,6 +2246,145 @@
     {
       "name": "Chats",
       "item": [
+        {
+          "name": "Register User Test Variants",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{{currentUser}}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/register",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "register"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Initialize index",
+                  "if (!pm.environment.get('currentIndex')) {",
+                  "    pm.environment.set('currentIndex', 0);",
+                  "}",
+                  "// Array of test cases",
+                  "const testCases = [",
+                  "  {\"email\":\"user1@example.com\",\"password\":\"Pa$$w0rd!\",\"firstName\":\"John\",\"lastName\":\"Doe\",\"dateOfBirth\":\"2000-01-01\"},",
+                  "  {\"email\":\"user2@example.com\",\"password\":\"Pa$$w0rd!\",\"firstName\":\"Jane\",\"lastName\":\"Smith\",\"dateOfBirth\":\"2000-02-02\"},",
+                  "  {\"email\":\"user3@example.com\",\"password\":\"Pa$$w0rd!\",\"firstName\":\"Alice\",\"lastName\":\"Brown\",\"dateOfBirth\":\"2000-03-03\"},",
+                  "  {\"email\":\"user4@example.com\",\"password\":\"Pa$$w0rd!\",\"firstName\":\"Bob\",\"lastName\":\"White\",\"dateOfBirth\":\"2000-04-04\"},",
+                  "  {\"email\":\"avatar@example.com\",\"password\":\"Pa$$w0rd!\",\"firstName\":\"Avatar\",\"lastName\":\"User\",\"dateOfBirth\":\"1999-05-05\",\"nickname\":\"avuser\",\"aboutMe\":\"I have an avatar\",\"avatarId\":999999},",
+                  "  {\"email\":\"invalid-email\",\"password\":\"123\",\"firstName\":\"Bad\",\"lastName\":\"Data\",\"dateOfBirth\":\"2000-01-01\"},",
+                  "];",
+                  "// Set current test case",
+                  "let index = parseInt(pm.environment.get('currentIndex'));",
+                  "pm.environment.set('currentUser', JSON.stringify(testCases[index]));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Capture response",
+                  "const response = pm.response.json();",
+                  "const status = pm.response.code;",
+                  "",
+                  "// Get current test case index",
+                  "let index = parseInt(pm.environment.get('currentIndex'));",
+                  "",
+                  "// Define expected status per test case (200 for valid, 400 for invalid)",
+                  "const expectedStatuses = [200, 200, 200, 200, 400, 400];",
+                  "",
+                  "// Test status code",
+                  "pm.test('Check response status', function() {",
+                  "    if (status === 500) {",
+                  "        pm.environment.set('requestWith500', index);",
+                  "        pm.expect.fail(`Request at index ${index} returned 500`);",
+                  "    } else {",
+                  "        pm.expect(status).to.eql(expectedStatuses[index]);",
+                  "    }",
+                  "});",
+                  "",
+                  "// Save userId/email for valid responses (status 200)",
+                  "if (status === 200) {",
+                  "    pm.environment.set(`userId_${index}`, response.userId);",
+                  "    pm.environment.set(`email_${index}`, response.email);",
+                  "    pm.environment.set(`password_${index}`, response.password);",
+                  "}",
+                  "",
+                  "// Loop to next request",
+                  "index++;",
+                  "if (index < expectedStatuses.length) {",
+                  "    pm.environment.set('currentIndex', index);",
+                  "    postman.setNextRequest('Register User Test Variants');",
+                  "} else {",
+                  "    pm.environment.unset('currentIndex');",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login User0",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"email\":\"{{email_0}}\",\"password\":\"{{password_0}}\",\"rememberMe\":true}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Login User0 should be 200', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "console.log('✅ Logged in as User0');"
+                ]
+              }
+            }
+          ]
+        },
         {
           "name": "List Conversations",
           "request": {
@@ -1384,30 +2401,34 @@
                 "chats"
               ]
             }
-          }
-        },
-        {
-          "name": "Fetch Chat Messages",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/v1/chats/:chat_id/messages",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "v1",
-                "chats",
-                ":chat_id",
-                "messages"
-              ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// ✅ Expect 200 OK",
+                  "pm.test('List Conversations OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "// ✅ Parse response and store the first chatId only",
+                  "let chats = pm.response.json();",
+                  "if (Array.isArray(chats) && chats.length > 0) {",
+                  "    let firstChatId = chats[0].chatId;",
+                  "    pm.environment.set('chatId', firstChatId);",
+                  "    console.log('✅ Stored chatId:', firstChatId);",
+                  "} else {",
+                  "    console.warn('⚠️ No chat found in response');",
+                  "}"
+                ]
+              }
             }
-          }
+          ]
         },
         {
-          "name": "Send Message",
+          "name": "Send Message (User0 → User1)",
           "request": {
             "method": "POST",
             "header": [
@@ -1418,10 +2439,10 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"text\": \"Hello, how are you?\"\n}"
+              "raw": "{\n  \"text\": \"Hello user_1, how are you?\"\n}"
             },
             "url": {
-              "raw": "{{base_url}}/api/v1/chats/:chat_id/messages",
+              "raw": "{{base_url}}/api/v1/chats/{{chatId}}/messages",
               "host": [
                 "{{base_url}}"
               ],
@@ -1429,11 +2450,137 @@
                 "api",
                 "v1",
                 "chats",
-                ":chat_id",
+                "{{chatId}}",
+                "messages"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Message sent OK', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "// ✅ Capture message ID",
+                  "let res = pm.response.json();",
+                  "if (res.messageId) {",
+                  "    pm.environment.set('msgId', res.messageId);",
+                  "    console.log('Stored msgId:', res.messageId);",
+                  "} else {",
+                  "    console.warn('⚠️ messageId not found');",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login User1",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"email\":\"{{email_1}}\",\"password\":\"{{password_1}}\",\"rememberMe\":true}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Login User1 OK', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "console.log('✅ Logged in as User1');"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Fetch Chat Messages",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/chats/{{chatId}}/messages",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "chats",
+                "{{chatId}}",
                 "messages"
               ]
             }
           }
+        },
+        {
+          "name": "Send Message (User1 → User0)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"text\": \"Hey user_0! I’m good, thanks.\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/chats/{{chatId}}/messages",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "chats",
+                "{{chatId}}",
+                "messages"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Message sent OK', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ]
         },
         {
           "name": "Delete Message",
@@ -1441,7 +2588,7 @@
             "method": "DELETE",
             "header": [],
             "url": {
-              "raw": "{{base_url}}/api/v1/chats/:chat_id/messages/:msg_id",
+              "raw": "{{base_url}}/api/v1/chats/{{chatId}}/messages/{{msgId}}",
               "host": [
                 "{{base_url}}"
               ],
@@ -1449,9 +2596,9 @@
                 "api",
                 "v1",
                 "chats",
-                ":chat_id",
+                "{{chatId}}",
                 "messages",
-                ":msg_id"
+                "{{msgId}}"
               ]
             }
           }
@@ -1462,7 +2609,7 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{base_url}}/api/v1/chats/:chat_id/participants",
+              "raw": "{{base_url}}/api/v1/chats/{{chatId}}/participants",
               "host": [
                 "{{base_url}}"
               ],
@@ -1470,7 +2617,7 @@
                 "api",
                 "v1",
                 "chats",
-                ":chat_id",
+                "{{chatId}}",
                 "participants"
               ]
             }
@@ -1481,6 +2628,136 @@
     {
       "name": "Notifications",
       "item": [
+        {
+          "name": "Register User Test Variants",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{{currentUser}}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/register",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "register"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Initialize index",
+                  "if (!pm.environment.get('currentIndex')) {",
+                  "    pm.environment.set('currentIndex', 0);",
+                  "}",
+                  "// Array of test cases",
+                  "const testCases = [",
+                  "  {\"email\":\"user1@example.com\",\"password\":\"Pa$$w0rd!\",\"firstName\":\"John\",\"lastName\":\"Doe\",\"dateOfBirth\":\"2000-01-01\"},",
+                  "  {\"email\":\"user2@example.com\",\"password\":\"Pa$$w0rd!\",\"firstName\":\"Jane\",\"lastName\":\"Smith\",\"dateOfBirth\":\"2000-02-02\"},",
+                  "  {\"email\":\"user3@example.com\",\"password\":\"Pa$$w0rd!\",\"firstName\":\"Alice\",\"lastName\":\"Brown\",\"dateOfBirth\":\"2000-03-03\"},",
+                  "  {\"email\":\"user4@example.com\",\"password\":\"Pa$$w0rd!\",\"firstName\":\"Bob\",\"lastName\":\"White\",\"dateOfBirth\":\"2000-04-04\"},",
+                  "  {\"email\":\"avatar@example.com\",\"password\":\"Pa$$w0rd!\",\"firstName\":\"Avatar\",\"lastName\":\"User\",\"dateOfBirth\":\"1999-05-05\",\"nickname\":\"avuser\",\"aboutMe\":\"I have an avatar\",\"avatarId\":999999},",
+                  "  {\"email\":\"invalid-email\",\"password\":\"123\",\"firstName\":\"Bad\",\"lastName\":\"Data\",\"dateOfBirth\":\"2000-01-01\"},",
+                  "];",
+                  "// Set current test case",
+                  "let index = parseInt(pm.environment.get('currentIndex'));",
+                  "pm.environment.set('currentUser', JSON.stringify(testCases[index]));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Capture response",
+                  "const response = pm.response.json();",
+                  "const status = pm.response.code;",
+                  "",
+                  "// Get current test case index",
+                  "let index = parseInt(pm.environment.get('currentIndex'));",
+                  "",
+                  "// Define expected status per test case (200 for valid, 400 for invalid)",
+                  "const expectedStatuses = [200, 200, 200, 200, 400, 400];",
+                  "",
+                  "// Test status code",
+                  "pm.test('Check response status', function() {",
+                  "    if (status === 500) {",
+                  "        pm.environment.set('requestWith500', index);",
+                  "        pm.expect.fail(`Request at index ${index} returned 500`);",
+                  "    } else {",
+                  "        pm.expect(status).to.eql(expectedStatuses[index]);",
+                  "    }",
+                  "});",
+                  "",
+                  "// Save userId/email for valid responses (status 200)",
+                  "if (status === 200) {",
+                  "    pm.environment.set(`userId_${index}`, response.userId);",
+                  "    pm.environment.set(`email_${index}`, response.email);",
+                  "    pm.environment.set(`password_${index}`, response.password);",
+                  "}",
+                  "",
+                  "// Loop to next request",
+                  "index++;",
+                  "if (index < expectedStatuses.length) {",
+                  "    pm.environment.set('currentIndex', index);",
+                  "    postman.setNextRequest('Register User Test Variants');",
+                  "} else {",
+                  "    pm.environment.unset('currentIndex');",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login User1",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"email\":\"{{email_0}}\",\"password\":\"{{password_0}}\",\"rememberMe\":true}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/login"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// capture cookie automatically, Postman handles this",
+                  "pm.test('Login User1 should be 200', function() {",
+                  "    pm.expect(pm.response.code).to.eql(200);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
         {
           "name": "List Notifications",
           "request": {
@@ -1495,9 +2772,44 @@
                 "api",
                 "v1",
                 "notifications"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                }
               ]
             }
-          }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('List Notifications should return 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "// Parse JSON response",
+                  "var jsonData = pm.response.json();",
+                  "",
+                  "// Check if there is at least one notification",
+                  "if (Array.isArray(jsonData) && jsonData.length > 0) {",
+                  "    var firstNotificationId = jsonData[0].notificationId;",
+                  "    pm.environment.set('notification_id', firstNotificationId);",
+                  "    console.log('Stored notification_id:', firstNotificationId);",
+                  "} else {",
+                  "    console.warn('No notifications found to store.');",
+                  "}"
+                ]
+              }
+            }
+          ]
         },
         {
           "name": "Mark Notification Read",
@@ -1505,7 +2817,7 @@
             "method": "POST",
             "header": [],
             "url": {
-              "raw": "{{base_url}}/api/v1/notifications/:id/mark-read",
+              "raw": "{{base_url}}/api/v1/notifications/{{notification_id}}/mark-read",
               "host": [
                 "{{base_url}}"
               ],
@@ -1513,7 +2825,7 @@
                 "api",
                 "v1",
                 "notifications",
-                ":id",
+                "{{notification_id}}",
                 "mark-read"
               ]
             }
