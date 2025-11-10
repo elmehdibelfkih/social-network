@@ -204,11 +204,11 @@ No need for a request body.
 ``` json
 {
   "userId": 1289843874339, // the user id of the profile owner 
-  "status": "follow", // follow/unfollow
+  "status": "follow", // follow/unfollow or null if the user is the owner of the profile
   "nickname": "nickname", // or null
   "firstName": "first",
   "lastName": "last",
-  "avatarId": 1289843874780,
+  "avatarId": 1289843874780, // or null
   "aboutMe": "Full-stack developer and cloud enthusiast.", // or null
   "dateOfBirth": "2001-01-01",
   "privacy": "public",
@@ -236,9 +236,9 @@ No need for a request body.
 {
   "firstName": "first",
   "lastName": "last",
-  "nickname": "nickname",
-  "aboutMe": "Cloud and DevOps engineer passionate about scalable systems.",
-  "avatarId": 1289843874780,
+  "nickname": "nickname", // or null
+  "aboutMe": "Cloud and DevOps engineer passionate about scalable systems.", // or null
+  "avatarId": 1289843874780, // or null
   "dateOfBirth": "2001-01-01",
   "email": "email@example.com"
 }
