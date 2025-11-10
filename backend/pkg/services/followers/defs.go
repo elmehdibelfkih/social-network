@@ -1,10 +1,5 @@
 package follow
 
-type contextKey string
-
-// context keys
-const REQUEST_STRUCT_KEY contextKey = "requestStruct"
-
 // POST /api/v1/users/:user_id/follow
 // No need for a request body.
 type FollowResponseJson struct {
