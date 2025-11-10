@@ -7,12 +7,11 @@ const (
 )
 
 var validTypes = map[string]bool{
-	"post":    true,
-	"comment": true,
-	"group":   true,
-	"event":   true,
-	"user":    true,
-	"chat":    true,
+	"post_liked":    true,
+	"post_comment": true,
+	"group_invite":   true,
+	"event_created":   true,
+	"follow_request":    true,
 }
 
 type Notification struct {

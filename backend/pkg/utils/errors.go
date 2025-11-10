@@ -42,6 +42,7 @@ func InitLogger() {
 	backendLog.Printf("Backend log initialized at: %s\n", backendPath)
 }
 
+// todo:
 func CloseLogger() {
 	if sqliteFile != nil {
 		sqliteLog.Printf("Server shutdown.\n\n\n")
@@ -55,14 +56,14 @@ func CloseLogger() {
 
 func logSQLiteError(err error, query string) {
 	if err != nil {
-		sqliteLog.Printf("[%s] %v: %s",
+		sqliteLog.Printf("[%s]\n %v:\n %s\n",
 			time.Now().Format(time.RFC3339), err, query)
 	}
 }
 
 func logBackendError(err error, context string) {
 	if err != nil {
-		backendLog.Printf("[%s] %v: %s",
+		backendLog.Printf("[%s]\n %v:\n %s\n",
 			time.Now().Format(time.RFC3339), err, context)
 	}
 }
@@ -85,27 +86,27 @@ func handleBackendError(err error, context string) bool {
 
 func SQLiteErrorTarget(err error, query string) {
 	_, file, line, _ := runtime.Caller(1)
-	handleSQLiteError(fmt.Errorf("%s:%d: %w", file, line, err), query)
+	handleSQLiteError(fmt.Errorf("%s:%d:\n %w", file, line, err), query)
 }
 
 func BackendErrorTarget(err error, context string) {
 	_, file, line, _ := runtime.Caller(1)
-	handleBackendError(fmt.Errorf("%s:%d: %w", file, line, err), context)
+	handleBackendError(fmt.Errorf("%s:%d:\n %w", file, line, err), context)
 }
 
-func ValidateJsonRequest(r *http.Request, body any, context string) bool {
-	err := JsonStaticDecode(r, &body)
-	if err != nil {
-		BackendErrorTarget(err, context)
-		return false
-	}
-	return true
-}
+// func ValidateJsonRequest(r *http.Request, body any, context string) bool {
+// 	err := JsonStaticDecode(r, &body)
+// 	if err != nil {
+// 		BackendErrorTarget(err, context)
+// 		return false
+// 	}
+// 	return true
+// }
 
 func sendErrorResponse(w http.ResponseWriter, status int, errTitle, errMsg, errType string) {
 	JsonResponseEncode(w, status, map[string]any{
 		"success": false,
-		"payload": errMsg,
+		// "payload": errMsg,
 		"error": map[string]any{
 			"errorTitle":   errTitle,
 			"statusCode":   status,

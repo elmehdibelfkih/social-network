@@ -7,12 +7,12 @@ CREATE TABLE
     first_name TEXT NOT NULL,
     last_name TEXT NOT NULL,
     date_of_birth TEXT NOT NULL,
-    avatar_media_id INTEGER,
+    avatar_id INTEGER,
     about_me TEXT,
     privacy TEXT NOT NULL DEFAULT 'public' CHECK (privacy IN ('public', 'private')),
     created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (avatar_media_id) REFERENCES media (id) ON DELETE SET NULL
+    FOREIGN KEY (avatar_id) REFERENCES media (id) ON DELETE SET NULL
   );
 
 CREATE UNIQUE INDEX IF NOT EXISTS ux_users_email ON users (email);

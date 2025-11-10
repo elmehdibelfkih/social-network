@@ -61,12 +61,13 @@ func GetWildCardValue(w http.ResponseWriter, r *http.Request, key string) int64 
 	if err != nil {
 		BackendErrorTarget(err, "UserContext")
 		BadRequest(w, "ParseInt failed wild card", "alert")
+		NotFoundError(w, "not found")
 	}
 	return wildCard
 }
 
 func GetUserIdFromContext(r *http.Request) int64 {
-	var userId int64
+	var userId int64 = -1
 	if r.Context().Value(config.USER_ID_KEY) != nil {
 		userId = r.Context().Value(config.USER_ID_KEY).(int64)
 	}

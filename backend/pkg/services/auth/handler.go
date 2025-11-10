@@ -9,7 +9,7 @@ func PostRegister(w http.ResponseWriter, r *http.Request) {
 	var body RegisterRequestJson
 	var response RegisterResponseJson
 	var s SessionResponseJson
-	if !utils.ValidateJsonRequest(r, &body, "register handler") {
+	if !utils.ValidateJsonRequest(w, r, &body, "register handler") {
 		utils.BadRequest(w, "request body invalid json format", "redirect")
 		return
 	}
@@ -32,7 +32,7 @@ func PostLogin(w http.ResponseWriter, r *http.Request) {
 	var response LoginResponseJson
 	var s SessionResponseJson
 	var remember RememberMeSqlRow
-	if !utils.ValidateJsonRequest(r, &body, "login handler") {
+	if !utils.ValidateJsonRequest(w, r, &body, "login handler") {
 		utils.BadRequest(w, "request body invalid json format", "redirect")
 		return
 	}
