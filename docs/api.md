@@ -51,13 +51,14 @@
   "firstName": "first",
   "lastName": "last",
   "dateOfBirth": "2001-01-01",
-  "nickname": "nickname",
-  "aboutMe": "present who you are and what you do.",
-  "avatarId": 23456754324567
+  "nickname": "nickname", // optinal
+  "aboutMe": "present who you are and what you do.", // optinal
+  "avatarId": 23456754324567 // optinal
 }
 ```
 
 - response payload
+
 ``` json
 {
   "userId": 1289843874339,
@@ -65,9 +66,9 @@
   "firstName": "first",
   "lastName": "last",
   "dateOfBirth": "2001-01-01",
-  "nickname": "nickname", // optinal
-  "aboutMe": "present who you are and what you do.", // optinal
-  "avatarId": 23456754324567 // optinal 
+  "nickname": "nickname", // or null
+  "aboutMe": "present who you are and what you do.", // or null
+  "avatarId": 23456754324567 // or null
 }
 ```
 
@@ -83,7 +84,7 @@
 
 ```json
 {
-  "email/userId/nickname": "email@example.com/1289843874339/nickname",
+  "email/userId/nickname": "email@example.com", // or 1289843874339 or nickname",
   "password": "Pa$$w0rd!",
   "rememberMe":true
 }
@@ -98,9 +99,9 @@
   "firstName": "first",
   "lastName": "last",
   "dateOfBirth": "2001-01-01",
-  "nickname": "nickname",
-  "aboutMe": "present who you are and what you do.",
-  "avatarId": 23456754324567
+  "nickname": "nickname", // or null
+  "aboutMe": "present who you are and what you do.", // or null
+  "avatarId": 23456754324567 // or null
 }
 ```
 
@@ -152,7 +153,7 @@ No need for a request body.
 - response payload
 
 ``` json
-{
+
   [
     {
       "sessionId": 1289843874339,
@@ -171,7 +172,6 @@ No need for a request body.
       "current": false
     }
   ]
-}
 
 ```
 
@@ -204,11 +204,11 @@ No need for a request body.
 ``` json
 {
   "userId": 1289843874339, // the user id of the profile owner 
-  "status": "follow", // follow/unfollow
+  "status": "follow", // follow/unfollow or null if the user is the owner of the profile
   "nickname": "nickname", // or null
   "firstName": "first",
   "lastName": "last",
-  "avatarId": 1289843874780,
+  "avatarId": 1289843874780, // or null
   "aboutMe": "Full-stack developer and cloud enthusiast.", // or null
   "dateOfBirth": "2001-01-01",
   "privacy": "public",
@@ -226,7 +226,7 @@ No need for a request body.
 
 ---
 
-### PUT `/api/v1/users/:user_id/profile` => update own profile
+### PATCH `/api/v1/users/:user_id/profile` => update own profile
 
 ***status code in success: 200***
 
@@ -234,15 +234,16 @@ No need for a request body.
 
 ```json
 {
-  "firstName": "first",
-  "lastName": "last",
-  "nickname": "nickname",
-  "aboutMe": "Cloud and DevOps engineer passionate about scalable systems.",
-  "avatarId": 1289843874780,
-  "dateOfBirth": "2001-01-01",
-  "email": "email@example.com"
+  "firstName": "first",  // optinal
+  "lastName": "last",  // optinal
+  "nickname": "nickname",  // optinal
+  "aboutMe": "Cloud and DevOps engineer passionate about scalable systems.", // optinal
+  "dateOfBirth": "2001-01-01", // optinal
+  "email": "email@example.com"  // optinal
 }
 ```
+  
+> - Note⚠️: At least one of those fields must be present.
 
 - response payload
 
@@ -276,8 +277,6 @@ No need for a request body.
 ```
 
 ---
-
-<!-- ### GET `/api/v1/users/:user_id/activity` => user activity summary -->
 
 ### GET `/api/v1/users/:user_id/stats` => counts
 
@@ -343,7 +342,7 @@ No need for a request body.
 
 ``` json
 {
-  "message": "You have unfollowed this user.",
+  "message": "Unfollow successful.",
   "targetUserId": 1289843874339,
   "followerrId": 1289843874336,
 }
@@ -358,7 +357,7 @@ No need for a request body.
 - response payload
 
 ``` json
-{
+
   [
     {
       "userId": 1289843874323,
@@ -367,7 +366,7 @@ No need for a request body.
       "lastName": "Johnson",
       "avatarId": 5956843825683,
       "followedAt": "2025-10-10T12:00:00Z",
-      "status": "accepted" // pending/accepted/declined
+      "status": "accepted"
     },
     {
       "userId": 1289843874334,
@@ -376,10 +375,9 @@ No need for a request body.
       "lastName": "Smith",
       "avatarId": 5956843825683,
       "followedAt": "2025-10-12T15:30:00Z",
-      "status": "accepted" // pending/accepted/declined
+      "status": "accepted"
     }
   ]
-}
 
 ```
 
@@ -392,7 +390,7 @@ No need for a request body.
 - response payload
 
 ``` json
-{
+
   [
     {
       "userId": 1289843874323,
@@ -413,7 +411,7 @@ No need for a request body.
       "status": "accepted" // pending/accepted/declined
     }
   ]
-}
+
 ```
 
 ---
@@ -425,7 +423,7 @@ No need for a request body.
 - response payload
 
 ``` json
-{
+
   [
     {
       "userId": 6249843274333,
@@ -446,12 +444,12 @@ No need for a request body.
       "status": "pending"
     }
   ]
-}
+
 ```
 
 ---
 
-### POST `/api/v1/follow-requests/:user_id/accept` => accept request // todo
+### POST `/api/v1/follow-requests/:user_id/accept` => accept request
 
 ***status code in success: 200***
 
@@ -508,35 +506,41 @@ No need for a request body.
 |page| integer| Page number (default = 1)|
 |limit| integer| Number of items per page (default = 20)|
 
+> - Note⚠️: check the limit before using it.
+
 - response payload
 
 ``` json
-{
+
   [
     {
       "postId": 3389843874075,
       "authorId": 1289843874339,
-      "authorNickname": "charlie_dev",
+      "authorNickname": "charlie_dev", // or null
+      "authorlastName": "alice",
+      "authorFirstName": "khalifa",
       "content": "Deploying a new Go microservice!",
-      "mediaIds": [23456543456787654],
+      "mediaIds": [23456543456787654], // or null
       "privacy": "followers",
       "createdAt": "2025-10-24T15:00:00Z",
       "updatedAt": "2025-10-24T15:00:00Z",
-      "groupId": 98765789765789
+      "groupId": 98765789765789 // or null
     },
     {
       "postId": 8689843874069,
       "authorId": 1289843874339,
       "authorNickname": "diana_ops",
+      "authorlastName": "alice",
+      "authorFirstName": "khalifa",
       "content": "Cloud architecture tips.",
-      "mediaIds": [],
+      "mediaIds": null,
       "privacy": "public",
       "createdAt": "2025-10-23T18:20:00Z",
       "updatedAt": "2025-10-23T18:20:00Z",
       "groupId": null
     }
   ]
-}
+
 ```
 
 ---
@@ -545,21 +549,25 @@ No need for a request body.
 
 ***status code in success: 200***
 
+|Parameter| Type| Description|
+|----------|-------|--------------|
+|page| integer| Page number (default = 1)|
+|limit| integer| Number of items per page (default = 20)|
+
+> - Note⚠️: check the limit before using it.
+
 - response payload
 
 ``` json
-{
-  "userId": 1289843874339,
-  "page": 1,
-  "limit": 20,
-  "totalPosts": 48,
-  "posts": [
+  [
     {
       "postId": 1289843874332,
       "authorId": 1289843874339,
       "authorNickname": "charlie_dev",
+      "authorlastName": "alice",
+      "authorFirstName": "khalifa",
       "content": "Working on a new distributed system...",
-      "mediaIds": [],
+      "mediaIds": null,
       "privacy": "public",
       "createdAt": "2025-10-24T12:30:00Z",
       "updatedAt": "2025-10-24T12:30:00Z"
@@ -568,14 +576,16 @@ No need for a request body.
       "postId": 1289843874658,
       "authorId": 1289843874339,
       "authorNickname": "charlie_dev",
+      "authorlastName": "alice",
+      "authorFirstName": "khalifa",
       "content": "Private note only visible to followers.",
-      "mediaIds": [],
+      "mediaIds": null,
       "privacy": "followers",
       "createdAt": "2025-10-23T17:05:00Z",
       "updatedAt": "2025-10-23T17:05:00Z"
     }
   ]
-}
+
 ```
 
 ---
@@ -584,19 +594,23 @@ No need for a request body.
 
 ***status code in success: 200***
 
+|Parameter| Type| Description|
+|----------|-------|--------------|
+|page| integer| Page number (default = 1)|
+|limit| integer| Number of items per page (default = 20)|
+
+> - Note⚠️: check the limit before using it.
+
 - response payload
 
 ``` json
-{
-  "groupId": 1289843874339,
-  "page": 1,
-  "limit": 20,
-  "totalPosts": 37,
-  "posts": [
+  [
     {
       "postId": 1289843874332,
       "authorId": 1289843874339,
       "authorNickname": "charlie_dev",
+      "authorlastName": "alice",
+      "authorFirstName": "khalifa",
       "content": "Working on a new distributed system...",
       "mediaIds": [1234567890987],
       "privacy": "public",
@@ -607,41 +621,19 @@ No need for a request body.
       "postId": 1289843874658,
       "authorId": 1289843874339,
       "authorNickname": "charlie_dev",
+      "authorlastName": "alice",
+      "authorFirstName": "khalifa",
       "content": "Private note only visible to followers.",
-      "mediaIds": [],
+      "mediaIds": null,
       "privacy": "followers",
       "createdAt": "2025-10-23T17:05:00Z",
       "updatedAt": "2025-10-23T17:05:00Z"
     }
   ]
-}
+
 ```
 
 ---
-
-<!-- 
-
-***status code in success: 200***
-
-- request
-
-```json
-{
-
-}
-```
-
-- response payload
-
-``` json
-{
-
-}
-```
-
----
-
--->
 
 ## 🔴 Posts / Comments / Reactions
 
@@ -654,10 +646,10 @@ No need for a request body.
 ```json
 {
   "content": "Hello world — launching my new service today!",
-  "privacy": "public",
-  "allowedList": [1289843874658, 1289843874658],
-  "groupId": null,
-  "mediaIds": [1289843874657, 1289843872746]
+  "privacy": "public", // public, followers, private, group, restricted.
+  "allowedList": [1289843874658, 1289843874658], // exists only if the privacy is restricted.
+  "groupId": 2345678654, // optinal
+  "mediaIds": [1289843874657, 1289843872746] // optinal
 }
 ```
 
@@ -668,9 +660,9 @@ No need for a request body.
   "message": "Post created successfully.",
   "postId": 128984387246925,
   "authorId": 1289843892780,
-  "privacy": "public",
-  "groupId": null,
-  "mediaIds": [1289843874657, 1289843872746],
+  "privacy": "public", // public, followers, private, group, restricted.
+  "groupId": null, // or the id of the group
+  "mediaIds": [1289843874657, 1289843872746], // or null
   "createdAt": "2025-10-24T19:30:00Z"
 }
 ```
@@ -691,12 +683,14 @@ No need for a request body.
 {
   "postId": 128984387246925,
   "authorId": 128984387246929,
-  "authorNickname": "devops_mehdi",
+  "authorNickname": "devops_mehdi", // or null
+  "authorlastName": "alice",
+  "authorFirstName": "khalifa",
   "content": "Hello world — launching my new service today!",
-  "mediaIds": [1289843874657, 1289843872746],
+  "mediaIds": [1289843874657, 1289843872746], // or null
   "privacy": "public",
   "groupId": null,
-  "allowedList": [],
+  "allowedList": null,
   "createdAt": "2025-10-24T19:30:00Z",
   "updatedAt": "2025-10-24T19:30:00Z"
 }
@@ -705,7 +699,7 @@ No need for a request body.
 
 ---
 
-### PUT `/api/v1/posts/:post_id` => update own post
+### PATCH `/api/v1/posts/:post_id` => update own post
 
 ***status code in success: 200***
 
@@ -713,12 +707,14 @@ No need for a request body.
 
 ```json
 {
-  "content": "Updated post content here...",
-  "privacy": "followers",
-  "allowedList": [128984387246925, 128984387246925],
-  "mediaIds": [1289843874657, 1289843872746],
+  "content": "Updated post content here...", // optional
+  "privacy": "followers", // optional
+  "allowedList": [128984387246925, 128984387246925], // optional
+  "mediaIds": [1289843874657, 1289843872746], // optional
 }
 ```
+
+> - Note⚠️: At least one of those fields must be present.
 
 - response payload
 
@@ -729,10 +725,10 @@ No need for a request body.
     "postId": 128984387246925,
     "authorId": 128984387246925,
     "content": "Updated post content here...",
-    "mediaIds": [1289843874657, 1289843872746],
-    "privacy": "followers",
-    "allowedList": [128984387246925, 128984387246925],
-    "groupId": null,
+    "mediaIds": [1289843874657, 1289843872746], // or null
+    "privacy": "restricted",
+    "allowedList": [128984387246925, 128984387246925], // or null if the privacy not restricted
+    "groupId": null, // or group id if the post belongs to a group
     "createdAt": "2025-10-24T19:30:00Z",
     "updatedAt": "2025-10-24T20:05:00Z"
   }
@@ -765,6 +761,13 @@ No need for a request body.
 
 ***status code in success: 200***
 
+|Parameter| Type| Description|
+|----------|-------|--------------|
+|page| integer| Page number (default = 1)|
+|limit| integer| Number of items per page (default = 20)|
+
+> - Note⚠️: check the limit before using it.
+
 - request
 
 ```json
@@ -774,19 +777,18 @@ No need for a request body.
 - response payload
 
 ``` json
-{
-  "userId": 128984387246925,
-  "page": 1,
-  "limit": 20,
-  "totalPosts": 48,
-  "posts": [
+
+  [
     {
       "postId": 128984387246923,
       "authorId": 128984387246925,
-      "authorNickname": "charlie_dev",
+      "authorNickname": "charlie_dev", // or null
+      "authorlastName": "alice",
+      "authorFirstName": "khalifa",
       "content": "Working on a new distributed system...",
-      "mediaIds": [1289843874657, 1289843872746],
+      "mediaIds": [1289843874657, 1289843872746], // or null
       "privacy": "public",
+      "allowedList": null,
       "createdAt": "2025-10-24T12:30:00Z",
       "updatedAt": "2025-10-24T12:30:00Z"
     },
@@ -794,14 +796,17 @@ No need for a request body.
       "postId": 128984387246922,
       "authorId": 128984387246925,
       "authorNickname": "charlie_dev",
+      "authorlastName": "alice",
+      "authorFirstName": "khalifa",
       "content": "Private note only visible to followers.",
       "mediaIds": [1289843872746],
-      "privacy": "followers",
+      "privacy": "restricted",
+      "allowedList": [128984387246925, 128984387246925], // or null if the privacy not restricted
       "createdAt": "2025-10-23T17:05:00Z",
       "updatedAt": "2025-10-23T17:05:00Z"
     }
   ]
-}
+
 ```
 
 ---
@@ -815,7 +820,7 @@ No need for a request body.
 ```json
 {
   "content": "Great post! Learned a lot.",
-  "mediaIds": [901, 902]   // optional, array of uploaded media IDs
+  "mediaIds": [1289843874657, 1289843872746]   // optional, array of uploaded media IDs
 }
 ```
 
@@ -824,9 +829,9 @@ No need for a request body.
 ``` json
 {
   "message": "Comment added successfully.",
-  "commentId": 501,
-  "postId": 101,
-  "authorId": 42,
+  "commentId": 34567865443567,
+  "postId": 6754524645542645,
+  "authorId": 654657658768678764,
   "content": "Great post! Learned a lot.",
   "mediaIds": [1289843874657, 1289843872746],
   "createdAt": "2025-10-24T20:45:00Z",
@@ -841,6 +846,13 @@ No need for a request body.
 
 ***status code in success: 200***
 
+|Parameter| Type| Description|
+|----------|-------|--------------|
+|page| integer| Page number (default = 1)|
+|limit| integer| Number of items per page (default = 20)|
+
+> - Note⚠️: check the limit before using it.
+
 - request
 
 ```json
@@ -850,32 +862,31 @@ No need for a request body.
 - response payload
 
 ``` json
-{
-  "postId": 101,
-  "page": 1,
-  "limit": 20,
-  "totalComments": 12,
-  "comments": [
+ [
     {
-      "commentId": 501,
-      "authorId": 42,
+      "commentId": 43765876897987,
+      "authorId": 787598687987987,
       "authorNickname": "devops_mehdi",
+      "authorlastName": "alice",
+      "authorFirstName": "khalifa",
       "content": "Great post! Learned a lot.",
       "mediaIds": [23456789876567],
       "createdAt": "2025-10-24T20:45:00Z",
       "updatedAt": "2025-10-24T20:45:00Z"
     },
     {
-      "commentId": 502,
-      "authorId": 55,
+      "commentId": 879875987698998,
+      "authorId": 787989968686,
       "authorNickname": "charlie_dev",
+      "authorlastName": "alice",
+      "authorFirstName": "khalifa",
       "content": "Thanks for sharing!",
-      "mediaIds": [],
+      "mediaIds": null,
       "createdAt": "2025-10-24T21:10:00Z",
       "updatedAt": "2025-10-24T21:10:00Z"
     }
   ]
-}
+
 ```
 
 ---
@@ -946,7 +957,7 @@ No need for a request body.
 
 ---
 
-<!-- ### POST `/api/v1/posts/:post_id/share` => share/repost todo: later
+<!-- ### POST `/api/v1/posts/:post_id/share` => share/repost
 
 ***status code in success: 200***
 
@@ -999,8 +1010,8 @@ No need for a request body.
 ``` json
 {
   "message": "Media uploaded successfully.",
-  "mediaId": 789,
-  "mediaPath": "/media/uploads/789_avatar.png",
+  "mediaId": 4576543456789,
+  "mediaPath": "/media/uploads/4576543456789_avatar.png",
   "fileType": "image/png",
   "uploadedAt": "2025-10-24T22:30:00Z"
 }
@@ -1042,7 +1053,7 @@ No need for a request body.
 ``` json
 {
   "message": "Media deleted successfully.",
-  "mediaId": 789
+  "mediaId": 4567890985745
 }
 
 ```
@@ -1071,8 +1082,8 @@ No need for a request body.
 ``` json
 {
   "message": "Group created successfully.",
-  "groupId": 101,
-  "creatorId": 42,
+  "groupId": 865435678765435,
+  "creatorId": 456789087654678,
   "title": "Go Developers",
   "description": "A group for sharing Go programming tips and projects.",
   "avatarId": 657543234567865, // optinal
@@ -1093,8 +1104,8 @@ No need for a request body.
 
 ``` json
 {
-  "groupId": 101,
-  "creatorId": 42,
+  "groupId": 34567897656789,
+  "creatorId": 45678987654678,
   "title": "Go Developers",
   "description": "A group for sharing Go programming tips and projects.",
   "memberCount": 25,
@@ -1107,7 +1118,7 @@ No need for a request body.
 
 ---
 
-### PUT `/api/v1/groups/:group_id` => update group (owner/moderator)
+### PATCH `/api/v1/groups/:group_id` => update group (owner/moderator)
 
 ***status code in success: 200***
 
@@ -1115,8 +1126,8 @@ No need for a request body.
 
 ```json
 {
-  "title": "Advanced Go Developers",
-  "description": "A group for advanced Go programming discussions and projects.",
+  "title": "Advanced Go Developers", // optinal
+  "description": "A group for advanced Go programming discussions and projects.", // optinal
   "avatarId": 657543234567865 // optinal
 
 }
@@ -1127,7 +1138,7 @@ No need for a request body.
 ``` json
 {
   "message": "Group updated successfully.",
-  "groupId": 101,
+  "groupId": 324567865435678,
   "title": "Advanced Go Developers",
   "description": "A group for advanced Go programming discussions and projects.",
   "avatarId": 657543234567865, // optinal
@@ -1153,7 +1164,7 @@ No need for a request body.
 ``` json
 {
   "message": "Group deleted successfully.",
-  "groupId": 101
+  "groupId": 456789087657890
 }
 
 ```
@@ -1163,6 +1174,51 @@ No need for a request body.
 ### GET `/api/v1/groups` => browse/search groups
 
 ***status code in success: 200***
+
+|Parameter| Type| Description|
+|----------|-------|--------------|
+|page| integer| Page number (default = 1)|
+|limit| integer| Number of items per page (default = 20)|
+
+> - Note⚠️: check the limit before using it.
+
+- request
+
+```json
+No need for a request body.
+```
+
+- response payload
+
+``` json
+ [
+    {
+      "groupId": 345678908765,
+      "title": "Go Developers",
+      "description": "A group for sharing Go programming tips and projects.",
+      "avatarId": 657543234567865, // optinal
+      "creatorId": 567890987654,
+      "memberCount": 456789098765,
+      "createdAt": "2025-10-24T23:15:00Z"
+    },
+    {
+      "groupId": 6574876987567647,
+      "title": "Advanced Go",
+      "description": "Advanced topics and projects in Go.",
+      "avatarId": 657543234567865, // optinal
+      "creatorId": 766587689658658,
+      "memberCount": 76876876846876,
+      "createdAt": "2025-10-24T23:45:00Z"
+    }
+  ]
+
+```
+
+---
+
+### POST `/api/v1/groups/:group_id/invite/:user_id` => invite user to group
+
+***status code in success: 201***
 
 - request
 
@@ -1174,53 +1230,9 @@ No need for a request body.
 
 ``` json
 {
-  "limit": 20,
-  "totalGroups": 48,
-  "groups": [
-    {
-      "groupId": 101,
-      "title": "Go Developers",
-      "description": "A group for sharing Go programming tips and projects.",
-      "avatarId": 657543234567865, // optinal
-      "creatorId": 42,
-      "memberCount": 25,
-      "createdAt": "2025-10-24T23:15:00Z"
-    },
-    {
-      "groupId": 102,
-      "title": "Advanced Go",
-      "description": "Advanced topics and projects in Go.",
-      "avatarId": 657543234567865, // optinal
-      "creatorId": 55,
-      "memberCount": 12,
-      "createdAt": "2025-10-24T23:45:00Z"
-    }
-  ]
-}
-
-```
-
----
-
-### POST `/api/v1/groups/:group_id/invite` => invite user to group
-
-***status code in success: 201***
-
-- request
-
-```json
-{
-  "userId": 55
-}
-```
-
-- response payload
-
-``` json
-{
   "message": "User invited to group successfully.",
-  "groupId": 101,
-  "invitedUserId": 55,
+  "groupId": 56757876867876,
+  "invitedUserId": 76876980547648,
   "status": "pending",
   "createdAt": "2025-10-25T10:12:00Z"
 }
@@ -1244,7 +1256,7 @@ No need for a request body.
 ``` json
 {
   "message": "Join request submitted.",
-  "groupId": 101,
+  "groupId": 7686786787567678,
   "status": "pending"
 }
 
@@ -1267,8 +1279,8 @@ No need for a request body.
 ``` json
 {
   "message": "User has been added to the group.",
-  "groupId": 101,
-  "userId": 55,
+  "groupId": 658745768769784676,
+  "userId": 78768979585799966,
   "status": "accepted",
   "role": "member"
 }
@@ -1292,8 +1304,8 @@ No need for a request body.
 ``` json
 {
   "message": "Group join request declined.",
-  "groupId": 101,
-  "userId": 55,
+  "groupId": 787684563876876666,
+  "userId": 678674687686777777,
   "status": "declined"
 }
 
@@ -1305,6 +1317,14 @@ No need for a request body.
 
 ***status code in success: 200***
 
+|Parameter| Type| Description|
+|----------|-------|--------------|
+|page| integer| Page number (default = 1)|
+|limit| integer| Number of items per page (default = 20)|
+
+> - example of use: GET /api/v1/groups/:group_id/members?page=2&limit
+> - Note⚠️: check the limit before using it.
+
 - request
 
 ```json
@@ -1314,22 +1334,17 @@ No need for a request body.
 - response payload
 
 ``` json
-{
-  "group_id": 12,
-  "members": [
+
+  [
     {
-      "user_id": 101,
-      "full_name": "Example User",
+      "userId": 57687684648746,
+      "UserNickname": "charlie_dev",
+      "UserlastName": "alice",
       "role": "member",
-      "joined_at": "2025-10-24T13:40:00Z"
+      "joinedAt": "2025-10-24T13:40:00Z"
     }
-  ],
-  "pagination": {
-    "page": 1,
-    "limit": 25,
-    "total": 135
-  }
-}
+  ]
+
 ```
 
 ---
@@ -1346,8 +1361,8 @@ No need for a request body.
 {
   "title": "Weekly Study Meetup",
   "description": "Discussion about system design topics.",
-  "start_at": "2025-11-02T18:00:00Z",
-  "end_at": "2025-11-02T20:00:00Z",
+  "startAt": "2025-11-02T18:00:00Z",
+  "endAt": "2025-11-02T20:00:00Z",
   "location": "Group voice room"
 }
 ```
@@ -1356,15 +1371,15 @@ No need for a request body.
 
 ``` json
 {
-  "event_id": 987,
-  "group_id": 45,
+  "eventId": 65765764678564,
+  "groupId": 65768886543363,
   "title": "Weekly Study Meetup",
   "description": "Discussion about system design topics.",
-  "start_at": "2025-11-02T18:00:00Z",
-  "end_at": "2025-11-02T20:00:00Z",
+  "startAt": "2025-11-02T18:00:00Z",
+  "endAt": "2025-11-02T20:00:00Z",
   "location": "Group voice room",
-  "created_by": 123,
-  "created_at": "2025-10-26T12:33:10Z"
+  "createdBy": 67373777367373,
+  "createdAt": "2025-10-26T12:33:10Z"
 }
 
 ```
@@ -1375,34 +1390,39 @@ No need for a request body.
 
 ***status code in success: 200***
 
+|Parameter| Type| Description|
+|----------|-------|--------------|
+|page| integer| Page number (default = 1)|
+|limit| integer| Number of items per page (default = 20)|
+
+> - Note⚠️: check the limit before using it.
+
 - response payload
 
 ``` json
-{
-  "group_id": 45,
-  "events": [
+  [
     {
-      "event_id": 987,
+      "eventId": 7635676576587654,
       "title": "Weekly Study Meetup",
       "description": "Discussion about system design topics.",
-      "start_at": "2025-11-02T18:00:00Z",
-      "end_at": "2025-11-02T20:00:00Z",
+      "startAt": "2025-11-02T18:00:00Z",
+      "endAt": "2025-11-02T20:00:00Z",
       "location": "Group voice room",
-      "created_by": 123,
-      "created_at": "2025-10-26T12:33:10Z"
+      "createdBy": 674657536765756,
+      "createdAt": "2025-10-26T12:33:10Z"
     },
     {
-      "event_id": 988,
+      "eventId": 35673657657653,
       "title": "Reading Club",
       "description": "Chapter 3 & 4 deep dive.",
-      "start_at": "2025-11-05T18:00:00Z",
-      "end_at": "2025-11-05T19:30:00Z",
+      "startAt": "2025-11-05T18:00:00Z",
+      "endAt": "2025-11-05T19:30:00Z",
       "location": "Discord stage",
-      "created_by": 123,
-      "created_at": "2025-10-27T10:20:11Z"
+      "createdBy": 657567835675673,
+      "createdAt": "2025-10-27T10:20:11Z"
     }
   ]
-}
+
 
 ```
 
@@ -1416,18 +1436,15 @@ No need for a request body.
 
 ``` json
 {
-  "event_id": 987,
-  "group_id": 45,
+  "eventId": 76763576576577777,
+  "groupId": 56756373567373567,
   "title": "Weekly Study Meetup",
   "description": "Discussion about system design topics.",
-  "start_at": "2025-11-02T18:00:00Z",
-  "end_at": "2025-11-02T20:00:00Z",
+  "startAt": "2025-11-02T18:00:00Z",
+  "endAt": "2025-11-02T20:00:00Z",
   "location": "Group voice room",
-  "created_by": {
-    "user_id": 123,
-    "username": "sam_dev"
-  },
-  "created_at": "2025-10-26T12:33:10Z"
+  "createdBy": 657567835675673,
+  "createdAt": "2025-10-26T12:33:10Z"
 }
 
 ```
@@ -1480,17 +1497,23 @@ No need for a request body.
 
 ***status code in success: 200***
 
+|Parameter| Type| Description|
+|----------|-------|--------------|
+|last-conversation-id| integer| the last conversations id default 0|
+|limit| integer| Number of items per page (default = 20)|
+
+> - Note⚠️: check the limit before using it.
+
 - response payload
 
 ``` json
-{
-  "chats": [
+  [
     {
-      "chatId": 789,
+      "chatId": 5654635465465,
       "groupId": 2345678765456, // can be null
       "name": "John Doe",
       "lastMessage": {
-        "id": 4521,
+        "id": 654645645564,
         "text": "See you tomorrow!",
         "createdAt": "2025-10-26T12:45:00Z"
       },
@@ -1498,11 +1521,11 @@ No need for a request body.
       "updatedAt": "2025-10-26T12:45:00Z"
     },
     {
-      "chatId": 101,
+      "chatId": 5654654765756,
       "groupId": 8765456787656, // can be null
       "name": "DevOps Study Group",
       "lastMessage": {
-        "id": 9981,
+        "id": 456546456456,
         "text": "Server deployment successful.",
         "createdAt": "2025-10-26T09:32:10Z"
       },
@@ -1510,7 +1533,7 @@ No need for a request body.
       "updatedAt": "2025-10-26T09:32:10Z"
     }
   ]
-}
+
 
 ```
 
@@ -1520,28 +1543,31 @@ No need for a request body.
 
 ***status code in success: 200***
 
+|Parameter| Type| Description|
+|----------|-------|--------------|
+|last-message-id| integer| the last conversations id default 0|
+|limit| integer| Number of items per page (default = 20)|
+
+> - Note⚠️: check the limit before using it.
+
 - response payload
 
 ``` json
-{
-  "chatId": 789,
-  "page": 1,
-  "limit": 20,
-  "messages": [
+ [
     {
-      "messageId": 4521,
-      "senderId": 123,
+      "messageId": 564645654645,
+      "senderId": 456546456546,
       "text": "See you tomorrow!",
       "createdAt": "2025-10-26T12:45:00Z"
     },
     {
-      "messageId": 4520,
-      "senderId": 456,
+      "messageId": 6546567365454,
+      "senderId": 6456546455644,
       "text": "Okay cool.",
       "createdAt": "2025-10-26T12:44:10Z"
     }
   ]
-}
+
 
 ```
 
@@ -1563,9 +1589,9 @@ No need for a request body.
 
 ``` json
 {
-  "messageId": 9921,
-  "chatId": 789,
-  "senderId": 123,
+  "messageId": 6345476657563765,
+  "chatId": 454576457457457,
+  "senderId": 754574574574574,
   "text": "Hello, how are you?",
   "createdAt": "2025-10-26T13:15:22Z"
 }
@@ -1605,25 +1631,23 @@ No need for a request body.
 - response payload
 
 ``` json
-{
-  "chatId": 789,
-  "participants": [
+  [
     {
-      "userId": 123,
+      "userId": 5464574574545,
       "username": "alice_dev",
       "role": "owner",
-      "lastSeenMessageId": 4521,
+      "lastSeenMessageId": 457645674566546,
       "unreadCount": 0
     },
     {
-      "userId": 456,
+      "userId": 456745645645745,
       "username": "bob_ops",
       "role": "member",
-      "lastSeenMessageId": 4519,
+      "lastSeenMessageId": 4574576457474744,
       "unreadCount": 2
     }
   ]
-}
+
 
 ```
 
@@ -1637,7 +1661,6 @@ No need for a request body.
 
 > - example of use: GET /api/v1/notifications?page=2&limit=10&read=unread
 
-
 |Parameter| Type| Description|
 |----------|-------|--------------|
 |page| integer| Page number (default = 1)|
@@ -1650,28 +1673,25 @@ No need for a request body.
 - response payload
 
 ``` json
-{
-  "page": 1,
-  "limit": 20,
-  "notifications": [
+ [
     {
-      "notificationId": 987,
+      "notificationId": 457547457457457,
       "type": "follow_request",
-      "referenceId": 123,
+      "referenceId": 4745745547568565,
       "content": "Alice has sent you a follow request.",
       "read": "unread",
       "createdAt": "2025-10-26T12:55:00Z"
     },
     {
-      "notificationId": 988,
+      "notificationId": 4324278547856,
       "type": "post_liked",
-      "referenceId": 4521,
+      "referenceId": 452657356573661,
       "content": "Bob liked your post.",
       "read": "read",
       "createdAt": "2025-10-26T11:45:00Z"
     }
   ]
-}
+
 
 ```
 
@@ -1745,29 +1765,32 @@ No need for a request body.
 
 ***status code in success: 200***
 
+|Parameter| Type| Description|
+|----------|-------|--------------|
+|page| integer| Page number (default = 1)|
+|limit| integer| Number of items per page (default = 20)|
+
+> - Note⚠️: check the limit before using it.
+
 - response payload
 
 ``` json
-{
-  "query": "keyword",
-  "type": "users",
-  "results": [
+ [
     {
-      "id": 123,
+      "id": 4657634346334,
       "username": "alice_dev",
       "firstName": "Alice",
       "lastName": "Smith",
-      "avatarPath": "/media/avatars/1289843874339.png"
+      "avatarId": 32456788986756444
     },
     {
-      "id": 456,
+      "id": 43646547547547456,
       "username": "bob_ops",
       "firstName": "Bob",
       "lastName": "Johnson",
-      "avatarPath": "/media/avatars/1289843874340.png"
+      "avatarId": 32456788986756446
     }
   ]
-}
 
 ```
 

@@ -132,11 +132,6 @@ func (v *RegisterRequestJson) Validate() (bool, string) {
 			return false, str
 		}
 	}
-	// if v.AvatarId != nil {
-	// 	if !utils.IdValidation(*v.AvatarId) {
-	// 		return false, "invalid int64 id"
-	// 	}
-	// }
 	return true, "OK"
 }
 

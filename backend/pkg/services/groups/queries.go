@@ -7,7 +7,7 @@ const (
 		SELECT creator_id FROM groups WHERE id = ?
 	`
 	SELECT_GROUP_BY_GROUP_ID = `
-		SELECT id, creator_id, title, description, avatar_media_id, created_at, updated_at
+		SELECT id, creator_id, title, description, avatar_id, created_at, updated_at
 		FROM groups
 		WHERE id = ?;
 	`
@@ -41,7 +41,7 @@ const (
 	`
 
 	SELECT_BROWSE_GROUPS = `
-		SELECT id, title, description, avatar_media_id, creator_id, created_at
+		SELECT id, title, description, avatar_id, creator_id, created_at
 		FROM groups
 		WHERE id < ?
 		ORDER BY created_at DESC
@@ -85,9 +85,9 @@ const (
 
 const (
 	INSERT_GROUP_BY_USER_ID = `
-		INSERT INTO groups (id, creator_id, title, description, avatar_media_id)
+		INSERT INTO groups (id, creator_id, title, description, avatar_id)
 		VALUES (?, ?, ?, ?, ?)
-		RETURNING id, creator_id, title, description, avatar_media_id, created_at, updated_at;
+		RETURNING id, creator_id, title, description, avatar_id, created_at, updated_at;
 	`
 	INSERT_GROUP_MEMBER_BY_GROUP_ID = `
 		INSERT INTO group_members (group_id, user_id, status, role)
@@ -120,9 +120,9 @@ const (
 const (
 	UPDATE_GROUP_BY_ID = `
 		UPDATE groups
-		SET title = ?, description = ?, avatar_media_id = ?, updated_at = CURRENT_TIMESTAMP
+		SET title = ?, description = ?, avatar_id = ?, updated_at = CURRENT_TIMESTAMP
 		WHERE id = ?
-		RETURNING id, title, description, avatar_media_id, updated_at;
+		RETURNING id, title, description, avatar_id, updated_at;
 	`
 
 	UPDATE_GROUP_MEMBER_STATUS = `
