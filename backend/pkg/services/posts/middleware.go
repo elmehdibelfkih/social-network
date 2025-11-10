@@ -146,7 +146,6 @@ func UserPostsViewMiddleware(next http.HandlerFunc) http.HandlerFunc {
 			utils.ForbiddenError(w, "You don't have permission to view this user's posts")
 			return
 		}
-
 		next(w, r)
 	}
 }

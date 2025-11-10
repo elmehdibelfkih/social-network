@@ -10,6 +10,7 @@ import (
 	follow "social/pkg/services/followers"
 	"social/pkg/services/groups"
 	"social/pkg/services/media"
+	"social/pkg/services/posts"
 	"social/pkg/services/users"
 	"social/pkg/utils"
 )
@@ -76,13 +77,12 @@ func SocialMux() *router.Router {
 	socialMux.HandleFunc("PATCH", "/api/v1/users/{user_id}/privacy", utils.MiddlewareChain(users.PatchProfile, middleware.AuthMiddleware))
 	socialMux.HandleFunc("GET", "/api/v1/users/{user_id}/stats", utils.MiddlewareChain(users.GetStats, middleware.AuthMiddleware))
 
-
 	// Posts
 	socialMux.HandleFunc("POST", "/api/v1/posts", utils.MiddlewareChain(posts.HandleCreatePost, middleware.UserContext, middleware.AuthMiddleware))
 	socialMux.HandleFunc("GET", "/api/v1/posts/{post_id}", utils.MiddlewareChain(posts.HandleGetPost, middleware.UserContext, middleware.AuthMiddleware, posts.PostViewMiddleware))
 	socialMux.HandleFunc("PUT", "/api/v1/posts/{post_id}", utils.MiddlewareChain(posts.HandleUpdatePost, middleware.UserContext, middleware.AuthMiddleware, posts.PostEditMiddleware))
 	socialMux.HandleFunc("DELETE", "/api/v1/posts/{post_id}", utils.MiddlewareChain(posts.HandleDeletePost, middleware.UserContext, middleware.AuthMiddleware, posts.PostDeleteMiddleware))
-	socialMux.HandleFunc("GET", "/api/v1/users/{user_id}/posts",utils.MiddlewareChain(posts.HandleGetUserPosts, middleware.UserContext, middleware.AuthMiddleware, posts.UserPostsViewMiddleware))
+	socialMux.HandleFunc("GET", "/api/v1/users/{user_id}/posts", utils.MiddlewareChain(posts.HandleGetUserPosts, middleware.UserContext, middleware.AuthMiddleware, posts.UserPostsViewMiddleware))
 
 	// Comments
 	socialMux.HandleFunc("POST", "/api/v1/posts/{post_id}/comments", utils.MiddlewareChain(posts.HandleCreateComment, middleware.UserContext, middleware.AuthMiddleware, posts.CommentViewMiddleware))
@@ -92,7 +92,6 @@ func SocialMux() *router.Router {
 	// Reactions
 	socialMux.HandleFunc("POST", "/api/v1/posts/{post_id}/like", utils.MiddlewareChain(posts.HandleLikePost, middleware.UserContext, middleware.AuthMiddleware, posts.PostViewMiddleware))
 	socialMux.HandleFunc("DELETE", "/api/v1/posts/{post_id}/like", utils.MiddlewareChain(posts.HandleUnlikePost, middleware.UserContext, middleware.AuthMiddleware, posts.PostViewMiddleware))
-
 
 	return socialMux
 }
