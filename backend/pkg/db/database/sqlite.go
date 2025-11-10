@@ -21,11 +21,15 @@ const COMMENTS_ENTITY_NAME = "comments"
 const REACTIONS_ENTITY_NAME = "reactions"
 const SHARSE_ENTITY_TYPE = "shares"
 
+const ACTION_INCREMENT = "increment"
+const ACTION_DECREMENT = "decrement"
+
+
 type DBCounter struct {
 	CounterName string
 	EntityType  string
 	EntityID    int64
-	Action      string //++ or --
+	Action      string //++ or --	
 }
 
 const UPDATE_COUNT = `

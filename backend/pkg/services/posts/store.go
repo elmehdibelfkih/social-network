@@ -3,10 +3,11 @@ package posts
 import (
 	"database/sql"
 	"fmt"
+	"time"
+
 	"social/pkg/config"
 	"social/pkg/db/database"
 	"social/pkg/utils"
-	"time"
 
 	"github.com/mattn/go-sqlite3"
 )
@@ -31,6 +32,28 @@ func CreatePost(post *Post) error {
 			utils.SQLiteErrorTarget(err, "CreatePost")
 			return fmt.Errorf("failed to create post: %w", err)
 		}
+
+		// Increment posts_count
+		if err := database.UpdateCounter(tx, database.DBCounter{
+			CounterName: database.POSTS_ENTITY_NAME,
+			EntityType:  database.USER_ENTITY_TYPE,
+			EntityID:    post.AuthorID,
+			Action:      database.ACTION_INCREMENT,
+		}); err != nil {
+			return err
+		}
+
+		if post.GroupID != nil {
+			if err := database.UpdateCounter(tx, database.DBCounter{
+				CounterName: database.POSTS_ENTITY_NAME,
+				EntityType:  database.GROUP_ENTITY_TYPE,
+				EntityID:    *post.GroupID,
+				Action:      database.ACTION_INCREMENT,
+			}); err != nil {
+				return err
+			}
+		}
+
 		return nil
 	})
 	return err
@@ -82,14 +105,19 @@ func UpdatePost(postID, authorID int64, content, privacy string, updatedAt time.
 // DeletePost deletes a post by ID and author ID
 func DeletePost(postID, authorID int64) error {
 	err := database.WrapWithTransaction(func(tx *sql.Tx) error {
-		// Delete post media associations
-		_, err := tx.Exec(QUERY_DELETE_POST_MEDIA, postID)
+		post, err := GetPostByID(postID)
 		if err != nil {
 			utils.SQLiteErrorTarget(err, "DeletePost (delete media)")
 			return err
 		}
 
-		// Delete allowed viewers
+		// Delete post media associations
+		_, err = tx.Exec(QUERY_DELETE_POST_MEDIA, postID)
+		if err != nil {
+			utils.SQLiteErrorTarget(err, "DeletePost (delete media)")
+			return err
+		}
+
 		_, err = tx.Exec(QUERY_DELETE_POST_ALLOWED_VIEWERS, postID)
 		if err != nil {
 			utils.SQLiteErrorTarget(err, "DeletePost (delete allowed viewers)")
@@ -110,6 +138,27 @@ func DeletePost(postID, authorID int64) error {
 
 		if rowsAffected == 0 {
 			return sql.ErrNoRows
+		}
+
+		// Decrement posts_count
+		if err := database.UpdateCounter(tx, database.DBCounter{
+			CounterName: database.POSTS_ENTITY_NAME,
+			EntityType:  database.USER_ENTITY_TYPE,
+			EntityID:    post.AuthorID,
+			Action:      database.ACTION_DECREMENT,
+		}); err != nil {
+			return err
+		}
+
+		if post.GroupID != nil {
+			if err := database.UpdateCounter(tx, database.DBCounter{
+				CounterName: database.POSTS_ENTITY_NAME,
+				EntityType:  database.GROUP_ENTITY_TYPE,
+				EntityID:    *post.GroupID,
+				Action:      database.ACTION_DECREMENT,
+			}); err != nil {
+				return err
+			}
 		}
 
 		return nil
@@ -251,6 +300,27 @@ func CreateComment(comment *Comment) error {
 			utils.SQLiteErrorTarget(err, "CreateComment")
 			return fmt.Errorf("failed to create comment: %w", err)
 		}
+
+		// Increment post's comments_count
+		if err := database.UpdateCounter(tx, database.DBCounter{
+			CounterName: database.COMMENTS_ENTITY_NAME,
+			EntityType:  database.POST_ENTITY_TYPE,
+			EntityID:    comment.PostID,
+			Action:      database.ACTION_INCREMENT,
+		}); err != nil {
+			return err
+		}
+
+		// Increment user's comments_count
+		if err := database.UpdateCounter(tx, database.DBCounter{
+			CounterName: database.COMMENTS_ENTITY_NAME,
+			EntityType:  database.USER_ENTITY_TYPE,
+			EntityID:    comment.AuthorID,
+			Action:      database.ACTION_INCREMENT,
+		}); err != nil {
+			return err
+		}
+
 		return nil
 	})
 	return err
@@ -279,22 +349,50 @@ func GetCommentByID(commentID int64) (*Comment, error) {
 
 // DeleteComment deletes a comment
 func DeleteComment(commentID, authorID int64) error {
-	result, err := config.DB.Exec(QUERY_DELETE_COMMENT, commentID, authorID)
-	if err != nil {
-		utils.SQLiteErrorTarget(err, "DeleteComment")
-		return fmt.Errorf("failed to delete comment: %w", err)
-	}
+	err := database.WrapWithTransaction(func(tx *sql.Tx) error {
+		comment, err := GetCommentByID(commentID)
+		if err != nil {
+			utils.SQLiteErrorTarget(err, "GET in DeleteComment")
+			return fmt.Errorf("failed to delete comment: %w", err)
+		}
 
-	rowsAffected, err := result.RowsAffected()
-	if err != nil {
-		return err
-	}
+		result, err := tx.Exec(QUERY_DELETE_COMMENT, commentID, authorID)
+		if err != nil {
+			utils.SQLiteErrorTarget(err, "DeleteComment")
+			return fmt.Errorf("failed to delete comment: %w", err)
+		}
 
-	if rowsAffected == 0 {
-		return sql.ErrNoRows
-	}
+		rowsAffected, err := result.RowsAffected()
+		if err != nil {
+			return err
+		}
 
-	return nil
+		if rowsAffected == 0 {
+			return sql.ErrNoRows
+		}
+
+		// Increment post's comments_count
+		if err := database.UpdateCounter(tx, database.DBCounter{
+			CounterName: database.COMMENTS_ENTITY_NAME,
+			EntityType:  database.POST_ENTITY_TYPE,
+			EntityID:    comment.PostID,
+			Action:      database.ACTION_DECREMENT,
+		}); err != nil {
+			return err
+		}
+
+		// Increment user's comments_count
+		if err := database.UpdateCounter(tx, database.DBCounter{
+			CounterName: database.COMMENTS_ENTITY_NAME,
+			EntityType:  database.USER_ENTITY_TYPE,
+			EntityID:    comment.AuthorID,
+			Action:      database.ACTION_DECREMENT,
+		}); err != nil {
+			return err
+		}
+		return nil
+	})
+	return err
 }
 
 // GetPostComments retrieves comments for a post with pagination

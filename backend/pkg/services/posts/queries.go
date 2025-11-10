@@ -33,9 +33,9 @@ const (
 	`
 
 	QUERY_COUNT_USER_POSTS = `
-		SELECT COUNT(*)
-		FROM posts
-		WHERE author_id = ?;
+		SELECT posts_count
+		FROM counters
+		WHERE entity_id = ? && entity_type = user;
 	`
 
 	QUERY_GET_AUTHOR_NICKNAME = `
@@ -168,4 +168,10 @@ const (
 		FROM users
 		WHERE id = ?;
 	`
+	// count queries
+	QUERY_CREATE_COUNTERS_ENTITY = `
+		INSERT INTO counters (entity_type, entity_id, reaction, created_at, updated_at)
+		VALUES (?, ?, ?, ?, ?);
+	`
+
 )
