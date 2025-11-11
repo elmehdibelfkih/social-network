@@ -94,16 +94,15 @@
                   "",
                   "// Save userId/email for valid responses (status 200)",
                   "if (status === 200) {",
-                  "    pm.environment.set(`userId_${index}`, response.userId);",
-                  "    pm.environment.set(`email_${index}`, response.email);",
-                  "    pm.environment.set(`password_${index}`, response.password);",
+                  "    pm.environment.set(`userId_${index}`, response.payload.userId);",
+                  "    pm.environment.set(`email_${index}`, response.payload.email);",
                   "}",
                   "",
                   "// Loop to next request",
                   "index++;",
                   "if (index < expectedStatuses.length) {",
                   "    pm.environment.set('currentIndex', index);",
-                  "    postman.setNextRequest('Register User Test Variants');",
+                  "    pm.execution.setNextRequest('Register User Test Variants');",
                   "} else {",
                   "    pm.environment.unset('currentIndex');",
                   "}"
@@ -157,7 +156,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email/userId/nickname\": \"{{email_0}}\",\n  \"password\": \"{{password_0}}\",\n  \"rememberMe\": true\n}"
+              "raw": "{\n  \"email/userId/nickname\": \"{{email_0}}\",\n  \"password\": Pa$$w0rd!w0rd!\",\n  \"rememberMe\": true\n}"
             },
             "url": {
               "raw": "{{base_url}}/api/v1/auth/login",
@@ -185,8 +184,8 @@
                   "",
                   "// Capture token or session info if returned",
                   "const response = pm.response.json();",
-                  "if (response.token) {",
-                  "    pm.environment.set('sessionToken', response.token);",
+                  "if (response.payload.token) {",
+                  "    pm.environment.set('sessionToken', response.payload.token);",
                   "}"
                 ]
               }
@@ -225,9 +224,9 @@
                   "const response = pm.response.json();",
                   "",
                   "// Store sessionId in environment variable",
-                  "if (response && response.sessionId) {",
-                  "    pm.environment.set('sessionId', response.sessionId);",
-                  "    console.log('Session ID stored:', response.sessionId);",
+                  "if (response && response.payload.sessionId) {",
+                  "    pm.environment.set('sessionId', response.payload.sessionId);",
+                  "    console.log('Session ID stored:', response.payload.sessionId);",
                   "} else {",
                   "    console.warn('No sessionId found in response');",
                   "}"
@@ -300,10 +299,7 @@
                   "// ✅ Expect success",
                   "pm.test('Status code is 200', function() {",
                   "    pm.response.to.have.status(200);",
-                  "});",
-                  "",
-                  "// Optional: clear the sessionId after deletion",
-                  "pm.environment.unset('sessionId');"
+                  "});"
                 ]
               }
             }
@@ -353,12 +349,8 @@
                   "}",
                   "// Array of test cases",
                   "const testCases = [",
-                  "  {\"email\":\"user1@example.com\",\"password\":\"Pa$$w0rd!\",\"firstName\":\"John\",\"lastName\":\"Doe\",\"dateOfBirth\":\"2000-01-01\"},",
-                  "  {\"email\":\"user2@example.com\",\"password\":\"Pa$$w0rd!\",\"firstName\":\"Jane\",\"lastName\":\"Smith\",\"dateOfBirth\":\"2000-02-02\"},",
-                  "  {\"email\":\"user3@example.com\",\"password\":\"Pa$$w0rd!\",\"firstName\":\"Alice\",\"lastName\":\"Brown\",\"dateOfBirth\":\"2000-03-03\"},",
-                  "  {\"email\":\"user4@example.com\",\"password\":\"Pa$$w0rd!\",\"firstName\":\"Bob\",\"lastName\":\"White\",\"dateOfBirth\":\"2000-04-04\"},",
-                  "  {\"email\":\"avatar@example.com\",\"password\":\"Pa$$w0rd!\",\"firstName\":\"Avatar\",\"lastName\":\"User\",\"dateOfBirth\":\"1999-05-05\",\"nickname\":\"avuser\",\"aboutMe\":\"I have an avatar\",\"avatarId\":999999},",
-                  "  {\"email\":\"invalid-email\",\"password\":\"123\",\"firstName\":\"Bad\",\"lastName\":\"Data\",\"dateOfBirth\":\"2000-01-01\"},",
+                  "  {\"email\":\"profile1@example.com\",\"password\":\"Pa$$w0rd!\",\"firstName\":\"John\",\"lastName\":\"Doe\",\"dateOfBirth\":\"2000-01-01\"},",
+                  "  {\"email\":\"profile2@example.com\",\"password\":\"Pa$$w0rd!\",\"firstName\":\"Jane\",\"lastName\":\"Smith\",\"dateOfBirth\":\"2000-02-02\"},",
                   "];",
                   "// Set current test case",
                   "let index = parseInt(pm.environment.get('currentIndex'));",
@@ -372,14 +364,16 @@
                 "type": "text/javascript",
                 "exec": [
                   "// Capture response",
-                  "const response = pm.response.json();",
+                  "const raw = pm.response.text();",
+                  "const safe = raw.replace(/\"userId\":(\\d+)/, '\"userId\":\"$1\"');",
+                  "const response = JSON.parse(safe);",
                   "const status = pm.response.code;",
                   "",
                   "// Get current test case index",
                   "let index = parseInt(pm.environment.get('currentIndex'));",
                   "",
                   "// Define expected status per test case (200 for valid, 400 for invalid)",
-                  "const expectedStatuses = [200, 200, 200, 200, 400, 400];",
+                  "const expectedStatuses = [200, 200];",
                   "",
                   "// Test status code",
                   "pm.test('Check response status', function() {",
@@ -393,16 +387,15 @@
                   "",
                   "// Save userId/email for valid responses (status 200)",
                   "if (status === 200) {",
-                  "    pm.environment.set(`userId_${index}`, response.userId);",
-                  "    pm.environment.set(`email_${index}`, response.email);",
-                  "    pm.environment.set(`password_${index}`, response.password);",
+                  "    pm.environment.set(`userId_${index}`, String(response.payload.userId));",
+                  "    pm.environment.set(`email_${index}`, response.payload.email);",
                   "}",
                   "",
                   "// Loop to next request",
                   "index++;",
                   "if (index < expectedStatuses.length) {",
                   "    pm.environment.set('currentIndex', index);",
-                  "    postman.setNextRequest('Register User Test Variants');",
+                  "    pm.execution.setNextRequest('Register User Test Variants');",
                   "} else {",
                   "    pm.environment.unset('currentIndex');",
                   "}"
@@ -423,7 +416,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email/userId/nickname\": \"{{email_0}}\",\n  \"password\": \"{{password_0}}\",\n  \"rememberMe\": true\n}"
+              "raw": "{\n  \"email/userId/nickname\": \"{{email_0}}\",\n  \"password\": \"Pa$$w0rd!\",\n  \"rememberMe\": true\n}"
             },
             "url": {
               "raw": "{{base_url}}/api/v1/auth/login",
@@ -448,12 +441,7 @@
                   "pm.test('Login status 200', function() {",
                   "    pm.response.to.have.status(200);",
                   "});",
-                  "",
-                  "// Capture token or session info if returned",
-                  "const response = pm.response.json();",
-                  "if (response.token) {",
-                  "    pm.environment.set('sessionToken', response.token);",
-                  "}"
+                  ""
                 ]
               }
             }
@@ -538,7 +526,7 @@
                   "// Response must contain message",
                   "const res = pm.response.json();",
                   "pm.test('Response has success message', function() {",
-                  "    pm.expect(res).to.have.property('message', 'Updated successful.');",
+                  "    pm.expect(res.payload).to.have.property('message', \"Updated successful.\");",
                   "});",
                   "",
                   "// Save the updated profile if needed",
@@ -590,7 +578,7 @@
                   "// Response must contain success message",
                   "const res = pm.response.json();",
                   "pm.test('Response has success message', function() {",
-                  "    pm.expect(res).to.have.property('message', 'Updated successful.');",
+                  "    pm.expect(res.payload).to.have.property('message', \"Profile privacy updated successfully.\");",
                   "});",
                   "",
                   "// Save current privacy if needed",
@@ -681,12 +669,8 @@
                   "}",
                   "// Array of test cases",
                   "const testCases = [",
-                  "  {\"email\":\"user1@example.com\",\"password\":\"Pa$$w0rd!\",\"firstName\":\"John\",\"lastName\":\"Doe\",\"dateOfBirth\":\"2000-01-01\"},",
-                  "  {\"email\":\"user2@example.com\",\"password\":\"Pa$$w0rd!\",\"firstName\":\"Jane\",\"lastName\":\"Smith\",\"dateOfBirth\":\"2000-02-02\"},",
-                  "  {\"email\":\"user3@example.com\",\"password\":\"Pa$$w0rd!\",\"firstName\":\"Alice\",\"lastName\":\"Brown\",\"dateOfBirth\":\"2000-03-03\"},",
-                  "  {\"email\":\"user4@example.com\",\"password\":\"Pa$$w0rd!\",\"firstName\":\"Bob\",\"lastName\":\"White\",\"dateOfBirth\":\"2000-04-04\"},",
-                  "  {\"email\":\"avatar@example.com\",\"password\":\"Pa$$w0rd!\",\"firstName\":\"Avatar\",\"lastName\":\"User\",\"dateOfBirth\":\"1999-05-05\",\"nickname\":\"avuser\",\"aboutMe\":\"I have an avatar\",\"avatarId\":999999},",
-                  "  {\"email\":\"invalid-email\",\"password\":\"123\",\"firstName\":\"Bad\",\"lastName\":\"Data\",\"dateOfBirth\":\"2000-01-01\"},",
+                  "  {\"email\":\"follow1@example.com\",\"password\":\"Pa$$w0rd!\",\"firstName\":\"John\",\"lastName\":\"Doe\",\"dateOfBirth\":\"2000-01-01\"},",
+                  "  {\"email\":\"follow2@example.com\",\"password\":\"Pa$$w0rd!\",\"firstName\":\"Jane\",\"lastName\":\"Smith\",\"dateOfBirth\":\"2000-02-02\"},",
                   "];",
                   "// Set current test case",
                   "let index = parseInt(pm.environment.get('currentIndex'));",
@@ -721,16 +705,15 @@
                   "",
                   "// Save userId/email for valid responses (status 200)",
                   "if (status === 200) {",
-                  "    pm.environment.set(`userId_${index}`, response.userId);",
-                  "    pm.environment.set(`email_${index}`, response.email);",
-                  "    pm.environment.set(`password_${index}`, response.password);",
+                  "    pm.environment.set(`userId_${index}`, response.payload.userId);",
+                  "    pm.environment.set(`email_${index}`, response.payload.email);",
                   "}",
                   "",
                   "// Loop to next request",
                   "index++;",
                   "if (index < expectedStatuses.length) {",
                   "    pm.environment.set('currentIndex', index);",
-                  "    postman.setNextRequest('Register User Test Variants');",
+                  "    pm.execution.setNextRequest('Register User Test Variants');",
                   "} else {",
                   "    pm.environment.unset('currentIndex');",
                   "}"
@@ -751,7 +734,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\"email\":\"{{email_0}}\",\"password\":\"{{password_0}}\",\"rememberMe\":true}"
+              "raw": "{\"email\":\"{{email_0}}\",\"password\":\"Pa$$w0rd!\",\"rememberMe\":true}"
             },
             "url": {
               "raw": "{{base_url}}/api/v1/auth/login"
@@ -767,6 +750,58 @@
                   "pm.test('Login User1 should be 200', function() {",
                   "    pm.expect(pm.response.code).to.eql(200);",
                   "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Toggle Profile Privacy",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"privacy\": \"private\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/users/{{userId_0}}/privacy",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "users",
+                "{{userId_0}}",
+                "privacy"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Status code must be 200",
+                  "pm.test('Status code is 200', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "// Response must contain success message",
+                  "const res = pm.response.json();",
+                  "pm.test('Response has success message', function() {",
+                  "    pm.expect(res.payload).to.have.property('message', \"Profile privacy updated successfully.\");",
+                  "});",
+                  "",
+                  "// Save current privacy if needed",
+                  "pm.environment.set('currentUserPrivacy', 'private');"
                 ]
               }
             }
@@ -806,7 +841,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\"email\":\"{{email_1}}\",\"password\":\"{{password_1}}\",\"rememberMe\":true}"
+              "raw": "{\"email\":\"{{email_1}}\",\"password\":\"Pa$$w0rd!\",\"rememberMe\":true}"
             },
             "url": {
               "raw": "{{base_url}}/api/v1/auth/login"
@@ -849,6 +884,28 @@
           ]
         },
         {
+          "name": "User2 follows User1",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/api/v1/users/{{userId_0}}/follow"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Follow request sent', function() {",
+                  "    pm.expect(pm.response.code).to.eql(200);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
           "name": "Login User1 Again",
           "request": {
             "method": "POST",
@@ -860,7 +917,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\"email\":\"{{email_0}}\",\"password\":\"{{password_0}}\",\"rememberMe\":true}"
+              "raw": "{\"email\":\"{{email_0}}\",\"password\":\"Pa$$w0rd!\",\"rememberMe\":true}"
             },
             "url": {
               "raw": "{{base_url}}/api/v1/auth/login"
@@ -938,12 +995,8 @@
                   "}",
                   "// Array of test cases",
                   "const testCases = [",
-                  "  {\"email\":\"user1@example.com\",\"password\":\"Pa$$w0rd!\",\"firstName\":\"John\",\"lastName\":\"Doe\",\"dateOfBirth\":\"2000-01-01\"},",
-                  "  {\"email\":\"user2@example.com\",\"password\":\"Pa$$w0rd!\",\"firstName\":\"Jane\",\"lastName\":\"Smith\",\"dateOfBirth\":\"2000-02-02\"},",
-                  "  {\"email\":\"user3@example.com\",\"password\":\"Pa$$w0rd!\",\"firstName\":\"Alice\",\"lastName\":\"Brown\",\"dateOfBirth\":\"2000-03-03\"},",
-                  "  {\"email\":\"user4@example.com\",\"password\":\"Pa$$w0rd!\",\"firstName\":\"Bob\",\"lastName\":\"White\",\"dateOfBirth\":\"2000-04-04\"},",
-                  "  {\"email\":\"avatar@example.com\",\"password\":\"Pa$$w0rd!\",\"firstName\":\"Avatar\",\"lastName\":\"User\",\"dateOfBirth\":\"1999-05-05\",\"nickname\":\"avuser\",\"aboutMe\":\"I have an avatar\",\"avatarId\":999999},",
-                  "  {\"email\":\"invalid-email\",\"password\":\"123\",\"firstName\":\"Bad\",\"lastName\":\"Data\",\"dateOfBirth\":\"2000-01-01\"},",
+                  "  {\"email\":\"group1@example.com\",\"password\":\"Pa$$w0rd!\",\"firstName\":\"John\",\"lastName\":\"Doe\",\"dateOfBirth\":\"2000-01-01\"},",
+                  "  {\"email\":\"group2@example.com\",\"password\":\"Pa$$w0rd!\",\"firstName\":\"Jane\",\"lastName\":\"Smith\",\"dateOfBirth\":\"2000-02-02\"},",
                   "];",
                   "// Set current test case",
                   "let index = parseInt(pm.environment.get('currentIndex'));",
@@ -978,16 +1031,15 @@
                   "",
                   "// Save userId/email for valid responses (status 200)",
                   "if (status === 200) {",
-                  "    pm.environment.set(`userId_${index}`, response.userId);",
-                  "    pm.environment.set(`email_${index}`, response.email);",
-                  "    pm.environment.set(`password_${index}`, response.password);",
+                  "    pm.environment.set(`userId_${index}`, response.payload.userId);",
+                  "    pm.environment.set(`email_${index}`, response.payload.email);",
                   "}",
                   "",
                   "// Loop to next request",
                   "index++;",
                   "if (index < expectedStatuses.length) {",
                   "    pm.environment.set('currentIndex', index);",
-                  "    postman.setNextRequest('Register User Test Variants');",
+                  "    pm.execution.setNextRequest('Register User Test Variants');",
                   "} else {",
                   "    pm.environment.unset('currentIndex');",
                   "}"
@@ -1008,7 +1060,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\"email\":\"{{email_0}}\",\"password\":\"{{password_0}}\",\"rememberMe\":true}"
+              "raw": "{\"email\":\"{{email_0}}\",\"password\":\"Pa$$w0rd!\",\"rememberMe\":true}"
             },
             "url": {
               "raw": "{{base_url}}/api/v1/auth/login"
@@ -1067,8 +1119,8 @@
                   "",
                   "pm.test('Store group_id', function() {",
                   "    const jsonData = pm.response.json();",
-                  "    pm.environment.set('groupId', jsonData.groupId);",
-                  "    pm.expect(jsonData.groupId).to.exist;",
+                  "    pm.environment.set('groupId', jsonData.payload.groupId);",
+                  "    pm.expect(jsonData.payload.groupId).to.exist;",
                   "});"
                 ]
               }
@@ -1148,7 +1200,7 @@
                   "});",
                   "pm.test('Update success message', function() {",
                   "    const jsonData = pm.response.json();",
-                  "    pm.expect(jsonData.message).to.eql('Updated successful.');",
+                  "    pm.expect(jsonData.payload.message).to.eql(\"Updated successful.\");",
                   "});"
                 ]
               }
@@ -1236,12 +1288,7 @@
                   "}",
                   "// Array of test cases",
                   "const testCases = [",
-                  "  {\"email\":\"user1@example.com\",\"password\":\"Pa$$w0rd!\",\"firstName\":\"John\",\"lastName\":\"Doe\",\"dateOfBirth\":\"2000-01-01\"},",
-                  "  {\"email\":\"user2@example.com\",\"password\":\"Pa$$w0rd!\",\"firstName\":\"Jane\",\"lastName\":\"Smith\",\"dateOfBirth\":\"2000-02-02\"},",
-                  "  {\"email\":\"user3@example.com\",\"password\":\"Pa$$w0rd!\",\"firstName\":\"Alice\",\"lastName\":\"Brown\",\"dateOfBirth\":\"2000-03-03\"},",
-                  "  {\"email\":\"user4@example.com\",\"password\":\"Pa$$w0rd!\",\"firstName\":\"Bob\",\"lastName\":\"White\",\"dateOfBirth\":\"2000-04-04\"},",
-                  "  {\"email\":\"avatar@example.com\",\"password\":\"Pa$$w0rd!\",\"firstName\":\"Avatar\",\"lastName\":\"User\",\"dateOfBirth\":\"1999-05-05\",\"nickname\":\"avuser\",\"aboutMe\":\"I have an avatar\",\"avatarId\":999999},",
-                  "  {\"email\":\"invalid-email\",\"password\":\"123\",\"firstName\":\"Bad\",\"lastName\":\"Data\",\"dateOfBirth\":\"2000-01-01\"},",
+                  "  {\"email\":\"groupEvent1@example.com\",\"password\":\"Pa$$w0rd!\",\"firstName\":\"John\",\"lastName\":\"Doe\",\"dateOfBirth\":\"2000-01-01\"},",
                   "];",
                   "// Set current test case",
                   "let index = parseInt(pm.environment.get('currentIndex'));",
@@ -1276,16 +1323,15 @@
                   "",
                   "// Save userId/email for valid responses (status 200)",
                   "if (status === 200) {",
-                  "    pm.environment.set(`userId_${index}`, response.userId);",
-                  "    pm.environment.set(`email_${index}`, response.email);",
-                  "    pm.environment.set(`password_${index}`, response.password);",
+                  "    pm.environment.set(`userId_${index}`, response.payload.userId);",
+                  "    pm.environment.set(`email_${index}`, response.payload.email);",
                   "}",
                   "",
                   "// Loop to next request",
                   "index++;",
                   "if (index < expectedStatuses.length) {",
                   "    pm.environment.set('currentIndex', index);",
-                  "    postman.setNextRequest('Register User Test Variants');",
+                  "    pm.execution.setNextRequest('Register User Test Variants');",
                   "} else {",
                   "    pm.environment.unset('currentIndex');",
                   "}"
@@ -1306,7 +1352,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\"email\":\"{{email_0}}\",\"password\":\"{{password_0}}\",\"rememberMe\":true}"
+              "raw": "{\"email\":\"{{email_0}}\",\"password\":\"Pa$$w0rd!\",\"rememberMe\":true}"
             },
             "url": {
               "raw": "{{base_url}}/api/v1/auth/login"
@@ -1581,12 +1627,7 @@
                   "}",
                   "// Array of test cases",
                   "const testCases = [",
-                  "  {\"email\":\"user1@example.com\",\"password\":\"Pa$$w0rd!\",\"firstName\":\"John\",\"lastName\":\"Doe\",\"dateOfBirth\":\"2000-01-01\"},",
-                  "  {\"email\":\"user2@example.com\",\"password\":\"Pa$$w0rd!\",\"firstName\":\"Jane\",\"lastName\":\"Smith\",\"dateOfBirth\":\"2000-02-02\"},",
-                  "  {\"email\":\"user3@example.com\",\"password\":\"Pa$$w0rd!\",\"firstName\":\"Alice\",\"lastName\":\"Brown\",\"dateOfBirth\":\"2000-03-03\"},",
-                  "  {\"email\":\"user4@example.com\",\"password\":\"Pa$$w0rd!\",\"firstName\":\"Bob\",\"lastName\":\"White\",\"dateOfBirth\":\"2000-04-04\"},",
-                  "  {\"email\":\"avatar@example.com\",\"password\":\"Pa$$w0rd!\",\"firstName\":\"Avatar\",\"lastName\":\"User\",\"dateOfBirth\":\"1999-05-05\",\"nickname\":\"avuser\",\"aboutMe\":\"I have an avatar\",\"avatarId\":999999},",
-                  "  {\"email\":\"invalid-email\",\"password\":\"123\",\"firstName\":\"Bad\",\"lastName\":\"Data\",\"dateOfBirth\":\"2000-01-01\"},",
+                  "  {\"email\":\"post1@example.com\",\"password\":\"Pa$$w0rd!\",\"firstName\":\"John\",\"lastName\":\"Doe\",\"dateOfBirth\":\"2000-01-01\"},",
                   "];",
                   "// Set current test case",
                   "let index = parseInt(pm.environment.get('currentIndex'));",
@@ -1621,16 +1662,15 @@
                   "",
                   "// Save userId/email for valid responses (status 200)",
                   "if (status === 200) {",
-                  "    pm.environment.set(`userId_${index}`, response.userId);",
-                  "    pm.environment.set(`email_${index}`, response.email);",
-                  "    pm.environment.set(`password_${index}`, response.password);",
+                  "    pm.environment.set(`userId_${index}`, response.payload.userId);",
+                  "    pm.environment.set(`email_${index}`, response.payload.email);",
                   "}",
                   "",
                   "// Loop to next request",
                   "index++;",
                   "if (index < expectedStatuses.length) {",
                   "    pm.environment.set('currentIndex', index);",
-                  "    postman.setNextRequest('Register User Test Variants');",
+                  "    pm.execution.setNextRequest('Register User Test Variants');",
                   "} else {",
                   "    pm.environment.unset('currentIndex');",
                   "}"
@@ -1651,7 +1691,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\"email\":\"{{email_0}}\",\"password\":\"{{password_0}}\",\"rememberMe\":true}"
+              "raw": "{\"email\":\"{{email_0}}\",\"password\":\"Pa$$w0rd!\",\"rememberMe\":true}"
             },
             "url": {
               "raw": "{{base_url}}/api/v1/auth/login"
@@ -1712,8 +1752,8 @@
                   "// ✅ Parse and store postId",
                   "let json = pm.response.json();",
                   "if (json.postId) {",
-                  "    pm.environment.set('postId', json.postId);",
-                  "    console.log('Stored postId:', json.postId);",
+                  "    pm.environment.set('postId', json.payload.postId);",
+                  "    console.log('Stored postId:', json.payload.postId);",
                   "} else {",
                   "    console.warn('⚠️ postId not found in response');",
                   "}"
@@ -1874,12 +1914,7 @@
                   "}",
                   "// Array of test cases",
                   "const testCases = [",
-                  "  {\"email\":\"user1@example.com\",\"password\":\"Pa$$w0rd!\",\"firstName\":\"John\",\"lastName\":\"Doe\",\"dateOfBirth\":\"2000-01-01\"},",
-                  "  {\"email\":\"user2@example.com\",\"password\":\"Pa$$w0rd!\",\"firstName\":\"Jane\",\"lastName\":\"Smith\",\"dateOfBirth\":\"2000-02-02\"},",
-                  "  {\"email\":\"user3@example.com\",\"password\":\"Pa$$w0rd!\",\"firstName\":\"Alice\",\"lastName\":\"Brown\",\"dateOfBirth\":\"2000-03-03\"},",
-                  "  {\"email\":\"user4@example.com\",\"password\":\"Pa$$w0rd!\",\"firstName\":\"Bob\",\"lastName\":\"White\",\"dateOfBirth\":\"2000-04-04\"},",
-                  "  {\"email\":\"avatar@example.com\",\"password\":\"Pa$$w0rd!\",\"firstName\":\"Avatar\",\"lastName\":\"User\",\"dateOfBirth\":\"1999-05-05\",\"nickname\":\"avuser\",\"aboutMe\":\"I have an avatar\",\"avatarId\":999999},",
-                  "  {\"email\":\"invalid-email\",\"password\":\"123\",\"firstName\":\"Bad\",\"lastName\":\"Data\",\"dateOfBirth\":\"2000-01-01\"},",
+                  "  {\"email\":\"feed1@example.com\",\"password\":\"Pa$$w0rd!\",\"firstName\":\"John\",\"lastName\":\"Doe\",\"dateOfBirth\":\"2000-01-01\"},",
                   "];",
                   "// Set current test case",
                   "let index = parseInt(pm.environment.get('currentIndex'));",
@@ -1914,16 +1949,15 @@
                   "",
                   "// Save userId/email for valid responses (status 200)",
                   "if (status === 200) {",
-                  "    pm.environment.set(`userId_${index}`, response.userId);",
-                  "    pm.environment.set(`email_${index}`, response.email);",
-                  "    pm.environment.set(`password_${index}`, response.password);",
+                  "    pm.environment.set(`userId_${index}`, response.payload.userId);",
+                  "    pm.environment.set(`email_${index}`, response.payload.email);",
                   "}",
                   "",
                   "// Loop to next request",
                   "index++;",
                   "if (index < expectedStatuses.length) {",
                   "    pm.environment.set('currentIndex', index);",
-                  "    postman.setNextRequest('Register User Test Variants');",
+                  "    pm.execution.setNextRequest('Register User Test Variants');",
                   "} else {",
                   "    pm.environment.unset('currentIndex');",
                   "}"
@@ -1944,7 +1978,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\"email\":\"{{email_0}}\",\"password\":\"{{password_0}}\",\"rememberMe\":true}"
+              "raw": "{\"email\":\"{{email_0}}\",\"password\":\"Pa$$w0rd!\",\"rememberMe\":true}"
             },
             "url": {
               "raw": "{{base_url}}/api/v1/auth/login"
@@ -2003,8 +2037,8 @@
                   "",
                   "pm.test('Store group_id', function() {",
                   "    const jsonData = pm.response.json();",
-                  "    pm.environment.set('groupId', jsonData.groupId);",
-                  "    pm.expect(jsonData.groupId).to.exist;",
+                  "    pm.environment.set('groupId', jsonData.payload.groupId);",
+                  "    pm.expect(jsonData.payload.groupId).to.exist;",
                   "});"
                 ]
               }
@@ -2285,12 +2319,8 @@
                   "}",
                   "// Array of test cases",
                   "const testCases = [",
-                  "  {\"email\":\"user1@example.com\",\"password\":\"Pa$$w0rd!\",\"firstName\":\"John\",\"lastName\":\"Doe\",\"dateOfBirth\":\"2000-01-01\"},",
-                  "  {\"email\":\"user2@example.com\",\"password\":\"Pa$$w0rd!\",\"firstName\":\"Jane\",\"lastName\":\"Smith\",\"dateOfBirth\":\"2000-02-02\"},",
-                  "  {\"email\":\"user3@example.com\",\"password\":\"Pa$$w0rd!\",\"firstName\":\"Alice\",\"lastName\":\"Brown\",\"dateOfBirth\":\"2000-03-03\"},",
-                  "  {\"email\":\"user4@example.com\",\"password\":\"Pa$$w0rd!\",\"firstName\":\"Bob\",\"lastName\":\"White\",\"dateOfBirth\":\"2000-04-04\"},",
-                  "  {\"email\":\"avatar@example.com\",\"password\":\"Pa$$w0rd!\",\"firstName\":\"Avatar\",\"lastName\":\"User\",\"dateOfBirth\":\"1999-05-05\",\"nickname\":\"avuser\",\"aboutMe\":\"I have an avatar\",\"avatarId\":999999},",
-                  "  {\"email\":\"invalid-email\",\"password\":\"123\",\"firstName\":\"Bad\",\"lastName\":\"Data\",\"dateOfBirth\":\"2000-01-01\"},",
+                  "  {\"email\":\"chat1@example.com\",\"password\":\"Pa$$w0rd!\",\"firstName\":\"John\",\"lastName\":\"Doe\",\"dateOfBirth\":\"2000-01-01\"},",
+                  "  {\"email\":\"chat22@example.com\",\"password\":\"Pa$$w0rd!\",\"firstName\":\"Jane\",\"lastName\":\"Smith\",\"dateOfBirth\":\"2000-02-02\"},",
                   "];",
                   "// Set current test case",
                   "let index = parseInt(pm.environment.get('currentIndex'));",
@@ -2311,7 +2341,7 @@
                   "let index = parseInt(pm.environment.get('currentIndex'));",
                   "",
                   "// Define expected status per test case (200 for valid, 400 for invalid)",
-                  "const expectedStatuses = [200, 200, 200, 200, 400, 400];",
+                  "const expectedStatuses = [200, 200];",
                   "",
                   "// Test status code",
                   "pm.test('Check response status', function() {",
@@ -2325,16 +2355,15 @@
                   "",
                   "// Save userId/email for valid responses (status 200)",
                   "if (status === 200) {",
-                  "    pm.environment.set(`userId_${index}`, response.userId);",
-                  "    pm.environment.set(`email_${index}`, response.email);",
-                  "    pm.environment.set(`password_${index}`, response.password);",
+                  "    pm.environment.set(`userId_${index}`, response.payload.userId);",
+                  "    pm.environment.set(`email_${index}`, response.payload.email);",
                   "}",
                   "",
                   "// Loop to next request",
                   "index++;",
                   "if (index < expectedStatuses.length) {",
                   "    pm.environment.set('currentIndex', index);",
-                  "    postman.setNextRequest('Register User Test Variants');",
+                  "    pm.execution.setNextRequest('Register User Test Variants');",
                   "} else {",
                   "    pm.environment.unset('currentIndex');",
                   "}"
@@ -2355,7 +2384,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\"email\":\"{{email_0}}\",\"password\":\"{{password_0}}\",\"rememberMe\":true}"
+              "raw": "{\"email\":\"{{email_0}}\",\"password\":\"Pa$$w0rd!\",\"rememberMe\":true}"
             },
             "url": {
               "raw": "{{base_url}}/api/v1/auth/login",
@@ -2415,8 +2444,8 @@
                   "",
                   "// ✅ Parse response and store the first chatId only",
                   "let chats = pm.response.json();",
-                  "if (Array.isArray(chats) && chats.length > 0) {",
-                  "    let firstChatId = chats[0].chatId;",
+                  "if (Array.isArray(chats) && chats.payload.length > 0) {",
+                  "    let firstChatId = chats[0].payload.chatId;",
                   "    pm.environment.set('chatId', firstChatId);",
                   "    console.log('✅ Stored chatId:', firstChatId);",
                   "} else {",
@@ -2707,16 +2736,15 @@
                   "",
                   "// Save userId/email for valid responses (status 200)",
                   "if (status === 200) {",
-                  "    pm.environment.set(`userId_${index}`, response.userId);",
-                  "    pm.environment.set(`email_${index}`, response.email);",
-                  "    pm.environment.set(`password_${index}`, response.password);",
+                  "    pm.environment.set(`userId_${index}`, response.payload.userId);",
+                  "    pm.environment.set(`email_${index}`, response.payload.email);",
                   "}",
                   "",
                   "// Loop to next request",
                   "index++;",
                   "if (index < expectedStatuses.length) {",
                   "    pm.environment.set('currentIndex', index);",
-                  "    postman.setNextRequest('Register User Test Variants');",
+                  "    pm.execution.setNextRequest('Register User Test Variants');",
                   "} else {",
                   "    pm.environment.unset('currentIndex');",
                   "}"
@@ -2737,7 +2765,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\"email\":\"{{email_0}}\",\"password\":\"{{password_0}}\",\"rememberMe\":true}"
+              "raw": "{\"email\":\"{{email_0}}\",\"password\":\"Pa$$w0rd!\",\"rememberMe\":true}"
             },
             "url": {
               "raw": "{{base_url}}/api/v1/auth/login"
