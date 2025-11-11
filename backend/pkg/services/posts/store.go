@@ -371,7 +371,7 @@ func DeleteComment(commentID, authorID int64) error {
 			return sql.ErrNoRows
 		}
 
-		// Increment post's comments_count
+		// decrement post's comments_count
 		if err := database.UpdateCounter(tx, database.DBCounter{
 			CounterName: database.COMMENTS_ENTITY_NAME,
 			EntityType:  database.POST_ENTITY_TYPE,
@@ -381,7 +381,7 @@ func DeleteComment(commentID, authorID int64) error {
 			return err
 		}
 
-		// Increment user's comments_count
+		// decrement user's comments_count
 		if err := database.UpdateCounter(tx, database.DBCounter{
 			CounterName: database.COMMENTS_ENTITY_NAME,
 			EntityType:  database.USER_ENTITY_TYPE,
