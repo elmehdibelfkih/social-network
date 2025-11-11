@@ -6,8 +6,8 @@ import (
 	"time"
 )
 
-func GetUserChatsFromDB(db *sql.DB, userId int64) ([]ConversationsList, error) {
-	rows, err := db.Query(GetUserChatsQuery, userId)
+func GetUserChatsFromDB(db *sql.DB, userId, lastConversationId int64, limit int) ([]ConversationsList, error) {
+	rows, err := db.Query(GetUserChatsQuery, userId, userId, lastConversationId, lastConversationId, limit)
 	if err != nil {
 		return nil, err
 	}
@@ -17,6 +17,7 @@ func GetUserChatsFromDB(db *sql.DB, userId int64) ([]ConversationsList, error) {
 
 	for rows.Next() {
 		var chat ConversationsList
+		var groupId sql.NullInt64
 		var lastMsgId sql.NullInt64
 		var lastMsgText sql.NullString
 		var lastMsgCreated sql.NullString
@@ -24,6 +25,7 @@ func GetUserChatsFromDB(db *sql.DB, userId int64) ([]ConversationsList, error) {
 
 		err := rows.Scan(
 			&chat.ChatId,
+			&groupId,
 			&chat.Name,
 			&lastMsgId,
 			&lastMsgText,
@@ -35,22 +37,20 @@ func GetUserChatsFromDB(db *sql.DB, userId int64) ([]ConversationsList, error) {
 			return nil, err
 		}
 
-		chat.GroupId = nil
+		if groupId.Valid {
+			chat.GroupId = &groupId.Int64
+		}
 
 		if lastMsgId.Valid {
-			chat.LastMessage = lastMessage{
+			chat.LastMessage = &LastMessage{
 				Id:        lastMsgId.Int64,
 				Text:      lastMsgText.String,
 				CreatedAt: lastMsgCreated.String,
 			}
-		} else {
-			chat.LastMessage = lastMessage{}
 		}
 
 		if updatedAt.Valid {
 			chat.UpdatedAt = updatedAt.String
-		} else {
-			chat.UpdatedAt = ""
 		}
 
 		chats = append(chats, chat)
@@ -59,12 +59,8 @@ func GetUserChatsFromDB(db *sql.DB, userId int64) ([]ConversationsList, error) {
 	return chats, nil
 }
 
-func GetChatMessagesFromDB(db *sql.DB, chatId int64, page, limit int) (*PaginatedMessagesResponse, error) {
-	offset := (page - 1) * limit
-
-	query := GetmassageByP
-
-	rows, err := db.Query(query, chatId, limit, offset)
+func GetChatMessagesFromDB(db *sql.DB, chatId, userId, lastMessageId int64, limit int) ([]Message, error) {
+	rows, err := db.Query(GetMessagesQuery, chatId, lastMessageId, lastMessageId, chatId, userId, limit)
 	if err != nil {
 		return nil, err
 	}
@@ -74,7 +70,6 @@ func GetChatMessagesFromDB(db *sql.DB, chatId int64, page, limit int) (*Paginate
 
 	for rows.Next() {
 		var msg Message
-
 		err := rows.Scan(
 			&msg.MessageID,
 			&msg.SenderID,
@@ -84,24 +79,17 @@ func GetChatMessagesFromDB(db *sql.DB, chatId int64, page, limit int) (*Paginate
 		if err != nil {
 			return nil, err
 		}
-
 		messages = append(messages, msg)
 	}
 
-	response := &PaginatedMessagesResponse{
-		ChatID:   chatId,
-		Page:     page,
-		Limit:    limit,
-		Messages: messages,
-	}
-
-	return response, nil
+	return messages, nil
 }
+
 func DeleteMessage(db *sql.DB, messageId, userId, chatId int64) error {
 	var exists bool
 	err := db.QueryRow(checkMessageOwnershipQuery, messageId, userId, chatId).Scan(&exists)
 	if err == sql.ErrNoRows {
-		return fmt.Errorf("message not found or you don't have permission to delete it")
+		return fmt.Errorf("message not found or unauthorized")
 	}
 	if err != nil {
 		return fmt.Errorf("failed to check message ownership: %v", err)
@@ -123,8 +111,8 @@ func DeleteMessage(db *sql.DB, messageId, userId, chatId int64) error {
 	return nil
 }
 
-func GetChatParticipants(db *sql.DB, chatId int64) (*ParticipantsResponse, error) {
-	rows, err := db.Query(getParticipantsQuery, chatId)
+func GetChatParticipants(db *sql.DB, chatId, userId int64) ([]ChatParticipant, error) {
+	rows, err := db.Query(getParticipantsQuery, chatId, chatId, userId)
 	if err != nil {
 		return nil, fmt.Errorf("failed to fetch participants: %v", err)
 	}
@@ -146,10 +134,7 @@ func GetChatParticipants(db *sql.DB, chatId int64) (*ParticipantsResponse, error
 		participants = append(participants, p)
 	}
 
-	return &ParticipantsResponse{
-		ChatID:       chatId,
-		Participants: participants,
-	}, nil
+	return participants, nil
 }
 
 func InsertMessage(db *sql.DB, chatId, senderId int64, text string) (*SendMessageResponse, error) {
@@ -175,6 +160,11 @@ func InsertMessage(db *sql.DB, chatId, senderId int64, text string) (*SendMessag
 
 	var messageId int64
 	err = tx.QueryRow(getLastInsertedMessageID).Scan(&messageId)
+	if err != nil {
+		return nil, err
+	}
+
+	_, err = tx.Exec(updateChatTimestampQuery, chatId)
 	if err != nil {
 		return nil, err
 	}

@@ -1,191 +1,154 @@
 package chat
 
 import (
-	"encoding/json"
 	"net/http"
 	"social/pkg/config"
 	"social/pkg/utils"
-	"strconv"
 )
 
-type ConversationsResponse struct {
-	Chats []ConversationsList `json:"chats"`
-}
-
+// GET /api/v1/chats
 func GetUserChats(w http.ResponseWriter, r *http.Request) {
 	userId := utils.GetUserIdFromContext(r)
 	if userId == 0 {
-		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		utils.Unauthorized(w, "Unauthorized")
 		return
 	}
 
-	chats, err := GetUserChatsFromDB(config.DB, userId)
+	lastConversationId := utils.GetQuerryPramInt(r, "last-conversation-id")
+	limit := int(utils.GetQuerryPramInt(r, "limit"))
+	if limit == 0 {
+		limit = 20
+	}
+	if limit > 100 {
+		limit = 100
+	}
+
+	chats, err := GetUserChatsFromDB(config.DB, userId, lastConversationId, limit)
 	if err != nil {
-		http.Error(w, "Failed to fetch chats: "+err.Error(), http.StatusInternalServerError)
+		utils.BackendErrorTarget(err, "GetUserChats")
+		utils.InternalServerError(w)
 		return
 	}
 
-	resp := ConversationsResponse{Chats: chats}
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(resp)
+	utils.JsonResponseEncode(w, http.StatusOK, chats)
 }
 
-// GET /api/v1/chats/{chat_id}/messages?page=1&limit=20
+// GET /api/v1/chats/{chat_id}/messages
 func GetmassageByPagination(w http.ResponseWriter, r *http.Request) {
 	userId := utils.GetUserIdFromContext(r)
 	if userId == 0 {
-		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		utils.Unauthorized(w, "Unauthorized")
 		return
 	}
 
 	chatId := utils.GetWildCardValue(w, r, "chat_id")
 	if chatId == 0 {
-		http.Error(w, "Invalid chatId", http.StatusBadRequest)
 		return
 	}
 
-	queryParams := r.URL.Query()
-	pageStr := queryParams.Get("page")
-	limitStr := queryParams.Get("limit")
-
-	page := 1
-	limit := 20
-
-	if pageStr != "" {
-		if p, err := strconv.Atoi(pageStr); err == nil && p > 0 {
-			page = p
-		}
+	lastMessageId := utils.GetQuerryPramInt(r, "last-message-id")
+	limit := int(utils.GetQuerryPramInt(r, "limit"))
+	if limit == 0 {
+		limit = 20
 	}
-	if limitStr != "" {
-		if l, err := strconv.Atoi(limitStr); err == nil && l > 0 {
-			limit = l
-		}
+	if limit > 100 {
+		limit = 100
 	}
 
-	messages, err := GetChatMessagesFromDB(config.DB, chatId, page, limit)
+	messages, err := GetChatMessagesFromDB(config.DB, chatId, userId, lastMessageId, limit)
 	if err != nil {
-		http.Error(w, "Failed to fetch messages: "+err.Error(), http.StatusInternalServerError)
+		utils.BackendErrorTarget(err, "GetmassageByPagination")
+		utils.InternalServerError(w)
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-
-	if err := json.NewEncoder(w).Encode(messages); err != nil {
-		http.Error(w, "Failed to encode response: "+err.Error(), http.StatusInternalServerError)
-		return
-	}
+	utils.JsonResponseEncode(w, http.StatusOK, messages)
 }
 
+// DELETE /api/v1/chats/{chat_id}/messages/{msg_id}
 func DeleteMessageHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodDelete {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-		return
-	}
-
-	// Get user ID from context
 	userId := utils.GetUserIdFromContext(r)
 	if userId == 0 {
-		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		utils.Unauthorized(w, "Unauthorized")
 		return
 	}
 
-	// Get chat_id and message_id from URL path
 	chatId := utils.GetWildCardValue(w, r, "chat_id")
 	if chatId == 0 {
-		http.Error(w, "Invalid chat ID", http.StatusBadRequest)
 		return
 	}
 
 	messageId := utils.GetWildCardValue(w, r, "msg_id")
 	if messageId == 0 {
-		http.Error(w, "Invalid message ID", http.StatusBadRequest)
 		return
 	}
 
-	// Delete the message
 	err := DeleteMessage(config.DB, messageId, userId, chatId)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		utils.BackendErrorTarget(err, "DeleteMessageHandler")
+		utils.BadRequest(w, "Message not found or unauthorized", "alert")
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(map[string]string{
+	utils.JsonResponseEncode(w, http.StatusOK, map[string]string{
 		"message": "Message deleted successfully.",
 	})
 }
 
+// GET /api/v1/chats/{chat_id}/participants
 func GetParticipantsHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-		return
-	}
-
-	// Get user ID from context
 	userId := utils.GetUserIdFromContext(r)
 	if userId == 0 {
-		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		utils.Unauthorized(w, "Unauthorized")
 		return
 	}
 
-	// Get chat_id from URL path
 	chatId := utils.GetWildCardValue(w, r, "chat_id")
 	if chatId == 0 {
-		http.Error(w, "Invalid chat ID", http.StatusBadRequest)
 		return
 	}
 
-	// Get participants
-	response, err := GetChatParticipants(config.DB, chatId)
+	participants, err := GetChatParticipants(config.DB, chatId, userId)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		utils.BackendErrorTarget(err, "GetParticipantsHandler")
+		utils.InternalServerError(w)
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(response)
+	utils.JsonResponseEncode(w, http.StatusOK, participants)
 }
 
+// POST /api/v1/chats/{chat_id}/messages
 func SendMessageHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-		return
-	}
-
 	userId := utils.GetUserIdFromContext(r)
 	if userId == 0 {
-		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		utils.Unauthorized(w, "Unauthorized")
 		return
 	}
 
 	chatId := utils.GetWildCardValue(w, r, "chat_id")
 	if chatId == 0 {
-		http.Error(w, "Invalid chatId", http.StatusBadRequest)
 		return
 	}
 
 	var req SendMessageRequest
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, "Invalid request body", http.StatusBadRequest)
+	if err := utils.JsonStaticDecode(r, &req); err != nil {
+		utils.BackendErrorTarget(err, "SendMessageHandler")
+		utils.BadRequest(w, "Invalid request body", "alert")
 		return
 	}
 
 	if req.Text == "" {
-		http.Error(w, "Text cannot be empty", http.StatusBadRequest)
+		utils.BadRequest(w, "Text cannot be empty", "alert")
 		return
 	}
 
 	msg, err := InsertMessage(config.DB, chatId, userId, req.Text)
 	if err != nil {
-		http.Error(w, "Failed to send message: "+err.Error(), http.StatusInternalServerError)
+		utils.BackendErrorTarget(err, "SendMessageHandler")
+		utils.InternalServerError(w)
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(msg)
+	utils.JsonResponseEncode(w, http.StatusOK, msg)
 }
