@@ -52,15 +52,13 @@ func followResponse(w http.ResponseWriter, r *http.Request) {
 	case "accepted":
 		response.Message = "You are now following this user."
 	}
+
 	response.Status = status
 	response.TargetUserId = targetUserId
 	response.FollowerId = userId
 
-	utils.JsonResponseEncode(w, http.StatusOK, map[string]any{
-		"success": true,
-		"payload": response,
-		"error":   map[string]any{},
-	})
+	utils.WriteSuccess(w, http.StatusAccepted, response)
+
 }
 
 func unfollowResponse(w http.ResponseWriter, r *http.Request) {
@@ -72,11 +70,8 @@ func unfollowResponse(w http.ResponseWriter, r *http.Request) {
 	response.Message = "Unfollow successful."
 	response.TargetUserId = targetUserId
 	response.FollowerId = userId
-	utils.JsonResponseEncode(w, http.StatusOK, map[string]any{
-		"success": true,
-		"payload": response,
-		"error":   map[string]any{},
-	})
+
+	utils.WriteSuccess(w, http.StatusAccepted, response)
 }
 
 func acceptFollowResponse(w http.ResponseWriter, r *http.Request) {
@@ -88,11 +83,8 @@ func acceptFollowResponse(w http.ResponseWriter, r *http.Request) {
 	response.FollowerId = userId
 	response.FollowedId = targetUserId
 	response.Status = "accepted"
-	utils.JsonResponseEncode(w, http.StatusOK, map[string]any{
-		"success": true,
-		"payload": response,
-		"error":   map[string]any{},
-	})
+
+	utils.WriteSuccess(w, http.StatusAccepted, response)
 }
 
 func declineFollowResponse(w http.ResponseWriter, r *http.Request) {
@@ -104,17 +96,6 @@ func declineFollowResponse(w http.ResponseWriter, r *http.Request) {
 	response.FollowerId = userId
 	response.FollowedId = targetUserId
 	response.Status = "declined"
-	utils.JsonResponseEncode(w, http.StatusOK, map[string]any{
-		"success": true,
-		"payload": response,
-		"error":   map[string]any{},
-	})
-}
 
-func FollowersFollowingFollowRequestListResponse(w http.ResponseWriter, response []map[string]any) {
-	utils.JsonResponseEncode(w, http.StatusOK, map[string]any{
-		"success": true,
-		"payload": response,
-		"error":   map[string]any{},
-	})
+	utils.WriteSuccess(w, http.StatusAccepted, response)
 }

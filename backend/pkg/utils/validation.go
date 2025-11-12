@@ -11,22 +11,12 @@ import (
 var (
 	emailRegex      = regexp.MustCompile(`^[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,4}$`)
 	nameRegex       = regexp.MustCompile(`^[a-zA-Z]+(?:[-'\s][a-zA-Z]+)*$`)
-	dateRegex       = regexp.MustCompile(`^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$`)
 	passwordLength  = regexp.MustCompile(`^.{8,16}$`)
 	passwordUpper   = regexp.MustCompile(`[A-Z]`)
 	passwordLower   = regexp.MustCompile(`[a-z]`)
 	passwordDigit   = regexp.MustCompile(`[0-9]`)
 	passwordSpecial = regexp.MustCompile(`[!@#$%^&*]`)
 	passwordNoSpace = regexp.MustCompile(`^\S+$`)
-	// emailRegex      = regexp.MustCompile(`^[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,4}$`)
-	// nameRegex       = regexp.MustCompile(`^[a-zA-Z]+(?:[-'\s][a-zA-Z]+)*$`)
-	// // dateRegex       = regexp.MustCompile(`^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$`)
-	// passwordLength  = regexp.MustCompile(`^.{8,16}$`)
-	// passwordUpper   = regexp.MustCompile(`[A-Z]`)
-	// passwordLower   = regexp.MustCompile(`[a-z]`)
-	// passwordDigit   = regexp.MustCompile(`[0-9]`)
-	// passwordSpecial = regexp.MustCompile(`[!@#$%^&*]`)
-	// passwordNoSpace = regexp.MustCompile(`^\S+$`)
 )
 
 func EmailValidation(mail string) (bool, string) {

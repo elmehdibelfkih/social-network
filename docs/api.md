@@ -18,7 +18,6 @@
 ```json
 {
   "success": false,
-  "payload": {},
   "error": {
     "StatusCode": 404,
     "StatusText": "Not Found",
@@ -204,7 +203,7 @@ No need for a request body.
 ``` json
 {
   "userId": 1289843874339, // the user id of the profile owner 
-  "status": "follow", // follow/unfollow or null if the user is the owner of the profile
+  "status": "accepted", // pending/accepted/declined or null
   "nickname": "nickname", // or null
   "firstName": "first",
   "lastName": "last",
@@ -212,6 +211,7 @@ No need for a request body.
   "aboutMe": "Full-stack developer and cloud enthusiast.", // or null
   "dateOfBirth": "2001-01-01",
   "privacy": "public",
+  "chatId": 34567864535677, // or null
   "stats": {
     "postsCount": 123,
     "followersCount": 890,
@@ -317,6 +317,7 @@ No need for a request body.
   "status": "pending",
   "targetUserId": 1289843874339,
   "followerId": 1289843874336,
+  "chatId": 67642454575 // or null
 }
 ```
 
@@ -366,7 +367,8 @@ No need for a request body.
       "lastName": "Johnson",
       "avatarId": 5956843825683,
       "followedAt": "2025-10-10T12:00:00Z",
-      "status": "accepted"
+      "status": "accepted", // pending/accepted/declined or null
+      "chatId": 45678654356756 // or null
     },
     {
       "userId": 1289843874334,
@@ -375,7 +377,8 @@ No need for a request body.
       "lastName": "Smith",
       "avatarId": 5956843825683,
       "followedAt": "2025-10-12T15:30:00Z",
-      "status": "accepted"
+      "status": "accepted", // pending/accepted/declined or null
+      "chatId": 32456786543567 // or null
     }
   ]
 
@@ -399,7 +402,8 @@ No need for a request body.
       "lastName": "Johnson",
       "avatarId": 5956843825683,
       "followedAt": "2025-10-10T12:00:00Z",
-      "status": "accepted" // pending/accepted/declined
+      "status": "accepted", // pending/accepted
+      "chatId": null
     },
     {
       "userId": 1289843874334,
@@ -408,7 +412,8 @@ No need for a request body.
       "lastName": "Smith",
       "avatarId": 5956843825683,
       "followedAt": "2025-10-12T15:30:00Z",
-      "status": "accepted" // pending/accepted/declined
+      "status": "accepted", // pending/accepted
+      "chatId": 4567876543 // or null
     }
   ]
 
@@ -432,7 +437,8 @@ No need for a request body.
       "lastName": "Johnson",
       "avatarId": 5956843825683,
       "followedAt": "2025-10-20T14:30:00Z",
-      "status": "pending"
+      "status": "pending", // pending/accepted/declined or null
+      "chatId": null
     },
     {
       "userId": 3489443834339,
@@ -441,7 +447,8 @@ No need for a request body.
       "lastName": "Smith",
       "avatarId": 5956843825683,
       "followedAt": "2025-10-21T10:15:00Z",
-      "status": "pending"
+      "status": "pending", // pending/accepted/declined or null
+      "chatId": 98765434567 // or null
     }
   ]
 
@@ -467,6 +474,8 @@ No need for a request body.
   "followerId": 5389143874311,
   "followedId": 1289843874339, // the current user
   "status": "accepted",
+  "chatId": 98765434567 // or null
+
 }
 ```
 
@@ -523,6 +532,10 @@ No need for a request body.
       "mediaIds": [23456543456787654], // or null
       "privacy": "followers",
       "isLikedByUser": true,
+      "stats": {
+        "reactionCount": 10,
+        "commentCount": 30,
+      },
       "createdAt": "2025-10-24T15:00:00Z",
       "updatedAt": "2025-10-24T15:00:00Z",
       "groupId": 98765789765789 // or null
@@ -537,6 +550,10 @@ No need for a request body.
       "mediaIds": null,
       "privacy": "public",
       "isLikedByUser": true,
+      "stats": {
+        "reactionCount": 10,
+        "commentCount": 30,
+      },
       "createdAt": "2025-10-23T18:20:00Z",
       "updatedAt": "2025-10-23T18:20:00Z",
       "groupId": null
@@ -572,6 +589,10 @@ No need for a request body.
       "mediaIds": null,
       "privacy": "public",
       "isLikedByUser": true,
+      "stats": {
+        "reactionCount": 10,
+        "commentCount": 30,
+      },
       "createdAt": "2025-10-24T12:30:00Z",
       "updatedAt": "2025-10-24T12:30:00Z"
     },
@@ -585,6 +606,10 @@ No need for a request body.
       "mediaIds": null,
       "privacy": "followers",
       "isLikedByUser": true,
+      "stats": {
+        "reactionCount": 10,
+        "commentCount": 30,
+      },
       "createdAt": "2025-10-23T17:05:00Z",
       "updatedAt": "2025-10-23T17:05:00Z"
     }
@@ -619,6 +644,10 @@ No need for a request body.
       "mediaIds": [1234567890987],
       "privacy": "public",
       "isLikedByUser": true,
+      "stats": {
+        "reactionCount": 10,
+        "commentCount": 30,
+      },
       "createdAt": "2025-10-24T12:30:00Z",
       "updatedAt": "2025-10-24T12:30:00Z"
     },
@@ -632,6 +661,10 @@ No need for a request body.
       "mediaIds": null,
       "privacy": "followers",
       "isLikedByUser": true,
+      "stats": {
+        "reactionCount": 10,
+        "commentCount": 30,
+      },
       "createdAt": "2025-10-23T17:05:00Z",
       "updatedAt": "2025-10-23T17:05:00Z"
     }
@@ -698,6 +731,10 @@ No need for a request body.
   "groupId": null,
   "allowedList": null,
   "isLikedByUser": true,
+  "stats": {
+    "reactionCount": 10,
+    "commentCount": 30,
+  },
   "createdAt": "2025-10-24T19:30:00Z",
   "updatedAt": "2025-10-24T19:30:00Z"
 }
@@ -798,6 +835,10 @@ No need for a request body.
       "privacy": "public",
       "allowedList": null,
       "isLikedByUser": true,
+      "stats": {
+        "reactionCount": 10,
+        "commentCount": 30,
+      },
       "createdAt": "2025-10-24T12:30:00Z",
       "updatedAt": "2025-10-24T12:30:00Z"
     },
@@ -812,6 +853,10 @@ No need for a request body.
       "privacy": "restricted",
       "allowedList": [128984387246925, 128984387246925], // or null if the privacy not restricted
       "isLikedByUser": true,
+      "stats": {
+        "reactionCount": 10,
+        "commentCount": 30,
+      },
       "createdAt": "2025-10-23T17:05:00Z",
       "updatedAt": "2025-10-23T17:05:00Z"
     }
@@ -936,8 +981,8 @@ No need for a request body.
 ``` json
 {
   "message": "Post liked successfully.",
-  "postId": 101,
-  "userId": 42,
+  "postId": 145677733776456401,
+  "userId": 444354476576576572,
   "reaction": "like",
   "createdAt": "2025-10-24T21:30:00Z"
 }
@@ -960,8 +1005,8 @@ No need for a request body.
 ``` json
 {
   "message": "Like removed successfully.",
-  "postId": 101,
-  "userId": 42
+  "postId": 101345435464565745,
+  "userId": 456456456456456452
 }
 ```
 
@@ -1097,6 +1142,7 @@ No need for a request body.
   "title": "Go Developers",
   "description": "A group for sharing Go programming tips and projects.",
   "avatarId": 657543234567865, // optinal
+  "chatId": 3567845678765,
   "createdAt": "2025-10-24T23:15:00Z",
   "updatedAt": "2025-10-24T23:15:00Z"
 }
@@ -1120,6 +1166,8 @@ No need for a request body.
   "description": "A group for sharing Go programming tips and projects.",
   "memberCount": 25,
   "avatarId": 657543234567865, // optinal
+  "status": "accepted", // pending/accepted/declined or null
+  "chatId": 43567898765, // if the user mumber of the group
   "createdAt": "2025-10-24T23:15:00Z",
   "updatedAt": "2025-10-24T23:15:00Z"
 }
@@ -1209,6 +1257,8 @@ No need for a request body.
       "avatarId": 657543234567865, // optinal
       "creatorId": 567890987654,
       "memberCount": 77,
+      "status": "accepted", // pending/accepted/declined or null 
+      "chatId": 43567898765, // if the user mumber of the group
       "createdAt": "2025-10-24T23:15:00Z"
     },
     {
@@ -1218,6 +1268,50 @@ No need for a request body.
       "avatarId": 657543234567865, // optinal
       "creatorId": 766587689658658,
       "memberCount": 77,
+      "status": "accepted", // pending/accepted/declined or null 
+      "chatId": 43567898765, // if the user mumber of the group
+      "createdAt": "2025-10-24T23:45:00Z"
+    }
+  ]
+
+```
+
+---
+
+### GET `/api/v1/groups/{user_id}` => get user groups (respect pricavy)
+
+***status code in success: 200***
+
+- request
+
+```json
+No need for a request body.
+```
+
+- response payload
+
+``` json
+ [
+    {
+      "groupId": 345678908765,
+      "title": "Go Developers",
+      "description": "A group for sharing Go programming tips and projects.",
+      "avatarId": 657543234567865, // optinal
+      "creatorId": 567890987654,
+      "memberCount": 77,
+      "status": "accepted", // pending/accepted/declined or null (the status of the loged in user)
+      "chatId": 43567898765, // if the user mumber of the group
+      "createdAt": "2025-10-24T23:15:00Z"
+    },
+    {
+      "groupId": 6574876987567647,
+      "title": "Advanced Go",
+      "description": "Advanced topics and projects in Go.",
+      "avatarId": 657543234567865, // optinal
+      "creatorId": 766587689658658,
+      "memberCount": 77,
+      "status": "accepted", // pending/accepted/declined or null (the status of the loged in user)
+      "chatId": 43567898765, // if the user mumber of the group
       "createdAt": "2025-10-24T23:45:00Z"
     }
   ]
@@ -1267,7 +1361,8 @@ No need for a request body.
 {
   "message": "Join request submitted.",
   "groupId": 7686786787567678,
-  "status": "pending"
+  "status": "pending",
+  "chatId": 3456789076543
 }
 
 ```
@@ -1292,6 +1387,7 @@ No need for a request body.
   "groupId": 658745768769784676,
   "userId": 78768979585799966,
   "status": "accepted",
+  "chatId": 43567898765,
   "role": "member"
 }
 
@@ -1345,15 +1441,16 @@ No need for a request body.
 
 ``` json
 
-  [
-    {
-      "userId": 57687684648746,
-      "UserNickname": "charlie_dev",
-      "UserlastName": "alice",
-      "role": "member",
-      "joinedAt": "2025-10-24T13:40:00Z"
-    }
-  ]
+[
+  {
+    "userId": 57687684648746,
+    "nickname": "nickname", // or null
+    "firstName": "first",
+    "lastName": "last",
+    "role": "member",
+    "joinedAt": "2025-10-24T13:40:00Z"
+  }
+]
 
 ```
 
@@ -1788,16 +1885,16 @@ No need for a request body.
  [
     {
       "id": 4657634346334,
-      "username": "alice_dev",
-      "firstName": "Alice",
-      "lastName": "Smith",
+      "nickname": "nickname", // or null
+      "firstName": "first",
+      "lastName": "last",
       "avatarId": 32456788986756444
     },
     {
       "id": 43646547547547456,
-      "username": "bob_ops",
-      "firstName": "Bob",
-      "lastName": "Johnson",
+      "nickname": "nickname", // or null
+      "firstName": "first",
+      "lastName": "last",
       "avatarId": 32456788986756446
     }
   ]

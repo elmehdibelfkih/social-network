@@ -6,6 +6,7 @@ import (
 )
 
 // POST /api/v1/users/:user_id/follow => send follow request or follow immediately if target is public
+// todo: creat chat table if not exist
 func FollowHandler(w http.ResponseWriter, r *http.Request) {
 	userId := utils.GetUserIdFromContext(r)
 	targetUserId := utils.GetWildCardValue(w, r, "user_id")
@@ -38,7 +39,7 @@ func FollowersListHandler(w http.ResponseWriter, r *http.Request) {
 		utils.InternalServerError(w)
 		return
 	}
-	FollowersFollowingFollowRequestListResponse(w, res)
+	utils.WriteSuccess(w, http.StatusAccepted, res)
 }
 
 // GET /api/v1/users/:user_id/following  => list followees
@@ -49,7 +50,7 @@ func FolloweesListHandler(w http.ResponseWriter, r *http.Request) {
 		utils.InternalServerError(w)
 		return
 	}
-	FollowersFollowingFollowRequestListResponse(w, res)
+	utils.WriteSuccess(w, http.StatusAccepted, res)
 }
 
 // GET /api/v1/follow-requests => list received follow requests for current user
@@ -60,7 +61,7 @@ func FollowRequestListHandler(w http.ResponseWriter, r *http.Request) {
 		utils.InternalServerError(w)
 		return
 	}
-	FollowersFollowingFollowRequestListResponse(w, res)
+	utils.WriteSuccess(w, http.StatusAccepted, res)
 }
 
 // POST /api/v1/follow-requests/:user_id/accept => accept request
