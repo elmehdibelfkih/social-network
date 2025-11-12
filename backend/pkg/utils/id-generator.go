@@ -9,6 +9,7 @@ const (
 	workerBits     = 5
 	datacenterBits = 5
 	sequenceBits   = 12
+	timestampBits  = 31
 
 	maxWorkerID     = -1 ^ (-1 << workerBits)
 	maxDatacenterID = -1 ^ (-1 << datacenterBits)
@@ -18,7 +19,7 @@ const (
 	datacenterShift = sequenceBits + workerBits
 	timestampShift  = sequenceBits + workerBits + datacenterBits
 
-	epoch = int64(1700000000000)
+	epoch = int64(1700000000000) // adjust as needed
 )
 
 var (
@@ -50,10 +51,9 @@ func GenerateID() int64 {
 
 	lastTimestamp = now
 
-	id := ((now - epoch) << timestampShift) |
-		(datacenterID << datacenterShift) |
-		(workerID << workerShift) |
-		sequence
+	ts := (now - epoch) & ((1 << timestampBits) - 1)
+
+	id := (ts << timestampShift) | (datacenterID << datacenterShift) | (workerID << workerShift) | sequence
 
 	return id
 }
