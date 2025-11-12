@@ -99,6 +99,7 @@ type AvatarMediaSqlRow struct {
 type RememberMeSqlRow struct {
 	RememberId int64
 	UserId     int64
+	SessionId  int64
 	Selector   string
 	Token      string
 	ExpiresAt  string

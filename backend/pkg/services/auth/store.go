@@ -234,7 +234,7 @@ func InsertRegisterUserSession(s *SessionResponseJson) error {
 
 //update
 
-func UpdateRememberMeToken(remember *RememberMeSqlRow, userId int64) error {
+func UpdateRememberMeToken(sessionId int64, remember *RememberMeSqlRow, userId int64) error {
 	return database.WrapWithTransaction(func(tx *sql.Tx) error {
 		err := tx.QueryRow(SELECT_REMEMBER_ME_BY_ID, userId).Scan(
 			&remember.RememberId,
@@ -255,6 +255,7 @@ func UpdateRememberMeToken(remember *RememberMeSqlRow, userId int64) error {
 		if err == sql.ErrNoRows {
 			remember.RememberId = utils.GenerateID()
 			remember.UserId = userId
+			remember.SessionId = sessionId
 			remember.Selector = utils.GenerateSessionToken(16)
 			remember.Token = utils.GenerateSessionToken(256)
 
@@ -262,6 +263,7 @@ func UpdateRememberMeToken(remember *RememberMeSqlRow, userId int64) error {
 				INSERT_REMEMBER_ME_TOKEN,
 				remember.RememberId,
 				remember.UserId,
+				remember.SessionId,
 				remember.Selector,
 				remember.Token,
 				remember.ExpiresAt,
