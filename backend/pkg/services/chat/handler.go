@@ -9,10 +9,6 @@ import (
 // GET /api/v1/chats
 func GetUserChats(w http.ResponseWriter, r *http.Request) {
 	userId := utils.GetUserIdFromContext(r)
-	if userId == 0 {
-		utils.Unauthorized(w, "Unauthorized")
-		return
-	}
 
 	lastConversationId := utils.GetQuerryPramInt(r, "last-conversation-id")
 	limit := int(utils.GetQuerryPramInt(r, "limit"))
@@ -36,15 +32,8 @@ func GetUserChats(w http.ResponseWriter, r *http.Request) {
 // GET /api/v1/chats/{chat_id}/messages
 func GetmassageByPagination(w http.ResponseWriter, r *http.Request) {
 	userId := utils.GetUserIdFromContext(r)
-	if userId == 0 {
-		utils.Unauthorized(w, "Unauthorized")
-		return
-	}
 
 	chatId := utils.GetWildCardValue(w, r, "chat_id")
-	if chatId == 0 {
-		return
-	}
 
 	lastMessageId := utils.GetQuerryPramInt(r, "last-message-id")
 	limit := int(utils.GetQuerryPramInt(r, "limit"))
@@ -68,20 +57,8 @@ func GetmassageByPagination(w http.ResponseWriter, r *http.Request) {
 // DELETE /api/v1/chats/{chat_id}/messages/{msg_id}
 func DeleteMessageHandler(w http.ResponseWriter, r *http.Request) {
 	userId := utils.GetUserIdFromContext(r)
-	if userId == 0 {
-		utils.Unauthorized(w, "Unauthorized")
-		return
-	}
-
 	chatId := utils.GetWildCardValue(w, r, "chat_id")
-	if chatId == 0 {
-		return
-	}
-
 	messageId := utils.GetWildCardValue(w, r, "msg_id")
-	if messageId == 0 {
-		return
-	}
 
 	err := DeleteMessage(config.DB, messageId, userId, chatId)
 	if err != nil {
@@ -90,6 +67,7 @@ func DeleteMessageHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// todo: use utils.JsonResponseEncode()
 	utils.JsonResponseEncode(w, http.StatusOK, map[string]string{
 		"message": "Message deleted successfully.",
 	})
@@ -98,15 +76,7 @@ func DeleteMessageHandler(w http.ResponseWriter, r *http.Request) {
 // GET /api/v1/chats/{chat_id}/participants
 func GetParticipantsHandler(w http.ResponseWriter, r *http.Request) {
 	userId := utils.GetUserIdFromContext(r)
-	if userId == 0 {
-		utils.Unauthorized(w, "Unauthorized")
-		return
-	}
-
 	chatId := utils.GetWildCardValue(w, r, "chat_id")
-	if chatId == 0 {
-		return
-	}
 
 	participants, err := GetChatParticipants(config.DB, chatId, userId)
 	if err != nil {

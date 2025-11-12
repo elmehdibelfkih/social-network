@@ -9,15 +9,7 @@ import (
 func ChatAccessMiddleware(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		userId := utils.GetUserIdFromContext(r)
-		if userId == 0 {
-			utils.Unauthorized(w, "Unauthorized")
-			return
-		}
-
 		chatId := utils.GetWildCardValue(w, r, "chat_id")
-		if chatId == 0 {
-			return
-		}
 
 		// Check if user is participant in the chat
 		var exists bool
@@ -35,15 +27,7 @@ func ChatAccessMiddleware(next http.HandlerFunc) http.HandlerFunc {
 func FollowRelationshipMiddleware(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		userId := utils.GetUserIdFromContext(r)
-		if userId == 0 {
-			utils.Unauthorized(w, "Unauthorized")
-			return
-		}
-
 		chatId := utils.GetWildCardValue(w, r, "chat_id")
-		if chatId == 0 {
-			return
-		}
 
 		// Check if it's a group chat (allow all group messages)
 		var isGroup bool

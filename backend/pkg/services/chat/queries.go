@@ -1,5 +1,6 @@
 package chat
 
+// todo: there is no colomn in chats named is_group (if the group_id not null thats mean thi is a group chat)
 var GetUserChatsQuery = `
 SELECT
 	c.id AS chat_id,
