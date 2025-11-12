@@ -73,7 +73,9 @@
                 "type": "text/javascript",
                 "exec": [
                   "// Capture response",
-                  "const response = pm.response.json();",
+                  "const raw = pm.response.text();",
+                  "const safe = raw.replace(/\"userId\":(\\d+)/, '\"userId\":\"$1\"');",
+                  "const response = JSON.parse(safe);",
                   "const status = pm.response.code;",
                   "",
                   "// Get current test case index",
@@ -94,7 +96,7 @@
                   "",
                   "// Save userId/email for valid responses (status 200)",
                   "if (status === 200) {",
-                  "    pm.environment.set(`userId_${index}`, response.payload.userId);",
+                  "    pm.environment.set(`userId_${index}`, String(response.payload.userId));",
                   "    pm.environment.set(`email_${index}`, response.payload.email);",
                   "}",
                   "",
@@ -156,7 +158,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email/userId/nickname\": \"{{email_0}}\",\n  \"password\": Pa$$w0rd!w0rd!\",\n  \"rememberMe\": true\n}"
+              "raw": "{\n  \"email/userId/nickname\": \"{{email_0}}\",\n  \"password\": \"Pa$$w0rd!\",\n  \"rememberMe\": true\n}"
             },
             "url": {
               "raw": "{{base_url}}/api/v1/auth/login",
