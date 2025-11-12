@@ -1884,19 +1884,43 @@ No need for a request body.
 ``` json
  [
     {
-      "id": 4657634346334,
-      "nickname": "nickname", // or null
-      "firstName": "first",
-      "lastName": "last",
-      "avatarId": 32456788986756444
+      "userId": 1289843874323,
+      "nickname": "alice123",
+      "firstName": "Alice",
+      "lastName": "Johnson",
+      "avatarId": 5956843825683,
+      "status": "accepted", // pending/accepted
+      "chatId": null
     },
     {
-      "id": 43646547547547456,
-      "nickname": "nickname", // or null
-      "firstName": "first",
-      "lastName": "last",
-      "avatarId": 32456788986756446
-    }
+      "postId": 3389843874075,
+      "authorId": 1289843874339,
+      "authorNickname": "charlie_dev", // or null
+      "authorlastName": "alice",
+      "authorFirstName": "khalifa",
+      "content": "Deploying a new Go microservice!",
+      "mediaIds": [23456543456787654], // or null
+      "privacy": "followers",
+      "isLikedByUser": true,
+      "stats": {
+        "reactionCount": 10,
+        "commentCount": 30,
+      },
+      "createdAt": "2025-10-24T15:00:00Z",
+      "updatedAt": "2025-10-24T15:00:00Z",
+      "groupId": 98765789765789 // or null
+    },
+    {
+      "groupId": 345678908765,
+      "title": "Go Developers",
+      "description": "A group for sharing Go programming tips and projects.",
+      "avatarId": 657543234567865, // optinal
+      "creatorId": 567890987654,
+      "memberCount": 77,
+      "status": "accepted", // pending/accepted/declined or null 
+      "chatId": 43567898765, // if the user mumber of the group
+      "createdAt": "2025-10-24T23:15:00Z"
+    },
   ]
 
 ```
