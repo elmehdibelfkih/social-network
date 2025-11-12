@@ -77,7 +77,7 @@ func LoginUserAccount(w http.ResponseWriter, r *http.Request, body *LoginRequest
 		return false
 	}
 	if body.RememberMe {
-		err = UpdateRememberMeToken(remember, response.UserId)
+		err = UpdateRememberMeToken(s.SessionId, remember, response.UserId)
 		if err != nil {
 			utils.BackendErrorTarget(err, context)
 			utils.IdentifySqlError(w, err)

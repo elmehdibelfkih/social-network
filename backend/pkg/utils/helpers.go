@@ -10,6 +10,7 @@ import (
 	"net/http"
 	config "social/pkg/config"
 	"strconv"
+	"strings"
 
 	"github.com/mattn/go-sqlite3"
 	"golang.org/x/crypto/bcrypt"
@@ -17,21 +18,28 @@ import (
 
 func IdentifySqlError(w http.ResponseWriter, err error) {
 	if errors.Is(err, sql.ErrNoRows) {
-		BadRequest(w, err.Error(), "alert")
+		BadRequest(w, "Record not found", "alert")
 		return
 	}
 	var sqliteErr sqlite3.Error
 	if errors.As(err, &sqliteErr) {
 		switch sqliteErr.ExtendedCode {
 		case sqlite3.ErrConstraintUnique:
-			BadRequest(w, err.Error(), "alert")
+			BadRequest(w, getDuplicatedColumn(err.Error()), "alert")
 			return
 		case sqlite3.ErrConstraintForeignKey:
-			BadRequest(w, err.Error(), "alert")
+			BadRequest(w, "Cannot perform this action: linked data exists", "alert")
 			return
 		}
 	}
 	InternalServerError(w)
+}
+
+func getDuplicatedColumn(errStr string) string {
+	const prefix = "UNIQUE constraint failed: "
+	field := strings.TrimPrefix(errStr, prefix)
+	parts := strings.Split(field, ".")
+	return parts[len(parts)-1] + "already Exists"
 }
 
 func GetQuerryPramInt(r *http.Request, key string) int64 {
