@@ -68,7 +68,7 @@ func tryRememberMe(w http.ResponseWriter, r *http.Request) (int64, error) {
 	setSessionCookie(w, s)
 
 	//update the remeber me
-	if err := auth.UpdateRememberMeToken(rememberMe, rememberMe.UserId); err != nil {
+	if err := auth.UpdateRememberMeToken(s.SessionId, rememberMe, rememberMe.UserId); err != nil {
 		return 0, err
 	}
 	setRememberMeCookie(w, rememberMe)
