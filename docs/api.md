@@ -522,6 +522,7 @@ No need for a request body.
       "content": "Deploying a new Go microservice!",
       "mediaIds": [23456543456787654], // or null
       "privacy": "followers",
+      "isLikedByUser": true,
       "createdAt": "2025-10-24T15:00:00Z",
       "updatedAt": "2025-10-24T15:00:00Z",
       "groupId": 98765789765789 // or null
@@ -535,6 +536,7 @@ No need for a request body.
       "content": "Cloud architecture tips.",
       "mediaIds": null,
       "privacy": "public",
+      "isLikedByUser": true,
       "createdAt": "2025-10-23T18:20:00Z",
       "updatedAt": "2025-10-23T18:20:00Z",
       "groupId": null
@@ -569,6 +571,7 @@ No need for a request body.
       "content": "Working on a new distributed system...",
       "mediaIds": null,
       "privacy": "public",
+      "isLikedByUser": true,
       "createdAt": "2025-10-24T12:30:00Z",
       "updatedAt": "2025-10-24T12:30:00Z"
     },
@@ -581,6 +584,7 @@ No need for a request body.
       "content": "Private note only visible to followers.",
       "mediaIds": null,
       "privacy": "followers",
+      "isLikedByUser": true,
       "createdAt": "2025-10-23T17:05:00Z",
       "updatedAt": "2025-10-23T17:05:00Z"
     }
@@ -614,6 +618,7 @@ No need for a request body.
       "content": "Working on a new distributed system...",
       "mediaIds": [1234567890987],
       "privacy": "public",
+      "isLikedByUser": true,
       "createdAt": "2025-10-24T12:30:00Z",
       "updatedAt": "2025-10-24T12:30:00Z"
     },
@@ -626,6 +631,7 @@ No need for a request body.
       "content": "Private note only visible to followers.",
       "mediaIds": null,
       "privacy": "followers",
+      "isLikedByUser": true,
       "createdAt": "2025-10-23T17:05:00Z",
       "updatedAt": "2025-10-23T17:05:00Z"
     }
@@ -691,6 +697,7 @@ No need for a request body.
   "privacy": "public",
   "groupId": null,
   "allowedList": null,
+  "isLikedByUser": true,
   "createdAt": "2025-10-24T19:30:00Z",
   "updatedAt": "2025-10-24T19:30:00Z"
 }
@@ -729,6 +736,7 @@ No need for a request body.
     "privacy": "restricted",
     "allowedList": [128984387246925, 128984387246925], // or null if the privacy not restricted
     "groupId": null, // or group id if the post belongs to a group
+    "isLikedByUser": true,
     "createdAt": "2025-10-24T19:30:00Z",
     "updatedAt": "2025-10-24T20:05:00Z"
   }
@@ -789,6 +797,7 @@ No need for a request body.
       "mediaIds": [1289843874657, 1289843872746], // or null
       "privacy": "public",
       "allowedList": null,
+      "isLikedByUser": true,
       "createdAt": "2025-10-24T12:30:00Z",
       "updatedAt": "2025-10-24T12:30:00Z"
     },
@@ -802,6 +811,7 @@ No need for a request body.
       "mediaIds": [1289843872746],
       "privacy": "restricted",
       "allowedList": [128984387246925, 128984387246925], // or null if the privacy not restricted
+      "isLikedByUser": true,
       "createdAt": "2025-10-23T17:05:00Z",
       "updatedAt": "2025-10-23T17:05:00Z"
     }
@@ -1198,7 +1208,7 @@ No need for a request body.
       "description": "A group for sharing Go programming tips and projects.",
       "avatarId": 657543234567865, // optinal
       "creatorId": 567890987654,
-      "memberCount": 456789098765,
+      "memberCount": 77,
       "createdAt": "2025-10-24T23:15:00Z"
     },
     {
@@ -1207,7 +1217,7 @@ No need for a request body.
       "description": "Advanced topics and projects in Go.",
       "avatarId": 657543234567865, // optinal
       "creatorId": 766587689658658,
-      "memberCount": 76876876846876,
+      "memberCount": 77,
       "createdAt": "2025-10-24T23:45:00Z"
     }
   ]
