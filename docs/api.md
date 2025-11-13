@@ -1,4 +1,4 @@
-# SOCIAL-NETWORK API
+# [SOCIAL-NETWORK](../README.md) API
 
 ## Response structure
 
@@ -1278,7 +1278,7 @@ No need for a request body.
 
 ---
 
-### GET `/api/v1/groups/{user_id}` => get user groups (respect pricavy)
+### GET `/api/v1/groups/:user_id` => get user groups (respect pricavy)
 
 ***status code in success: 200***
 
