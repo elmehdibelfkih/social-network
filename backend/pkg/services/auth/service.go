@@ -181,11 +181,7 @@ func GetUserSession(w http.ResponseWriter, r *http.Request, response *SessionRes
 }
 
 func GetUserSessionHttp(w http.ResponseWriter, response SessionResponseJson) {
-	utils.JsonResponseEncode(w, http.StatusOK, map[string]any{
-		"success": true,
-		"payload": response,
-		"error":   map[string]any{},
-	})
+	utils.WriteSuccess(w, http.StatusOK, response)
 }
 
 func GetUserSessions(w http.ResponseWriter, r *http.Request, response *SessionsResponseJson, context string) bool {
@@ -206,11 +202,7 @@ func GetUserSessions(w http.ResponseWriter, r *http.Request, response *SessionsR
 }
 
 func GetUserSessionsHttp(w http.ResponseWriter, response SessionsResponseJson) {
-	utils.JsonResponseEncode(w, http.StatusOK, map[string]any{
-		"success": true,
-		"payload": response,
-		"error":   map[string]any{},
-	})
+	utils.WriteSuccess(w, http.StatusOK, response)
 }
 
 func DeleteSessionBySessionId(w http.ResponseWriter, r *http.Request, sessionId int64, context string) bool {
@@ -237,11 +229,7 @@ func DeleteSessionHttp(w http.ResponseWriter, response RevokeSessionResponseJson
 		Path: "/",
 	})
 	response.Message = "Logout successful."
-	utils.JsonResponseEncode(w, http.StatusOK, map[string]any{
-		"success": true,
-		"payload": response,
-		"error":   map[string]any{},
-	})
+	utils.WriteSuccess(w, http.StatusOK, response)
 }
 
 func GeneratePasswordHash(w http.ResponseWriter, body *RegisterRequestJson, context string) bool {

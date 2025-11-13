@@ -16,16 +16,23 @@ const GROUP_ENTITY_TYPE = `group`
 const COMMENT_ENTITY_TYPE = `comment`
 
 const FOLLOWERS_ENTITY_NAME = "followers"
+const FOLLOWEES_ENTITY_NAME = "followees"
 const POSTS_ENTITY_NAME = "posts"
 const COMMENTS_ENTITY_NAME = "comments"
 const REACTIONS_ENTITY_NAME = "reactions"
 const SHARSE_ENTITY_TYPE = "shares"
 
-type DBCounter struct {
+type DBCounterSetter struct {
 	CounterName string
 	EntityType  string
 	EntityID    int64
 	Action      string
+}
+
+type DBCounterGetter struct {
+	CounterName string
+	EntityType  string
+	EntityID    int64
 }
 
 const UPDATE_COUNT = `
@@ -42,6 +49,7 @@ const UPDATE_COUNT = `
       ?2, -- entity_type
       ?3, -- entity_id
       CASE WHEN ?1 = 'followers' THEN (CASE WHEN ?4 = 'increment' THEN 1 ELSE -1 END) ELSE 0 END,
+      CASE WHEN ?1 = 'followees' THEN (CASE WHEN ?4 = 'increment' THEN 1 ELSE -1 END) ELSE 0 END,
       CASE WHEN ?1 = 'posts'     THEN (CASE WHEN ?4 = 'increment' THEN 1 ELSE -1 END) ELSE 0 END,
       CASE WHEN ?1 = 'comments'  THEN (CASE WHEN ?4 = 'increment' THEN 1 ELSE -1 END) ELSE 0 END,
       CASE WHEN ?1 = 'reactions' THEN (CASE WHEN ?4 = 'increment' THEN 1 ELSE -1 END) ELSE 0 END,
@@ -49,12 +57,23 @@ const UPDATE_COUNT = `
     )
     ON CONFLICT (entity_type, entity_id) DO UPDATE SET
       followers_count = followers_count + CASE WHEN ?1 = 'followers' THEN (CASE WHEN ?4 = 'increment' THEN 1 ELSE -1 END) ELSE 0 END,
+      followees_count = followees_count + CASE WHEN ?1 = 'followees' THEN (CASE WHEN ?4 = 'increment' THEN 1 ELSE -1 END) ELSE 0 END,
       posts_count     = posts_count     + CASE WHEN ?1 = 'posts'     THEN (CASE WHEN ?4 = 'increment' THEN 1 ELSE -1 END) ELSE 0 END,
       comments_count  = comments_count  + CASE WHEN ?1 = 'comments'  THEN (CASE WHEN ?4 = 'increment' THEN 1 ELSE -1 END) ELSE 0 END,
       reactions_count = reactions_count + CASE WHEN ?1 = 'reactions' THEN (CASE WHEN ?4 = 'increment' THEN 1 ELSE -1 END) ELSE 0 END,
       shares_count    = shares_count    + CASE WHEN ?1 = 'shares'    THEN (CASE WHEN ?4 = 'increment' THEN 1 ELSE -1 END) ELSE 0 END,
       updated_at = CURRENT_TIMESTAMP;
 `
+
+func UpdateCounter(tx *sql.Tx, counter DBCounterSetter) error {
+	_, err := tx.Exec(UPDATE_COUNT, counter.CounterName, counter.EntityType, counter.EntityID, counter.Action)
+	return err
+}
+
+func GetCounter(counter DBCounterGetter) (int, error) {
+
+	return 0, nil
+}
 
 func InitDB() error {
 	var err error
@@ -103,9 +122,4 @@ func WrapWithTransaction(fn func(*sql.Tx) error) error {
 	}
 
 	return tx.Commit()
-}
-
-func UpdateCounter(tx *sql.Tx, counter DBCounter) error {
-	_, err := tx.Exec(UPDATE_COUNT, counter.CounterName, counter.EntityType, counter.EntityID, counter.Action)
-	return err
 }

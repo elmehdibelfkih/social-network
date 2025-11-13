@@ -23,8 +23,8 @@ func followNotification(followerId, followedId int64, status string) Notificatio
 	return notification
 }
 
-func followUnfollowUpdateCounterStruct(entityType string, entityID int64, counterName string, action string) database.DBCounter {
-	var counter database.DBCounter
+func followUnfollowUpdateCounterStruct(entityType string, entityID int64, counterName string, action string) database.DBCounterSetter {
+	var counter database.DBCounterSetter
 
 	counter.CounterName = counterName
 	counter.EntityType = entityType

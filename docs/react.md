@@ -1,12 +1,14 @@
 # react hooks
 
 ## react hooks used in this project
-useState 
+
+useState
 useEffects
 useRef
 useContext
 
 ## you might also find one of multiple of these
+
 - useReducer → Forms with multiple fields or state machines.
 - useMemo → Expensive calculations, filtering/sorting large arrays.
 - useCallback → Prevent unnecessary re-render of child components when passing callbacks.

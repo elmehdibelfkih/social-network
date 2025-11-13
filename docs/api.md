@@ -222,7 +222,6 @@ No need for a request body.
 ```
 
 > - Note⚠️: The status key includes the state of the follower/following relationship between the current user and the user that owns the profile.
-> - Note⚠️: If the user already follows the owner of the profile. The status key must be 'unfollow'.
 
 ---
 

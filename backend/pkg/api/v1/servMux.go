@@ -1,10 +1,6 @@
 package v1
 
 import (
-	"fmt"
-	"net/http"
-
-
 	"social/pkg/app/dependencies/middleware"
 	"social/pkg/app/dependencies/router"
 	"social/pkg/services/auth"
@@ -12,16 +8,14 @@ import (
 	follow "social/pkg/services/followers"
 	"social/pkg/services/groups"
 	"social/pkg/services/media"
-	"social/pkg/services/users"
 	"social/pkg/services/notifications"
 	"social/pkg/services/search"
+	"social/pkg/services/users"
 	"social/pkg/utils"
 )
 
 func SocialMux() *router.Router {
 	socialMux := router.NewRouter()
-	socialMux.HandleFunc("GET", "/", utils.MiddlewareChain(testHandler, middleware.AuthMiddleware, middleware.UserContext))
-	socialMux.HandleFunc("DELETE", "/", utils.MiddlewareChain(testHandler, middleware.UserContext))
 
 	// auth
 	socialMux.HandleFunc("POST", "/api/v1/auth/register", utils.MiddlewareChain(auth.PostRegister))
@@ -89,9 +83,4 @@ func SocialMux() *router.Router {
 
 	socialMux.HandleFunc("GET", "/api/v1/search", utils.MiddlewareChain(search.HandleSearch, middleware.UserContext, middleware.AuthMiddleware))
 	return socialMux
-}
-
-func testHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("Route hit:", r.URL.Path, r.Header.Get("User-Agent"))
-	fmt.Fprintf(w, "hello")
 }

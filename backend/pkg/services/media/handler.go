@@ -136,6 +136,7 @@ func HandleDeleteMedia(w http.ResponseWriter, r *http.Request) {
 		}
 		utils.SQLiteErrorTarget(err, "handleDeleteMedia (DeleteMedia)")
 		utils.InternalServerError(w)
+		
 		return
 	}
 

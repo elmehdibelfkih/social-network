@@ -3,6 +3,7 @@
 - [go back to the next doc](./next.md)
 
 ## structure
+
 ```
 ├── components/           # Reusable UI components (Buttons, Navbar, etc.)
 │   ├── ui/
@@ -16,10 +17,10 @@
 
 ## layout
 
-- this folder is dedicated for a components that are shared acroos a global layout of a specific route 
+- this folder is dedicated for a components that are shared acroos a global layout of a specific route
 
 for example:
-    
+
 ```
 ├── components/
 │   ├── chat/
@@ -36,7 +37,6 @@ for example:
         loginForm.tsx
 ```
 
-
 styles of the components should be placed in styles/components/ and must be named *.module.css and imported in their component
 for example:
 
@@ -50,7 +50,7 @@ for example:
                 loginForm.module.css
 ```
 
-## server side vs client side components 
+## server side vs client side components
 
 ### Server Components (default)
 

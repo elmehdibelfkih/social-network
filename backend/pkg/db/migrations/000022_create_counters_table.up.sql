@@ -2,6 +2,7 @@ CREATE TABLE IF NOT EXISTS counters (
   entity_type TEXT NOT NULL,
   entity_id INTEGER NOT NULL,
   followers_count INTEGER NOT NULL DEFAULT 0,
+  followees_count INTEGER NOT NULL DEFAULT 0,
   posts_count INTEGER NOT NULL DEFAULT 0,
   comments_count INTEGER NOT NULL DEFAULT 0,
   reactions_count INTEGER NOT NULL DEFAULT 0,
