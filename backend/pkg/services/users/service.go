@@ -24,7 +24,8 @@ func GetUserProfile(w http.ResponseWriter, profileUserId, viewerUserId int64, co
 	}
 
 	// Privacy check: if private, only owner or followers can view
-	if profile.Privacy == "private" {
+	println(viewerUserId, profileUserId)
+	if profile.Privacy == "private" && viewerUserId != profileUserId {
 		// Owner can always view their own profile
 		if viewerUserId == 0 || viewerUserId != profileUserId {
 			// Check if viewer is a follower
@@ -42,7 +43,9 @@ func GetUserProfile(w http.ResponseWriter, profileUserId, viewerUserId int64, co
 	}
 
 	// Get follow status (only if viewer is logged in and not viewing own profile)
-	var followStatus string = "follow"
+	var followStatus *string
+	tmp := "follow"
+	followStatus = &tmp
 	if viewerUserId > 0 && viewerUserId != profileUserId {
 		isFollowing, err := SelectFollowStatus(viewerUserId, profileUserId)
 		if err != nil {
@@ -51,7 +54,8 @@ func GetUserProfile(w http.ResponseWriter, profileUserId, viewerUserId int64, co
 			return response, false
 		}
 		if isFollowing {
-			followStatus = "unfollow"
+			tmp := "unfollow"
+			followStatus = &tmp
 		}
 	}
 
@@ -79,6 +83,7 @@ func GetUserProfile(w http.ResponseWriter, profileUserId, viewerUserId int64, co
 
 	// Build response
 	response.UserId = profile.Id
+	// if
 	response.Status = followStatus
 	response.Nickname = profile.Nickname
 	response.FirstName = profile.FirstName

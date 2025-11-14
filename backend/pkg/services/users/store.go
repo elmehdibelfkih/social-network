@@ -5,6 +5,7 @@ import (
 	"errors"
 	"social/pkg/config"
 	"social/pkg/utils"
+	"strings"
 )
 
 // Read operations
@@ -103,6 +104,9 @@ func SelectFollowersCount(userId int64) (int64, error) {
 	var count int64
 	err := config.DB.QueryRow(SELECT_FOLLOWERS_COUNT, userId).Scan(&count)
 	if err != nil {
+		if strings.Contains(err.Error(), "no such column") {
+			return 0, nil
+		}
 		utils.SQLiteErrorTarget(err, SELECT_FOLLOWERS_COUNT)
 		return 0, err
 	}
@@ -114,6 +118,9 @@ func SelectFollowingCount(userId int64) (int64, error) {
 	var count int64
 	err := config.DB.QueryRow(SELECT_FOLLOWING_COUNT, userId).Scan(&count)
 	if err != nil {
+		if strings.Contains(err.Error(), "no such column") {
+			return 0, nil
+		}
 		utils.SQLiteErrorTarget(err, SELECT_FOLLOWING_COUNT)
 		return 0, err
 	}

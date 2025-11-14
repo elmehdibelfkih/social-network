@@ -208,6 +208,7 @@ No need for a request body.
   "firstName": "first",
   "lastName": "last",
   "avatarId": 1289843874780, // or null
+  "avatarId": 1289843874780, // or null
   "aboutMe": "Full-stack developer and cloud enthusiast.", // or null
   "dateOfBirth": "2001-01-01",
   "privacy": "public",

@@ -17,17 +17,17 @@ type UpdatePrivacyRequestJson struct {
 
 // Response structs
 type UserProfileResponseJson struct {
-	UserId      int64                 `json:"userId"`
-	Status      string                `json:"status"` // "follow" or "unfollow"
-	Nickname    *string               `json:"nickname"`
-	FirstName   string                `json:"firstName"`
-	LastName    string                `json:"lastName"`
-	AvatarId    *int64                `json:"avatarId"`
-	AboutMe     *string               `json:"aboutMe"`
-	DateOfBirth string                `json:"dateOfBirth"`
-	Privacy     string                `json:"privacy"`
-	Stats       UserProfileStatsJson  `json:"stats"`
-	JoinedAt    string                `json:"joinedAt"`
+	UserId      int64                `json:"userId"`
+	Status      *string              `json:"status"` // "follow" or "unfollow"
+	Nickname    *string              `json:"nickname"`
+	FirstName   string               `json:"firstName"`
+	LastName    string               `json:"lastName"`
+	AvatarId    *int64               `json:"avatarId"`
+	AboutMe     *string              `json:"aboutMe"`
+	DateOfBirth string               `json:"dateOfBirth"`
+	Privacy     string               `json:"privacy"`
+	Stats       UserProfileStatsJson `json:"stats"`
+	JoinedAt    string               `json:"joinedAt"`
 }
 
 type UserProfileStatsJson struct {
