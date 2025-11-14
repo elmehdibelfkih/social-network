@@ -63,15 +63,41 @@ func SelectUserBasicById(userId int64) (int64, string, error) {
 }
 
 // SelectFollowStatus returns whether followerId is following followingId.
-func SelectFollowStatus(followerId, followed int64) (bool, error) {
-	var count int64
-	err := config.DB.QueryRow(SELECT_FOLLOW_STATUS, followerId, followed).Scan(&count)
+// func SelectFollowStatus(followerId, followed int64) (bool, error) {
+// 	var count int64
+// 	err := config.DB.QueryRow(SELECT_FOLLOW_STATUS, followerId, followed).Scan(&count)
+// 	if err != nil {
+// 		utils.SQLiteErrorTarget(err, SELECT_FOLLOW_STATUS)
+// 		return false, err
+// 	}
+// 	return count > 0, nil
+// }
+
+func SelectFollowStatusType(followerId, followed int64) (*FollowStatusType, error) {
+	var followType FollowStatusType
+	err := config.DB.QueryRow(SELECT_FOLLOW_STATUS_TYPE, followerId, followed).Scan(&followType.Status)
 	if err != nil {
-		utils.SQLiteErrorTarget(err, SELECT_FOLLOW_STATUS)
-		return false, err
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, sql.ErrNoRows
+		}
+		utils.SQLiteErrorTarget(err, SELECT_FOLLOW_STATUS_TYPE)
+		return nil, err
 	}
-	return count > 0, nil
+	return &followType, nil
 }
+
+// func SelectFollowChatId(followerId, followed int64) (*FollowChatId, error) {
+// 	var chatId FollowChatId
+// 	err := config.DB.QueryRow(SELECT_CHAT_ID, followerId, followed).Scan(&FollowChatId.chatId.Status)
+// 	if err != nil {
+// 		if errors.Is(err, sql.ErrNoRows) {
+// 			return nil, sql.ErrNoRows
+// 		}
+// 		utils.SQLiteErrorTarget(err, SELECT_FOLLOW_STATUS_TYPE)
+// 		return nil, err
+// 	}
+// 	return &chatId, nil
+// }
 
 // SelectUserPrivacy returns the privacy value for a user.
 func SelectUserPrivacy(userId int64) (string, error) {
@@ -101,7 +127,7 @@ func SelectPostsCount(userId int64) (int64, error) {
 // SelectFollowersCount returns how many users follow the given user.
 func SelectFollowersCount(userId int64) (int64, error) {
 	var count int64
-	err := config.DB.QueryRow(SELECT_FOLLOWERS_COUNT, userId).Scan(&count)
+	err := config.DB.QueryRow(SELECT_FOLLOWERS_COUNT, userId, "accepted").Scan(&count)
 	if err != nil {
 		utils.SQLiteErrorTarget(err, SELECT_FOLLOWERS_COUNT)
 		return 0, err
@@ -112,7 +138,7 @@ func SelectFollowersCount(userId int64) (int64, error) {
 // SelectFollowingCount returns how many users the given user follows.
 func SelectFollowingCount(userId int64) (int64, error) {
 	var count int64
-	err := config.DB.QueryRow(SELECT_FOLLOWING_COUNT, userId).Scan(&count)
+	err := config.DB.QueryRow(SELECT_FOLLOWING_COUNT, userId, "accepted").Scan(&count)
 	if err != nil {
 		utils.SQLiteErrorTarget(err, SELECT_FOLLOWING_COUNT)
 		return 0, err

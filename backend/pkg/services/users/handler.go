@@ -13,9 +13,12 @@ func GetProfile(w http.ResponseWriter, r *http.Request) {
 		utils.BadRequest(w, "Invalid user ID.", "redirect")
 		return
 	}
-	// Get current user from context (may be 0 if not logged in)
+	// Get current user from context
 	viewerUserId := utils.GetUserIdFromContext(r)
-
+	if viewerUserId == -1 {
+		utils.BadRequest(w, "Invalid user ID.", "redirect")
+		return
+	}
 	// Call service layer
 	response, ok := GetUserProfile(w, profileUserId, viewerUserId, "GetProfile handler")
 	if !ok {

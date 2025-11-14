@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"errors"
 	"net/http"
+	// "social/pkg/services/chat"
 	"social/pkg/utils"
 )
 
@@ -23,36 +24,24 @@ func GetUserProfile(w http.ResponseWriter, profileUserId, viewerUserId int64, co
 		return response, false
 	}
 
-	// Privacy check: if private, only owner or followers can view
-	if profile.Privacy == "private" {
-		// Owner can always view their own profile
-		if viewerUserId == 0 || viewerUserId != profileUserId {
-			// Check if viewer is a follower
-			isFollower, err := SelectFollowStatus(viewerUserId, profileUserId)
-			if err != nil {
-				utils.BackendErrorTarget(err, context)
-				utils.InternalServerError(w)
-				return response, false
-			}
-			if !isFollower {
-				utils.Unauthorized(w, "This profile is private. You must follow this user to view their profile.")
-				return response, false
-			}
-		}
-	}
-
-	// Get follow status (is follow || unfollow )
-	var followStatus string = "follow"
-	if viewerUserId > 0 && viewerUserId != profileUserId {
-		isFollowing, err := SelectFollowStatus(viewerUserId, profileUserId)
+	// Get follow status  (pending/accepted/declined or null)
+	var followStatus *FollowStatusType
+	if viewerUserId != profileUserId {
+		followStatus, err = SelectFollowStatusType(viewerUserId, profileUserId)
 		if err != nil {
 			utils.BackendErrorTarget(err, context)
 			utils.InternalServerError(w)
 			return response, false
 		}
-		if isFollowing {
-			followStatus = "unfollow"
-		}
+
+	}
+	// Privacy check: if private, only owner or followers can view
+	if profile.Privacy == "private" && viewerUserId != profileUserId  {
+
+		if followStatus == nil || *followStatus.Status != "accepted" {
+				utils.Unauthorized(w, "This profile is private. You must follow this user to view their profile.")
+				return response, false
+			}
 	}
 
 	// Get stats
@@ -62,7 +51,7 @@ func GetUserProfile(w http.ResponseWriter, profileUserId, viewerUserId int64, co
 		utils.InternalServerError(w)
 		return response, false
 	}
-
+	//followes && following COUNT
 	followersCount, err := SelectFollowersCount(profileUserId)
 	if err != nil {
 		utils.BackendErrorTarget(err, context)
@@ -77,9 +66,20 @@ func GetUserProfile(w http.ResponseWriter, profileUserId, viewerUserId int64, co
 		return response, false
 	}
 
+	// Get ChatId if current user and the target user have an accepted relationship
+	// var chatId =  *FollowChatId
+	// if  viewerUserId != profileUserId   && followStatus != nil || *followStatus.Status == "accepted"{
+	// 	chatId, err = SelectChatId(viewerUserId, profileUserId)
+	// 	if err != nil {
+	// 		utils.BackendErrorTarget(err, context)
+	// 		utils.InternalServerError(w)
+	// 		return response, false
+	// 	}
+	// }
+
 	// Build response
 	response.UserId = profile.Id
-	if (viewerUserId == profileUserId) { response.Status = nil }else{ response.Status = &followStatus  }
+	if viewerUserId == profileUserId || followStatus == nil { response.Status = nil } else { response.Status = followStatus.Status }
 	response.Nickname = profile.Nickname
 	response.FirstName = profile.FirstName
 	response.LastName = profile.LastName
@@ -87,6 +87,7 @@ func GetUserProfile(w http.ResponseWriter, profileUserId, viewerUserId int64, co
 	response.AboutMe = profile.AboutMe
 	response.DateOfBirth = profile.DateOfBirth
 	response.Privacy = profile.Privacy
+	// if viewerUserId == profileUserId  || *followStatus.Status != "accepted"  { response.ChatId = nil }else { response.ChatId = chatId} 
 	response.Stats.PostsCount = postsCount
 	response.Stats.FollowersCount = followersCount
 	response.Stats.FollowingCount = followingCount
