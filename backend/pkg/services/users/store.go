@@ -62,42 +62,33 @@ func SelectUserBasicById(userId int64) (int64, string, error) {
 	return id, privacy, nil
 }
 
-// SelectFollowStatus returns whether followerId is following followingId.
-// func SelectFollowStatus(followerId, followed int64) (bool, error) {
-// 	var count int64
-// 	err := config.DB.QueryRow(SELECT_FOLLOW_STATUS, followerId, followed).Scan(&count)
-// 	if err != nil {
-// 		utils.SQLiteErrorTarget(err, SELECT_FOLLOW_STATUS)
-// 		return false, err
-// 	}
-// 	return count > 0, nil
-// }
-
-func SelectFollowStatusType(followerId, followed int64) (*FollowStatusType, error) {
-	var followType FollowStatusType
-	err := config.DB.QueryRow(SELECT_FOLLOW_STATUS_TYPE, followerId, followed).Scan(&followType.Status)
+// SelectFollowStatus returns the follow status ('pending', 'accepted', 'declined') or nil if no relationship exists
+func SelectFollowStatus(followerId, followedId int64) (*string, error) {
+	var status string
+	err := config.DB.QueryRow(SELECT_FOLLOW_STATUS, followerId, followedId).Scan(&status)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return nil, sql.ErrNoRows
+			return nil, nil // No relationship exists
 		}
-		utils.SQLiteErrorTarget(err, SELECT_FOLLOW_STATUS_TYPE)
+		utils.SQLiteErrorTarget(err, SELECT_FOLLOW_STATUS)
 		return nil, err
 	}
-	return &followType, nil
+	return &status, nil
 }
 
-// func SelectFollowChatId(followerId, followed int64) (*FollowChatId, error) {
-// 	var chatId FollowChatId
-// 	err := config.DB.QueryRow(SELECT_CHAT_ID, followerId, followed).Scan(&FollowChatId.chatId.Status)
-// 	if err != nil {
-// 		if errors.Is(err, sql.ErrNoRows) {
-// 			return nil, sql.ErrNoRows
-// 		}
-// 		utils.SQLiteErrorTarget(err, SELECT_FOLLOW_STATUS_TYPE)
-// 		return nil, err
-// 	}
-// 	return &chatId, nil
-// }
+//  finds a private chat between two users and return the chat ID if found || nil
+func SelectChatIdBetweenUsers(userId1, userId2 int64) (*int64, error) {
+	var chatId int64
+	err := config.DB.QueryRow(SELECT_CHAT_ID_BETWEEN_USERS, userId1, userId2).Scan(&chatId)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, nil // No private chat exists, return nil
+		}
+		utils.SQLiteErrorTarget(err, SELECT_CHAT_ID_BETWEEN_USERS)
+		return nil, err
+	}
+	return &chatId, nil
+}
 
 // SelectUserPrivacy returns the privacy value for a user.
 func SelectUserPrivacy(userId int64) (string, error) {

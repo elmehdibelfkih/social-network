@@ -26,7 +26,7 @@ type UserProfileResponseJson struct {
 	AboutMe     *string              `json:"aboutMe"`
 	DateOfBirth string               `json:"dateOfBirth"`
 	Privacy     string               `json:"privacy"`
-	ChatId      *string              `jsone:"chatId"`
+	ChatId      *int64               `json:"chatId"`
 	Stats       UserProfileStatsJson `json:"stats"`
 	JoinedAt    string               `json:"joinedAt"`
 }
@@ -68,11 +68,3 @@ type UserProfile struct {
 	Privacy     string
 	CreatedAt   string
 }
-
-type FollowStatusType struct {
-	Status *string `json:"status`
-}
-
-// type FollowChatId struct {
-// 	ChatId *string `json:"chatId`
-// }
