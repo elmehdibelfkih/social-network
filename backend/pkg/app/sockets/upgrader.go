@@ -3,7 +3,6 @@ package socket
 import (
 	"net/http"
 	"social/pkg/utils"
-	"time"
 
 	"github.com/gorilla/websocket"
 )
@@ -26,14 +25,8 @@ func checkOrigin(r *http.Request) bool {
 	}
 }
 
-var (
-	pongWait     = 10 * time.Second
-	pingInterval = (pongWait * 9) / 10
-)
-
 func UpgradeProtocol(w http.ResponseWriter, r *http.Request) {
 	userId := utils.GetUserIdFromContext(r)
-
 	if r.Header.Get("Upgrade") != "websocket" {
 		utils.BadRequest(w, "not a websocket upgrade request", "redirect")
 		return
@@ -53,5 +46,11 @@ func UpgradeProtocol(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Replace old connection atomically
+	// create the client sturuct
+	c := NewClient(WSManger, conn, userId, sessionCookie)
+
+	WSManger.add <- c
+
+	go c.readMessages()
+	go c.writeMessages()
 }
