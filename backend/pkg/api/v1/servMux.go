@@ -5,6 +5,7 @@ import (
 	"social/pkg/app/dependencies/router"
 	"social/pkg/services/auth"
 	"social/pkg/services/chat"
+	"social/pkg/services/feed"
 	follow "social/pkg/services/followers"
 	"social/pkg/services/groups"
 	"social/pkg/services/media"
@@ -12,6 +13,7 @@ import (
 	"social/pkg/services/posts"
 	"social/pkg/services/search"
 	"social/pkg/services/users"
+
 	"social/pkg/utils"
 )
 
@@ -99,5 +101,11 @@ func SocialMux() *router.Router {
 	socialMux.HandleFunc("POST", "/api/v1/notifications/{id}/mark-read", utils.MiddlewareChain(notifications.HandleMarkNotifAsRead, middleware.AuthMiddleware, notifications.NotifMiddleware))
 
 	socialMux.HandleFunc("GET", "/api/v1/search", utils.MiddlewareChain(search.HandleSearch, middleware.UserContext, middleware.AuthMiddleware))
+
+	// Feed   ( personal && Specific user feed && Group feed )
+	socialMux.HandleFunc("GET", "/api/v1/feed", utils.MiddlewareChain(feed.GetFeed, middleware.AuthMiddleware))
+	socialMux.HandleFunc("GET", "/api/v1/users/{user_id}/feed", utils.MiddlewareChain(feed.GetFeedUser, middleware.AuthMiddleware))
+	socialMux.HandleFunc("GET", "/api/v1/groups/{group_id}/feed", utils.MiddlewareChain(feed.GetFeedGroup, middleware.AuthMiddleware))
+
 	return socialMux
 }

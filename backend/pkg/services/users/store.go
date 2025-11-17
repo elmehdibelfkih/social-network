@@ -63,15 +63,32 @@ func SelectUserBasicById(userId int64) (int64, string, error) {
 	return id, privacy, nil
 }
 
-// SelectFollowStatus returns whether followerId is following followingId.
-func SelectFollowStatus(followerId, followingId int64) (bool, error) {
-	var count int64
-	err := config.DB.QueryRow(SELECT_FOLLOW_STATUS, followerId, followingId).Scan(&count)
+// SelectFollowStatus returns the follow status ('pending', 'accepted', 'declined') or nil if no relationship exists
+func SelectFollowStatus(followerId, followedId int64) (*string, error) {
+	var status string
+	err := config.DB.QueryRow(SELECT_FOLLOW_STATUS, followerId, followedId).Scan(&status)
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, nil // No relationship exists
+		}
 		utils.SQLiteErrorTarget(err, SELECT_FOLLOW_STATUS)
-		return false, err
+		return nil, err
 	}
-	return count > 0, nil
+	return &status, nil
+}
+
+//  finds a private chat between two users and return the chat ID if found || nil
+func SelectChatIdBetweenUsers(userId1, userId2 int64) (*int64, error) {
+	var chatId int64
+	err := config.DB.QueryRow(SELECT_CHAT_ID_BETWEEN_USERS, userId1, userId2).Scan(&chatId)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, nil // No private chat exists, return nil
+		}
+		utils.SQLiteErrorTarget(err, SELECT_CHAT_ID_BETWEEN_USERS)
+		return nil, err
+	}
+	return &chatId, nil
 }
 
 // SelectUserPrivacy returns the privacy value for a user.
@@ -102,7 +119,7 @@ func SelectPostsCount(userId int64) (int64, error) {
 // SelectFollowersCount returns how many users follow the given user.
 func SelectFollowersCount(userId int64) (int64, error) {
 	var count int64
-	err := config.DB.QueryRow(SELECT_FOLLOWERS_COUNT, userId).Scan(&count)
+	err := config.DB.QueryRow(SELECT_FOLLOWERS_COUNT, userId, "accepted").Scan(&count)
 	if err != nil {
 		if strings.Contains(err.Error(), "no such column") {
 			return 0, nil
@@ -116,7 +133,7 @@ func SelectFollowersCount(userId int64) (int64, error) {
 // SelectFollowingCount returns how many users the given user follows.
 func SelectFollowingCount(userId int64) (int64, error) {
 	var count int64
-	err := config.DB.QueryRow(SELECT_FOLLOWING_COUNT, userId).Scan(&count)
+	err := config.DB.QueryRow(SELECT_FOLLOWING_COUNT, userId, "accepted").Scan(&count)
 	if err != nil {
 		if strings.Contains(err.Error(), "no such column") {
 			return 0, nil

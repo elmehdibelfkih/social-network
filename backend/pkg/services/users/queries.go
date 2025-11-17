@@ -19,11 +19,23 @@ const (
 		FROM users 
 		WHERE id = ?`
 
-	// Check if follower follows following
+
+	// Get Follow STATUS ('pending'|'accepted'|'declined') or NULL if no relationship
 	SELECT_FOLLOW_STATUS = `
-		SELECT COUNT(*) 
+		SELECT status 
 		FROM follows 
-		WHERE follower_id = ? AND following_id = ?`
+		WHERE follower_id = ? AND followed_id = ?`
+
+	// Get private chat ID between two users
+	SELECT_CHAT_ID_BETWEEN_USERS = `
+		SELECT c.id 
+		FROM chats c
+		INNER JOIN chat_participants cp1 ON c.id = cp1.chat_id
+		INNER JOIN chat_participants cp2 ON c.id = cp2.chat_id
+		WHERE c.is_group = 0
+		  AND cp1.user_id = ?
+		  AND cp2.user_id = ?
+		LIMIT 1`
 
 	// Get user privacy setting
 	SELECT_USER_PRIVACY = `
@@ -41,13 +53,13 @@ const (
 	SELECT_FOLLOWERS_COUNT = `
 		SELECT COUNT(*) 
 		FROM follows 
-		WHERE following_id = ?`
+		WHERE followed_id = ? AND status = ?`
 
 	// Count following
 	SELECT_FOLLOWING_COUNT = `
 		SELECT COUNT(*) 
 		FROM follows 
-		WHERE follower_id = ?`
+		WHERE follower_id = ? and status = ?`
 
 	// Count likes received on user's posts
 	SELECT_LIKES_RECEIVED = `
