@@ -1,11 +1,9 @@
 'use client'
 
 import { useState } from 'react';
-// @ts-ignore
-import styles from '../styles/components/createPostForm.module.css';
-// @ts-ignore
-import { ImageIcon, GlobeIcon, DropdownIcon } from '../../components/ui/icons.tsx';
-import { createPost } from './services/post';
+import styles from './styles.module.css';
+import { ImageIcon, GlobeIcon, DropdownIcon } from '../../components/ui/icons';
+import { createPost } from '@/features/posts/index';
 
 export function NewPost({ userAvatar }: { userAvatar: string }) {
     const [content, setContent] = useState("")
