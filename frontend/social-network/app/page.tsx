@@ -6,35 +6,35 @@ interface Post {
 }
 
 export default async function HomePage() {
-  const apiUrl =( process.env.NEXT_PUBLIC_GO_API_URL||'')+'/auth/login'
+  const apiUrl ='http://localhost:3000/api/v1'+'/auth/login'
   console.log("======>", apiUrl);
   
 
   let posts: Post[] = [];
   let error: string | null = null;
 
-  try {
+  // try {
 
-    const response = await fetch(apiUrl, {
-      // Optional: Add a cache configuration (default is 'force-cache')
-      // cache: 'no-store', // To fetch data on every request (dynamic rendering)
-    });
+  //   const response = await fetch(apiUrl, {
+  //     // Optional: Add a cache configuration (default is 'force-cache')
+  //     // cache: 'no-store', // To fetch data on every request (dynamic rendering)
+  //   });
 
     
     
-    if (!response.ok) {
-      throw new Error(`Failed to fetch posts: ${response.status} ${response.statusText}`);
-    }
+  //   if (!response.ok) {
+  //     throw new Error(`Failed to fetch posts: ${response.status} ${response.statusText}`);
+  //   }
     
-    // 2. Parse the JSON response
-    posts = await response.json();
-    console.log(posts);
+  //   // 2. Parse the JSON response
+  //   posts = await response.json();
+  //   console.log(posts);
     
-  } catch (err) {
-    // 3. Handle errors
-    console.error("Data fetching error:", err);
-    error = err instanceof Error ? err.message : 'An unknown error occurred.';
-  }
+  // } catch (err) {
+  //   // 3. Handle errors
+  //   console.error("Data fetching error:", err);
+  //   error = err instanceof Error ? err.message : 'An unknown error occurred.';
+  // }
 
   // 4. Display the data (or error message)
   return (
