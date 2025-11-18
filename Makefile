@@ -1,28 +1,49 @@
-NPM_CMD = npm
-LOGS_PATH = "./logs/"
-SQLITE_LOGS_PATH = ./logs/backend-sqlite.log
-FRONTEND_LOGS_PATH = ./logs/frontend.log
-NGINX_LOGS_PATH = ./logs/nginx-error.log
-BACKEND_LOGS_PATH = ./logs/backend.log
+RED=\e[31m
+GREEN=\e[32m
+BLUE=\e[34m
+YELLOW=\e[33m
+MAGENTA=\e[35m
+CYAN=\e[36m
+RESET=\e[0m
 
-DATA_PATH = ./data/
-SQLITE_DATA_PATH = ./data/sqlite
-UPLOADS_DATA_PATH = ./data/uploads
-AVATARS_DATA_PATH = ./data/uploads/avatars
-POSTS_DATA_PATH = ./data/uploads/posts
-MESSAGES_DATA_PATH = ./data/uploads/messages
-COMMENTS_DATA_PATH = ./data/uploads/comments
+PROJECT_ROOT := $(shell pwd)
 
-DOCKER_COMPOSE_PATH = ./docker-compose.yml
+LOGS_PATH = "$(PROJECT_ROOT)/logs/"
+SQLITE_LOGS_PATH = $(PROJECT_ROOT)/logs/backend-sqlite.log
+FRONTEND_LOGS_PATH = $(PROJECT_ROOT)/logs/frontend.log
+NGINX_LOGS_PATH = $(PROJECT_ROOT)/logs/nginx-error.log
+BACKEND_LOGS_PATH = $(PROJECT_ROOT)/logs/backend.log
 
-local: setup
-	@echo "Starting backend and capturing PID..."
-	@cd "./backend/" && go run ./cmd/main.go & echo
-	@echo "Starting frontend..."
-	@cd "./frontend/social-network" && npm run dev
-	@echo "Frontend stopped. Cleaning up backend process..."
-# 	@bash -c 'trap "echo \"Cleanup on SIGINT/SIGTERM/ERR\"; rm -f important_temp.file; exit 1" SIGINT SIGTERM ERR;
-# 	@-if [ -f backend.pid ]; then kill $$(cat backend.pid); rm backend.pid; fi
+DATA_PATH = $(PROJECT_ROOT)/data/
+SQLITE_DATA_PATH = $(PROJECT_ROOT)/data/sqlite
+UPLOADS_DATA_PATH = $(PROJECT_ROOT)/data/uploads
+AVATARS_DATA_PATH = $(PROJECT_ROOT)/data/uploads/avatars
+POSTS_DATA_PATH = $(PROJECT_ROOT)/data/uploads/posts
+MESSAGES_DATA_PATH = $(PROJECT_ROOT)/data/uploads/messages
+COMMENTS_DATA_PATH = $(PROJECT_ROOT)/data/uploads/comments
+
+DOCKER_COMPOSE_PATH = $(PROJECT_ROOT)/docker-compose.yml
+
+FRONTEND_PATH = $(PROJECT_ROOT)/frontend/social-network
+
+
+dev: start-backend start-frontend
+
+stop-dev:
+	@echo "$(RED)Stopping processes gracefully....$(RESET)"
+	@fuser -k -s 8080/tcp || true
+	@fuser -k -s 3000/tcp || true
+	@echo "$(GREEN)Cleanup complete.$(RESET)"
+
+start-backend: setup
+	@echo "$(GREEN)Starting backend (Port 8080).$(RESET)"
+	@echo "$(MAGENTA)Logs redirected to$(RESET) $(BACKEND_LOGS_PATH)..."
+	@(cd "./backend/" && nohup go run ./cmd/main.go < /dev/null >> $(BACKEND_LOGS_PATH) 2>&1 &)
+
+start-frontend: setup
+	@echo "$(GREEN)Starting frontend (Port 3000).$(RESET)"
+	@echo "$(MAGENTA)Logs redirected to$(RESET) $(FRONTEND_LOGS_PATH)..."
+	@(cd $(FRONTEND_PATH) && nohup npm run dev < /dev/null >> $(FRONTEND_LOGS_PATH) 2>&1 &)
 
 setup:
 	@mkdir -p $(LOGS_PATH)
@@ -37,14 +58,17 @@ setup:
 	@mkdir -p $(POSTS_DATA_PATH)
 	@mkdir -p $(MESSAGES_DATA_PATH)
 	@mkdir -p $(COMMENTS_DATA_PATH)
-	@cd ./frontend/social-network && npm install
-	@cd ./frontend/social-network && cp example.env .env
+	@cd $(FRONTEND_PATH) && npm install
+	@cd $(FRONTEND_PATH) && cp example.env .env
+
 
 up: setup
 	docker compose -f $(DOCKER_COMPOSE_PATH) up -d
 
+
 build: setup
 	docker compose -f $(DOCKER_COMPOSE_PATH) build
+
 
 down:
 	docker compose -f $(DOCKER_COMPOSE_PATH) down
@@ -53,24 +77,36 @@ status:
 	docker compose -f $(DOCKER_COMPOSE_PATH) ps
 	docker logs
 
+
+
+
 clean-logs:
+	@echo "$(YELLOW)Cleaning logs files...$(RESET)"
 	@rm -rf $(LOGS_PATH)
 
+
 clean-data:
+	@echo "$(YELLOW)Cleaning data...$(RESET)"
 	@rm -rf $(DATA_PATH)
 
+
 clean-next:
-	@rm -rf ./frontend/social-network/node_modules
-	@rm -f ./frontend/social-network/package-lock.json
-	@rm -rf ./frontend/social-network/.next
+	@echo "$(YELLOW)Cleaning Next.js project files...$(RESET)"
+	@rm -rf $(FRONTEND_PATH)/node_modules
+	@rm -f $(FRONTEND_PATH)/package-lock.json
+	@rm -f $(FRONTEND_PATH)/npm-debug.log
+	@rm -f $(FRONTEND_PATH)/.env
+	@rm -f $(FRONTEND_PATH)/next-env.d.ts
+	@rm -f $(FRONTEND_PATH)/tsconfig.json
+	@rm -rf $(FRONTEND_PATH)/.next
+	@rm -rf $(FRONTEND_PATH)/out
+	@rm -rf $(FRONTEND_PATH)/dist
+	@rm -rf $(FRONTEND_PATH)/build
 
 
 prune:clean-logs clean-data clean-next
 
-re-prune: prune local
 
-.PHONY: local setup up build down status clean-logs clean-data prune re-prune
-.PHONY: local setup up build down status clean-logs clean-data prune re-prune
-# todo:
-# enter:
-# 	docker exec -it forum bash
+re-prune: prune dev
+
+.PHONY: dev 

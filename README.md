@@ -5,6 +5,21 @@ Built with **Go (backend)**, **Next.js (frontend)**, and **SQLite (database)** �
 
 ---
 
+## run the project
+
+- Note⚠️: the commands must be run in the root of the project.
+
+to run local on your machine:
+
+```makefile
+    make dev # running a development server.
+    make up # up directly relates to the docker-compose up command.
+    
+    make stop-dev # Clearly indicates stopping the local development process.
+    make down # down directly relates to the docker-compose down command, which is often preferred for a clean stop
+
+```
+
 ## 🚀 Overview
 
 This project provides a complete social platform stack with:
