@@ -1,0 +1,268 @@
+/* Navbar Container */
+.navbar-continer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 120px;
+  background: var(--white);
+  border-bottom: 1px solid var(--gray-200);
+  box-shadow: var(--shadow-sm);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+/* Left Section - Logo & Brand */
+.vanbarleft {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  flex: 1;
+}
+
+.logo-icon img {
+  width: 24px;
+  height: 24px;
+  filter: brightness(0) invert(1);
+}
+
+.brand-text {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--primary-purple);
+  white-space: nowrap;
+}
+
+.logo-link {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  text-decoration: none;
+  padding: 0;
+}
+
+.logo-icon {
+  width: 40px;
+  height: 40px;
+  background: var(--primary-purple);
+  border-radius: var(--border-radius);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.logo-icon svg {
+  width: 24px;
+  height: 24px;
+  color: var(--white);
+}
+
+.brand-text {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--gray-500);
+  white-space: nowrap;
+}
+
+/* Center Section - Navigation Links */
+.navbar-center {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  flex: 1;
+  justify-content: center;
+}
+
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-lg);
+  text-decoration: none;
+  color: var(--gray-500);
+  border-radius: var(--border-radius);
+  transition: all var(--transition-base);
+  font-size: 0.95rem;
+  font-weight: 500;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.nav-link:hover {
+  background: var(--gray-100);
+  color: var(--primary-purple);
+}
+
+.nav-link.active {
+  color: var(--white);
+  background: var(--primary-purple);
+}
+
+.nav-link svg,
+.nav-link img {
+  width: 20px;
+  height: 20px;
+}
+
+.nav-link.active svg {
+  color: var(--white);
+}
+
+.nav-link.active img {
+  filter: brightness(0) invert(1);
+}
+
+.nav-link span {
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+/* Right Section - Actions */
+.navbar-right {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-lg);
+  flex: 1;
+  justify-content: flex-end;
+}
+
+/* Notification Button */
+.notification-btn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  background: transparent;
+  border: none;
+  color: var(--gray-500);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  width: auto;
+  height: auto;
+}
+
+.notification-btn:hover {
+  color: var(--primary-purple);
+}
+
+.notification-btn svg,
+.notification-btn img {
+  width: 24px;
+  height: 24px;
+}
+
+.notification-badge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  background: var(--red-500);
+  color: var(--white);
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: var(--border-radius-full);
+  min-width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+/* User Profile */
+.user-profile {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: 4px 12px 4px 4px;
+  background: transparent;
+  border: none;
+  border-radius: var(--border-radius-full);
+  cursor: pointer;
+  transition: all var(--transition-base);
+}
+
+.user-profile:hover {
+  background: var(--gray-100);
+}
+
+.user-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--border-radius-full);
+  background: var(--gray-300);
+}
+
+.user-name {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--gray-700);
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .navbar-continer {
+    padding: 12px 48px;
+  }
+}
+
+@media (max-width: 768px) {
+  .navbar-continer {
+    padding: 8px 24px;
+  }
+  
+  .navbar-center {
+    gap: 4px;
+  }
+  
+  .nav-link {
+    padding: var(--spacing-sm) var(--spacing-md);
+  }
+  
+  .nav-link span {
+    display: none;
+  }
+  
+  .user-name {
+    display: none;
+  }
+
+  .navbar-right {
+    gap: var(--spacing-md);
+  }
+}
+
+@media (max-width: 640px) {
+  .navbar-continer {
+    padding: 8px 16px;
+  }
+
+  .brand-text {
+    display: none;
+  }
+
+  .logo-icon {
+    width: 36px;
+    height: 36px;
+  }
+
+  .logo-icon svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .navbar-center {
+    gap: 2px;
+  }
+
+  .nav-link {
+    padding: var(--spacing-sm);
+  }
+
+  .navbar-right {
+    gap: var(--spacing-sm);
+  }
+}
