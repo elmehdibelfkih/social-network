@@ -8,7 +8,7 @@ import (
 	"social/pkg/services/auth"
 	"social/pkg/services/chat"
 	"social/pkg/services/feed"
-	"social/pkg/services/followers"
+	follow "social/pkg/services/followers"
 	"social/pkg/services/groups"
 	"social/pkg/services/media"
 	"social/pkg/services/users"
@@ -80,8 +80,8 @@ func SocialMux() *router.Router {
 
 	// Feed   ( personal && Specific user feed && Group feed )
 	socialMux.HandleFunc("GET", "/api/v1/feed", utils.MiddlewareChain(feed.GetFeed, middleware.AuthMiddleware))
-	socialMux.HandleFunc("GET", "/api/v1/users/{user_id}/feed", utils.MiddlewareChain(feed.GetFeedUser, middleware.AuthMiddleware))
-	socialMux.HandleFunc("GET", "/api/v1/groups/{group_id}/feed", utils.MiddlewareChain(feed.GetFeedGroup, middleware.AuthMiddleware))
+	// socialMux.HandleFunc("GET", "/api/v1/users/{user_id}/feed", utils.MiddlewareChain(feed.GetFeedUser, middleware.AuthMiddleware))
+	// socialMux.HandleFunc("GET", "/api/v1/groups/{group_id}/feed", utils.MiddlewareChain(feed.GetFeedGroup, middleware.AuthMiddleware))
 
 	return socialMux
 }
