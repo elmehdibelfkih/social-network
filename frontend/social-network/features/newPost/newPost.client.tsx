@@ -4,7 +4,7 @@ import { useState } from 'react';
 // @ts-ignore
 import styles from '../styles/components/createPostForm.module.css';
 // @ts-ignore
-import { ImageIcon, GlobeIcon, DropdownIcon } from '../../components/ui/icons.tsx';
+import { ImageIcon, GlobeIcon, DropdownIcon } from '../../components/ui/icons';
 import { createPost } from './services/post';
 
 export function NewPost({ userAvatar }: { userAvatar: string }) {
