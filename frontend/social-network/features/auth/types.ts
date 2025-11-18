@@ -1,4 +1,4 @@
-type RegisterRequest = {
+export type RegisterRequest = {
     email: string
     password: string
     firstName: string
@@ -9,13 +9,13 @@ type RegisterRequest = {
     avatarId?: Number
 }
 
-type LoginRequest = {
-    "email/userId/nickname": string
+export type LoginRequest = {
+    identifier: string
     password: string
     rememberMe: boolean
 }
 
-type RegisterResponse = {
+export type RegisterResponse = {
     userId: Number
     email: string
     firstName: string
@@ -26,7 +26,7 @@ type RegisterResponse = {
     avatarId?: Number
 }
 
-type LoginResponse = {
+export type LoginResponse = {
     userId: Number
     email: string
     firstName: string
@@ -37,7 +37,7 @@ type LoginResponse = {
     avatarId?: Number
 }
 
-type AuthResponse = {
+export type AuthResponse = {
     sessionId: Number
     sessionToken: string
     ipAddress: string
@@ -46,7 +46,7 @@ type AuthResponse = {
     expiresAt: string
 }
 
-type SessionListResponse = {
+export type SessionListResponse = {
     sessionId: Number
     ipAddress: string
     device: string

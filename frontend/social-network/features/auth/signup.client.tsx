@@ -2,8 +2,8 @@
 
 import { useState, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
-import { authService } from './services/auth';
-import styles from '../styles.module.css';
+import { authService } from './index';
+import styles from './styles.module.css';
 
 export function RegisterForm() {
     const router = useRouter();
