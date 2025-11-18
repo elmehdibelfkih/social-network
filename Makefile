@@ -70,6 +70,7 @@ prune:clean-logs clean-data clean-next
 re-prune: prune local
 
 .PHONY: local setup up build down status clean-logs clean-data prune re-prune
+.PHONY: local setup up build down status clean-logs clean-data prune re-prune
 # todo:
 # enter:
 # 	docker exec -it forum bash
