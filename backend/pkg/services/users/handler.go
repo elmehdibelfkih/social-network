@@ -83,7 +83,6 @@ func PatchProfile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 		
-	//  var currentUserId int64 = 55
 	// Validate user owns the profile
 	if currentUserId != profileUserId {
 		utils.Unauthorized(w, "You can only update your own profile privacy.")
