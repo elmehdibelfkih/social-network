@@ -1,8 +1,6 @@
-import styles from '@/styles.module.css'
-// @ts-ignore
-import getProfileData from '@/features/profile/services/profile.ts'
-// @ts-ignore
-import EditProfileButton from './profile.client.tsx'
+import styles from './styles.module.css'
+import getProfileData from './services/profile'
+import EditProfileButton from './profile.client'
 import { CalendarIcon, GlobeIcon } from '@/components/ui/icons'
 
 export async function Profile({ userId }: { userId: string }) {
