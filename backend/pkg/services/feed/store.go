@@ -143,6 +143,85 @@ func GetUserFeed(viewerId, profileUserId int64, page, limit int) ([]FeedPostResp
 	return posts, nil
 }
 
+// GetGroupFeed retrieves posts from a specific group
+func GetGroupFeed(userId, groupId int64, page, limit int) ([]FeedPostResponseJson, error) {
+	offset := (page - 1) * limit
+	rows, err := config.DB.Query(SELECT_GROUP_FEED, groupId, limit, offset)
+	if err != nil {
+		utils.SQLiteErrorTarget(err, SELECT_GROUP_FEED)
+		return nil, err
+	}
+	defer rows.Close()
+
+	var posts []FeedPostResponseJson
+	for rows.Next() {
+		var post FeedPostResponseJson
+		var authorNickname sql.NullString
+		var groupId sql.NullInt64
+
+		err := rows.Scan(
+			&post.PostId,
+			&post.AuthorId,
+			&authorNickname,
+			&post.AuthorLastName,
+			&post.AuthorFirstName,
+			&post.Content,
+			&post.Privacy,
+			&groupId,
+			&post.CreatedAt,
+			&post.UpdatedAt,
+		)
+		if err != nil {
+			utils.SQLiteErrorTarget(err, SELECT_GROUP_FEED)
+			return nil, err
+		}
+
+		// Handle nullable fields
+		if authorNickname.Valid {
+			post.AuthorNickname = &authorNickname.String
+		}
+		if groupId.Valid {
+			post.GroupId = &groupId.Int64
+		}
+
+		// Get additional data for this post
+		post.IsLikedByUser = checkUserLikedPost(post.PostId, userId)
+		post.Stats.ReactionCount = getPostReactionCount(post.PostId)
+		post.Stats.CommentCount = getPostCommentCount(post.PostId)
+
+		// Get media IDs
+		mediaIds, err := GetPostMediaIds(post.PostId)
+		if err != nil {
+			utils.SQLiteErrorTarget(err, SELECT_POST_MEDIA_IDS)
+			return nil, err
+		}
+		if len(mediaIds) > 0 {
+			post.MediaIds = mediaIds
+		} else {
+			post.MediaIds = nil
+		}
+
+		posts = append(posts, post)
+	}
+
+	if err = rows.Err(); err != nil {
+		utils.SQLiteErrorTarget(err, SELECT_GROUP_FEED)
+		return nil, err
+	}
+
+	return posts, nil
+}
+
+// checkGroupMember checks if user is an accepted member of the group
+func checkGroupMember(groupId, userId int64) (bool, error) {
+	var exists bool
+	err := config.DB.QueryRow(SELECT_GROUP_MEMBER_ACCEPTED, groupId, userId).Scan(&exists)
+	if err != nil {
+		return false, err
+	}
+	return exists, nil
+}
+
 // checkUserLikedPost checks if user liked a post
 func checkUserLikedPost(postId, userId int64) bool {
 	var exists int
