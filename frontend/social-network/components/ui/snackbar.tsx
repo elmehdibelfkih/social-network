@@ -1,13 +1,14 @@
+'use client'
+
 import { FailureIcon, SuccessIcon } from "./icons";
 import styles from "../../styles/snackbar.module.css"
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 type SnackbarData = {
     status: boolean
     message: string
 }
 
-// initialize to null so it's safe to check before use
 let snackFn: ((payload: SnackbarData) => void) | null = null;
 
 export const ShowSnackbar = (payload: SnackbarData) => {
@@ -18,17 +19,27 @@ export const ShowSnackbar = (payload: SnackbarData) => {
     }
 }
 
-function Snackbar() {
+export default function Snackbar() {
     const [snackbar, setSnackbar] = useState<SnackbarData | null>(null)
+    const timerRef = useRef<NodeJS.Timeout>(null)
 
     useEffect(() => {
         snackFn = (payload: SnackbarData) => {
             setSnackbar(payload)
-            const timer = setTimeout(() => { setSnackbar(null) }, 4000)
-            return () => { clearTimeout(timer) }
+
+            if (timerRef.current) {
+                clearTimeout(timerRef.current)
+            }
+
+            timerRef.current = setTimeout(() => { setSnackbar(null) }, 4000)
         }
-        return () => { snackFn = null }
+        return () => {
+            snackFn = null
+            if (timerRef.current) { clearTimeout(timerRef.current) }
+        }
     }, [])
+
+    if (!snackbar) return null
 
     return (
         <div className={`${styles.container} ${snackbar?.status ? styles.success : styles.failure}`}>

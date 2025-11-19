@@ -2,6 +2,23 @@ import { ShowSnackbar } from "../components/ui/snackbar"
 
 type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
 
+export const http = {
+    get: <T>(url: string) =>
+        apiClient<T>(url, "GET", undefined),
+
+    post: <T>(url: string, payload?: any) =>
+        apiClient<T>(url, "POST", payload),
+
+    put: <T>(url: string, payload?: any) =>
+        apiClient<T>(url, "PUT", payload),
+
+    patch: <T>(url: string, payload?: any) =>
+        apiClient<T>(url, "PATCH", payload),
+
+    delete: <T>(url: string) =>
+        apiClient<T>(url, "DELETE", undefined),
+};
+
 async function apiClient<T>(
     url: string,
     method: HttpMethod,
@@ -23,6 +40,7 @@ async function apiClient<T>(
             }
         }
         showSnackbar(errorToast)
+        return Promise.reject()
     }
     const successToast = {
         payload: { success: true, message: "The operation was successful" }
@@ -30,24 +48,6 @@ async function apiClient<T>(
     showSnackbar(successToast)
     return body
 }
-
-
-export const http = {
-    get: <T>(url: string) =>
-        apiClient<T>(url, "GET", undefined),
-
-    post: <T>(url: string, payload?: any) =>
-        apiClient<T>(url, "POST", payload),
-
-    put: <T>(url: string, payload?: any) =>
-        apiClient<T>(url, "PUT", payload),
-
-    patch: <T>(url: string, payload?: any) =>
-        apiClient<T>(url, "PATCH", payload),
-
-    delete: <T>(url: string) =>
-        apiClient<T>(url, "DELETE", undefined),
-};
 
 function showSnackbar({ payload }: { payload: SnackbarPayload }) {
     ShowSnackbar({ status: payload.success, message: payload.message })
