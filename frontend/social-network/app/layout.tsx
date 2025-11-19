@@ -9,7 +9,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         <header style={{ padding: 12 }}>
           <div>Logo</div>
-          {/* <AuthForm /> */}
+          <AuthForm />
         </header>
 
         <main>{children}</main>

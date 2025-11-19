@@ -5,7 +5,7 @@ import styles from './styles.module.css'
 // @ts-ignore
 import { SettingsIcon } from '@/components/ui/icons'
 
-export function EditProfileButton({ profile }: { profile: ProfileData }) {
+export default function EditProfileButton({ profile }: { profile: ProfileData }) {
     const [isOpen, setIsOpen] = useState(false)
 
     const handleOpenModal = () => {
