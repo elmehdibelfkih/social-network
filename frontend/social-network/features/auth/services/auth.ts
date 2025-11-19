@@ -5,8 +5,7 @@ import type {
   RegisterRequest,
   AuthResponse,
   SessionListResponse
-  // @ts-ignore
-} from '../types.ts';
+} from '../types';
 
 export const authService = {
   async register(data: RegisterRequest): Promise<AuthResponse> {
@@ -15,7 +14,7 @@ export const authService = {
 
   async login(data: LoginRequest): Promise<AuthResponse> {
     const payload: LoginRequest = {
-      "email/userId/nickname": data.identifier,
+      identifier: data.identifier,
       password: data.password,
       rememberMe: data.rememberMe,
     };
