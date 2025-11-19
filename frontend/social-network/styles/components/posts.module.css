@@ -1,0 +1,102 @@
+@import '../variables.css';
+
+/* CARD */
+.postCard {
+    width: 100%;
+    max-width: 600px;
+    background: var(--white);
+    border-radius: var(--border-radius-lg);
+    padding: var(--spacing-md);
+    box-shadow: var(--shadow-md);
+    margin: var(--spacing-lg) auto;
+    transition: box-shadow var(--transition-base);
+}
+
+.postCard:hover {
+    box-shadow: var(--shadow-lg);
+}
+
+/* USER SECTION */
+.postUserSection {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-md);
+}
+
+.postUserAvatar img {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--border-radius-full);
+    object-fit: cover;
+    box-shadow: var(--shadow-sm);
+}
+
+.postUserInfo h4 {
+    margin: 0;
+    font-size: 15px;
+    color: var(--gray-900);
+    font-weight: 600;
+}
+
+.postUserInfo span {
+    font-size: 13px;
+    color: var(--gray-500);
+}
+
+/* CAPTION */
+.postCaption p {
+    margin: var(--spacing-xs) 0 var(--spacing-md);
+    color: var(--gray-800);
+    line-height: 1.4;
+}
+
+/* IMAGE */
+.postImg img {
+    width: 100%;
+    border-radius: var(--border-radius-lg);
+    object-fit: cover;
+    box-shadow: var(--shadow);
+}
+
+/* INTERACTIONS */
+.postInteraction {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: var(--spacing-md);
+    padding-top: var(--spacing-md);
+    border-top: 1px solid var(--gray-200);
+}
+
+.interactionItem {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    cursor: pointer;
+    color: var(--gray-700);
+    font-size: 14px;
+    transition: color var(--transition-fast);
+}
+
+.interactionItem:hover {
+    color: var(--primary-purple);
+}
+
+.interactionItem img {
+    width: 20px;
+    opacity: 0.9;
+    transition: opacity var(--transition-fast);
+}
+
+.interactionItem:hover img {
+    opacity: 1;
+}
+
+.interactionItem.liked {
+    color: var(--primary-purple);
+}
+
+.interactionItem.liked img {
+    opacity: 1;
+}

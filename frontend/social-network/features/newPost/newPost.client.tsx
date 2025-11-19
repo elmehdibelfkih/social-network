@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 // @ts-ignore
-import styles from '../styles/components/createPostForm.module.css';
+import styles from './styles.module.css';
 // @ts-ignore
 import { ImageIcon, GlobeIcon, DropdownIcon } from '../../components/ui/icons';
 import { createPost } from './services/post';
