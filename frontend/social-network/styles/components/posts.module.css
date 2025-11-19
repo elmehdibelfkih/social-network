@@ -1,14 +1,27 @@
 @import '../variables.css';
 
+/* POSTS CONTAINER */
+.postsContainer {
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.loading {
+    text-align: center;
+    padding: 40px;
+    color: var(--gray-500);
+    font-size: 16px;
+}
+
 /* CARD */
 .postCard {
     width: 100%;
-    max-width: 600px;
     background: var(--white);
     border-radius: var(--border-radius-lg);
     padding: var(--spacing-md);
     box-shadow: var(--shadow-md);
-    margin: var(--spacing-lg) auto;
+    margin-bottom: var(--spacing-lg);
     transition: box-shadow var(--transition-base);
 }
 
@@ -24,12 +37,18 @@
     margin-bottom: var(--spacing-md);
 }
 
-.postUserAvatar img {
+.postUserAvatar {
     width: 48px;
     height: 48px;
     border-radius: var(--border-radius-full);
-    object-fit: cover;
+    overflow: hidden;
     box-shadow: var(--shadow-sm);
+}
+
+.postUserAvatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 
 .postUserInfo h4 {
@@ -42,18 +61,25 @@
 .postUserInfo span {
     font-size: 13px;
     color: var(--gray-500);
+    text-transform: capitalize;
 }
 
 /* CAPTION */
 .postCaption p {
     margin: var(--spacing-xs) 0 var(--spacing-md);
     color: var(--gray-800);
-    line-height: 1.4;
+    line-height: 1.5;
+    white-space: pre-wrap;
 }
 
 /* IMAGE */
+.postImg {
+    margin: var(--spacing-md) 0;
+}
+
 .postImg img {
     width: 100%;
+    max-height: 400px;
     border-radius: var(--border-radius-lg);
     object-fit: cover;
     box-shadow: var(--shadow);
@@ -77,14 +103,20 @@
     color: var(--gray-700);
     font-size: 14px;
     transition: color var(--transition-fast);
+    background: none;
+    border: none;
+    padding: 8px 12px;
+    border-radius: var(--border-radius);
 }
 
 .interactionItem:hover {
     color: var(--primary-purple);
+    background: var(--gray-100);
 }
 
 .interactionItem img {
     width: 20px;
+    height: 20px;
     opacity: 0.9;
     transition: opacity var(--transition-fast);
 }
@@ -99,4 +131,55 @@
 
 .interactionItem.liked img {
     opacity: 1;
+    filter: brightness(0) saturate(100%) invert(27%) sepia(51%) saturate(2878%) hue-rotate(346deg) brightness(104%) contrast(97%);
+}
+
+/* LOAD MORE BUTTON */
+.loadMore {
+    width: 100%;
+    padding: 12px;
+    background: var(--primary-purple);
+    color: white;
+    border: none;
+    border-radius: var(--border-radius);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    margin-top: var(--spacing-lg);
+    transition: background-color var(--transition-base);
+}
+
+.loadMore:hover {
+    background: var(--primary-purple-dark);
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+    .postCard {
+        margin-bottom: var(--spacing-md);
+        padding: var(--spacing-sm);
+    }
+    
+    .postUserAvatar {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .postUserInfo h4 {
+        font-size: 14px;
+    }
+    
+    .postUserInfo span {
+        font-size: 12px;
+    }
+    
+    .interactionItem {
+        padding: 6px 8px;
+        font-size: 13px;
+    }
+    
+    .interactionItem img {
+        width: 18px;
+        height: 18px;
+    }
 }

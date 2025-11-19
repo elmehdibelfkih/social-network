@@ -1,45 +1,78 @@
 'use client';
 
-import styles from '../../styles/components/navbar.module.css';
+import { useState, useEffect } from 'react';
+import styles from './styles.module.css';
+import { homeService } from './services/homeService';
+import { User } from './types';
 
 export default function Navbar() {
-    return (
-        <nav className={styles['navbar-continer']}>
-            <div className={styles.vanbarleft}>
-                <a href="/" aria-label="Go to homepage" className={styles['logo-link']}>
-                    <div className={styles['logo-icon']}>
-                        <img src="/users.svg" alt="" />
-                    </div>
-                    <span className={styles['brand-text']}>Social Network</span>
-                </a>
-            </div>
+  const [user, setUser] = useState<User | null>(null);
+  const [notificationCount, setNotificationCount] = useState(0);
+  const [activeTab, setActiveTab] = useState('home');
 
-            <div className={styles['navbar-center']}>
-                <a href="#" className={`${styles['nav-link']} ${styles.active}`}>
-                    <img src="/home (1).svg" alt="Home" />
-                    <span>Home</span>
-                </a>
-                <button className={styles['nav-link']}>
-                    <img src="/searchb.svg" alt="Search" />
-                    <span>Search</span>
-                </button>
-                <button className={styles['nav-link']}>
-                    <img src="/groupb.svg" alt="Groups" />
-                    <span>Groups</span>
-                </button>
-            </div>
+  useEffect(() => {
+    // homeService.getCurrentUser().then(setUser);
+    // homeService.getNotificationCount().then(setNotificationCount);
+    setUser({ userId: 1, firstName: 'John', lastName: 'Doe' });
+    setNotificationCount(3);
+  }, []);
 
-            <div className={styles['navbar-right']}>
-                <button className={styles['notification-btn']} aria-label="Notifications">
-                    <img src="/bell.svg" alt="Notifications" />
-                    <span className={styles['notification-badge']}>1</span>
-                </button>
+  return (
+    <nav className={styles.navbar}>
+      <div className={styles.navbarLeft}>
+        <a href="/" aria-label="Go to homepage" className={styles.logoLink}>
+          <div className={styles.logoIcon}>
+            <img src="/users.svg" alt="" />
+          </div>
+          <span className={styles.brandText}>Social Network</span>
+        </a>
+      </div>
 
-                <button className={styles['user-profile']} aria-label="User profile">
-                    <div className={styles['user-avatar']}></div>
-                    <span className={styles['user-name']}>User</span>
-                </button>
-            </div>
-        </nav>
-    );
+      <div className={styles.navbarCenter}>
+        <button 
+          className={`${styles.navLink} ${activeTab === 'home' ? styles.active : ''}`}
+          onClick={() => setActiveTab('home')}
+        >
+          <img src="/home (1).svg" alt="Home" />
+          <span>Home</span>
+        </button>
+        <button 
+          className={`${styles.navLink} ${activeTab === 'search' ? styles.active : ''}`}
+          onClick={() => setActiveTab('search')}
+        >
+          <img src="/searchb.svg" alt="Search" />
+          <span>Search</span>
+        </button>
+        <button 
+          className={`${styles.navLink} ${activeTab === 'groups' ? styles.active : ''}`}
+          onClick={() => setActiveTab('groups')}
+        >
+          <img src="/groupb.svg" alt="Groups" />
+          <span>Groups</span>
+        </button>
+      </div>
+
+      <div className={styles.navbarRight}>
+        <button className={styles.notificationBtn} aria-label="Notifications">
+          <img src="/bell.svg" alt="Notifications" />
+          {notificationCount > 0 && (
+            <span className={styles.notificationBadge}>{notificationCount}</span>
+          )}
+        </button>
+
+        <div className={styles.userProfile}>
+          <div className={styles.userAvatar}>
+            {user?.avatarId ? (
+              <img src={`/api/v1/media/${user.avatarId}`} alt="Avatar" />
+            ) : (
+              <img src="/users.svg" alt="Default Avatar" />
+            )}
+          </div>
+          <span className={styles.userName}>
+            {user?.nickname || `${user?.firstName} ${user?.lastName}` || 'User'}
+          </span>
+        </div>
+      </div>
+    </nav>
+  );
 }
