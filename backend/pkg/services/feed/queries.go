@@ -1,5 +1,6 @@
 package feed
 
+// Get  personal feed (public posts + followeedcpost + groups post + allowed private post) 
 const (
 	SELECT_PERSONAL_FEED = `
 		SELECT 
@@ -28,6 +29,45 @@ const (
 			   SELECT 1 FROM group_members 
 			   WHERE group_id = p.group_id AND user_id = ? AND status = 'accepted'
 		   ))
+		ORDER BY p.created_at DESC
+		LIMIT ? OFFSET ?`
+
+	// Get user feed (public posts + followeedpost + allowed private post)
+	SELECT_USER_FEED = `
+		SELECT 
+			p.id,
+			p.author_id,
+			u.nickname,
+			u.last_name,
+			u.first_name,
+			p.content,
+			p.visibility,
+			p.group_id,
+			p.created_at,
+			p.updated_at
+		FROM posts p
+		JOIN users u ON p.author_id = u.id
+		WHERE p.author_id = ?
+		  AND p.group_id IS NULL
+		  AND (
+			-- Author can see all their posts
+			p.author_id = ?
+			OR
+			-- Public posts
+			p.visibility = 'public'
+			OR
+			-- Friends posts (if viewer follows author)
+			(p.visibility = 'friends' AND EXISTS (
+				SELECT 1 FROM follows 
+				WHERE follower_id = ? AND followed_id = p.author_id AND status = 'accepted'
+			))
+			OR
+			-- Private posts (if viewer is in allowed list)
+			(p.visibility = 'private' AND EXISTS (
+				SELECT 1 FROM post_allowed_viewers 
+				WHERE post_id = p.id AND user_id = ?
+			))
+		  )
 		ORDER BY p.created_at DESC
 		LIMIT ? OFFSET ?`
 

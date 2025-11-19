@@ -74,6 +74,75 @@ func GetPersonalFeed(userId int64, page, limit int) ([]FeedPostResponseJson, err
 	return posts, nil
 }
 
+// GetUserFeed retrieves posts by a specific user (respects privacy)
+func GetUserFeed(viewerId, profileUserId int64, page, limit int) ([]FeedPostResponseJson, error) {
+	offset := (page - 1) * limit
+	rows, err := config.DB.Query(SELECT_USER_FEED, profileUserId, profileUserId, viewerId, viewerId, limit, offset)
+	if err != nil {
+		utils.SQLiteErrorTarget(err, SELECT_USER_FEED)
+		return nil, err
+	}
+	defer rows.Close()
+
+	var posts []FeedPostResponseJson
+	for rows.Next() {
+		var post FeedPostResponseJson
+		var authorNickname sql.NullString
+		var groupId sql.NullInt64
+
+		err := rows.Scan(
+			&post.PostId,
+			&post.AuthorId,
+			&authorNickname,
+			&post.AuthorLastName,
+			&post.AuthorFirstName,
+			&post.Content,
+			&post.Privacy,
+			&groupId,
+			&post.CreatedAt,
+			&post.UpdatedAt,
+		)
+		if err != nil {
+			utils.SQLiteErrorTarget(err, SELECT_USER_FEED)
+			return nil, err
+		}
+
+		// Handle nullable fields
+		if authorNickname.Valid {
+			post.AuthorNickname = &authorNickname.String
+		}
+		if groupId.Valid {
+			post.GroupId = &groupId.Int64
+		}
+
+		// Get additional data for this post
+		post.IsLikedByUser = checkUserLikedPost(post.PostId, viewerId)
+		post.Stats.ReactionCount = getPostReactionCount(post.PostId)
+		post.Stats.CommentCount = getPostCommentCount(post.PostId)
+
+		// Get media IDs
+		mediaIds, err := GetPostMediaIds(post.PostId)
+		if err != nil {
+			utils.SQLiteErrorTarget(err, SELECT_POST_MEDIA_IDS)
+			return nil, err
+		}
+		if len(mediaIds) > 0 {
+			post.MediaIds = mediaIds
+		} else {
+			post.MediaIds = nil
+		}
+
+		posts = append(posts, post)
+	}
+
+	if err = rows.Err(); err != nil {
+		utils.SQLiteErrorTarget(err, SELECT_USER_FEED)
+		return nil, err
+	}
+
+	return posts, nil
+}
+
 // checkUserLikedPost checks if user liked a post
 func checkUserLikedPost(postId, userId int64) bool {
 	var exists int
