@@ -14,7 +14,9 @@ func GetPersonalFeedService(w http.ResponseWriter, userId int64, page, limit int
 		utils.InternalServerError(w)
 		return nil, false
 	}
-	if posts == nil { return []FeedPostResponseJson{}, true}
+	if posts == nil {
+		return []FeedPostResponseJson{}, true
+	}
 
 	return posts, true
 }
@@ -28,7 +30,25 @@ func GetUserFeedService(w http.ResponseWriter, viewerId, profileUserId int64, pa
 		return nil, false
 	}
 
-	if posts == nil { return []FeedPostResponseJson{}, true}
+	if posts == nil {
+		return []FeedPostResponseJson{}, true
+	}
+
+	return posts, true
+}
+
+// GetGroupFeedService handles the business logic for group feed
+func GetGroupFeedService(w http.ResponseWriter, userId, groupId int64, page, limit int, context string) ([]FeedPostResponseJson, bool) {
+	posts, err := GetGroupFeed(userId, groupId, page, limit)
+	if err != nil {
+		utils.BackendErrorTarget(err, context)
+		utils.InternalServerError(w)
+		return nil, false
+	}
+
+	if posts == nil {
+		return []FeedPostResponseJson{}, true
+	}
 
 	return posts, true
 }

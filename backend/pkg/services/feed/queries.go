@@ -1,6 +1,6 @@
 package feed
 
-// Get  personal feed (public posts + followeedcpost + groups post + allowed private post) 
+// Get  personal feed (public posts + followeedpost + groups post + allowed private post)
 const (
 	SELECT_PERSONAL_FEED = `
 		SELECT 
@@ -70,6 +70,32 @@ const (
 		  )
 		ORDER BY p.created_at DESC
 		LIMIT ? OFFSET ?`
+
+	// Get posts from a specific group (members only)
+	SELECT_GROUP_FEED = `
+		SELECT 
+			p.id,
+			p.author_id,
+			u.nickname,
+			u.last_name,
+			u.first_name,
+			p.content,
+			p.visibility,
+			p.group_id,
+			p.created_at,
+			p.updated_at
+		FROM posts p
+		JOIN users u ON p.author_id = u.id
+		WHERE p.group_id = ?
+		ORDER BY p.created_at DESC
+		LIMIT ? OFFSET ?`
+
+	// Check if user is group member with accepted status
+	SELECT_GROUP_MEMBER_ACCEPTED = `
+		SELECT EXISTS (
+			SELECT 1 FROM group_members 
+			WHERE group_id = ? AND user_id = ? AND status = 'accepted'
+		)`
 
 	// Check if user liked a post
 	SELECT_USER_LIKED_POST = `

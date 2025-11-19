@@ -5,7 +5,7 @@ import (
 	"social/pkg/utils"
 )
 
-// Returns personal feed (public posts + followeedcpost + groups post + allowed private post)
+// Returns personal feed (public posts + followeedpost + groups post + allowed private post)
 func GetFeed(w http.ResponseWriter, r *http.Request) {
 	// Get current user from context
 	userId := utils.GetUserIdFromContext(r)
@@ -19,9 +19,15 @@ func GetFeed(w http.ResponseWriter, r *http.Request) {
 	limit := utils.GetQuerryPramInt(r, "limit")
 
 	// Set defaults if not provided
-	if page <= 0 { page = 1 }
-	if limit <= 0 { limit = 20 }
-	if limit > 100 { limit = 100 }
+	if page <= 0 {
+		page = 1
+	}
+	if limit <= 0 {
+		limit = 20
+	}
+	if limit > 100 {
+		limit = 100
+	}
 
 	// Call service layer
 	response, ok := GetPersonalFeedService(w, userId, int(page), int(limit), "GetFeed handler")
@@ -30,7 +36,6 @@ func GetFeed(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// GetFeedUser handles GET /api/v1/users/:user_id/feed
 // Returns user's visible posts (respects privacy)
 func GetFeedUser(w http.ResponseWriter, r *http.Request) {
 	// Get current user from context
@@ -52,12 +57,56 @@ func GetFeedUser(w http.ResponseWriter, r *http.Request) {
 	limit := utils.GetQuerryPramInt(r, "limit")
 
 	// Set defaults if not provided
-	if page <= 0 { page = 1 }
-	if limit <= 0 { limit = 20 }
-	if limit > 100 { limit = 100 }
+	if page <= 0 {
+		page = 1
+	}
+	if limit <= 0 {
+		limit = 20
+	}
+	if limit > 100 {
+		limit = 100
+	}
 
 	// Call service layer
 	response, ok := GetUserFeedService(w, viewerId, profileUserId, int(page), int(limit), "GetFeedUser handler")
+	if ok {
+		utils.JsonResponseEncode(w, http.StatusOK, response)
+	}
+}
+
+// Returns group posts (members only)
+func GetFeedGroup(w http.ResponseWriter, r *http.Request) {
+	// Get current user from context
+	userId := utils.GetUserIdFromContext(r)
+	if userId == -1 {
+		utils.Unauthorized(w, "You must be logged in to view feeds.")
+		return
+	}
+
+	// Extract group_id from URL path
+	groupId := utils.GetWildCardValue(w, r, "group_id")
+	if groupId <= 0 {
+		utils.BadRequest(w, "Invalid group ID.", "redirect")
+		return
+	}
+
+	// Get pagination parameters from query
+	page := utils.GetQuerryPramInt(r, "page")
+	limit := utils.GetQuerryPramInt(r, "limit")
+
+	// Set defaults if not provided
+	if page <= 0 {
+		page = 1
+	}
+	if limit <= 0 {
+		limit = 20
+	}
+	if limit > 100 {
+		limit = 100
+	}
+
+	// Call service layer
+	response, ok := GetGroupFeedService(w, userId, groupId, int(page), int(limit), "GetFeedGroup handler")
 	if ok {
 		utils.JsonResponseEncode(w, http.StatusOK, response)
 	}
