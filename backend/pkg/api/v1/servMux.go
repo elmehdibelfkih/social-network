@@ -3,6 +3,7 @@ package v1
 import (
 	"social/pkg/app/dependencies/middleware"
 	"social/pkg/app/dependencies/router"
+	socket "social/pkg/app/sockets"
 	"social/pkg/services/auth"
 	"social/pkg/services/chat"
 	"social/pkg/services/feed"
@@ -100,7 +101,11 @@ func SocialMux() *router.Router {
 	socialMux.HandleFunc("POST", "/api/v1/notifications/mark-all-read", utils.MiddlewareChain(notifications.HandleMarkAllNotifAsRead, middleware.AuthMiddleware))
 	socialMux.HandleFunc("POST", "/api/v1/notifications/{id}/mark-read", utils.MiddlewareChain(notifications.HandleMarkNotifAsRead, middleware.AuthMiddleware, notifications.NotifMiddleware))
 
+	//search
 	socialMux.HandleFunc("GET", "/api/v1/search", utils.MiddlewareChain(search.HandleSearch, middleware.UserContext, middleware.AuthMiddleware))
+
+	//ws
+	socialMux.HandleFunc("GET", "/ws", utils.MiddlewareChain(socket.UpgradeProtocol, middleware.AuthMiddleware))
 
 	// Feed   ( personal && Specific user feed && Group feed )
 	socialMux.HandleFunc("GET", "/api/v1/feed", utils.MiddlewareChain(feed.GetFeed, middleware.AuthMiddleware))
