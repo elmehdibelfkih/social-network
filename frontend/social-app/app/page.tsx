@@ -1,9 +1,9 @@
-import TestComponent from '@/components/test'
+import Post from '@/components/Posts'
 
 export default function HomePage() {
   return (
     <>
-      <TestComponent name="root" />
+      <Post />
     </>
   )
 }
