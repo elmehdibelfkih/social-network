@@ -1,4 +1,4 @@
-type ProfileData = {
+export type ProfileData = {
     userId: number;
     status: "pending" | "accepted" | "declined" | null;
     nickname: string | null;

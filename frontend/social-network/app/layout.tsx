@@ -1,7 +1,8 @@
-// app/layout.tsx
 'use client';
 import './globals.css';
 import AuthForm from '../features/auth/auth.client';
+import { NewPost } from '../features/newPost/newPost.client';
+import { Profile } from '../features/profile';
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -9,7 +10,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         <header style={{ padding: 12 }}>
           <div>Logo</div>
-          {/* <AuthForm /> */}
+          {/* <NewPost userAvatar='https://placehold.co/140x140/8b4fc9/ffffff?text=ABDNOUR' /> */}
+          {/* <Profile userId='948590438590' /> */}
+          <AuthForm />
         </header>
 
         <main>{children}</main>

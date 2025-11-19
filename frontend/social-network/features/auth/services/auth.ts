@@ -1,5 +1,4 @@
-// @ts-ignore
-import { apiClient } from '@/libs/apiClient';
+import apiClient from '../../../libs/apiClient';
 import type {
   LoginRequest,
   RegisterRequest,

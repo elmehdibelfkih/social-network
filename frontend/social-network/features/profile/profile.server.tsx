@@ -1,7 +1,7 @@
 import styles from './styles.module.css'
 import getProfileData from './services/profile'
 import EditProfileButton from './profile.client'
-import { CalendarIcon, GlobeIcon } from '@/components/ui/icons'
+import { CalendarIcon, GlobeIcon } from '../../components/ui/icons'
 
 export async function Profile({ userId }: { userId: string }) {
     const profile = await getProfileData(userId)
@@ -15,10 +15,10 @@ export async function Profile({ userId }: { userId: string }) {
             </div>
 
             <div className={styles.bottomPart}>
-                <AvatarComponent avatarUrl={profile.avatarId} />
+                <AvatarComponent />
 
                 <div className={styles.info}>
-                    <h2 className={styles.fullname}>{profile.firstname} {profile.lastname}</h2>
+                    <h2 className={styles.fullname}>{profile.firstName} {profile.lastName}</h2>
                     <h3 className={styles.nickname}>@{profile.nickname}</h3>
                     <p className={styles.aboutMe}>{profile.aboutMe}</p>
 
@@ -43,7 +43,9 @@ export async function Profile({ userId }: { userId: string }) {
     )
 }
 
-function AvatarComponent({ avatarUrl }: { avatarUrl?: string }) {
+function AvatarComponent() {
+    // should get the avatar from cache //TODO:
+    const avatarUrl = 'https://placehold.co/140x140/8b4fc9/ffffff?text=ABDNOUR'
     return (
         <div className={styles.avatarContainer}>
             <img

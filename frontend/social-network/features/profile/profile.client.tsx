@@ -2,8 +2,8 @@
 
 import { useState } from 'react'
 import styles from './styles.module.css'
-// @ts-ignore
-import { SettingsIcon } from '@/components/ui/icons'
+import { SettingsIcon } from '../../components/ui/icons'
+import { ProfileData } from './types'
 
 export default function EditProfileButton({ profile }: { profile: ProfileData }) {
     const [isOpen, setIsOpen] = useState(false)
