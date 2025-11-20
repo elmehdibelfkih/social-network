@@ -10,6 +10,11 @@ export const http = {
     put: <T>(url: string, payload?: any) => apiClient<T>(url, "PUT", payload),
     patch: <T>(url: string, payload?: any) => apiClient<T>(url, "PATCH", payload),
     delete: <T>(url: string) => apiClient<T>(url, "DELETE", undefined),
+    get: <T>(url: string) => apiClient<T>(url, "GET", undefined),
+    post: <T>(url: string, payload?: any) => apiClient<T>(url, "POST", payload),
+    put: <T>(url: string, payload?: any) => apiClient<T>(url, "PUT", payload),
+    patch: <T>(url: string, payload?: any) => apiClient<T>(url, "PATCH", payload),
+    delete: <T>(url: string) => apiClient<T>(url, "DELETE", undefined),
 };
 
 async function apiClient<T>(

@@ -6,7 +6,7 @@ import { LoginForm } from './login.client'
 import { RegisterForm } from './signup.client'
 
 
-export default function AuthForm() {
+export default function AuthForm({ onAuthSuccess }: { onAuthSuccess?: () => void }) {
     const [isLogin, setIsLogin] = useState(true)
 
     return (
@@ -24,7 +24,7 @@ export default function AuthForm() {
                 </button>
             </div>
             <div className={styles.formContent}>
-                {isLogin ? <LoginForm /> : <RegisterForm />}
+                {isLogin ? <LoginForm onAuthSuccess={onAuthSuccess} /> : <RegisterForm onAuthSuccess={onAuthSuccess} />}
             </div>
         </div>
     )

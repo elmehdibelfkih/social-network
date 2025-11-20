@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { authService } from './services/auth';
 import styles from './styles.module.css';
 
-export function RegisterForm() {
+export function RegisterForm({ onAuthSuccess }: { onAuthSuccess?: () => void }) {
     const router = useRouter();
     const [isLoading, setIsLoading] = useState(false);
     const [formData, setFormData] = useState({
@@ -25,7 +25,7 @@ export function RegisterForm() {
 
         try {
             await authService.register(formData);
-            router.push('/');
+            onAuthSuccess?.();
         } catch (error) {
             console.error("Failed to register:", error);
         } finally {

@@ -3,7 +3,8 @@
 import { useState } from 'react';
 import styles from './styles.module.css';
 import { ImageIcon, GlobeIcon, DropdownIcon } from '../../components/ui/icons';
-import { createPost } from '@/features/posts/index';
+import { createPost } from '../posts/services/postsService';
+
 
 export function NewPost({ userAvatar }: { userAvatar: string }) {
     const [content, setContent] = useState("")
@@ -14,10 +15,11 @@ export function NewPost({ userAvatar }: { userAvatar: string }) {
         if (!content.trim()) return;
 
         try {
-            await createPost({ content, privacy: 'public' }) // TODO
-            setContent("")
+            await createPost({ content, privacy: 'public' });
+            setContent("");
         } catch (error) {
-            console.error("Failed to post", error)
+            console.error("Failed to post:", error);
+            alert("Please login first to create posts");
         }
     }
 

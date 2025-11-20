@@ -34,25 +34,26 @@ func CreatePost(post *Post) error {
 		}
 
 		// Increment posts_count
-		if err := database.UpdateCounter(tx, database.DBCounterSetter{
-			CounterName: database.POSTS_ENTITY_NAME,
-			EntityType:  database.USER_ENTITY_TYPE,
-			EntityID:    post.AuthorID,
-			Action:      database.ACTION_INCREMENT,
-		}); err != nil {
-			return err
-		}
+		// if err := database.UpdateCounter(tx, database.DBCounterSetter{
+		// 	CounterName: database.POSTS_ENTITY_NAME,
+		// 	EntityType:  database.USER_ENTITY_TYPE,
+		// 	EntityID:    post.AuthorID,
+		// 	Action:      database.ACTION_INCREMENT,
+		// }); err != nil {
+		// 	fmt.Println("=----->", err)
+		// 	return err
+		// }
 
-		if post.GroupID != nil {
-			if err := database.UpdateCounter(tx, database.DBCounterSetter{
-				CounterName: database.POSTS_ENTITY_NAME,
-				EntityType:  database.GROUP_ENTITY_TYPE,
-				EntityID:    *post.GroupID,
-				Action:      database.ACTION_INCREMENT,
-			}); err != nil {
-				return err
-			}
-		}
+		// if post.GroupID != nil {
+		// 	if err := database.UpdateCounter(tx, database.DBCounterSetter{
+		// 		CounterName: database.POSTS_ENTITY_NAME,
+		// 		EntityType:  database.GROUP_ENTITY_TYPE,
+		// 		EntityID:    *post.GroupID,
+		// 		Action:      database.ACTION_INCREMENT,
+		// 	}); err != nil {
+		// 		return err
+		// 	}
+		// }
 
 		return nil
 	})
