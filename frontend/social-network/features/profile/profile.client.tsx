@@ -21,3 +21,18 @@ export default function EditProfileButton({ profile }: { profile: ProfileData })
         </>
     )
 }
+
+export function FollowButton(followStatus: string) {
+    const [isFollowing, setIsFollowing] = useState(false)
+
+    const handleFollow = () => {
+        
+    }
+
+    return (
+        <button className={styles.followButton} onClick={handleFollow}>
+            {isFollowing ? 'Following' : 'Follow'}
+
+        </button>
+    )
+}
