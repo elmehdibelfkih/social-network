@@ -1,10 +1,9 @@
 'use client';
 
 import styles from './styles.module.css';
-import { useNavbar } from './hooks/useNavbar';
 
 export function NavbarClient() {
-  const { user, notificationCount, activeTab, setActiveTab } = useNavbar();
+  // No hooks, no state
 
   return (
     <nav className={styles.navbar}>
@@ -18,24 +17,17 @@ export function NavbarClient() {
       </div>
 
       <div className={styles.navbarCenter}>
-        <button 
-          className={`${styles.navLink} ${activeTab === 'home' ? styles.active : ''}`}
-          onClick={() => setActiveTab('home')}
-        >
+        <button className={styles.navLink}>
           <img src="/home (1).svg" alt="Home" />
           <span>Home</span>
         </button>
-        <button 
-          className={`${styles.navLink} ${activeTab === 'search' ? styles.active : ''}`}
-          onClick={() => setActiveTab('search')}
-        >
+
+        <button className={styles.navLink}>
           <img src="/searchb.svg" alt="Search" />
           <span>Search</span>
         </button>
-        <button 
-          className={`${styles.navLink} ${activeTab === 'groups' ? styles.active : ''}`}
-          onClick={() => setActiveTab('groups')}
-        >
+
+        <button className={styles.navLink}>
           <img src="/groupb.svg" alt="Groups" />
           <span>Groups</span>
         </button>
@@ -44,18 +36,13 @@ export function NavbarClient() {
       <div className={styles.navbarRight}>
         <button className={styles.notificationBtn} aria-label="Notifications">
           <img src="/bell.svg" alt="Notifications" />
-          {notificationCount > 0 && (
-            <span className={styles.notificationBadge}>{notificationCount}</span>
-          )}
         </button>
 
         <div className={styles.userProfile}>
           <div className={styles.userAvatar}>
             <img src="/users.svg" alt="Default Avatar" />
           </div>
-          <span className={styles.userName}>
-            {user?.nickname || `${user?.firstName} ${user?.lastName}` || 'User'}
-          </span>
+          <span className={styles.userName}>User</span>
         </div>
       </div>
     </nav>
