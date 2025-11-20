@@ -1,21 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
 import styles from './styles.module.css';
-import { homeService } from './services/homeService';
-import { User } from './types';
+import { useNavbar } from './hooks/useNavbar';
 
-export default function Navbar() {
-  const [user, setUser] = useState<User | null>(null);
-  const [notificationCount, setNotificationCount] = useState(0);
-  const [activeTab, setActiveTab] = useState('home');
-
-  useEffect(() => {
-    // homeService.getCurrentUser().then(setUser);
-    // homeService.getNotificationCount().then(setNotificationCount);
-    setUser({ userId: 1, firstName: 'John', lastName: 'Doe' });
-    setNotificationCount(3);
-  }, []);
+export function NavbarClient() {
+  const { user, notificationCount, activeTab, setActiveTab } = useNavbar();
 
   return (
     <nav className={styles.navbar}>
@@ -62,11 +51,7 @@ export default function Navbar() {
 
         <div className={styles.userProfile}>
           <div className={styles.userAvatar}>
-            {user?.avatarId ? (
-              <img src={`/api/v1/media/${user.avatarId}`} alt="Avatar" />
-            ) : (
-              <img src="/users.svg" alt="Default Avatar" />
-            )}
+            <img src="/users.svg" alt="Default Avatar" />
           </div>
           <span className={styles.userName}>
             {user?.nickname || `${user?.firstName} ${user?.lastName}` || 'User'}
