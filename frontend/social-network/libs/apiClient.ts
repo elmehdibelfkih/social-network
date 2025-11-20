@@ -42,10 +42,6 @@ async function apiClient<T>(
         showSnackbar(errorToast)
         return Promise.reject()
     }
-    const successToast = {
-        payload: { success: true, message: "The operation was successful" }
-    }
-    showSnackbar(successToast)
     return body
 }
 

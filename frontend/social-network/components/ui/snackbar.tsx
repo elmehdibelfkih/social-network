@@ -1,6 +1,6 @@
 'use client'
 
-import { FailureIcon, SuccessIcon } from "./icons";
+import { FailureIcon } from "./icons";
 import styles from "../../styles/snackbar.module.css"
 import { useEffect, useRef, useState } from "react";
 
@@ -42,8 +42,8 @@ export default function Snackbar() {
     if (!snackbar) return null
 
     return (
-        <div className={`${styles.container} ${snackbar?.status ? styles.success : styles.failure}`}>
-            {snackbar?.status ? <SuccessIcon /> : <FailureIcon />}
+        <div className={`${styles.container} ${styles.failure}`}>
+            <FailureIcon />
             <div >
                 {snackbar?.message}
             </div>
