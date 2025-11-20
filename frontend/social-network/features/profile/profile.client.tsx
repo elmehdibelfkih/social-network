@@ -3,7 +3,9 @@
 import { useState } from 'react'
 import styles from './styles.module.css'
 // @ts-ignore
-import { SettingsIcon } from '@/components/ui/icons'
+import { FollowIcon, SettingsIcon } from '@/components/ui/icons'
+import { unfollowPerson, followPerson } from './services/profile'
+import { ProfileData } from './types'
 
 export default function EditProfileButton({ profile }: { profile: ProfileData }) {
     const [isOpen, setIsOpen] = useState(false)
@@ -22,17 +24,36 @@ export default function EditProfileButton({ profile }: { profile: ProfileData })
     )
 }
 
-export function FollowButton(followStatus: string) {
-    const [isFollowing, setIsFollowing] = useState(false)
+type FollowStatus = 'none' | 'follow' | 'following' | 'pending' | 'declined';
 
-    const handleFollow = () => {
-        
-    }
+export function FollowButton({ targetUserId, initialStatus, isPrivate = false }: { targetUserId: string, initialStatus: FollowStatus, isPrivate?: boolean }) {
+    const [status, setStatus] = useState<FollowStatus>(initialStatus);
+
+    const handleFollow = async () => {
+        if (status == 'follow' || status == 'none') {
+            const nextState = isPrivate ? 'pending' : 'following';
+            setStatus(nextState);
+
+            await followPerson(targetUserId)
+        } else {
+            setStatus('follow');
+
+            await unfollowPerson(targetUserId)
+        }
+    };
+
+    const getButtonText = () => {
+        switch (status) {
+            case 'following': return 'Following';
+            case 'pending': return 'Requested';
+            case 'declined': return 'Follow';
+            default: return 'Follow';
+        }
+    };
 
     return (
-        <button className={styles.followButton} onClick={handleFollow}>
-            {isFollowing ? 'Following' : 'Follow'}
-
+        <button className={styles.followButton} onClick={handleFollow} >
+            <span>{getButtonText()}</span>
         </button>
-    )
+    );
 }

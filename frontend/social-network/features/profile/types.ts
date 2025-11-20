@@ -1,4 +1,4 @@
-type ProfileData = {
+export type ProfileData = {
     userId: number;
     status: "pending" | "accepted" | "declined" | null;
     nickname: string | null;
@@ -16,3 +16,14 @@ type ProfileData = {
     };
     joinedAt: string;
 };
+
+export type FollowResponse = {
+    succes: boolean
+    payload: {
+        message: string
+        status: string
+        targetUserId: number
+        followerId: number
+        chatId: number | null
+    }
+}
