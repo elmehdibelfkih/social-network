@@ -20,32 +20,32 @@ export const ShowSnackbar = (payload: SnackbarData) => {
 }
 
 export default function Snackbar() {
-    const [snackbar, setSnackbar] = useState<SnackbarData | null>(null)
-    const timerRef = useRef<NodeJS.Timeout>(null)
+    // const [snackbar, setSnackbar] = useState<SnackbarData | null>(null)
+    // const timerRef = useRef<NodeJS.Timeout>(null)
 
-    useEffect(() => {
-        snackFn = (payload: SnackbarData) => {
-            setSnackbar(payload)
+    // useEffect(() => {
+    //     snackFn = (payload: SnackbarData) => {
+    //         setSnackbar(payload)
 
-            if (timerRef.current) {
-                clearTimeout(timerRef.current)
-            }
+    //         if (timerRef.current) {
+    //             clearTimeout(timerRef.current)
+    //         }
 
-            timerRef.current = setTimeout(() => { setSnackbar(null) }, 4000)
-        }
-        return () => {
-            snackFn = null
-            if (timerRef.current) { clearTimeout(timerRef.current) }
-        }
-    }, [])
+    //         timerRef.current = setTimeout(() => { setSnackbar(null) }, 4000)
+    //     }
+    //     return () => {
+    //         snackFn = null
+    //         if (timerRef.current) { clearTimeout(timerRef.current) }
+    //     }
+    // }, [])
 
-    if (!snackbar) return null
+    // if (!snackbar) return null
 
     return (
         <div className={`${styles.container} ${styles.failure}`}>
             <FailureIcon />
             <div >
-                {snackbar?.message}
+                {"snackbar?.message"}
             </div>
         </div>
     )
