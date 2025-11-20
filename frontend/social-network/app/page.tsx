@@ -6,15 +6,15 @@ import { NewPost } from '../features/newPost/newPost.client';
 import { PostsClient } from "../features/posts";
 
 export default function HomePage(): JSX.Element {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  // const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  const handleAuthSuccess = () => {
-    setIsAuthenticated(true);
-  };
+  // const handleAuthSuccess = () => {
+  //   setIsAuthenticated(true);
+  // };
 
-  if (!isAuthenticated) {
-    return <AuthForm onAuthSuccess={handleAuthSuccess} />;
-  }
+  // if (!isAuthenticated) {
+  //   return <AuthForm onAuthSuccess={handleAuthSuccess} />;
+  // }
 
   return (
     <main>
