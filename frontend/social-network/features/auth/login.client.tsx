@@ -21,11 +21,9 @@ export function LoginForm() {
         try {
             await authService.login(formData);
             router.push('/feed');
-            router.refresh();
         } catch (error) {
-            console.error("Login failed:", error);
-        } finally {
             setIsLoading(false);
+            console.error("Login failed:", error);
         }
     };
 

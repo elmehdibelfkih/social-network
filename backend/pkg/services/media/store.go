@@ -14,7 +14,7 @@ import (
 
 func CreateMedia(media *Media) error {
 	err := database.WrapWithTransaction(func(tx *sql.Tx) error {
-		_, err := config.DB.Exec(QUERY_CREATE_MEDIA, media.ID, media.OwnerId, media.Path, media.Mime, media.Purpose, media.CreatedAt)
+		_, err := config.DB.Exec(QUERY_CREATE_MEDIA, media.ID, media.OwnerId, media.Path, media.Mime, media.Size, media.Purpose, media.CreatedAt)
 		if err != nil {
 			if e, ok := err.(sqlite3.Error); ok && e.Code == sqlite3.ErrConstraint {
 				return fmt.Errorf("constraint error: %w", err)

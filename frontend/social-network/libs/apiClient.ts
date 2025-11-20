@@ -1,4 +1,5 @@
 import { ShowSnackbar } from "../components/ui/snackbar"
+import { ApiErrorResponse } from "../features/auth/types";
 
 type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
 
@@ -24,7 +25,8 @@ async function apiClient<T>(
     method: HttpMethod,
     payload?: any
 ): Promise<T> {
-    const response = await fetch(url, {
+    const BASE_URL = process.env.NEXT_PUBLIC_GO_API_URL
+    const response = await fetch(`${BASE_URL}${url}`, {
         method: method,
         headers: {
             "content-type": "application/json"
@@ -33,23 +35,16 @@ async function apiClient<T>(
     })
     const body = await response.json()
     if (!response.ok) {
-        const errorToast = {
-            payload: {
-                success: false,
-                message: body.error.ErrorMessage
-            }
+        if (body.error.type == 'redirect') {
+            
         }
-        showSnackbar(errorToast)
+        showSnackbar(body)
+
         return Promise.reject()
     }
     return body
 }
 
-function showSnackbar({ payload }: { payload: SnackbarPayload }) {
-    ShowSnackbar({ status: payload.success, message: payload.message })
-}
-
-type SnackbarPayload = {
-    success: boolean
-    message: string
+function showSnackbar(payload: ApiErrorResponse) {
+    ShowSnackbar(payload)
 }

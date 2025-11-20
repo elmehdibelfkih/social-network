@@ -26,7 +26,6 @@ export function RegisterForm() {
         try {
             await authService.register(formData);
             router.push('/login');
-            router.refresh();
         } catch (error) {
             console.error("Failed to register:", error);
         } finally {
@@ -40,6 +39,7 @@ export function RegisterForm() {
 
         try {
             const avatarId = await authService.uploadAvatar(avatar);
+
             setFormData(prev => ({ ...prev, avatarId }));
         } catch (error) {
             console.error("Failed to upload avatar:", error);

@@ -8,9 +8,10 @@ import (
 	"errors"
 	"log"
 	"net/http"
-	config "social/pkg/config"
 	"strconv"
 	"strings"
+
+	config "social/pkg/config"
 
 	"github.com/mattn/go-sqlite3"
 	"golang.org/x/crypto/bcrypt"

@@ -1,24 +1,19 @@
-// @ts-ignore
-import { apiClient } from '@/libs/apiClient';
+import { http } from '../../../libs/apiClient';
 import type {
   LoginRequest,
   RegisterRequest,
   AuthResponse,
-  SessionListResponse
+  SessionListResponse,
+  UploadMediaResponse
 } from '../types';
 
 export const authService = {
   async register(data: RegisterRequest): Promise<AuthResponse> {
-    return apiClient.post('/api/v1/auth/register', data);
+    return http.post('/api/v1/auth/register', data);
   },
 
   async login(data: LoginRequest): Promise<AuthResponse> {
-    const payload: LoginRequest = {
-      identifier: data.identifier,
-      password: data.password,
-      rememberMe: data.rememberMe,
-    };
-    return apiClient.post('/api/v1/auth/login', payload);
+    return http.post('/api/v1/auth/login', data);
   },
 
   async uploadAvatar(file: File): Promise<number> {
@@ -34,24 +29,24 @@ export const authService = {
       purpose: "avatar"
     }
 
-    const response = await apiClient.post('/api/v1/media/upload', payload)
-    return response.payload.mediaId
+    const resp = await http.post<UploadMediaResponse>('/api/v1/media/upload', payload)
+    return resp.payload.mediaId
   },
 
   async logout(): Promise<void> {
-    return apiClient.post('/api/v1/auth/logout', {});
+    return http.post('/api/v1/auth/logout', {});
   },
 
   async getSession(): Promise<AuthResponse> {
-    return apiClient.get('/api/v1/auth/session');
+    return http.get('/api/v1/auth/session');
   },
 
   async getActiveSessions(): Promise<SessionListResponse> {
-    return apiClient.get('/api/v1/sessions');
+    return http.get('/api/v1/sessions');
   },
 
   async revokeSession(sessionId: number): Promise<void> {
-    return apiClient.delete(`/api/v1/sessions/${sessionId}`);
+    return http.delete(`/api/v1/sessions/${sessionId}`);
   },
 
   avatarToBase64(file: File): Promise<string> {
