@@ -25,7 +25,7 @@ export function RegisterForm() {
 
         try {
             await authService.register(formData);
-            router.push('/login');
+            router.push('/');
         } catch (error) {
             console.error("Failed to register:", error);
         } finally {

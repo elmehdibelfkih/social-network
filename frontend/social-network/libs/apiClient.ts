@@ -4,20 +4,11 @@ import { ApiErrorResponse } from "../features/auth/types";
 type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
 
 export const http = {
-    get: <T>(url: string) =>
-        apiClient<T>(url, "GET", undefined),
-
-    post: <T>(url: string, payload?: any) =>
-        apiClient<T>(url, "POST", payload),
-
-    put: <T>(url: string, payload?: any) =>
-        apiClient<T>(url, "PUT", payload),
-
-    patch: <T>(url: string, payload?: any) =>
-        apiClient<T>(url, "PATCH", payload),
-
-    delete: <T>(url: string) =>
-        apiClient<T>(url, "DELETE", undefined),
+    get: <T>(url: string) => apiClient<T>(url, "GET", undefined),
+    post: <T>(url: string, payload?: any) => apiClient<T>(url, "POST", payload),
+    put: <T>(url: string, payload?: any) => apiClient<T>(url, "PUT", payload),
+    patch: <T>(url: string, payload?: any) => apiClient<T>(url, "PATCH", payload),
+    delete: <T>(url: string) => apiClient<T>(url, "DELETE", undefined),
 };
 
 async function apiClient<T>(
@@ -26,8 +17,10 @@ async function apiClient<T>(
     payload?: any
 ): Promise<T> {
     const BASE_URL = process.env.NEXT_PUBLIC_GO_API_URL
-    const response = await fetch(`${BASE_URL}${url}`, {
+    url = `${BASE_URL}${url}`
+    const response = await fetch(url, {
         method: method,
+        credentials: "include",
         headers: {
             "content-type": "application/json"
         },
@@ -36,15 +29,12 @@ async function apiClient<T>(
     const body = await response.json()
     if (!response.ok) {
         if (body.error.type == 'redirect') {
-            
+
         }
-        showSnackbar(body)
+        ShowSnackbar(body)
 
         return Promise.reject()
     }
     return body
 }
 
-function showSnackbar(payload: ApiErrorResponse) {
-    ShowSnackbar(payload)
-}
