@@ -2,6 +2,7 @@ package main
 
 import (
 	server "social/pkg/app/server"
+	socket "social/pkg/app/sockets"
 	migration "social/pkg/db/database"
 	errorLogger "social/pkg/utils"
 )
@@ -13,5 +14,6 @@ func main() {
 		errorLogger.SQLiteErrorTarget(err, "migration")
 		return
 	}
+	socket.InitWsHub()
 	server.StartServer()
 }

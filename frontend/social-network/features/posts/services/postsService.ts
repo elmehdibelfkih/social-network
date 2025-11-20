@@ -1,4 +1,5 @@
 import { Post } from '../types';
+import { http } from '../../../libs/apiClient';
 
 export const postsService = {
   async getFeed(page = 1, limit = 20): Promise<Post[]> {
@@ -7,6 +8,10 @@ export const postsService = {
     // const data = await response.json();
     // return data.success ? data.payload : [];
     return [];
+  },
+
+  async createPost(data: { content: string; privacy: string }): Promise<void> {
+    await http.post('/api/v1/posts', data);
   },
 
   async toggleLike(postId: number, isLiked: boolean): Promise<boolean> {
@@ -20,3 +25,5 @@ export const postsService = {
     return true;
   }
 };
+
+export const createPost = postsService.createPost;

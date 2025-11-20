@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import styles from '../../styles/components/authComponent.module.css'
+import styles from './styles.module.css'
 import { LoginForm } from './login.client'
 import { RegisterForm } from './signup.client'
 
