@@ -2,8 +2,8 @@ package media
 
 const (
 	QUERY_CREATE_MEDIA = `
-		INSERT INTO media (id, owner_id, path, mime, purpose, created_at)
-		VALUES (?, ?, ?, ?, ?, ?);
+		INSERT INTO media (id, owner_id, path, mime, size, purpose, created_at)
+		VALUES (?, ?, ?, ?, ?, ?, ?);
 	`
 
 	QUERY_GET_MEDIA = `

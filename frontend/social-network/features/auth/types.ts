@@ -54,3 +54,26 @@ export type SessionListResponse = {
     expiresAt: string
     current: boolean
 }
+
+export type ApiErrorResponse = {
+    success: boolean;
+    error: {
+        statusCode: number;
+        statusText: string;
+        errorMessage: string;
+        errorTitle: string;
+        errorDescription: string;
+        errorType: string;
+    };
+};
+
+export type UploadMediaResponse = {
+    succes: boolean;
+    payload: {
+        message: string;
+        mediaId: number;
+        mediaPath: string;
+        fileType: string;
+        uploadedAt: string;
+    }
+};

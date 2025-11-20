@@ -32,7 +32,7 @@ type RegisterResponseJson struct {
 
 // api/v1/auth/login
 type LoginRequestJson struct {
-	Identifier string `json:"email/userId/nickname"` // flexible login field 
+	Identifier string `json:"identifier"` // flexible login field 
 	Password   string `json:"password"`
 	RememberMe bool   `json:"rememberMe"`
 }

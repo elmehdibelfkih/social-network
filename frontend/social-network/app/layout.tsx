@@ -1,14 +1,22 @@
 // app/layout.tsx
 'use client';
 import './globals.css';
+import AuthForm from '../features/auth/auth.client';
+import { NewPost } from '../features/newPost/newPost.client';
+import { Profile } from '../features/profile';
 import Snackbar from '../components/ui/snackbar';
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <body>
-        {children}
-        <Snackbar />
+        <header style={{ padding: 12 }}>
+          {/* <NewPost userAvatar='https://placehold.co/140x140/8b4fc9/ffffff?text=ABDNOUR' /> */}
+          {/* <Profile userId='948590438590' /> */}
+          <Snackbar />
+        </header>
+
+        <main>{children}</main>
       </body>
     </html>
   );

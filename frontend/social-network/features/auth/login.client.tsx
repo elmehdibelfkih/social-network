@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { authService } from './index';
 import styles from './styles.module.css';
 
-export function LoginForm() {
+export function LoginForm({ onAuthSuccess }: { onAuthSuccess?: () => void }) {
     const router = useRouter();
     const [isLoading, setIsLoading] = useState(false);
     const [formData, setFormData] = useState({
@@ -20,12 +20,10 @@ export function LoginForm() {
 
         try {
             await authService.login(formData);
-            router.push('/feed');
-            router.refresh();
+            onAuthSuccess?.();
         } catch (error) {
-            console.error("Login failed:", error);
-        } finally {
             setIsLoading(false);
+            console.error("Login failed:", error);
         }
     };
 
