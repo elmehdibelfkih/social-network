@@ -47,7 +47,7 @@ func RegisterUserHttp(w http.ResponseWriter, response RegisterResponseJson, s Se
 	http.SetCookie(w, &http.Cookie{
 		Name:     "session_token",
 		Value:    s.SessionToken,
-		Expires:  time.Now().Add(time.Hour),
+		Expires:  time.Now().Add(time.Hour * 24),
 		HttpOnly: true,
 		SameSite: http.SameSiteStrictMode,
 		Path:     "/",
