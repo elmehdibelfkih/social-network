@@ -19,11 +19,14 @@ export const http = {
         apiClient<T>(url, "DELETE", undefined),
 };
 
+const BASE_URL = process.env.NEXT_PUBLIC_GO_API_URL
+
 async function apiClient<T>(
     url: string,
     method: HttpMethod,
     payload?: any
 ): Promise<T> {
+    url = `${BASE_URL}${url}`
     const response = await fetch(url, {
         method: method,
         headers: {

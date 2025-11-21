@@ -4,6 +4,7 @@ import { useState, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import { authService } from './index';
 import styles from './styles.module.css';
+import { useAuth } from '../../providers/authProvider';
 
 export function LoginForm() {
     const router = useRouter();
@@ -14,12 +15,21 @@ export function LoginForm() {
         rememberMe: false
     });
 
+    const { setUser } = useAuth()
+
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setIsLoading(true);
 
         try {
-            await authService.login(formData);
+            const resp = await authService.login(formData);
+            setUser({
+                userId: resp.userId,
+                avatarId: resp.avatarId,
+                nickname: resp.nickname,
+                firstName: resp.firstName,
+                lastName: resp.lastName
+            })
             router.push('/feed');
             router.refresh();
         } catch (error) {
