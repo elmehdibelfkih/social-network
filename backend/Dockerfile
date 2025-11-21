@@ -1,15 +1,16 @@
 # Build Stage
 FROM golang:1.23.0 AS builder
-WORKDIR /app/project
-COPY ./project/. ./
-RUN go build -o social main.go
+WORKDIR /app/backend
+COPY . .
+RUN go build -o social ./cmd/main.go
 
 FROM debian:stable-slim
 RUN apt-get update && apt-get upgrade -y
-WORKDIR /project
+WORKDIR /app/backend
 
-COPY --from=builder /app/project/social     .
+COPY --from=builder /app/backend/social     .
 
 EXPOSE 8080
 
+# CMD ["tail", "-f", "/dev/null"]
 CMD ["./social"]

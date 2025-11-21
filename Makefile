@@ -26,25 +26,24 @@ DOCKER_COMPOSE_PATH = $(PROJECT_ROOT)/docker-compose.yml
 
 FRONTEND_PATH = $(PROJECT_ROOT)/frontend/social-network
 
-
+# local dev
 dev: start-backend start-frontend
-
 stop-dev:
 	@echo "$(RED)Stopping processes gracefully....$(RESET)"
 	@fuser -k -s 8080/tcp || true
 	@fuser -k -s 3000/tcp || true
 	@echo "$(GREEN)Cleanup complete.$(RESET)"
-
 start-backend: setup
 	@echo "$(GREEN)Starting backend (Port 8080).$(RESET)"
 	@echo "$(MAGENTA)Logs redirected to$(RESET) $(BACKEND_LOGS_PATH)..."
 	@(cd "./backend/" && nohup go run ./cmd/main.go < /dev/null >> $(BACKEND_LOGS_PATH) 2>&1 &)
-
 start-frontend: setup
 	@echo "$(GREEN)Starting frontend (Port 3000).$(RESET)"
 	@echo "$(MAGENTA)Logs redirected to$(RESET) $(FRONTEND_LOGS_PATH)..."
 	@(cd $(FRONTEND_PATH) && nohup npm run dev < /dev/null >> $(FRONTEND_LOGS_PATH) 2>&1 &)
+#=============================================================
 
+# setup ======================================================
 setup:
 	@mkdir -p $(LOGS_PATH)
 	@	: >> $(SQLITE_LOGS_PATH)
@@ -60,36 +59,27 @@ setup:
 	@mkdir -p $(COMMENTS_DATA_PATH)
 	@cd $(FRONTEND_PATH) && npm install
 	@cd $(FRONTEND_PATH) && cp example.env .env
+#=============================================================
 
-
+# docker =====================================================
 up: setup
 	docker compose -f $(DOCKER_COMPOSE_PATH) up -d
-
-
 build: setup
 	docker compose -f $(DOCKER_COMPOSE_PATH) build
-
-
 down:
 	docker compose -f $(DOCKER_COMPOSE_PATH) down
-
 status:
 	docker compose -f $(DOCKER_COMPOSE_PATH) ps
 	docker logs
+#=============================================================
 
-
-
-
+# clean ======================================================
 clean-logs:
 	@echo "$(YELLOW)Cleaning logs files...$(RESET)"
 	@rm -rf $(LOGS_PATH)
-
-
 clean-data:
 	@echo "$(YELLOW)Cleaning data...$(RESET)"
 	@rm -rf $(DATA_PATH)
-
-
 clean-next:
 	@echo "$(YELLOW)Cleaning Next.js project files...$(RESET)"
 	@rm -rf $(FRONTEND_PATH)/node_modules
@@ -102,11 +92,10 @@ clean-next:
 	@rm -rf $(FRONTEND_PATH)/out
 	@rm -rf $(FRONTEND_PATH)/dist
 	@rm -rf $(FRONTEND_PATH)/build
+purge:clean-logs clean-data clean-next
+#=============================================================
 
 
-prune:clean-logs clean-data clean-next
+# re-prune: prune dev
 
-
-re-prune: prune dev
-
-.PHONY: dev 
+# .PHONY: dev 
