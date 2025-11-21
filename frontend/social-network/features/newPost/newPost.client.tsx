@@ -4,9 +4,14 @@ import { useState } from 'react';
 import styles from './styles.module.css';
 import { ImageIcon, GlobeIcon, DropdownIcon } from '../../components/ui/icons';
 import { createPost } from '../posts/services/postsService';
+import { Post } from '../posts/types';
 
+interface NewPostProps {
+    userAvatar: string;
+    onPostCreated?: (post: Post) => void;
+}
 
-export function NewPost({ userAvatar }: { userAvatar: string }) {
+export function NewPost({ userAvatar, onPostCreated }: NewPostProps) {
     const [content, setContent] = useState("")
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -16,6 +21,22 @@ export function NewPost({ userAvatar }: { userAvatar: string }) {
 
         try {
             await createPost({ content, privacy: 'public' });
+            
+            // Create a mock post object for immediate UI update
+            const newPost: Post = {
+                postId: Date.now(),
+                authorId: 1,
+                authorFirstName: 'Current',
+                authorLastName: 'User',
+                content: content.trim(),
+                privacy: 'public',
+                isLikedByUser: false,
+                stats: { reactionCount: 0, commentCount: 0 },
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString()
+            };
+            
+            onPostCreated?.(newPost);
             setContent("");
         } catch (error) {
             console.error("Failed to post:", error);
