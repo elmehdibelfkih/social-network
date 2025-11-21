@@ -1,10 +1,10 @@
 import { http } from '../../../libs/apiClient';
 import type {
   LoginRequest,
-  RegisterRequest,
-  AuthResponse,
-  SessionListResponse
+  RegisterRequest
 } from '../types';
+
+import { Session, AuthResponse } from '../../../libs/globalTypes';
 
 export const authService = {
   async register(data: RegisterRequest): Promise<AuthResponse> {
@@ -43,7 +43,7 @@ export const authService = {
     return http.get('/api/v1/auth/session')
   },
 
-  async getActiveSessions(): Promise<SessionListResponse> {
+  async getActiveSessions(): Promise<Session> {
     return http.get('/api/v1/sessions');
   },
 
