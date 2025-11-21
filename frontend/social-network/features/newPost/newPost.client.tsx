@@ -3,8 +3,7 @@
 import { useState } from 'react';
 import styles from './styles.module.css';
 import { ImageIcon, GlobeIcon, DropdownIcon } from '../../components/ui/icons';
-import { createPost } from '../posts/services/postsService';
-
+import { createPost } from '../../features/newPost/index';
 
 export function NewPost({ userAvatar }: { userAvatar: string }) {
     const [content, setContent] = useState("")
