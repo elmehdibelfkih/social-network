@@ -1,4 +1,3 @@
-import { error } from "console"
 import { createContext, useContext, useState } from "react"
 
 type User = {

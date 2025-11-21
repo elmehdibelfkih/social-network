@@ -20,6 +20,7 @@ export type PrivacyLevel = 'public' | 'followers' | 'private' | 'group' | 'restr
 export type FollowStatus = 'pending' | 'accepted' | 'declined' | null;
 export type ReactionType = 'like';
 export type MediaType = 'image/png' | 'image/jpeg' | 'image/gif';
+
 export interface Session {
     sessionId: number;
     sessionToken?: string;

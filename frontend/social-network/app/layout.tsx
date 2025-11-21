@@ -1,8 +1,4 @@
 'use client';
-// import './globals.css';
-import AuthForm from '../features/auth/auth.client';
-import { NewPost } from '../features/newPost/newPost.client';
-import { Profile } from '../features/profile';
 import { AuthProvider } from '../providers/authProvider';
 import Snackbar from '../components/ui/snackbar';
 
@@ -11,17 +7,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en">
       <body>
         <header style={{ padding: 12 }}>
-          <div>Logo</div>
-          <AuthProvider>
-            <AuthForm />
-            {/* <NewPost userAvatar='https://placehold.co/140x140/8b4fc9/ffffff?text=ABDNOUR' /> */}
-            {/* <Profile userId='948590438590' /> */}
-            <Snackbar />
-          </AuthProvider>
+          <h1>Logo</h1>
         </header>
 
         <main>
-          {children}
           <Snackbar />
         </main>
 

@@ -1,15 +1,17 @@
 'use client';
 import AuthForm from '../../features/auth/auth.client';
+import { AuthProvider } from '../../providers/authProvider';
+
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <body>
-        <header style={{ padding: 12 }}>
-          <AuthForm />
-        </header>
-
-        <main>{children}</main>
+        <main>
+          <AuthProvider>
+            <AuthForm />
+          </AuthProvider>
+        </main>
       </body>
     </html>
   );

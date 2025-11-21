@@ -1,14 +1,17 @@
 'use client'
 
-import { FailureIcon } from "./icons";
+import { FailureIcon, SuccessIcon } from "./icons";
 import styles from "../../styles/snackbar.module.css"
 import { useEffect, useRef, useState } from "react";
-import { ApiErrorResponse } from "../../features/auth/types";
 
+type SnackbarData = {
+    status: boolean
+    message: string
+}
 
-let snackFn: ((payload: ApiErrorResponse) => void) | null = null;
+let snackFn: ((payload: SnackbarData) => void) | null = null;
 
-export const ShowSnackbar = (payload: ApiErrorResponse) => {
+export const ShowSnackbar = (payload: SnackbarData) => {
     if (snackFn) {
         snackFn(payload)
     } else {
@@ -17,11 +20,11 @@ export const ShowSnackbar = (payload: ApiErrorResponse) => {
 }
 
 export default function Snackbar() {
-    const [snackbar, setSnackbar] = useState<ApiErrorResponse | null>(null)
+    const [snackbar, setSnackbar] = useState<SnackbarData | null>(null)
     const timerRef = useRef<NodeJS.Timeout>(null)
 
     useEffect(() => {
-        snackFn = (payload: ApiErrorResponse) => {
+        snackFn = (payload: SnackbarData) => {
             setSnackbar(payload)
 
             if (timerRef.current) {
@@ -39,10 +42,10 @@ export default function Snackbar() {
     if (!snackbar) return null
 
     return (
-        <div className={`${styles.container} ${styles.failure}`}>
-            <FailureIcon />
+        <div className={`${styles.container} ${snackbar?.status ? styles.success : styles.failure}`}>
+            {snackbar?.status ? <SuccessIcon /> : <FailureIcon />}
             <div >
-                {snackbar?.error.errorMessage}
+                {snackbar?.message}
             </div>
         </div>
     )
