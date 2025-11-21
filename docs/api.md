@@ -506,7 +506,7 @@ No need for a request body.
 
 ## 🔴 Feed
 
-### GET `GET /api/v1/feed?page=1&limit=20` => paginated personal feed (public + followees + groups + allowed private)
+### GET `/api/v1/feed?page=1&limit=20` => paginated personal feed (public + followees + groups + allowed private)
 
 ***status code in success: 200***
 
