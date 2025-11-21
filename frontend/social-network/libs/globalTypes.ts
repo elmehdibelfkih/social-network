@@ -135,6 +135,14 @@ export interface MediaUploadRequest {
     Purpose: 'avatar' | 'post' | 'message' | 'comment';
 }
 
+export interface MediaUploadResponse {
+    message: string;
+    mediaId: number;
+    mediaPath: string;
+    fileType: string;
+    uploadedAt: string;
+}
+
 export interface Group {
     groupId: number;
     creatorId: number;

@@ -4,7 +4,7 @@ import type {
   RegisterRequest
 } from '../types';
 
-import { Session, AuthResponse } from '../../../libs/globalTypes';
+import { Session, AuthResponse, MediaUploadResponse } from '../../../libs/globalTypes';
 
 export const authService = {
   async register(data: RegisterRequest): Promise<AuthResponse> {
@@ -20,7 +20,7 @@ export const authService = {
     return http.post('/api/v1/auth/login', payload)
   },
 
-  async uploadAvatar(file: File): Promise<number> {
+  async uploadAvatar(file: File): Promise<MediaUploadResponse> {
     if (!file) throw new Error("No file provided")
 
     const encodedFile = await this.avatarToBase64(file)
@@ -32,7 +32,7 @@ export const authService = {
       fileData: rawEncodedFile,
       purpose: "avatar"
     }
-    return http.post('/api/v1/media/upload', payload)
+    return await http.post<MediaUploadResponse>('/api/v1/media/upload', payload)
   },
 
   async logout(): Promise<void> {

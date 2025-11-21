@@ -29,6 +29,7 @@ async function apiClient<T>(
     url = `${BASE_URL}${url}`
     const response = await fetch(url, {
         method: method,
+        credentials: 'include',
         headers: {
             "content-type": "application/json"
         },

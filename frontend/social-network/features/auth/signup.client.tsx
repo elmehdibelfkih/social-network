@@ -34,8 +34,7 @@ export function RegisterForm({ onAuthSuccess }: { onAuthSuccess?: () => void }) 
                 firstName: resp.firstName,
                 lastName: resp.lastName
             })
-            router.push('/login');
-            router.refresh();
+            router.push('/');
         } catch (error) {
             console.error("Failed to register:", error);
         } finally {
@@ -48,8 +47,8 @@ export function RegisterForm({ onAuthSuccess }: { onAuthSuccess?: () => void }) 
         if (!avatar) return;
 
         try {
-            const avatarId = await authService.uploadAvatar(avatar);
-
+            const avatarResp = await authService.uploadAvatar(avatar);
+            const avatarId = avatarResp.mediaId
             setFormData(prev => ({ ...prev, avatarId }));
         } catch (error) {
             console.error("Failed to upload avatar:", error);
