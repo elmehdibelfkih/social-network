@@ -1,5 +1,3 @@
-'use client';
-import AuthForm from '../../../features/auth/auth.client';
 import { Profile } from '../../../features/profile';
 import { AuthProvider } from '../../../providers/authProvider';
 

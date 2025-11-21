@@ -6,6 +6,7 @@ import { unfollowPerson, followPerson } from './services/profile'
 import { SettingsIcon } from '../../components/ui/icons'
 import { ProfileData } from './types'
 import { FollowStatus } from '../../libs/globalTypes'
+import { useAuth } from '../../providers/authProvider'
 
 export default function EditProfileButton({ profile }: { profile: ProfileData }) {
     const [isOpen, setIsOpen] = useState(false)
@@ -64,5 +65,28 @@ export function MessageButton() {
         <button className={styles.messageButton} onClick={handleMessage} >
             <span>{"Message"}</span>
         </button>
+    )
+}
+
+export function ProfileClient({ userId, profile }: { userId: number, profile: ProfileData }) {
+    const { user } = useAuth()
+
+    const isOwnProfile = user.userId == userId
+
+    return (
+        <div className={styles.topPart}>
+            {isOwnProfile ? (
+                <EditProfileButton profile={profile} />
+            ) : (
+                <>
+                    <FollowButton
+                        targetUserId={userId}
+                        initialStatus={profile.status || 'none'}
+                        isPrivate={profile.privacy === 'private'}
+                    />
+                    <MessageButton />
+                </>
+            )}
+        </div>
     )
 }

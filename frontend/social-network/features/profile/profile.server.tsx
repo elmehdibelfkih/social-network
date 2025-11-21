@@ -1,32 +1,22 @@
 import styles from './styles.module.css'
 import getProfileData from './services/profile'
-import EditProfileButton, { FollowButton, MessageButton } from './profile.client'
+import { ProfileClient } from './profile.client'
 import { CalendarIcon, GlobeIcon } from '../../components/ui/icons'
-import { useAuth } from '../../providers/authProvider'
+import { ProfileData } from './types';
 
 export async function Profile({ userId }: { userId: number }) {
-    const profile = await getProfileData(userId)
+    let profile: ProfileData;
+    try {
+        profile = await getProfileData(userId)
+        console.log(profile);
 
-    const { user } = useAuth()
-
-    const isOwnProfile = user.userId === userId;
+    } catch (error) {
+        console.log(error)
+    }
 
     return (
         <div className={styles.profileContainer}>
-            <div className={styles.topPart}>
-                {isOwnProfile ? (
-                    <EditProfileButton profile={profile} />
-                ) : (
-                    <>
-                        <FollowButton
-                            targetUserId={userId}
-                            initialStatus={profile.status || 'none'}
-                            isPrivate={profile.privacy === 'private'}
-                        />
-                        <MessageButton />
-                    </>
-                )}
-            </div>
+            <ProfileClient userId={userId} profile={profile} />
 
             <div className={styles.bottomPart}>
                 <AvatarComponent />
