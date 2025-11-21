@@ -2,10 +2,10 @@
 
 import { useState } from 'react'
 import styles from './styles.module.css'
-// @ts-ignore
-import { FollowIcon, SettingsIcon } from '@/components/ui/icons'
 import { unfollowPerson, followPerson } from './services/profile'
+import { SettingsIcon } from '../../components/ui/icons'
 import { ProfileData } from './types'
+import { FollowStatus } from '../../libs/globalTypes'
 
 export default function EditProfileButton({ profile }: { profile: ProfileData }) {
     const [isOpen, setIsOpen] = useState(false)
@@ -24,9 +24,7 @@ export default function EditProfileButton({ profile }: { profile: ProfileData })
     )
 }
 
-type FollowStatus = 'none' | 'follow' | 'following' | 'pending' | 'declined';
-
-export function FollowButton({ targetUserId, initialStatus, isPrivate = false }: { targetUserId: string, initialStatus: FollowStatus, isPrivate?: boolean }) {
+export function FollowButton({ targetUserId, initialStatus, isPrivate = false }: { targetUserId: number, initialStatus: FollowStatus, isPrivate?: boolean }) {
     const [status, setStatus] = useState<FollowStatus>(initialStatus);
 
     const handleFollow = async () => {
@@ -56,4 +54,15 @@ export function FollowButton({ targetUserId, initialStatus, isPrivate = false }:
             <span>{getButtonText()}</span>
         </button>
     );
+}
+
+export function MessageButton() {
+    const handleMessage = () => {
+        // TODO: should open the message modal
+    }
+    return (
+        <button className={styles.messageButton} onClick={handleMessage} >
+            <span>{"Message"}</span>
+        </button>
+    )
 }

@@ -1,0 +1,168 @@
+.authCard {
+    width: 100%;
+    max-width: 550px;
+    margin: 3rem auto;
+    background-color: #fff;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+}
+
+.formContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 30px;
+}
+
+.title {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: #7a3fbc;
+    text-align: center;
+    margin: 0;
+}
+
+.welcomeMsg {
+    font-size: 1rem;
+    color: #888;
+    text-align: center;
+    margin-top: 15px;
+    margin-bottom: 10px;
+}
+
+.inputGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.inputGroup label {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #2b124c;
+}
+
+.input {
+    padding: 14px 16px;
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    font-size: 1rem;
+    color: #333;
+    background-color: #fafafa;
+    transition: all 0.2s ease;
+}
+
+.input:focus {
+    outline: none;
+    border-color: #7a3fbc;
+    background-color: #fff;
+    box-shadow: 0 0 0 3px rgba(122, 63, 188, 0.1);
+}
+
+.input::placeholder {
+    color: #bbb;
+}
+
+.textarea {
+    resize: none;
+    min-height: 80px;
+}
+
+.fileInput {
+    padding: 12px 16px;
+    cursor: pointer;
+}
+
+.row {
+    display: flex;
+    gap: 15px;
+}
+
+.row>div {
+    flex: 1;
+}
+
+.submitButton {
+    width: 100%;
+    padding: 14px 20px;
+    border: none;
+    border-radius: 10px;
+    background-color: #7a3fbc;
+    color: #ffffff;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.1s;
+    margin-top: 10px;
+}
+
+.submitButton:hover {
+    background-color: #6a35a7;
+}
+
+.submitButton:active {
+    transform: scale(0.98);
+}
+
+.submitButton:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+.errorAlert {
+    color: #d32f2f;
+    background-color: #ffebee;
+    padding: 10px;
+    border-radius: 8px;
+    text-align: center;
+    font-size: 0.9rem;
+    border: 1px solid #ffcdd2;
+}
+
+.navButtons {
+    display: flex;
+    justify-content: space-around;
+    background-color: #E6E7EB;
+    padding: 6px;
+    margin: 20px 20px 0;
+    border-radius: 14px;
+}
+
+.tabButton {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    background-color: transparent;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #888;
+    border-radius: 10px;
+    transition: all 0.2s ease;
+}
+
+.activeTab {
+    background-color: #fff;
+    color: #333;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+@media (max-width: 600px) {
+    .authCard {
+        margin: 0;
+        border-radius: 0;
+        height: 100vh;
+        box-shadow: none;
+    }
+
+    .title {
+        font-size: 1.8rem;
+    }
+
+    .row {
+        flex-direction: column;
+        gap: 16px;
+    }
+}

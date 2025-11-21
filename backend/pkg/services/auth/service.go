@@ -2,8 +2,9 @@ package auth
 
 import (
 	"net/http"
-	"social/pkg/utils"
 	"time"
+
+	"social/pkg/utils"
 )
 
 func RegisterUserAccount(w http.ResponseWriter, r *http.Request, body *RegisterRequestJson, s *SessionResponseJson, context string) (RegisterResponseJson, bool) {
@@ -46,7 +47,7 @@ func RegisterUserHttp(w http.ResponseWriter, response RegisterResponseJson, s Se
 	http.SetCookie(w, &http.Cookie{
 		Name:     "session_token",
 		Value:    s.SessionToken,
-		Expires:  time.Now().Add(time.Hour),
+		Expires:  time.Now().Add(time.Hour * 24),
 		HttpOnly: true,
 		SameSite: http.SameSiteStrictMode,
 		Path:     "/",
@@ -56,13 +57,12 @@ func RegisterUserHttp(w http.ResponseWriter, response RegisterResponseJson, s Se
 	utils.JsonResponseEncode(w, http.StatusOK, map[string]any{
 		"success": true,
 		"payload": response,
-		"error":   map[string]any{},
 	})
 }
 
 func LoginUserAccount(w http.ResponseWriter, r *http.Request, body *LoginRequestJson, response *LoginResponseJson,
-	s *SessionResponseJson, remember *RememberMeSqlRow, context string) bool {
-
+	s *SessionResponseJson, remember *RememberMeSqlRow, context string,
+) bool {
 	s.SessionId = utils.GenerateID()
 	s.UserId = response.UserId
 	s.SessionToken = utils.GenerateSessionToken(256)
@@ -114,7 +114,6 @@ func LoginUserHttp(w http.ResponseWriter, response LoginResponseJson, s SessionR
 	utils.JsonResponseEncode(w, http.StatusOK, map[string]any{
 		"success": true,
 		"payload": response,
-		"error":   map[string]any{},
 	})
 }
 

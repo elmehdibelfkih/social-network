@@ -4,8 +4,9 @@ import { useState, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import { authService } from './services/auth';
 import styles from './styles.module.css';
+import { useAuth } from '../../providers/authProvider';
 
-export function RegisterForm() {
+export function RegisterForm({ onAuthSuccess }: { onAuthSuccess?: () => void }) {
     const router = useRouter();
     const [isLoading, setIsLoading] = useState(false);
     const [formData, setFormData] = useState({
@@ -18,15 +19,22 @@ export function RegisterForm() {
         aboutMe: '',
         avatarId: 0,
     });
+    const { setUser } = useAuth()
 
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setIsLoading(true);
 
         try {
-            await authService.register(formData);
-            router.push('/login');
-            router.refresh();
+            const resp = await authService.register(formData);
+            setUser({
+                userId: resp.userId,
+                avatarId: resp.avatarId,
+                nickname: resp.nickname,
+                firstName: resp.firstName,
+                lastName: resp.lastName
+            })
+            router.push('/');
         } catch (error) {
             console.error("Failed to register:", error);
         } finally {
@@ -39,7 +47,8 @@ export function RegisterForm() {
         if (!avatar) return;
 
         try {
-            const avatarId = await authService.uploadAvatar(avatar);
+            const avatarResp = await authService.uploadAvatar(avatar);
+            const avatarId = avatarResp.mediaId
             setFormData(prev => ({ ...prev, avatarId }));
         } catch (error) {
             console.error("Failed to upload avatar:", error);

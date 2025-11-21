@@ -2,11 +2,11 @@ package users
 
 import (
 	"net/http"
+
 	"social/pkg/utils"
 )
 
-// GetProfile handles GET /api/v1/users/:user_id/profile
-// It returns the public or private view of a user's profile based on privacy rules.
+// return profile based on privacy rules (public / private)
 func GetProfile(w http.ResponseWriter, r *http.Request) {
 	// Extract user_id from URL path
 	profileUserId := utils.GetWildCardValue(w, r, "user_id")
@@ -14,10 +14,12 @@ func GetProfile(w http.ResponseWriter, r *http.Request) {
 		utils.BadRequest(w, "Invalid user ID.", "redirect")
 		return
 	}
-
-	// Get current user from context (may be 0 if not logged in)
+	// Get current user from context
 	viewerUserId := utils.GetUserIdFromContext(r)
-
+	if viewerUserId == -1 {
+		utils.BadRequest(w, "Invalid user ID.", "redirect")
+		return
+	}
 	// Call service layer
 	response, ok := GetUserProfile(w, profileUserId, viewerUserId, "GetProfile handler")
 	if !ok {
@@ -28,7 +30,7 @@ func GetProfile(w http.ResponseWriter, r *http.Request) {
 	utils.WriteSuccess(w, http.StatusOK, response)
 }
 
-// It updates the owner's profile fields
+// updates the owner's profile fields
 func PutProfile(w http.ResponseWriter, r *http.Request) {
 	// Extract user_id from URL path
 	profileUserId := utils.GetWildCardValue(w, r, "user_id")
@@ -66,8 +68,7 @@ func PutProfile(w http.ResponseWriter, r *http.Request) {
 	utils.WriteSuccess(w, http.StatusOK, response)
 }
 
-// PatchProfile handles PATCH /api/v1/users/:user_id/privacy
-// It toggles the profile privacy between "public" and "private".
+// toggles the profile privacy between "public" and "private".
 func PatchProfile(w http.ResponseWriter, r *http.Request) {
 	// Extract user_id from URL path
 	profileUserId := utils.GetWildCardValue(w, r, "user_id")
@@ -78,11 +79,12 @@ func PatchProfile(w http.ResponseWriter, r *http.Request) {
 
 	// Get current user from context
 	currentUserId := utils.GetUserIdFromContext(r)
-	if currentUserId == 0 {
+	if currentUserId == -1 {
 		utils.Unauthorized(w, "You must be logged in to update your profile privacy.")
 		return
 	}
 
+	//  var currentUserId int64 = 55
 	// Validate user owns the profile
 	if currentUserId != profileUserId {
 		utils.Unauthorized(w, "You can only update your own profile privacy.")
@@ -94,7 +96,6 @@ func PatchProfile(w http.ResponseWriter, r *http.Request) {
 	if !utils.ValidateJsonRequest(w, r, &req, "PatchProfile handler") {
 		return
 	}
-
 	// Call service layer
 	response, ok := UpdateUserPrivacy(w, profileUserId, &req, "PatchProfile handler")
 	if !ok {
@@ -105,7 +106,6 @@ func PatchProfile(w http.ResponseWriter, r *http.Request) {
 	utils.WriteSuccess(w, http.StatusOK, response)
 }
 
-// GetStats handles GET /api/v1/users/:user_id/stats
 // It returns counters like posts, followers, following, likes, comments.
 func GetStats(w http.ResponseWriter, r *http.Request) {
 	// Extract user_id from URL path

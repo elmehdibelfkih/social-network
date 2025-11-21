@@ -1,0 +1,189 @@
+.form {
+  background-color: #ffffff;
+  border-radius: 16px;
+  padding: 16px;
+  border: 1px solid #E6E7EB;
+  width: 100%;
+  max-width: 580px;
+  margin: auto;
+  box-sizing: border-box;
+  display: flex;
+  gap: 12px;
+}
+
+.leftPart {
+  flex-shrink: 0;
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid #4B2556;
+}
+
+.rightPart {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+
+.topPart {
+  flex: 1;
+}
+
+.textArea {
+  width: 100%;
+  border: 1px solid #E6E7EB;
+  border-radius: 5px;
+  background-color: #f7f7f7;
+  padding: 10px;
+  font-size: 16px;
+  color: #333;
+  resize: none;
+  min-height: 120px;
+  max-height: 200px;
+  overflow-y: auto;
+  font-family: inherit;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.textArea::placeholder {
+  color: #999;
+}
+
+.bottomPart {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.uploadImageButton,
+.privacyButton {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  padding: 8px 12px;
+  border-radius: 8px;
+  transition: background-color 0.2s ease;
+  white-space: nowrap;
+}
+
+.uploadImageButton:hover,
+.privacyButton:hover {
+  background-color: #f7f7f7;
+}
+
+.uploadImageButton {
+  color: #000;
+}
+
+.uploadImageButton svg {
+  color: #8a63d2;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+.privacyButton {
+  color: #555;
+  border: 1px solid #e1e1e1;
+  background-color: #f7f7f7;
+}
+
+.privacyButton>span {
+  margin-right: 8px;
+}
+
+.privacyButton svg {
+  flex-shrink: 0;
+}
+
+.privacyButton svg:first-of-type {
+  color: #555;
+  width: 20px;
+  height: 20px;
+}
+
+.privacyButton svg:last-child {
+  width: 16px;
+  height: 16px;
+  color: #777;
+}
+
+.actionButton {
+  background-color: #b9a2d8;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  margin-left: auto;
+}
+
+@media (max-width: 420px) {
+  .form {
+    padding: 12px;
+    gap: 8px;
+  }
+
+  .avatar {
+    width: 36px;
+    height: 36px;
+  }
+
+  .textArea {
+    font-size: 15px;
+    min-height: 100px;
+  }
+
+  .bottomPart {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .actionButton {
+    width: 100%;
+    margin-left: 0;
+    padding: 12px;
+  }
+
+  .uploadImageButton,
+  .privacyButton {
+    padding: 6px 10px;
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 340px) {
+
+  .uploadImageButton span,
+  .privacyButton span {
+    display: none;
+  }
+
+  .uploadImageButton,
+  .privacyButton {
+    padding: 8px;
+    gap: 0;
+  }
+
+  .privacyButton>span {
+    margin-right: 0;
+  }
+}

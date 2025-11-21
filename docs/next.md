@@ -31,11 +31,19 @@ src/
 │   ├── apiClient.ts              # single place for fetch/headers/refresh
 │   └── auth.ts      
 |
-└── styles/
-    ├── globals.css
-    └── variables.css
+├── styles/
+|   ├── globals.css
+|   └── variables.css
+|
+│
+├── .env.local            # Environment variables
+├── next.config.mjs       # Next.js config
+├── tsconfig.json         # TypeScript config
+├── package.json
+└── README.md
 
 ```
+
 
 ## 🏠 app/
 

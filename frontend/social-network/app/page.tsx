@@ -1,64 +1,77 @@
+'use client';
 
-interface Post {
-  id: number;
-  title: string;
-  content: string;
-}
+import { JSX, useEffect, useState } from "react";
+import { NavbarClient } from "../features/navbar";
+import { NewPost } from '../features/newPost/newPost.client';
+import { PostsClient } from "../features/posts";
+import { http } from '../libs/apiClient';
 
-export default async function HomePage() {
-  // const apiUrl =( process.env.NEXT_PUBLIC_GO_API_URL||'')+'/auth/login'
-  // console.log("======>", apiUrl);
-  
+type AuthResponse = {
+  sessionId: number;
+  sessionToken: string;
+  ipAddress: string;
+  device: string;
+  createdAt: string;
+  expiresAt: string;
+};
 
-  // let posts: Post[] = [];
-  // let error: string | null = null;
+export default function HomePage(): JSX.Element {
+  const [session, setSession] = useState<AuthResponse | null | undefined>(undefined);
+  const [error, setError] = useState<string | null>(null);
 
-  // try {
+  useEffect(() => {
+    let mounted = true;
 
-  //   const response = await fetch(apiUrl, {
-  //     // Optional: Add a cache configuration (default is 'force-cache')
-  //     // cache: 'no-store', // To fetch data on every request (dynamic rendering)
-  //   });
+    (async () => {
+      try {
+        const res = await http.get<AuthResponse>('/api/v1/auth/session');
+        if (!mounted) return;
+        // normalize undefined -> null so UI can distinguish "not fetched" from "no session"
+        setSession(res ?? null);
+      } catch (err: any) {
+        if (!mounted) return;
+        setSession(null);
+        // capture a message for debugging / simple UI
+        setError(err?.message ?? 'Failed to fetch session');
+      }
+    })();
 
-    
-    
-  //   if (!response.ok) {
-  //     throw new Error(`Failed to fetch posts: ${response.status} ${response.statusText}`);
-  //   }
-    
-  //   // 2. Parse the JSON response
-  //   posts = await response.json();
-  //   console.log(posts);
-    
-  // } catch (err) {
-  //   // 3. Handle errors
-  //   console.error("Data fetching error:", err);
-  //   error = err instanceof Error ? err.message : 'An unknown error occurred.';
-  // }
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
-  // 4. Display the data (or error message)
+  // loading: fetch hasn't completed yet (session === undefined)
+  if (session === undefined) {
+    return <main>Loading session...</main>;
+  }
+
+  // not authenticated / no session
+  if (session === null) {
+    return (
+      <main>
+        <p>No session found.</p>
+        {error && <p style={{ color: 'red' }}>Error: {error}</p>}
+        <NavbarClient />
+        <NewPost userAvatar="/pic.png" />
+        <PostsClient />
+      </main>
+    );
+  }
+
+  // authenticated — safe to access session fields
   return (
-    <main style={{ padding: '20px' }}>
-      <h1>Latest Posts from Go API</h1>
-      
-      {error && (
-        <div style={{ color: 'red', border: '1px solid red', padding: '10px' }}>
-          Error loading data: {error}
-        </div>
-      )}
+    <main>
+      <h1>Session ID: {session.sessionId}</h1>
+      <h2>Token: {session.sessionToken}</h2>
+      <p>IP: {session.ipAddress}</p>
+      <p>Device: {session.device}</p>
+      <p>Created: {session.createdAt}</p>
+      <p>Expires: {session.expiresAt}</p>
 
-      {!error && posts.length > 0 ? (
-        <ul>
-          {posts.map((post) => (
-            <li key={post.id} style={{ marginBottom: '15px', border: '1px solid #ccc', padding: '10px' }}>
-              <h2>{post.title}</h2>
-              <p>{post.content}</p>
-            </li>
-          ))}
-        </ul>
-      ) : (
-        !error && <p>No posts found.</p>
-      )}
+      <NavbarClient />
+      <NewPost userAvatar="/pic.png" />
+      <PostsClient />
     </main>
   );
 }

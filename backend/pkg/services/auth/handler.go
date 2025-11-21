@@ -2,6 +2,7 @@ package auth
 
 import (
 	"net/http"
+
 	"social/pkg/utils"
 )
 

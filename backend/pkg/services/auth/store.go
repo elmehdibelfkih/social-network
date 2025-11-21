@@ -26,7 +26,7 @@ func SelectAvatarMediaId(mediaId int64) (bool, error) {
 		utils.SQLiteErrorTarget(err, SELECT_MEDIA_BY_MEDIA_ID)
 		return false, err
 	}
-	if m.OwnerId != 0 || m.Purpose != "avatar" {
+	if m.OwnerId != -1 || m.Purpose != "avatar" {
 		return false, nil
 	}
 
@@ -148,10 +148,20 @@ func InsertUserAccount(u RegisterRequestJson) (RegisterResponseJson, error) {
 			aboutMe,
 			avatarId,
 		)
-
 		if err != nil {
 			utils.SQLiteErrorTarget(err, INSERT_USER_ACCOUNT)
 			return err
+		}
+		if avatarId != nil {
+			_, err = tx.Exec(
+				UPDATE_AVATAR_OWNER,
+				userId,
+				avatarId,
+			)
+			if err != nil {
+				utils.SQLiteErrorTarget(err, UPDATE_AVATAR_OWNER)
+				return err
+			}
 		}
 
 		err = tx.QueryRow(

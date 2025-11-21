@@ -1,6 +1,8 @@
+import { FollowStatus } from "../../libs/globalTypes";
+
 export type ProfileData = {
     userId: number;
-    status: "pending" | "accepted" | "declined" | null;
+    status: FollowStatus;
     nickname: string | null;
     firstName: string;
     lastName: string;

@@ -2,28 +2,32 @@ package middleware
 
 import (
 	"context"
+	"fmt"
 	"net/http"
+	"time"
+
 	"social/pkg/config"
 	"social/pkg/services/auth"
 	"social/pkg/utils"
-	"time"
 )
 
 func AuthMiddleware(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		fmt.Println(r)
 		userId, err := authenticateRequest(w, r)
 		if err != nil {
 			utils.Unauthorized(w, err.Error())
 			return
 		}
-		//inject user ID into context
+		// inject user ID into context
 		ctx := context.WithValue(r.Context(), config.USER_ID_KEY, userId)
 		next(w, r.WithContext(ctx))
 	}
 }
 
 func authenticateRequest(w http.ResponseWriter, r *http.Request) (int64, error) {
-	if userId := trySession(r); userId != 0 {
+	userId := trySession(r)
+	if userId != 0 {
 		return userId, nil
 	}
 
@@ -40,11 +44,11 @@ func trySession(r *http.Request) int64 {
 	if err != nil {
 		return 0
 	}
-
 	sessionItem, err := auth.SelectUserSession(sessionValue)
 	if err != nil || sessionItem == nil || sessionItem.IsExpired() {
 		return 0
 	}
+	fmt.Println(sessionItem)
 
 	return sessionItem.UserId
 }
@@ -60,14 +64,14 @@ func tryRememberMe(w http.ResponseWriter, r *http.Request) (int64, error) {
 		return 0, err
 	}
 
-	//create new session
+	// create new session
 	s := renewSession(rememberMe.UserId, r)
 	if err := auth.InsertRegisterUserSession(s); err != nil {
 		return 0, err
 	}
 	setSessionCookie(w, s)
 
-	//update the remeber me
+	// update the remeber me
 	if err := auth.UpdateRememberMeToken(s.SessionId, rememberMe, rememberMe.UserId); err != nil {
 		return 0, err
 	}
