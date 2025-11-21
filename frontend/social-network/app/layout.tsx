@@ -1,6 +1,6 @@
 // app/layout.tsx
 'use client';
-import './globals.css';
+// import './globals.css';
 import AuthForm from '../features/auth/auth.client';
 import { NewPost } from '../features/newPost/newPost.client';
 import { Profile } from '../features/profile';

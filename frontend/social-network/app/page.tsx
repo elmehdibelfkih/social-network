@@ -1,6 +1,5 @@
 'use client';
-import { JSX, useState } from "react";
-import AuthForm from "../features/auth/auth.client";
+import { JSX } from "react";
 import { NavbarClient } from "../features/navbar";
 import { NewPost } from '../features/newPost/newPost.client';
 import { PostsClient } from "../features/posts";
