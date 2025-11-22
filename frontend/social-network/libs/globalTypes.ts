@@ -32,7 +32,7 @@ export interface Session {
 }
 
 export interface AuthResponse {
-    userId: number;
+    userId: string;
     email: string;
     firstName: string;
     lastName: string;

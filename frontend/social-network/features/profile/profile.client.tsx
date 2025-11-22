@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import styles from './styles.module.css'
-import { unfollowPerson, followPerson } from './services/profile'
+import { unfollowPerson, followPerson } from './services/profile.client'
 import { SettingsIcon } from '../../components/ui/icons'
 import { ProfileData } from './types'
 import { FollowStatus } from '../../libs/globalTypes'
@@ -25,7 +25,7 @@ export default function EditProfileButton({ profile }: { profile: ProfileData })
     )
 }
 
-export function FollowButton({ targetUserId, initialStatus, isPrivate = false }: { targetUserId: number, initialStatus: FollowStatus, isPrivate?: boolean }) {
+export function FollowButton({ targetUserId, initialStatus, isPrivate = false }: { targetUserId: string, initialStatus: FollowStatus, isPrivate?: boolean }) {
     const [status, setStatus] = useState<FollowStatus>(initialStatus);
 
     const handleFollow = async () => {
@@ -68,10 +68,13 @@ export function MessageButton() {
     )
 }
 
-export function ProfileClient({ userId, profile }: { userId: number, profile: ProfileData }) {
+export function ProfileClient({ userId, profile }: { userId: string, profile: ProfileData }) {
     const { user } = useAuth()
 
     const isOwnProfile = user.userId == userId
+
+    console.log(isOwnProfile, user.userId, userId);
+
 
     return (
         <div className={styles.topPart}>
@@ -81,8 +84,8 @@ export function ProfileClient({ userId, profile }: { userId: number, profile: Pr
                 <>
                     <FollowButton
                         targetUserId={userId}
-                        initialStatus={profile.status || 'none'}
-                        isPrivate={profile.privacy === 'private'}
+                        initialStatus={profile.payload.status || 'none'}
+                        isPrivate={profile.payload.privacy === 'private'}
                     />
                     <MessageButton />
                 </>

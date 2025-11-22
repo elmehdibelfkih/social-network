@@ -1,46 +1,39 @@
 import styles from './styles.module.css'
-import getProfileData from './services/profile'
+import { getProfileData } from './services/profile.server'
 import { ProfileClient } from './profile.client'
 import { CalendarIcon, GlobeIcon } from '../../components/ui/icons'
-import { ProfileData } from './types';
 
-export async function Profile({ userId }: { userId: number }) {
-    let profile: ProfileData;
-    try {
-        profile = await getProfileData(userId)
-        console.log(profile);
+export async function Profile({ user_id }: { user_id: string }) {
 
-    } catch (error) {
-        console.log(error)
-    }
+    const profile = await getProfileData(user_id)
 
     return (
         <div className={styles.profileContainer}>
-            <ProfileClient userId={userId} profile={profile} />
+            <ProfileClient userId={user_id} profile={profile} />
 
             <div className={styles.bottomPart}>
                 <AvatarComponent />
 
                 <div className={styles.info}>
                     <h2 className={styles.fullname}>
-                        {profile.firstName} {profile.lastName}
+                        {profile.payload.firstName} {profile.payload.lastName}
                     </h2>
-                    <h3 className={styles.nickname}>@{profile.nickname}</h3>
-                    <p className={styles.aboutMe}>{profile.aboutMe}</p>
+                    <h3 className={styles.nickname}>@{profile.payload.nickname}</h3>
+                    <p className={styles.aboutMe}>{profile.payload.aboutMe}</p>
 
                     <div className={styles.stats}>
-                        <span><b>{profile.stats.followersCount}</b> Followers</span>
-                        <span><b>{profile.stats.followingCount}</b> Following</span>
+                        <span><b>{profile.payload.stats.followersCount}</b> Followers</span>
+                        <span><b>{profile.payload.stats.followingCount}</b> Following</span>
                     </div>
 
                     <div className={styles.meta}>
                         <span className={styles.joinDate}>
                             <CalendarIcon />
-                            Joined {new Date(profile.joinedAt).toLocaleDateString()}
+                            Joined {new Date(profile.payload.joinedAt).toLocaleDateString()}
                         </span>
                         <span className={styles.privacy}>
-                            <GlobeIcon fillColor={profile.privacy === 'public' ? '#01a63f' : '#666'} />
-                            {profile.privacy} profile
+                            <GlobeIcon fillColor={profile.payload.privacy === 'public' ? '#01a63f' : '#666'} />
+                            {profile.payload.privacy} profile
                         </span>
                     </div>
                 </div>

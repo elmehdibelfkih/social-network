@@ -2,8 +2,8 @@ package middleware
 
 import (
 	"context"
-	"fmt"
 	"net/http"
+	"net/url"
 	"time"
 
 	"social/pkg/config"
@@ -13,7 +13,6 @@ import (
 
 func AuthMiddleware(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		fmt.Println(r)
 		userId, err := authenticateRequest(w, r)
 		if err != nil {
 			utils.Unauthorized(w, err.Error())
@@ -44,11 +43,11 @@ func trySession(r *http.Request) int64 {
 	if err != nil {
 		return 0
 	}
-	sessionItem, err := auth.SelectUserSession(sessionValue)
+	decodedToken, _ := url.QueryUnescape(sessionValue)
+	sessionItem, err := auth.SelectUserSession(decodedToken)
 	if err != nil || sessionItem == nil || sessionItem.IsExpired() {
 		return 0
 	}
-	fmt.Println(sessionItem)
 
 	return sessionItem.UserId
 }

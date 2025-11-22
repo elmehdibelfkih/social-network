@@ -2,7 +2,7 @@
 import { createContext, useContext, useState } from "react"
 
 type User = {
-    userId: number
+    userId: string
     avatarId: number
     nickname: string
     firstName: string

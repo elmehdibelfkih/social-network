@@ -1,17 +1,16 @@
 import { Profile } from '../../../features/profile';
 import { AuthProvider } from '../../../providers/authProvider';
 
+interface PageProps {
+  params: Promise<{ user_id: string }>;
+}
 
-export default function RootLayout({ params }: { params: { user_id: string } }) {
+export default async function ProfilePage({ params }: PageProps) {
+  const { user_id } = await params;
+
   return (
-    <html lang="en">
-      <body>
-        <main>
-          <AuthProvider>
-            <Profile userId={6153903284555776} />
-          </AuthProvider>
-        </main>
-      </body>
-    </html>
+    <AuthProvider>
+      <Profile user_id={user_id} />
+    </AuthProvider>
   );
 }
