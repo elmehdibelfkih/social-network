@@ -1,6 +1,7 @@
 'use client';
 import { AuthProvider } from '../providers/authProvider';
 import Snackbar from '../components/ui/snackbar';
+import AuthForm from '../features/auth/auth.client';
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -11,6 +12,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </header>
 
         <main>
+          {children}
           <Snackbar />
         </main>
 
