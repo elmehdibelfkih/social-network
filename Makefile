@@ -25,8 +25,21 @@ COMMENTS_DATA_PATH = $(PROJECT_ROOT)/data/uploads/comments
 DOCKER_COMPOSE_PATH = $(PROJECT_ROOT)/docker-compose.yml
 
 FRONTEND_PATH = $(PROJECT_ROOT)/frontend/social-network
+#=============================================================
 
-# local dev
+#confirm =====================================================
+confirm:
+	@echo -n "⚠️  Are you absolutely sure you want to run $(MAKECMDGOALS)? [y/N]: " && \
+	read REPLY; \
+	if echo "$$REPLY" | grep -iq "^y"; then \
+		echo "✅ Confirmation received. Continuing..."; \
+	else \
+		echo "❌ Operation cancelled by user."; \
+		exit 0; \
+	fi
+#=============================================================
+
+# local dev ==================================================
 dev: start-backend start-frontend
 stop-dev:
 	@echo "$(RED)Stopping processes gracefully....$(RESET)"
@@ -74,10 +87,10 @@ status:
 #=============================================================
 
 # clean ======================================================
-clean-logs:
+clean-logs: confirm
 	@echo "$(YELLOW)Cleaning logs files...$(RESET)"
 	@rm -rf $(LOGS_PATH)
-clean-data:
+clean-data: confirm
 	@echo "$(YELLOW)Cleaning data...$(RESET)"
 	@rm -rf $(DATA_PATH)
 clean-next:
@@ -92,7 +105,8 @@ clean-next:
 	@rm -rf $(FRONTEND_PATH)/out
 	@rm -rf $(FRONTEND_PATH)/dist
 	@rm -rf $(FRONTEND_PATH)/build
-purge:clean-logs clean-data clean-next
+purge: clean-logs clean-data clean-next
+	@echo "$(GREEN)purge: done$(RESET)"
 #=============================================================
 
 

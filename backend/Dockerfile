@@ -12,5 +12,4 @@ COPY --from=builder /app/backend/social     .
 
 EXPOSE 8080
 
-# CMD ["tail", "-f", "/dev/null"]
 CMD ["./social"]
