@@ -23,15 +23,17 @@ export function LoginForm({ onAuthSuccess }: { onAuthSuccess?: () => void }) {
 
         try {
             const resp = await authService.login(formData);
-            setUser({
-                userId: resp.userId,
-                avatarId: resp.avatarId,
-                nickname: resp.nickname,
-                firstName: resp.firstName,
-                lastName: resp.lastName
-            })
-            router.push('/feed');
-            router.refresh();
+            const newUser = {
+                userId: resp.payload.userId,
+                avatarId: resp.payload.avatarId,
+                nickname: resp.payload.nickname,
+                firstName: resp.payload.firstName,
+                lastName: resp.payload.lastName
+            };
+
+            localStorage.setItem('social_network-user', JSON.stringify(newUser));
+            setUser(newUser);
+            router.push('/');
         } catch (error) {
             setIsLoading(false);
             console.error("Login failed:", error);

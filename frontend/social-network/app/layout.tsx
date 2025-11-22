@@ -12,7 +12,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </header>
 
         <main>
-          {children}
+          <AuthProvider>
+            {children}
+          </AuthProvider>
           <Snackbar />
         </main>
 

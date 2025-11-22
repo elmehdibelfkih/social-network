@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import styles from './styles.module.css'
 import { unfollowPerson, followPerson } from './services/profile.client'
-import { SettingsIcon } from '../../components/ui/icons'
+import { FollowIcon, MessageIcon, SettingsIcon } from '../../components/ui/icons'
 import { ProfileData } from './types'
 import { FollowStatus } from '../../libs/globalTypes'
 import { useAuth } from '../../providers/authProvider'
@@ -25,7 +25,7 @@ export default function EditProfileButton({ profile }: { profile: ProfileData })
     )
 }
 
-export function FollowButton({ targetUserId, initialStatus, isPrivate = false }: { targetUserId: string, initialStatus: FollowStatus, isPrivate?: boolean }) {
+export function FollowButton({ targetUserId, initialStatus, isPrivate = false }: { targetUserId: number, initialStatus: FollowStatus, isPrivate?: boolean }) {
     const [status, setStatus] = useState<FollowStatus>(initialStatus);
 
     const handleFollow = async () => {
@@ -52,6 +52,7 @@ export function FollowButton({ targetUserId, initialStatus, isPrivate = false }:
 
     return (
         <button className={styles.followButton} onClick={handleFollow} >
+            <FollowIcon />
             <span>{getButtonText()}</span>
         </button>
     );
@@ -59,23 +60,20 @@ export function FollowButton({ targetUserId, initialStatus, isPrivate = false }:
 
 export function MessageButton() {
     const handleMessage = () => {
-        // TODO: should open the message modal
+        // TODO: should open the conversation modal
     }
     return (
         <button className={styles.messageButton} onClick={handleMessage} >
+            <MessageIcon />
             <span>{"Message"}</span>
         </button>
     )
 }
 
-export function ProfileClient({ userId, profile }: { userId: string, profile: ProfileData }) {
+export function ProfileClient({ userId, profile }: { userId: number, profile: ProfileData }) {
     const { user } = useAuth()
 
     const isOwnProfile = user.userId == userId
-
-    console.log(isOwnProfile, user.userId, userId);
-
-
     return (
         <div className={styles.topPart}>
             {isOwnProfile ? (

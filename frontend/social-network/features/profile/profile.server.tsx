@@ -9,7 +9,7 @@ export async function Profile({ user_id }: { user_id: string }) {
 
     return (
         <div className={styles.profileContainer}>
-            <ProfileClient userId={user_id} profile={profile} />
+            <ProfileClient userId={parseInt(user_id)} profile={profile} />
 
             <div className={styles.bottomPart}>
                 <AvatarComponent />

@@ -5,6 +5,7 @@ import { NavbarClient } from "../features/navbar";
 import { NewPost } from '../features/newPost/newPost.client';
 import { PostsClient } from "../features/posts";
 import { http } from '../libs/apiClient';
+import {  } from "../providers/authProvider";
 
 type AuthResponse = {
   sessionId: number;

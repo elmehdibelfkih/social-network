@@ -1,10 +1,13 @@
 export interface ApiErrorDetails {
-    StatusCode: number;
-    StatusText: string;
-    ErrorMessage: string;
-    ErrorTitle?: string;
-    ErrorDescription?: string;
-    errorType?: 'redirect' | 'alert';
+    success: boolean;
+    payload: {
+        StatusCode: number;
+        StatusText: string;
+        ErrorMessage: string;
+        ErrorTitle?: string;
+        ErrorDescription?: string;
+        errorType?: 'redirect' | 'alert';
+    }
 }
 
 export type ApiResponse<T> =
@@ -32,14 +35,17 @@ export interface Session {
 }
 
 export interface AuthResponse {
-    userId: string;
-    email: string;
-    firstName: string;
-    lastName: string;
-    dateOfBirth: string;
-    nickname: string | null;
-    aboutMe: string | null;
-    avatarId: number | null;
+    success: boolean;
+    payload: {
+        userId: number;
+        email: string;
+        firstName: string;
+        lastName: string;
+        dateOfBirth: string;
+        nickname: string | null;
+        aboutMe: string | null;
+        avatarId: number | null;
+    }
 }
 
 export interface UserProfile {
@@ -136,11 +142,14 @@ export interface MediaUploadRequest {
 }
 
 export interface MediaUploadResponse {
-    message: string;
-    mediaId: number;
-    mediaPath: string;
-    fileType: string;
-    uploadedAt: string;
+    success: boolean;
+    payload: {
+        message: string;
+        mediaId: number;
+        mediaPath: string;
+        fileType: string;
+        uploadedAt: string;
+    }
 }
 
 export interface Group {
