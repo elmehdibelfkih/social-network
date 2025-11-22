@@ -45,11 +45,17 @@ async function apiClient<T>(
         if (!response.ok) {
             if (body.error.type == 'redirect') {
             }
-            ShowSnackbar(body)
+            // Don't show snackbar for feed endpoint errors
+            if (!url.includes('/api/v1/feed')) {
+                ShowSnackbar(body)
+            }
             return Promise.reject()
         }
     } catch (error) {
-        console.error(error)
+        // Don't log errors for feed endpoint
+        if (!url.includes('/api/v1/feed')) {
+            console.error(error)
+        }
     }
     return body
 }

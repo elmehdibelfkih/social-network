@@ -59,9 +59,9 @@ func SocialMux() *router.Router {
 	socialMux.HandleFunc("GET", "/api/v1/chats/{chat_id}/participants", utils.MiddlewareChain(chat.GetParticipantsHandler, middleware.UserContext, middleware.AuthMiddleware, chat.ChatAccessMiddleware))
 
 	// media
-	socialMux.HandleFunc("POST", "/api/v1/media/upload", media.HandleUploadMedia)
-	socialMux.HandleFunc("GET", "/api/v1/media/{media_id}", utils.MiddlewareChain(media.HandleGetMedia, media.MediaMiddleware, middleware.AuthMiddleware))
-	socialMux.HandleFunc("DELETE", "/api/v1/media/{media_id}", utils.MiddlewareChain(media.HandleDeleteMedia, media.MediaMiddleware, middleware.AuthMiddleware))
+	socialMux.HandleFunc("POST", "/api/v1/media/upload", utils.MiddlewareChain(media.HandleUploadMedia, middleware.AuthMiddleware))
+	socialMux.HandleFunc("GET", "/api/v1/media/{media_id}", utils.MiddlewareChain(media.HandleGetMedia, middleware.AuthMiddleware, media.MediaMiddleware))
+	socialMux.HandleFunc("DELETE", "/api/v1/media/{media_id}", utils.MiddlewareChain(media.HandleDeleteMedia, middleware.AuthMiddleware, media.MediaMiddleware))
 
 	// follow
 	socialMux.HandleFunc("POST", "/api/v1/users/{user_id}/follow", utils.MiddlewareChain(follow.FollowHandler, middleware.AuthMiddleware, follow.FollowRequestMiddleWare))
@@ -77,7 +77,7 @@ func SocialMux() *router.Router {
 	socialMux.HandleFunc("PUT", "/api/v1/users/{user_id}/profile", utils.MiddlewareChain(users.PutProfile, middleware.AuthMiddleware))
 	socialMux.HandleFunc("PATCH", "/api/v1/users/{user_id}/privacy", utils.MiddlewareChain(users.PatchProfile, middleware.AuthMiddleware))
 	socialMux.HandleFunc("GET", "/api/v1/users/{user_id}/stats", utils.MiddlewareChain(users.GetStats, middleware.AuthMiddleware))
-	socialMux.HandleFunc("DELETE", "/api/v1/media/{media_id} ", utils.MiddlewareChain(media.HandleDeleteMedia, media.MediaMiddleware, middleware.AuthMiddleware))
+
 
 	// Posts
 	

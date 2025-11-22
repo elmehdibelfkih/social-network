@@ -12,11 +12,13 @@ func MediaMiddleware(next http.HandlerFunc) http.HandlerFunc {
 		userID, ok := r.Context().Value(config.USER_ID_KEY).(int64)
 		if !ok {
 			utils.Unauthorized(w, "Invalid user")
+			return
 		}
 
 		mediaID, err := getMediaID(r)
 		if err != nil {
 			utils.NotFoundError(w, "can't get the requested media")
+			return
 		}
 
 		if r.Method == http.MethodGet {

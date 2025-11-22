@@ -62,7 +62,7 @@ const (
 	`
 
 	QUERY_GET_POST_VISIBILITY_AND_AUTHOR_FROM_MEDIA = `
-		SELECT p.visibility, p.author_id 
+		SELECT p.privacy, p.author_id 
 		FROM posts p 
 		JOIN post_media pm ON p.id = pm.post_id 
 		WHERE pm.media_id = ?
@@ -70,7 +70,7 @@ const (
 	`
 
 	QUERY_CHECK_FOLLOW = `
-		SELECT 1 FROM follows WHERE follower_id = ? AND followed_id = ? LIMIT 1;
+		SELECT 1 FROM follows WHERE follower_id = ? AND followed_id = ? AND status = 'accepted' LIMIT 1;
 	`
 
 	QUERY_GET_USER_PRIVACY = `
@@ -78,7 +78,7 @@ const (
 	`
 
 	QUERY_GET_POST_VISIBILITY_FROM_POST_MEDIA = `
-		SELECT p.id, p.visibility, p.author_id 
+		SELECT p.id, p.privacy, p.author_id 
 		FROM posts p 
 		JOIN post_media pm ON p.id = pm.post_id 
 		WHERE pm.media_id = ?

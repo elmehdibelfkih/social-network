@@ -1,37 +1,35 @@
 package posts
 
-import "time"
-
 // Post represents a post in the database
 type Post struct {
-	ID        int64     `db:"id"`
-	AuthorID  int64     `db:"author_id"`
-	GroupID   *int64    `db:"group_id"`
-	Content   string    `db:"content"`
-	Privacy   string    `db:"privacy"`
-	CreatedAt time.Time `db:"created_at"`
-	UpdatedAt time.Time `db:"updated_at"`
-	Pinned    int       `db:"pinned"`
+	ID        int64  `db:"id"`
+	AuthorID  int64  `db:"author_id"`
+	GroupID   *int64 `db:"group_id"`
+	Content   string `db:"content"`
+	Privacy   string `db:"privacy"`
+	CreatedAt string `db:"created_at"`
+	UpdatedAt string `db:"updated_at"`
+	Pinned    int    `db:"pinned"`
 }
 
 // Comment represents a comment in the database
 type Comment struct {
-	ID        int64     `db:"id"`
-	PostID    int64     `db:"post_id"`
-	AuthorID  int64     `db:"author_id"`
-	Content   string    `db:"content"`
-	CreatedAt time.Time `db:"created_at"`
-	UpdatedAt time.Time `db:"updated_at"`
+	ID        int64  `db:"id"`
+	PostID    int64  `db:"post_id"`
+	AuthorID  int64  `db:"author_id"`
+	Content   string `db:"content"`
+	CreatedAt string `db:"created_at"`
+	UpdatedAt string `db:"updated_at"`
 }
 
 // PostReaction represents a reaction to a post
 type PostReaction struct {
-	ID        int64     `db:"id"`
-	UserID    int64     `db:"user_id"`
-	PostID    int64     `db:"post_id"`
-	Reaction  string    `db:"reaction"`
-	CreatedAt time.Time `db:"created_at"`
-	UpdatedAt time.Time `db:"updated_at"`
+	ID        int64  `db:"id"`
+	UserID    int64  `db:"user_id"`
+	PostID    int64  `db:"post_id"`
+	Reaction  string `db:"reaction"`
+	CreatedAt string `db:"created_at"`
+	UpdatedAt string `db:"updated_at"`
 }
 
 // CreatePostRequest represents the request body for creating a post
@@ -45,27 +43,27 @@ type CreatePostRequest struct {
 
 // CreatePostResponse represents the response after creating a post
 type CreatePostResponse struct {
-	Message   string    `json:"message"`
-	PostID    int64     `json:"postId"`
-	AuthorID  int64     `json:"authorId"`
-	Privacy   string    `json:"privacy"`
-	GroupID   *int64    `json:"groupId"`
-	MediaIDs  []int64   `json:"mediaIds"`
-	CreatedAt time.Time `json:"createdAt"`
+	Message   string  `json:"message"`
+	PostID    int64   `json:"postId"`
+	AuthorID  int64   `json:"authorId"`
+	Privacy   string  `json:"privacy"`
+	GroupID   *int64  `json:"groupId"`
+	MediaIDs  []int64 `json:"mediaIds"`
+	CreatedAt string  `json:"createdAt"`
 }
 
 // GetPostResponse represents a single post response
 type GetPostResponse struct {
-	PostID         int64     `json:"postId"`
-	AuthorID       int64     `json:"authorId"`
-	AuthorNickname string    `json:"authorNickname"`
-	Content        string    `json:"content"`
-	MediaIDs       []int64   `json:"mediaIds"`
-	Privacy        string    `json:"privacy"`
-	GroupID        *int64    `json:"groupId"`
-	AllowedList    []int64   `json:"allowedList"`
-	CreatedAt      time.Time `json:"createdAt"`
-	UpdatedAt      time.Time `json:"updatedAt"`
+	PostID         int64   `json:"postId"`
+	AuthorID       int64   `json:"authorId"`
+	AuthorNickname string  `json:"authorNickname"`
+	Content        string  `json:"content"`
+	MediaIDs       []int64 `json:"mediaIds"`
+	Privacy        string  `json:"privacy"`
+	GroupID        *int64  `json:"groupId"`
+	AllowedList    []int64 `json:"allowedList"`
+	CreatedAt      string  `json:"createdAt"`
+	UpdatedAt      string  `json:"updatedAt"`
 }
 
 // UpdatePostRequest represents the request body for updating a post
@@ -104,25 +102,25 @@ type CreateCommentRequest struct {
 
 // CreateCommentResponse represents the response after creating a comment
 type CreateCommentResponse struct {
-	Message   string    `json:"message"`
-	CommentID int64     `json:"commentId"`
-	PostID    int64     `json:"postId"`
-	AuthorID  int64     `json:"authorId"`
-	Content   string    `json:"content"`
-	MediaIDs  []int64   `json:"mediaIds"`
-	CreatedAt time.Time `json:"createdAt"`
-	UpdatedAt time.Time `json:"updatedAt"`
+	Message   string  `json:"message"`
+	CommentID int64   `json:"commentId"`
+	PostID    int64   `json:"postId"`
+	AuthorID  int64   `json:"authorId"`
+	Content   string  `json:"content"`
+	MediaIDs  []int64 `json:"mediaIds"`
+	CreatedAt string  `json:"createdAt"`
+	UpdatedAt string  `json:"updatedAt"`
 }
 
 // CommentResponse represents a single comment
 type CommentResponse struct {
-	CommentID      int64     `json:"commentId"`
-	AuthorID       int64     `json:"authorId"`
-	AuthorNickname string    `json:"authorNickname"`
-	Content        string    `json:"content"`
-	MediaIDs       []int64   `json:"mediaIds"`
-	CreatedAt      time.Time `json:"createdAt"`
-	UpdatedAt      time.Time `json:"updatedAt"`
+	CommentID      int64   `json:"commentId"`
+	AuthorID       int64   `json:"authorId"`
+	AuthorNickname string  `json:"authorNickname"`
+	Content        string  `json:"content"`
+	MediaIDs       []int64 `json:"mediaIds"`
+	CreatedAt      string  `json:"createdAt"`
+	UpdatedAt      string  `json:"updatedAt"`
 }
 
 // ListCommentsResponse represents the response for listing comments
@@ -141,11 +139,11 @@ type DeleteCommentResponse struct {
 
 // LikePostResponse represents the response after liking a post
 type LikePostResponse struct {
-	Message   string    `json:"message"`
-	PostID    int64     `json:"postId"`
-	UserID    int64     `json:"userId"`
-	Reaction  string    `json:"reaction"`
-	CreatedAt time.Time `json:"createdAt"`
+	Message   string `json:"message"`
+	PostID    int64  `json:"postId"`
+	UserID    int64  `json:"userId"`
+	Reaction  string `json:"reaction"`
+	CreatedAt string `json:"createdAt"`
 }
 
 // UnlikePostResponse represents the response after removing a like

@@ -3,8 +3,9 @@ import { JSX, useState } from "react";
 import AuthForm from "../features/auth/auth.client";
 import { NavbarClient } from "../features/navbar";
 import { NewPost } from '../features/newPost/newPost.client';
-import { Feed } from "../features/posts";
+import { PostsClient } from "../features/posts";
 import { Post } from "../features/posts/types";
+
 
 export default function HomePage(): JSX.Element {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -30,7 +31,7 @@ export default function HomePage(): JSX.Element {
     <main>
       <NavbarClient />
       <NewPost userAvatar="/pic.png" onPostCreated={handlePostCreated} />
-      <Feed newPost={newPost} onNewPostDisplayed={handleNewPostDisplayed} />
+      <PostsClient newPost={newPost} onNewPostDisplayed={handleNewPostDisplayed} />
     </main>
   );
 }

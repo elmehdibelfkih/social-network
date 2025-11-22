@@ -84,7 +84,7 @@ func GetPostByID(postID int64) (*Post, error) {
 }
 
 // UpdatePost updates an existing post
-func UpdatePost(postID, authorID int64, content, privacy string, updatedAt time.Time) error {
+func UpdatePost(postID, authorID int64, content, privacy string, updatedAt string) error {
 	result, err := config.DB.Exec(QUERY_UPDATE_POST, content, privacy, updatedAt, postID, authorID)
 	if err != nil {
 		utils.SQLiteErrorTarget(err, "UpdatePost")
@@ -249,9 +249,8 @@ func GetPostMediaIDs(postID int64) ([]int64, error) {
 // InsertPostAllowedViewers inserts allowed viewers for a post
 func InsertPostAllowedViewers(postID int64, userIDs []int64) error {
 	return database.WrapWithTransaction(func(tx *sql.Tx) error {
-		now := time.Now()
 		for _, userID := range userIDs {
-			_, err := tx.Exec(QUERY_INSERT_POST_ALLOWED_VIEWER, postID, userID, now)
+			_, err := tx.Exec(QUERY_INSERT_POST_ALLOWED_VIEWER, postID, userID)
 			if err != nil {
 				utils.SQLiteErrorTarget(err, "InsertPostAllowedViewers")
 				return err
@@ -439,8 +438,8 @@ func GetPostComments(postID int64, limit, offset int) ([]Comment, int, error) {
 // InsertCommentMedia inserts media associations for a comment
 func InsertCommentMedia(commentID int64, mediaIDs []int64) error {
 	return database.WrapWithTransaction(func(tx *sql.Tx) error {
-		for i, mediaID := range mediaIDs {
-			_, err := tx.Exec(QUERY_INSERT_COMMENT_MEDIA, commentID, mediaID, i)
+		for _, mediaID := range mediaIDs {
+			_, err := tx.Exec(QUERY_INSERT_COMMENT_MEDIA, commentID, mediaID)
 			if err != nil {
 				utils.SQLiteErrorTarget(err, "InsertCommentMedia")
 				return err
@@ -473,9 +472,9 @@ func GetCommentMediaIDs(commentID int64) ([]int64, error) {
 }
 
 // CreatePostReaction creates a like/dislike reaction
-func CreatePostReaction(userID, postID int64, reaction string) error {
-	now := time.Now()
-	_, err := config.DB.Exec(QUERY_CREATE_POST_REACTION, userID, postID, reaction, now, now)
+func CreatePostReaction(postID, userID int64, reaction string) error {
+	now := time.Now().Format(time.RFC3339)
+	_, err := config.DB.Exec(QUERY_CREATE_POST_REACTION, postID, userID, reaction, now)
 	if err != nil {
 		if e, ok := err.(sqlite3.Error); ok && e.Code == sqlite3.ErrConstraint {
 			return fmt.Errorf("reaction already exists")
@@ -487,8 +486,8 @@ func CreatePostReaction(userID, postID int64, reaction string) error {
 }
 
 // DeletePostReaction removes a reaction
-func DeletePostReaction(userID, postID int64) error {
-	result, err := config.DB.Exec(QUERY_DELETE_POST_REACTION, userID, postID)
+func DeletePostReaction(postID, userID int64) error {
+	result, err := config.DB.Exec(QUERY_DELETE_POST_REACTION, postID, userID)
 	if err != nil {
 		utils.SQLiteErrorTarget(err, "DeletePostReaction")
 		return fmt.Errorf("failed to delete reaction: %w", err)
@@ -507,9 +506,9 @@ func DeletePostReaction(userID, postID int64) error {
 }
 
 // CheckPostReactionExists checks if a reaction already exists
-func CheckPostReactionExists(userID, postID int64) bool {
+func CheckPostReactionExists(postID, userID int64) bool {
 	var exists int
-	err := config.DB.QueryRow(QUERY_CHECK_POST_REACTION_EXISTS, userID, postID).Scan(&exists)
+	err := config.DB.QueryRow(QUERY_CHECK_POST_REACTION_EXISTS, postID, userID).Scan(&exists)
 	return err == nil
 }
 

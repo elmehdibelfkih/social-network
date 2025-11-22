@@ -69,6 +69,47 @@
   object-fit: cover;
 }
 
+.postImages {
+  display: grid;
+  gap: 8px;
+  margin: 16px 0;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.postImages:has(.postImage:nth-child(1):nth-last-child(1)) {
+  grid-template-columns: 1fr;
+}
+
+.postImages:has(.postImage:nth-child(1):nth-last-child(2)),
+.postImages:has(.postImage:nth-child(1):nth-last-child(3)) {
+  grid-template-columns: 1fr 1fr;
+}
+
+.postImages:has(.postImage:nth-child(1):nth-last-child(4)),
+.postImages:has(.postImage:nth-child(1):nth-last-child(5)),
+.postImages:has(.postImage:nth-child(1):nth-last-child(6)) {
+  grid-template-columns: 1fr 1fr 1fr;
+}
+
+.postImages:has(.postImage:nth-child(1):nth-last-child(7)),
+.postImages:has(.postImage:nth-child(1):nth-last-child(8)),
+.postImages:has(.postImage:nth-child(1):nth-last-child(9)) {
+  grid-template-columns: 1fr 1fr 1fr;
+}
+
+.postImage {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.postImage:hover {
+  transform: scale(1.02);
+}
+
 .postInteraction {
   display: flex;
   justify-content: space-between;

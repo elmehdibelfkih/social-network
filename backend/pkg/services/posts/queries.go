@@ -33,9 +33,9 @@ const (
 	`
 
 	QUERY_COUNT_USER_POSTS = `
-		SELECT posts_count
-		FROM counters
-		WHERE entity_id = ? && entity_type = user;
+		SELECT COUNT(*)
+		FROM posts
+		WHERE author_id = ?;
 	`
 
 	QUERY_GET_AUTHOR_NICKNAME = `
@@ -64,8 +64,8 @@ const (
 
 	// Post allowed viewers queries
 	QUERY_INSERT_POST_ALLOWED_VIEWER = `
-		INSERT INTO post_allowed_viewers (post_id, user_id, user_added_at)
-		VALUES (?, ?, ?);
+		INSERT INTO post_allowed_viewers (post_id, user_id)
+		VALUES (?, ?);
 	`
 
 	QUERY_GET_POST_ALLOWED_VIEWERS = `
@@ -119,32 +119,31 @@ const (
 
 	// Comment media queries
 	QUERY_INSERT_COMMENT_MEDIA = `
-		INSERT INTO comment_media (comment_id, media_id, ordinal)
-		VALUES (?, ?, ?);
+		INSERT INTO comment_media (comment_id, media_id)
+		VALUES (?, ?);
 	`
 
 	QUERY_GET_COMMENT_MEDIA_IDS = `
 		SELECT media_id
 		FROM comment_media
-		WHERE comment_id = ?
-		ORDER BY ordinal;
+		WHERE comment_id = ?;
 	`
 
 	// Post reaction queries
 	QUERY_CREATE_POST_REACTION = `
-		INSERT INTO post_reactions (user_id, post_id, reaction, created_at, updated_at)
-		VALUES (?, ?, ?, ?, ?);
+		INSERT INTO post_reactions (post_id, user_id, reaction_type, reacted_at)
+		VALUES (?, ?, ?, ?);
 	`
 
 	QUERY_DELETE_POST_REACTION = `
 		DELETE FROM post_reactions
-		WHERE user_id = ? AND post_id = ?;
+		WHERE post_id = ? AND user_id = ?;
 	`
 
 	QUERY_CHECK_POST_REACTION_EXISTS = `
 		SELECT 1
 		FROM post_reactions
-		WHERE user_id = ? AND post_id = ?
+		WHERE post_id = ? AND user_id = ?
 		LIMIT 1;
 	`
 

@@ -14,7 +14,7 @@ import (
 
 func CreateMedia(media *Media) error {
 	err := database.WrapWithTransaction(func(tx *sql.Tx) error {
-		_, err := config.DB.Exec(QUERY_CREATE_MEDIA, media.ID, media.OwnerId, media.Path, media.Mime, media.Size, media.Purpose, media.CreatedAt)
+		_, err := tx.Exec(QUERY_CREATE_MEDIA, media.ID, media.OwnerId, media.Path, media.Mime, media.Size, media.Purpose, media.CreatedAt)
 		if err != nil {
 			if e, ok := err.(sqlite3.Error); ok && e.Code == sqlite3.ErrConstraint {
 				return fmt.Errorf("constraint error: %w", err)
@@ -50,9 +50,7 @@ func GetMediaByID(id int64) (*Media, error) {
 
 func DeleteMedia(mediaID int64, userID int64) (string, error) {
 	var path string
-	database.WrapWithTransaction(func(tx *sql.Tx) error {
-		defer tx.Rollback()
-
+	err := database.WrapWithTransaction(func(tx *sql.Tx) error {
 		err := tx.QueryRow(QUERY_GET_MEDIA, mediaID).Scan(&path)
 		if err != nil {
 			if err == sql.ErrNoRows {
@@ -66,13 +64,12 @@ func DeleteMedia(mediaID int64, userID int64) (string, error) {
 			utils.SQLiteErrorTarget(err, "DeleteMedia (Exec)")
 			return err
 		}
-
-		if err := tx.Commit(); err != nil {
-			utils.SQLiteErrorTarget(err, "DeleteMedia (Commit)")
-			return err
-		}
 		return nil
 	})
+
+	if err != nil {
+		return "", err
+	}
 
 	if err := os.Remove(path); err != nil {
 		utils.BackendErrorTarget(err, fmt.Sprintf("failed to delete media file: %s", path))

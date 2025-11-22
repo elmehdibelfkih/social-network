@@ -59,7 +59,7 @@ func canGetMedia(userID, mediaID int64) bool {
 	var mediaOwnerID int64
 	var mediaPurpose string
 
-	err := config.DB.QueryRow(QUERY_GET_MEDIA_OWNER_AND_PURPOSE, mediaID).Scan(&mediaOwnerID, mediaPurpose)
+	err := config.DB.QueryRow(QUERY_GET_MEDIA_OWNER_AND_PURPOSE, mediaID).Scan(&mediaOwnerID, &mediaPurpose)
 	if err != nil {
 		if err != sql.ErrNoRows {
 			utils.SQLiteErrorTarget(err, QUERY_GET_MEDIA_OWNER_AND_PURPOSE)
@@ -76,11 +76,11 @@ func canGetMedia(userID, mediaID int64) bool {
 		return true
 
 	case "post", "comment":
-		var visibility string
+		var privacy string
 		var authorID int64
 		var postID int64
 
-		err := config.DB.QueryRow(QUERY_GET_POST_VISIBILITY_FROM_POST_MEDIA, mediaID).Scan(&postID, &visibility, &authorID)
+		err := config.DB.QueryRow(QUERY_GET_POST_VISIBILITY_FROM_POST_MEDIA, mediaID).Scan(&postID, &privacy, &authorID)
 		if err != nil {
 			if err != sql.ErrNoRows {
 				utils.SQLiteErrorTarget(err, QUERY_GET_POST_VISIBILITY_FROM_POST_MEDIA)
@@ -88,14 +88,16 @@ func canGetMedia(userID, mediaID int64) bool {
 			return false
 		}
 
-		switch visibility {
+		// Author can always see their own media
+		if authorID == userID {
+			return true
+		}
+
+		switch privacy {
 		case "public":
 			return true
 
-		case "private":
-			if authorID == userID {
-				return true
-			}
+		case "privatey":
 			return isUserOnList(userID, postID)
 
 		case "followers":

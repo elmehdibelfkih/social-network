@@ -5,7 +5,7 @@ type FeedPostResponseJson struct {
 	PostId          int64             `json:"postId"`
 	AuthorId        int64             `json:"authorId"`
 	AuthorNickname  *string           `json:"authorNickname"` // or null
-	AuthorLastName  string            `json:"authorlastName"`
+	AuthorLastName  string            `json:"authorLastName"`
 	AuthorFirstName string            `json:"authorFirstName"`
 	Content         string            `json:"content"`
 	MediaIds        []int64           `json:"mediaIds"` // or null
