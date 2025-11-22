@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	"time"
-
+	"fmt"
 	"github.com/gorilla/websocket"
 )
 
@@ -61,6 +61,7 @@ func (c *Client) readMessages() {
 			log.Println("invalid message format:", err)
 			continue
 		}
+		fmt.Println("received event:", event)
 
 		c.events <- event
 	}

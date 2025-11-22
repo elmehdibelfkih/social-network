@@ -1,7 +1,6 @@
 package socket
 
 import (
-	"log"
 	"sync"
 )
 
@@ -44,7 +43,7 @@ func (h *Hub) addClient(c *Client) {
 	defer h.mu.Unlock()
 
 	h.clients[c.userId] = append(h.clients[c.userId], c)
-	log.Printf("WS connected: user %v", *c)
+	// log.Printf("WS connected: user %v", *c)
 }
 
 func (h *Hub) removeClient(c *Client) {
@@ -57,7 +56,7 @@ func (h *Hub) removeClient(c *Client) {
 
 	for i := range clients {
 		if clients[i] == c {
-			//close connection before deleting it
+			// close connection before deleting it
 			clients[i].connection.Close()
 			clients = append(clients[:i], clients[i+1:]...)
 			break

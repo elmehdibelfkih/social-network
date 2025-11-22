@@ -2,7 +2,7 @@ package socket
 
 type Event struct {
 	Type    string        `json:"type"`
-	Payload ClientMessage `json:"payload"`
+	Payload *ClientMessage `json:"payload"`
 }
 
 type ClientMessage struct {
