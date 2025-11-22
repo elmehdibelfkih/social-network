@@ -13,7 +13,7 @@ export function PostsClient() {
         
         <div className={styles.postUserSection}>
           <div className={styles.postUserAvatar}>
-            <img src="/users.svg" alt="User Avatar" />
+            <img src="/svg/users.svg" alt="User Avatar" />
           </div>
 
           <div className={styles.postUserInfo}>
@@ -27,7 +27,7 @@ export function PostsClient() {
         </div>
 
         <div className={styles.postImg}>
-          <img src="/pic.png" alt="Post media" />
+          <img src="/svg/pic.png" alt="Post media" />
         </div>
 
         <div className={styles.postInteraction}>

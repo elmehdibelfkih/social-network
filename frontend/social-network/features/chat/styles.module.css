@@ -1,0 +1,12 @@
+
+.onlineSection {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.offlineSection {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}

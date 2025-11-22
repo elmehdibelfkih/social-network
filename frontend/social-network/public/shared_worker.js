@@ -70,11 +70,10 @@ class WebSocketManger {
 
     #attachPortHandlers(port) {
         port.onmessage = (e) => {
-            if (e.data === "INIT_WS") {
+            if (e.data.type === "init_ws") {
                 this.#initWebsocket();
                 return;
             }
-            e.data.origin = this.ports.indexOf(port)
             console.log(e.data)
             this.#sendOrQueue(e.data);
         };

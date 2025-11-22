@@ -5,6 +5,7 @@ import { NavbarClient } from "../features/navbar";
 import { NewPost } from '../features/newPost/newPost.client';
 import { PostsClient } from "../features/posts";
 import { http } from '../libs/apiClient';
+import { ChatSection } from '../features/chat/chat.client';
 
 type AuthResponse = {
   sessionId: number;
@@ -62,15 +63,9 @@ export default function HomePage(): JSX.Element {
   // authenticated — safe to access session fields
   return (
     <main>
-      <h1>Session ID: {session.sessionId}</h1>
-      <h2>Token: {session.sessionToken}</h2>
-      <p>IP: {session.ipAddress}</p>
-      <p>Device: {session.device}</p>
-      <p>Created: {session.createdAt}</p>
-      <p>Expires: {session.expiresAt}</p>
-
       <NavbarClient />
-      <NewPost userAvatar="/pic.png" />
+      <ChatSection />
+      <NewPost userAvatar="/svg/pic.png" />
       <PostsClient />
     </main>
   );

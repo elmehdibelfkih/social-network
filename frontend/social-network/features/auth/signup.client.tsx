@@ -17,7 +17,7 @@ export function RegisterForm({ onAuthSuccess }: { onAuthSuccess?: () => void }) 
         dateOfBirth: '',
         nickname: '',
         aboutMe: '',
-        avatarId: 0,
+        avatarId: null,
     });
     const { setUser } = useAuth()
 
