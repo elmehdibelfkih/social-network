@@ -1,29 +1,36 @@
-FROM node:18-alpine AS deps
+# ---- build stage ----
+FROM node:20-alpine AS builder
 WORKDIR /app
+COPY package.json package-lock.json* pnpm-lock.yaml* ./
 
-COPY package.json package-lock.json* yarn.lock* ./
-RUN npm ci --silent || npm install --silent
+RUN npm ci --legacy-peer-deps
 
-FROM node:18-alpine AS builder
-WORKDIR /app
-
-# copy node_modules from deps and project files
-COPY --from=deps /app/node_modules ./node_modules
+# Copy source and build
 COPY . .
 RUN npm run build
 
-# Stage 3 — runner: production image
-FROM node:18-alpine AS runner
+# ---- production stage ----
+FROM node:20-alpine AS runner
 WORKDIR /app
 
+# Create a non-root user for security
+RUN addgroup -S next && adduser -S next -G next
 ENV NODE_ENV=production
-# copy only what is needed to run
-COPY --from=builder /app/.next ./.next
-COPY --from=builder /app/public ./public
-COPY --from=builder /app/package.json ./package.json
-COPY --from=builder /app/node_modules ./node_modules
-# copy next.config if used (optional)
-COPY --from=builder /app/next.config.js ./next.config.js
 
+# Copy only the necessary artifacts from builder
+COPY --from=builder /app/package.json /app/package-lock.json* /app/
+COPY --from=builder /app/.next /app/.next
+COPY --from=builder /app/public /app/public
+# Copy next.config if you need it at runtime
+COPY --from=builder /app/next.config.js /app/next.config.js
+
+# Install only production dependencies (ensure package-lock exists)
+RUN npm ci --only=production --legacy-peer-deps
+
+# Drop privileges
+USER next
+
+# Expose port and run
+ENV PORT=3000
 EXPOSE 3000
-CMD ["npm", "start"]
+CMD ["node", "./node_modules/next/dist/bin/next", "start", "-p", "3000"]

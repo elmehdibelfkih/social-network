@@ -27,18 +27,6 @@ DOCKER_COMPOSE_PATH = $(PROJECT_ROOT)/docker-compose.yml
 FRONTEND_PATH = $(PROJECT_ROOT)/frontend/social-network
 #=============================================================
 
-#confirm =====================================================
-confirm:
-	@echo -n "⚠️  Are you absolutely sure you want to run $(MAKECMDGOALS)? [y/N]: " && \
-	read REPLY; \
-	if echo "$$REPLY" | grep -iq "^y"; then \
-		echo "✅ Confirmation received. Continuing..."; \
-	else \
-		echo "❌ Operation cancelled by user."; \
-		exit 0; \
-	fi
-#=============================================================
-
 # local dev ==================================================
 dev: start-backend start-frontend
 stop-dev:
@@ -56,7 +44,7 @@ start-frontend: setup
 	@(cd $(FRONTEND_PATH) && nohup npm run dev < /dev/null >> $(FRONTEND_LOGS_PATH) 2>&1 &)
 #=============================================================
 
-# setup ======================================================
+# deps  ======================================================
 setup:
 	@mkdir -p $(LOGS_PATH)
 	@	: >> $(SQLITE_LOGS_PATH)
@@ -72,6 +60,15 @@ setup:
 	@mkdir -p $(COMMENTS_DATA_PATH)
 	@cd $(FRONTEND_PATH) && npm install
 	@cd $(FRONTEND_PATH) && cp example.env .env
+confirm:
+	@echo -n "$(MAGENTA)Are you absolutely sure you want to run $(MAKECMDGOALS)?$(RESET) [$(RED)yes$(RESET)/$(GREEN)no$(RESET)]: " && \
+	read REPLY; \
+	if echo "$$REPLY" | grep -iq "^yes"; then \
+		echo "✅ Confirmation received. Continuing..."; \
+	else \
+		echo "❌ Operation cancelled by user."; \
+		exit 1; \
+	fi
 #=============================================================
 
 # docker =====================================================
@@ -94,17 +91,22 @@ clean-data: confirm
 	@echo "$(YELLOW)Cleaning data...$(RESET)"
 	@rm -rf $(DATA_PATH)
 clean-next:
-	@echo "$(YELLOW)Cleaning Next.js project files...$(RESET)"
+	@echo "$(YELLOW)Cleaning Next.js artifacts and generated files...$(RESET)"
 	@rm -rf $(FRONTEND_PATH)/node_modules
 	@rm -f $(FRONTEND_PATH)/package-lock.json
-	@rm -f $(FRONTEND_PATH)/npm-debug.log
-	@rm -f $(FRONTEND_PATH)/.env
-	@rm -f $(FRONTEND_PATH)/next-env.d.ts
-	@rm -f $(FRONTEND_PATH)/tsconfig.json
+	@rm -f $(FRONTEND_PATH)/yarn.lock
+	@rm -f $(FRONTEND_PATH)/pnpm-lock.yaml
 	@rm -rf $(FRONTEND_PATH)/.next
 	@rm -rf $(FRONTEND_PATH)/out
-	@rm -rf $(FRONTEND_PATH)/dist
 	@rm -rf $(FRONTEND_PATH)/build
+	@rm -rf $(FRONTEND_PATH)/dist
+	@rm -rf $(FRONTEND_PATH)/.vercel
+	@rm -rf $(FRONTEND_PATH)/.turbo
+	@rm -f $(FRONTEND_PATH)/.env
+	@rm -f $(FRONTEND_PATH)/npm-debug.log
+	@rm -f $(FRONTEND_PATH)/yarn-error.log
+	@rm -f $(FRONTEND_PATH)/next-env.d.ts
+	@find $(FRONTEND_PATH) -type f -name ".DS_Store" -delete
 purge: clean-logs clean-data clean-next
 	@echo "$(GREEN)purge: done$(RESET)"
 #=============================================================
