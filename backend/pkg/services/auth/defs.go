@@ -124,12 +124,12 @@ func (v *RegisterRequestJson) Validate() (bool, string) {
 	if !utils.DateValidation(v.DateOfBirth) {
 		return false, "invalid Date"
 	}
-	if v.Nickname != nil {
+	if v.Nickname != nil && *v.Nickname != "" {
 		if ok, str := utils.FirstNameLastName(*v.Nickname); !ok {
 			return false, str
 		}
 	}
-	if v.AboutMe != nil {
+	if v.AboutMe != nil && *v.AboutMe != "" {
 		if ok, str := utils.TextContentValidationEscape(v.AboutMe, 5, 2048); !ok {
 			return false, str
 		}

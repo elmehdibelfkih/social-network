@@ -31,8 +31,8 @@ export async function Profile({ user_id }: { user_id: string }) {
                             <CalendarIcon />
                             Joined {new Date(profile.payload.joinedAt).toLocaleDateString()}
                         </span>
-                        <span className={styles.privacy}>
-                            <GlobeIcon fillColor={profile.payload.privacy === 'public' ? '#01a63f' : '#666'} />
+                        <span className={`${styles.privacy} ${styles[profile.payload.privacy]}`}>
+                            <GlobeIcon fillColor={profile.payload.privacy === 'public' ? '#01a63f' : '#F7773D'} />
                             {profile.payload.privacy} profile
                         </span>
                     </div>

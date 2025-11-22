@@ -31,6 +31,7 @@ async function serverApiClient<T>(endpoint: string, method: string, payload?: an
 
     if (!response.ok) {
         const errorMessage = body?.error?.ErrorMessage || "Something went wrong";
+        console.log(response)
         throw new Error(errorMessage);
     }
     console.log(body);

@@ -33,7 +33,7 @@
     transition: all 0.2s ease;
 }
 
-.meaageButton {
+.messageButton {
     display: flex;
     align-items: center;
     gap: 8px;
@@ -46,7 +46,7 @@
     background: rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
-    color: white;
+    color: rgb(0, 0, 0);
     cursor: pointer;
     transition: all 0.2s ease;
 }
@@ -140,4 +140,12 @@
 
 .privacy {
     text-transform: capitalize;
+}
+
+.public {
+    color: #01a63f;
+}
+
+.private {
+    color: #F7773D;
 }

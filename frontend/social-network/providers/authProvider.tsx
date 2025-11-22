@@ -1,6 +1,5 @@
 'use client'
 import { createContext, useContext, useState, useEffect } from "react"
-import { serverHttp } from "../libs/apiClient.server"
 
 type User = {
     userId: number
@@ -20,7 +19,7 @@ const authContext = createContext<AuthContextType | null>(null)
 export function AuthProvider({ children }) {
     const [user, setUser] = useState<User | null>(() => {
         if (typeof window !== 'undefined') {
-            const stored = localStorage.getItem('user')
+            const stored = localStorage.getItem('social_network-user')
             if (stored) {
                 try {
                     return JSON.parse(stored)

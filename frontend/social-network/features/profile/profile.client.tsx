@@ -73,6 +73,10 @@ export function MessageButton() {
 export function ProfileClient({ userId, profile }: { userId: number, profile: ProfileData }) {
     const { user } = useAuth()
 
+    if (!user) {
+        return
+    }
+
     const isOwnProfile = user.userId == userId
     return (
         <div className={styles.topPart}>
