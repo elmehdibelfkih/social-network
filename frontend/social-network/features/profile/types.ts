@@ -32,3 +32,11 @@ export type FollowResponse = {
         chatId: number | null
     }
 }
+
+export type PrivacyToggleResponse = {
+    success: boolean;
+    payload: {
+        message: string
+        privacy: string
+    }
+}

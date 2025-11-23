@@ -1,5 +1,3 @@
-
-
 import { Profile } from '../../../features/profile';
 
 interface PageProps {
