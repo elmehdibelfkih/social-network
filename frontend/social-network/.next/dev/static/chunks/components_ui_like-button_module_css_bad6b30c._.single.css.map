@@ -1,0 +1,6 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 1, "column": 0}, "map": {"version":3,"sources":["turbopack:///[project]/components/ui/like-button.module.css"],"sourcesContent":[".likeButton {\n  display: flex;\n  align-items: center;\n  gap: 8px;\n  background: none;\n  border: none;\n  cursor: pointer;\n  padding: 8px;\n  border-radius: 8px;\n  transition: background-color 0.2s;\n}\n\n.likeButton:disabled {\n  cursor: not-allowed;\n}\n\n.likeButton:hover {\n  background-color: #f0f0f0;\n}\n\n.likeIcon {\n  transition: all 0.2s ease;\n}\n\n.likeIcon.loading {\n  transform: scale(0.9);\n}\n\n.likeIcon.liked {\n  fill: var(--primary-purple);\n  stroke: var(--primary-purple);\n}\n\n.likeIcon.unliked {\n  fill: none;\n  stroke: #666;\n}\n\n.likeText {\n  font-size: 14px;\n}\n\n.likeText.liked {\n  color: var(--primary-purple);\n}\n\n.likeText.unliked {\n  color: #666;\n}"],"names":[],"mappings":"AAAA;;;;;;;;;;;;AAYA;;;;AAIA;;;;AAIA;;;;AAIA;;;;AAIA;;;;;AAKA;;;;;AAKA;;;;AAIA;;;;AAIA"}}]
+}

@@ -1,0 +1,52 @@
+/* [project]/components/ui/like-button.module.css [app-client] (css) */
+.like-button-module__mS68za__likeButton {
+  cursor: pointer;
+  background: none;
+  border: none;
+  border-radius: 8px;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  transition: background-color .2s;
+  display: flex;
+}
+
+.like-button-module__mS68za__likeButton:disabled {
+  cursor: not-allowed;
+}
+
+.like-button-module__mS68za__likeButton:hover {
+  background-color: #f0f0f0;
+}
+
+.like-button-module__mS68za__likeIcon {
+  transition: all .2s;
+}
+
+.like-button-module__mS68za__likeIcon.like-button-module__mS68za__loading {
+  transform: scale(.9);
+}
+
+.like-button-module__mS68za__likeIcon.like-button-module__mS68za__liked {
+  fill: var(--primary-purple);
+  stroke: var(--primary-purple);
+}
+
+.like-button-module__mS68za__likeIcon.like-button-module__mS68za__unliked {
+  fill: none;
+  stroke: #666;
+}
+
+.like-button-module__mS68za__likeText {
+  font-size: 14px;
+}
+
+.like-button-module__mS68za__likeText.like-button-module__mS68za__liked {
+  color: var(--primary-purple);
+}
+
+.like-button-module__mS68za__likeText.like-button-module__mS68za__unliked {
+  color: #666;
+}
+
+/*# sourceMappingURL=components_ui_like-button_module_css_bad6b30c._.single.css.map*/

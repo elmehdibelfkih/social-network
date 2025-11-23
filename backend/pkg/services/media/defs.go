@@ -1,16 +1,14 @@
 package media
 
-import "time"
-
 // NediaManager defines the interface for media DB operations
 type Media struct {
-	ID        int64     `db:"id"`
-	OwnerId   int64     `db:"owner_id"`
-	Path      string    `db:"path"`
-	Mime      string    `db:"mime"`
-	Size      int       `db:"size"`
-	Purpose   string    `db:"purpose"`
-	CreatedAt time.Time `db:"created_at"`
+	ID        int64  `db:"id"`
+	OwnerId   int64  `db:"owner_id"`
+	Path      string `db:"path"`
+	Mime      string `db:"mime"`
+	Size      int    `db:"size"`
+	Purpose   string `db:"purpose"`
+	CreatedAt string `db:"created_at"`
 }
 
 type UploadMediaRequest struct {
@@ -22,11 +20,11 @@ type UploadMediaRequest struct {
 
 // for getting and uploading
 type UploadMediaResponse struct {
-	Message    string    `json:"message"`
-	MediaID    int64     `json:"mediaId"`
-	MediaPath  string    `json:"mediaPath,omitempty"`
-	FileType   string    `json:"fileType"`
-	UploadedAt time.Time `json:"uploadedAt"`
+	Message    string `json:"message"`
+	MediaID    int64  `json:"mediaId"`
+	MediaPath  string `json:"mediaPath,omitempty"`
+	FileType   string `json:"fileType"`
+	UploadedAt string `json:"uploadedAt"`
 }
 
 // for deleting
@@ -36,7 +34,7 @@ type DeleteMediaResponse struct {
 }
 
 const (
-	MaxMediaSize = 10485760 // 10 MB
+	MaxMediaSize   = 10485760 // 10 MB
 	MaxRequestSize = MaxMediaSize + 1048576
 )
 
