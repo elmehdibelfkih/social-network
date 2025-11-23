@@ -1,4 +1,5 @@
-'use client';
+// 'use client';
+// todo
 import { AuthProvider } from '../providers/authProvider';
 import Snackbar from '../components/ui/snackbar';
 import AuthForm from '../features/auth/auth.client';

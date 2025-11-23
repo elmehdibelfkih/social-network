@@ -29,19 +29,33 @@ FRONTEND_PATH = $(PROJECT_ROOT)/frontend/social-network
 
 # local dev ==================================================
 dev: start-backend start-frontend
-stop-dev:
-	@echo "$(RED)Stopping processes gracefully....$(RESET)"
-	@fuser -k -s 8080/tcp || true
-	@fuser -k -s 3000/tcp || true
-	@echo "$(GREEN)Cleanup complete.$(RESET)"
+stop-dev: stop-backend stop-frontend
 start-backend: setup
 	@echo "$(GREEN)Starting backend (Port 8080).$(RESET)"
 	@echo "$(MAGENTA)Logs redirected to$(RESET) $(BACKEND_LOGS_PATH)..."
 	@(cd "./backend/" && nohup go run ./cmd/main.go < /dev/null >> $(BACKEND_LOGS_PATH) 2>&1 &)
-start-frontend: setup
+start-frontend: setup next-setup
 	@echo "$(GREEN)Starting frontend (Port 3000).$(RESET)"
 	@echo "$(MAGENTA)Logs redirected to$(RESET) $(FRONTEND_LOGS_PATH)..."
 	@(cd $(FRONTEND_PATH) && nohup npm run dev < /dev/null >> $(FRONTEND_LOGS_PATH) 2>&1 &)
+stop-backend:
+	@echo "$(RED)Stopping backend process gracefully....$(RESET)"
+	@fuser -k -s 8080/tcp || true
+	@echo "$(GREEN)frontend stoped$(RESET)"
+stop-frontend:
+	@echo "$(RED)Stopping frontend process gracefully....$(RESET)"
+	@fuser -k -s 3000/tcp || true
+	@echo "$(GREEN)backend stoped$(RESET)"
+restart-backend:
+	@echo "$(RED)Stopping backend process gracefully....$(RESET)"
+	@fuser -k -s 8080/tcp || true
+	@$(MAKE) start-backend
+restart-frontend:
+	@echo "$(RED)Stopping frontend process gracefully....$(RESET)"
+	@fuser -k -s 8080/tcp || true
+	@$(MAKE) start-frontend
+re-dev: stop-dev dev
+re-purge-dev: stop-dev purge dev
 #=============================================================
 
 # deps  ======================================================
@@ -58,6 +72,7 @@ setup:
 	@mkdir -p $(POSTS_DATA_PATH)
 	@mkdir -p $(MESSAGES_DATA_PATH)
 	@mkdir -p $(COMMENTS_DATA_PATH)
+next-setup:
 	@cd $(FRONTEND_PATH) && npm install
 	@cd $(FRONTEND_PATH) && cp example.env .env
 confirm:
@@ -80,7 +95,8 @@ down:
 	docker compose -f $(DOCKER_COMPOSE_PATH) down
 status:
 	docker compose -f $(DOCKER_COMPOSE_PATH) ps
-	docker logs
+prune:
+	docker system prune -a --volumes
 #=============================================================
 
 # clean ======================================================
@@ -107,7 +123,7 @@ clean-next:
 	@rm -f $(FRONTEND_PATH)/yarn-error.log
 	@rm -f $(FRONTEND_PATH)/next-env.d.ts
 	@find $(FRONTEND_PATH) -type f -name ".DS_Store" -delete
-purge: clean-logs clean-data clean-next
+purge: stop-dev clean-logs clean-data clean-next
 	@echo "$(GREEN)purge: done$(RESET)"
 #=============================================================
 
