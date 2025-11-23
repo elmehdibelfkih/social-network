@@ -2,9 +2,10 @@ package socket
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"time"
-	"fmt"
+
 	"github.com/gorilla/websocket"
 )
 
@@ -13,12 +14,14 @@ type Client struct {
 	connection   *websocket.Conn
 	userId       int64
 	sessionToken string
+	typingTimer  *time.Timer
 	events       chan Event
 }
 
 var (
 	pongWait     = 10 * time.Second
 	pingInterval = (pongWait * 9) / 10
+	typingWait   = 3 * time.Second
 )
 
 func NewClient(wsHub *Hub, conn *websocket.Conn, id int64, token string) *Client {
@@ -63,7 +66,7 @@ func (c *Client) readMessages() {
 		}
 		fmt.Println("received event:", event)
 
-		c.events <- event
+		c.handleEvent(event)
 	}
 }
 
@@ -95,6 +98,26 @@ func (c *Client) writeMessages() {
 				log.Println("write msg: ", err)
 				return
 			}
+		}
+	}
+}
+
+func (c *Client) handleEvent(e Event) {
+	switch e.Type {
+	case "typing":
+		c.typing()
+	case "online_status":
+		c.onlineStatus()
+	case "seen":
+		return
+	case "notification":
+		return
+	case "chat":
+		return
+	default:
+		c.events <- Event{
+			Source: "undefined",
+			Type:   "undefined",
 		}
 	}
 }

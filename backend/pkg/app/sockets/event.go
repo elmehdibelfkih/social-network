@@ -1,15 +1,17 @@
 package socket
 
 type Event struct {
-	Type    string        `json:"type"`
+	Source  string         `json:"source"`
+	Type    string         `json:"type"`
 	Payload *ClientMessage `json:"payload"`
 }
 
 type ClientMessage struct {
-	SourceId   int64  `json:"sourceId"`
-	Content    string `json:"message"`
-	ChatId     int64  `json:"chatId"`
-	RecievedAt string `json:"recievedAt"`
+	SourceId     int64         `json:"sourceId"`
+	ChatMessage  *ChatMessage  `json:"chatMessage"`
+	MarkSeen     *MarkSeen     `json:"markSeen"`
+	Notification *Notification `json:"notification"`
+	OnlineStatus *OnlineStatus `json:"onlineStatus"`
 }
 
 type ChatMessage struct {
@@ -23,10 +25,10 @@ type ChatMessage struct {
 }
 
 type MarkSeen struct {
-	Id       int64 `json:"id"`
-	ChatId   int64 `json:"chatId"`
-	SenderId int64 `json:"SenderId"`
-	// Content   string `json:"content"`
+	Id        int64  `json:"id"`
+	ChatId    int64  `json:"chatId"`
+	SenderId  int64  `json:"SenderId"`
+	Content   string `json:"content"`
 	SeenState string `json:"seenState"`
 	CreatedAt string `json:"createdAt"`
 	UpdatedAt string `json:"updatedAt"`
@@ -50,13 +52,13 @@ type OnlineStatus struct {
 
 type User struct {
 	UserId      int64   `json:"userId"`
+	Nickname    *string `json:"nickname"`
 	Email       string  `json:"email"`
 	FirstName   string  `json:"firstName"`
 	LastName    string  `json:"lastName"`
 	DateOfBirth string  `json:"dateOfBirth"`
-	Nickname    *string `json:"nickname"`
-	AboutMe     *string `json:"aboutMe"`
 	AvatarId    *int64  `json:"avatarId"`
+	AboutMe     *string `json:"aboutMe"`
+	Privacy     string  `json:"privacy"`
 	Online      bool    `json:"online"`
 }
-

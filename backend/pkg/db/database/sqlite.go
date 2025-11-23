@@ -84,7 +84,6 @@ func InitDB() error {
 	if err != nil {
 		return err
 	}
-	// defer config.DB.Close()
 
 	_, err = config.DB.Exec(config.FOREIGN_KEYS_ON)
 	if err != nil {
