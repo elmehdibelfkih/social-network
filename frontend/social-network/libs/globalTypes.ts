@@ -1,10 +1,13 @@
 export interface ApiErrorDetails {
-    StatusCode: number;
-    StatusText: string;
-    ErrorMessage: string;
-    ErrorTitle?: string;
-    ErrorDescription?: string;
-    errorType?: 'redirect' | 'alert';
+    success: boolean;
+    payload: {
+        StatusCode: number;
+        StatusText: string;
+        ErrorMessage: string;
+        ErrorTitle?: string;
+        ErrorDescription?: string;
+        errorType?: 'redirect' | 'alert';
+    }
 }
 
 export type ApiResponse<T> =
@@ -17,7 +20,7 @@ export interface PaginationParams {
 }
 
 export type PrivacyLevel = 'public' | 'followers' | 'private' | 'group' | 'restricted';
-export type FollowStatus = 'pending' | 'accepted' | 'declined' | null;
+export type FollowStatus = 'none' | 'follow' | 'following' | 'pending' | 'declined';
 export type ReactionType = 'like';
 export type MediaType = 'image/png' | 'image/jpeg' | 'image/gif';
 
@@ -31,15 +34,22 @@ export interface Session {
     current?: boolean;
 }
 
+export interface MediaResponse {
+    mediaEncoded: string
+}
+
 export interface AuthResponse {
-    userId: number;
-    email: string;
-    firstName: string;
-    lastName: string;
-    dateOfBirth: string;
-    nickname: string | null;
-    aboutMe: string | null;
-    avatarId: number | null;
+    success: boolean;
+    payload: {
+        userId: number;
+        email: string;
+        firstName: string;
+        lastName: string;
+        dateOfBirth: string;
+        nickname: string | null;
+        aboutMe: string | null;
+        avatarId: number | null;
+    }
 }
 
 export interface UserProfile {
@@ -136,11 +146,14 @@ export interface MediaUploadRequest {
 }
 
 export interface MediaUploadResponse {
-    message: string;
-    mediaId: number;
-    mediaPath: string;
-    fileType: string;
-    uploadedAt: string;
+    success: boolean;
+    payload: {
+        message: string;
+        mediaId: number;
+        mediaPath: string;
+        fileType: string;
+        uploadedAt: string;
+    }
 }
 
 export interface Group {

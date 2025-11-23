@@ -4,7 +4,7 @@ import { useState, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import { authService } from './services/auth';
 import styles from './styles.module.css';
-import { useAuth } from '../../providers/authProvider';
+import { useAuth } from '@/providers/authProvider';
 
 export function RegisterForm({ onAuthSuccess }: { onAuthSuccess?: () => void }) {
     const router = useRouter();
@@ -17,7 +17,7 @@ export function RegisterForm({ onAuthSuccess }: { onAuthSuccess?: () => void }) 
         dateOfBirth: '',
         nickname: '',
         aboutMe: '',
-        avatarId: 0,
+        avatarId: null,
     });
     const { setUser } = useAuth()
 
@@ -27,13 +27,18 @@ export function RegisterForm({ onAuthSuccess }: { onAuthSuccess?: () => void }) 
 
         try {
             const resp = await authService.register(formData);
-            setUser({
-                userId: resp.userId,
-                avatarId: resp.avatarId,
-                nickname: resp.nickname,
-                firstName: resp.firstName,
-                lastName: resp.lastName
-            })
+
+            const newUser = {
+                userId: resp.payload.userId,
+                avatarId: resp.payload.avatarId,
+                nickname: resp.payload.nickname,
+                firstName: resp.payload.firstName,
+                lastName: resp.payload.lastName
+            };
+
+            localStorage.setItem('social_network-user', JSON.stringify(newUser));
+            setUser(newUser);
+
             router.push('/');
         } catch (error) {
             console.error("Failed to register:", error);
@@ -48,8 +53,8 @@ export function RegisterForm({ onAuthSuccess }: { onAuthSuccess?: () => void }) 
 
         try {
             const avatarResp = await authService.uploadAvatar(avatar);
-            const avatarId = avatarResp.mediaId
-            setFormData(prev => ({ ...prev, avatarId }));
+            const avatarId = avatarResp.payload.mediaId
+            setFormData(prev => ({ ...prev, avatarId: avatarId }));
         } catch (error) {
             console.error("Failed to upload avatar:", error);
         }

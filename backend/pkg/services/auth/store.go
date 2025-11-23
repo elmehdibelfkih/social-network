@@ -2,11 +2,12 @@ package auth
 
 import (
 	"database/sql"
+	"strings"
+	"time"
+
 	"social/pkg/config"
 	"social/pkg/db/database"
 	"social/pkg/utils"
-	"strings"
-	"time"
 )
 
 // read
@@ -91,7 +92,7 @@ func SelectUserSession(session string) (*SessionItemJson, error) {
 	)
 	if err != nil {
 		utils.SQLiteErrorTarget(err, SELECT_SESSION_BY_SESSION)
-		return &s, err
+		return nil, err
 	}
 	s.Current = true
 	return &s, nil
@@ -122,15 +123,13 @@ func SelectUserPasswordHash(l LoginRequestJson) (int64, string, error) {
 		return userId, password_hash, err
 	}
 	return userId, password_hash, nil
-
 }
 
 // write
 
-//insert
-
+// insert
 func InsertUserAccount(u RegisterRequestJson) (RegisterResponseJson, error) {
-	var userId = utils.GenerateID()
+	userId := utils.GenerateID()
 	var user RegisterResponseJson
 	err := database.WrapWithTransaction(func(tx *sql.Tx) error {
 		nickname := utils.OptionalJsonFields(u.Nickname)
@@ -177,7 +176,6 @@ func InsertUserAccount(u RegisterRequestJson) (RegisterResponseJson, error) {
 			&user.AboutMe,
 			&user.AvatarId,
 		)
-
 		if err != nil {
 			utils.SQLiteErrorTarget(err, INSERT_USER_ACCOUNT)
 		}
@@ -197,7 +195,6 @@ func InsertLoginUserSession(s *SessionResponseJson, l *LoginResponseJson) error 
 			s.Device,
 			s.ExpiresAt,
 		)
-
 		if err != nil {
 			utils.SQLiteErrorTarget(err, INSERT_USER_ACCOUNT)
 			return err
@@ -215,7 +212,6 @@ func InsertLoginUserSession(s *SessionResponseJson, l *LoginResponseJson) error 
 			&l.AboutMe,
 			&l.AvatarId,
 		)
-
 		if err != nil {
 			utils.SQLiteErrorTarget(err, INSERT_USER_ACCOUNT)
 		}
@@ -234,7 +230,6 @@ func InsertRegisterUserSession(s *SessionResponseJson) error {
 			s.Device,
 			s.ExpiresAt,
 		)
-
 		if err != nil {
 			utils.SQLiteErrorTarget(err, INSERT_USER_ACCOUNT)
 		}
@@ -242,8 +237,7 @@ func InsertRegisterUserSession(s *SessionResponseJson) error {
 	})
 }
 
-//update
-
+// update
 func UpdateRememberMeToken(sessionId int64, remember *RememberMeSqlRow, userId int64) error {
 	return database.WrapWithTransaction(func(tx *sql.Tx) error {
 		err := tx.QueryRow(SELECT_REMEMBER_ME_BY_ID, userId).Scan(
@@ -296,8 +290,7 @@ func UpdateRememberMeToken(sessionId int64, remember *RememberMeSqlRow, userId i
 	})
 }
 
-//delete
-
+// delete
 func DeleteUserSessionBySessionToken(session string, userId int64) error {
 	return database.WrapWithTransaction(func(tx *sql.Tx) error {
 		_, err := tx.Exec(

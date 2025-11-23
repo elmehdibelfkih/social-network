@@ -1,7 +1,7 @@
 'use client'
 
 import { FailureIcon, SuccessIcon } from "./icons";
-import styles from "../../styles/snackbar.module.css"
+import styles from "@/styles/snackbar.module.css"
 import { useEffect, useRef, useState } from "react";
 
 type SnackbarData = {

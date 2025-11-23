@@ -79,7 +79,7 @@ func HandleUploadMedia(w http.ResponseWriter, r *http.Request) {
 		Mime:      detectedMediaType,
 		Size:      len(data),
 		Purpose:   req.Purpose,
-		CreatedAt: time.Now().Format(time.RFC3339),
+		CreatedAt: time.Now().String(),
 	}
 
 	if err := CreateMedia(media); err != nil {
@@ -136,7 +136,7 @@ func HandleDeleteMedia(w http.ResponseWriter, r *http.Request) {
 		}
 		utils.SQLiteErrorTarget(err, "handleDeleteMedia (DeleteMedia)")
 		utils.InternalServerError(w)
-		
+
 		return
 	}
 

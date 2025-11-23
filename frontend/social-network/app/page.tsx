@@ -1,18 +1,32 @@
 'use client';
 
 import { JSX, useEffect, useState } from "react";
-import { NavbarClient } from "../features/navbar";
-import { NewPost } from '../features/newPost/newPost.client';
-import { PostsClient } from "../features/posts";
-import { Post } from "../features/posts/types";
+import { NavbarClient } from "@/features/navbar";
+import { NewPost } from '@/features/newPost/newPost.client';
+import { PostsClient } from "@/features/posts";
+import { http } from '@/libs/apiClient';
+// import { AuthForm } from "@/features/auth";
 
+type AuthResponse = {
+  sessionId: number;
+  sessionToken: string;
+  ipAddress: string;
+  device: string;
+  createdAt: string;
+  expiresAt: string;
+};
+
+type Post = {
+  id: number;
+  content: string;
+  createdAt: string;
+};
 
 export default function HomePage(): JSX.Element {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [newPost, setNewPost] = useState<Post | null>(null);
-
-  useEffect(() => {
-    let mounted = true;
+  const [session, setSession] = useState<AuthResponse | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const handlePostCreated = (post: Post) => {
     setNewPost(post);
@@ -22,11 +36,22 @@ export default function HomePage(): JSX.Element {
     setNewPost(null);
   };
 
-  if (!isAuthenticated) {
-    return <AuthForm onAuthSuccess={handleAuthSuccess} />;
-  }
+  const handleAuthSuccess = (sessionData: AuthResponse) => {
+    setSession(sessionData);
+    setIsAuthenticated(true);
+  };
 
-  // not authenticated / no session
+  useEffect(() => {
+    let mounted = true;
+    return () => { mounted = false; };
+  }, []);
+
+  // if (!isAuthenticated) {
+  //   return <AuthForm onAuthSuccess={handleAuthSuccess} />;
+  // }
+
+  // <AuthForm />
+
   if (session === null) {
     return (
       <main>
@@ -39,7 +64,6 @@ export default function HomePage(): JSX.Element {
     );
   }
 
-  // authenticated — safe to access session fields
   return (
     <main>
       <h1>Session ID: {session.sessionId}</h1>

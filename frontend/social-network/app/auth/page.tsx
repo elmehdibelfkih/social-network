@@ -1,6 +1,6 @@
 'use client';
-import AuthForm from '../../features/auth/auth.client';
-import { AuthProvider } from '../../providers/authProvider';
+import AuthForm from '@/features/auth/auth.client';
+import { AuthProvider } from '@/providers/authProvider';
 
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
