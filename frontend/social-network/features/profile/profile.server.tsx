@@ -1,6 +1,6 @@
 import styles from './styles.module.css'
 import getProfileData from './services/profile.client'
-import { ProfileClient } from './profile.client'
+import { ProfileClient, AvatarHolder } from './profile.client'
 import { CalendarIcon, GlobeIcon } from '../../components/ui/icons'
 import PrivacySettings from './privacy.server'
 
@@ -14,7 +14,7 @@ export async function Profile({ user_id }: { user_id: string }) {
 
             <div className={styles.bottomPart}>
                 <div className={styles.dataPart}>
-                    <AvatarComponent />
+                    <AvatarHolder />
 
                     <div className={styles.info}>
                         <h2 className={styles.fullname}>
@@ -47,16 +47,5 @@ export async function Profile({ user_id }: { user_id: string }) {
     )
 }
 
-function AvatarComponent() {
-    // should get the avatar from cache //TODO:
-    const avatarUrl = 'https://placehold.co/140x140/8b4fc9/ffffff?text=ABDNOUR'
-    return (
-        <div className={styles.avatarContainer}>
-            <img
-                className={styles.avatar}
-                src={avatarUrl}
-            />
-        </div>
-    )
-}
+
 

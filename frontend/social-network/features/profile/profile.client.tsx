@@ -1,14 +1,14 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import styles from './styles.module.css'
-import { unfollowPerson, followPerson } from './services/profile.client'
+import { unfollowPerson, followPerson, getMedia } from './services/profile.client'
 import { FollowIcon, MessageIcon, SettingsIcon } from '../../components/ui/icons'
 import { ProfileData } from './types'
 import { FollowStatus } from '../../libs/globalTypes'
 import { useAuth } from '../../providers/authProvider'
 
-export default function EditProfileButton({ profile }: { profile: ProfileData }) {
+export function EditProfileButton({ profile }: { profile: ProfileData }) {
     const [isOpen, setIsOpen] = useState(false)
 
     const handleOpenModal = () => {
@@ -92,6 +92,34 @@ export function ProfileClient({ userId, profile }: { userId: string, profile: Pr
                     <MessageButton />
                 </>
             )}
+        </div>
+    )
+}
+
+export function AvatarHolder() {
+    const { user } = useAuth()
+    const [avatarUrl, setAvatarUrl] = useState<string | null>(null)
+    console.log(avatarUrl)
+
+    useEffect(() => {
+
+        getMedia(String(user.avatarId))
+            .then((response) => {
+                if (response.mediaEncoded) {
+                    setAvatarUrl(`data:image/png;base64,${response.mediaEncoded}`)
+                }
+            })
+            .catch((err) => {
+                console.error('Failed to fetch avatar:', err)
+            })
+    }, [user?.avatarId])
+
+    return (
+        <div className={styles.avatarContainer}>
+            <img
+                className={styles.avatar}
+                src={avatarUrl}
+            />
         </div>
     )
 }

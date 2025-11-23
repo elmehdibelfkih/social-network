@@ -60,7 +60,7 @@ func SocialMux() *router.Router {
 
 	// media
 	socialMux.HandleFunc("POST", "/api/v1/media/upload", media.HandleUploadMedia)
-	socialMux.HandleFunc("GET", "/api/v1/media/{media_id}", utils.MiddlewareChain(media.HandleGetMedia, media.MediaMiddleware, middleware.AuthMiddleware))
+	socialMux.HandleFunc("GET", "/api/v1/media/{media_id}", utils.MiddlewareChain(media.HandleGetMedia, middleware.AuthMiddleware, media.MediaMiddleware))
 	socialMux.HandleFunc("DELETE", "/api/v1/media/{media_id}", utils.MiddlewareChain(media.HandleDeleteMedia, media.MediaMiddleware, middleware.AuthMiddleware))
 
 	// follow
@@ -101,10 +101,10 @@ func SocialMux() *router.Router {
 	socialMux.HandleFunc("POST", "/api/v1/notifications/mark-all-read", utils.MiddlewareChain(notifications.HandleMarkAllNotifAsRead, middleware.AuthMiddleware))
 	socialMux.HandleFunc("POST", "/api/v1/notifications/{id}/mark-read", utils.MiddlewareChain(notifications.HandleMarkNotifAsRead, middleware.AuthMiddleware, notifications.NotifMiddleware))
 
-	//search
+	// search
 	socialMux.HandleFunc("GET", "/api/v1/search", utils.MiddlewareChain(search.HandleSearch, middleware.UserContext, middleware.AuthMiddleware))
 
-	//ws
+	// ws
 	socialMux.HandleFunc("GET", "/ws", utils.MiddlewareChain(socket.UpgradeProtocol, middleware.AuthMiddleware))
 
 	// Feed   ( personal && Specific user feed && Group feed )

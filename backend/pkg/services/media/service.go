@@ -59,14 +59,14 @@ func canGetMedia(userID, mediaID int64) bool {
 	var mediaOwnerID int64
 	var mediaPurpose string
 
-	err := config.DB.QueryRow(QUERY_GET_MEDIA_OWNER_AND_PURPOSE, mediaID).Scan(&mediaOwnerID, mediaPurpose)
+	err := config.DB.QueryRow(QUERY_GET_MEDIA_OWNER_AND_PURPOSE, mediaID).Scan(&mediaOwnerID, &mediaPurpose)
 	if err != nil {
 		if err != sql.ErrNoRows {
 			utils.SQLiteErrorTarget(err, QUERY_GET_MEDIA_OWNER_AND_PURPOSE)
 		}
 		return false
 	}
-
+	
 	if mediaOwnerID == userID {
 		return true
 	}
