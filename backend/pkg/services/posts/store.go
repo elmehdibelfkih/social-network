@@ -289,6 +289,7 @@ func CreateComment(comment *Comment) error {
 			comment.ID,
 			comment.PostID,
 			comment.AuthorID,
+			nil, // parent_id
 			comment.Content,
 			comment.CreatedAt,
 			comment.UpdatedAt,
@@ -302,24 +303,24 @@ func CreateComment(comment *Comment) error {
 		}
 
 		// Increment post's comments_count
-		if err := database.UpdateCounter(tx, database.DBCounterSetter{
-			CounterName: database.COMMENTS_ENTITY_NAME,
-			EntityType:  database.POST_ENTITY_TYPE,
-			EntityID:    comment.PostID,
-			Action:      database.ACTION_INCREMENT,
-		}); err != nil {
-			return err
-		}
+		// if err := database.UpdateCounter(tx, database.DBCounterSetter{
+		// 	CounterName: database.COMMENTS_ENTITY_NAME,
+		// 	EntityType:  database.POST_ENTITY_TYPE,
+		// 	EntityID:    comment.PostID,
+		// 	Action:      database.ACTION_INCREMENT,
+		// }); err != nil {
+		// 	return err
+		// }
 
 		// Increment user's comments_count
-		if err := database.UpdateCounter(tx, database.DBCounterSetter{
-			CounterName: database.COMMENTS_ENTITY_NAME,
-			EntityType:  database.USER_ENTITY_TYPE,
-			EntityID:    comment.AuthorID,
-			Action:      database.ACTION_INCREMENT,
-		}); err != nil {
-			return err
-		}
+		// if err := database.UpdateCounter(tx, database.DBCounterSetter{
+		// 	CounterName: database.COMMENTS_ENTITY_NAME,
+		// 	EntityType:  database.USER_ENTITY_TYPE,
+		// 	EntityID:    comment.AuthorID,
+		// 	Action:      database.ACTION_INCREMENT,
+		// }); err != nil {
+		// 	return err
+		// }
 
 		return nil
 	})

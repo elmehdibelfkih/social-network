@@ -60,7 +60,7 @@ func SocialMux() *router.Router {
 
 	// media
 	socialMux.HandleFunc("POST", "/api/v1/media/upload", utils.MiddlewareChain(media.HandleUploadMedia, middleware.AuthMiddleware))
-	socialMux.HandleFunc("GET", "/api/v1/media/{media_id}", utils.MiddlewareChain(media.HandleGetMedia, middleware.AuthMiddleware, media.MediaMiddleware))
+	socialMux.HandleFunc("GET", "/api/v1/media/{media_id}", media.HandleGetMedia)
 	socialMux.HandleFunc("DELETE", "/api/v1/media/{media_id}", utils.MiddlewareChain(media.HandleDeleteMedia, middleware.AuthMiddleware, media.MediaMiddleware))
 
 	// follow

@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react';
 import { Post } from './types';
 import { postsService } from './services/postsService';
+import { LikeButton } from '../../components/ui/like-button';
+import { Comments } from '../../components/ui/comments';
 import styles from './styles.module.css';
 
 interface PostsClientProps {
@@ -12,6 +14,7 @@ interface PostsClientProps {
 
 export function PostsClient({ newPost, onNewPostDisplayed }: PostsClientProps) {
   const [posts, setPosts] = useState<Post[]>([]);
+  const [openComments, setOpenComments] = useState<number | null>(null);
 
   useEffect(() => {
     postsService.getFeed().then(setPosts);
@@ -64,7 +67,7 @@ export function PostsClient({ newPost, onNewPostDisplayed }: PostsClientProps) {
                     src={`${process.env.NEXT_PUBLIC_GO_API_URL}/api/v1/media/${mediaId}`}
                     alt="Post image"
                     className={styles.postImage}
-                    crossOrigin="use-credentials"
+
                     onError={(e) => {
                       console.error('Failed to load image:', mediaId);
                       e.currentTarget.style.display = 'none';
@@ -75,11 +78,22 @@ export function PostsClient({ newPost, onNewPostDisplayed }: PostsClientProps) {
             )}
 
             <div className={styles.postInteraction}>
-              <button className={styles.interactionItem}>
-                <img src="/icons/like.svg" alt="like icon" />
-                <span>{post.stats.reactionCount} likes</span>
-              </button>
-              <button className={styles.interactionItem}>
+              <LikeButton
+                postId={post.postId}
+                isLiked={post.isLikedByUser}
+                likeCount={post.stats.reactionCount}
+                onLikeChange={(isLiked, newCount) => {
+                  setPosts(prev => prev.map(p => 
+                    p.postId === post.postId 
+                      ? { ...p, isLikedByUser: isLiked, stats: { ...p.stats, reactionCount: newCount } }
+                      : p
+                  ));
+                }}
+              />
+              <button 
+                className={styles.interactionItem}
+                onClick={() => setOpenComments(post.postId)}
+              >
                 <img src="/icons/comment.svg" alt="comment icon" />
                 <span>{post.stats.commentCount} comments</span>
               </button>
@@ -88,6 +102,20 @@ export function PostsClient({ newPost, onNewPostDisplayed }: PostsClientProps) {
                 <span>Share</span>
               </button>
             </div>
+            
+            <Comments
+              postId={post.postId}
+              isOpen={openComments === post.postId}
+              onClose={() => setOpenComments(null)}
+              commentCount={post.stats.commentCount}
+              onCommentAdded={() => {
+                setPosts(prev => prev.map(p => 
+                  p.postId === post.postId 
+                    ? { ...p, stats: { ...p.stats, commentCount: p.stats.commentCount + 1 } }
+                    : p
+                ));
+              }}
+            />
           </div>
         ))
       )}

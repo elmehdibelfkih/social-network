@@ -88,8 +88,8 @@ const (
 
 	// Comment queries
 	QUERY_CREATE_COMMENT = `
-		INSERT INTO comments (id, post_id, author_id, content, created_at, updated_at)
-		VALUES (?, ?, ?, ?, ?, ?);
+		INSERT INTO comments (id, post_id, author_id, parent_id, content, created_at, updated_at)
+		VALUES (?, ?, ?, ?, ?, ?, ?);
 	`
 
 	QUERY_GET_COMMENT_BY_ID = `

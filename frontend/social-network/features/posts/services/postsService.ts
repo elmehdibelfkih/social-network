@@ -57,14 +57,17 @@ export const postsService = {
   },
 
   async toggleLike(postId: number, isLiked: boolean): Promise<boolean> {
-    // TODO: Implement API call
-    // const method = isLiked ? 'DELETE' : 'POST';
-    // const response = await fetch(`/api/v1/posts/${postId}/like`, {
-    //   method,
-    //   credentials: 'include'
-    // });
-    // return response.ok;
-    return true;
+    try {
+      const method = isLiked ? 'DELETE' : 'POST';
+      const response = await fetch(`${process.env.NEXT_PUBLIC_GO_API_URL}/api/v1/posts/${postId}/like`, {
+        method,
+        credentials: 'include'
+      });
+      return response.ok;
+    } catch (error) {
+      console.error('Error toggling like:', error);
+      return false;
+    }
   }
 };
 

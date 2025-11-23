@@ -7,7 +7,7 @@ const (
 	`
 
 	QUERY_GET_MEDIA = `
-		SELECT id, owner_id, path, mime, purpose, created_at
+		SELECT id, owner_id, path, mime, size, purpose, created_at
 		FROM media
 		WHERE id = ?;
 	`
