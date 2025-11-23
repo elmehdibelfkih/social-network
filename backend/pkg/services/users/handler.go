@@ -1,26 +1,32 @@
 package users
 
 import (
+	"fmt"
 	"net/http"
+
 
 	"social/pkg/utils"
 )
-
 // return profile based on privacy rules (public / private)
 func GetProfile(w http.ResponseWriter, r *http.Request) {
 	// Extract user_id from URL path
+	fmt.Println("xxxxxxxx", r)
 	profileUserId := utils.GetWildCardValue(w, r, "user_id")
 	if profileUserId == 0 {
+		fmt.Println("x", profileUserId)
 		utils.BadRequest(w, "Invalid user ID.", "redirect")
 		return
 	}
 	// Get current user from context
 	viewerUserId := utils.GetUserIdFromContext(r)
 	if viewerUserId == -1 {
+		fmt.Println("!!!!!", profileUserId)
+
 		utils.BadRequest(w, "Invalid user ID.", "redirect")
 		return
 	}
 	// Call service layer
+	fmt.Println("-------", profileUserId, viewerUserId)
 	response, ok := GetUserProfile(w, profileUserId, viewerUserId, "GetProfile handler")
 	if !ok {
 		return

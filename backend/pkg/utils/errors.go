@@ -106,7 +106,6 @@ func BackendErrorTarget(err error, context string) {
 func sendErrorResponse(w http.ResponseWriter, status int, errTitle, errMsg, errType string) {
 	JsonResponseEncode(w, status, map[string]any{
 		"success": false,
-		// "payload": errMsg,
 		"error": map[string]any{
 			"errorTitle":   errTitle,
 			"statusCode":   status,

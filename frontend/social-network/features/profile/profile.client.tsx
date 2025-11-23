@@ -25,7 +25,7 @@ export default function EditProfileButton({ profile }: { profile: ProfileData })
     )
 }
 
-export function FollowButton({ targetUserId, initialStatus, isPrivate = false }: { targetUserId: number, initialStatus: FollowStatus, isPrivate?: boolean }) {
+export function FollowButton({ targetUserId, initialStatus, isPrivate = false }: { targetUserId: string, initialStatus: FollowStatus, isPrivate?: boolean }) {
     const [status, setStatus] = useState<FollowStatus>(initialStatus);
 
     const handleFollow = async () => {
@@ -70,7 +70,7 @@ export function MessageButton() {
     )
 }
 
-export function ProfileClient({ userId, profile }: { userId: number, profile: ProfileData }) {
+export function ProfileClient({ userId, profile }: { userId: string, profile: ProfileData }) {
     const { user } = useAuth()
 
     if (!user) {

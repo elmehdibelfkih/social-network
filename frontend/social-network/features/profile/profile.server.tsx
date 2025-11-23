@@ -1,5 +1,5 @@
 import styles from './styles.module.css'
-import { getProfileData } from './services/profile.server'
+import getProfileData from './services/profile.client'
 import { ProfileClient } from './profile.client'
 import { CalendarIcon, GlobeIcon } from '../../components/ui/icons'
 
@@ -9,7 +9,7 @@ export async function Profile({ user_id }: { user_id: string }) {
 
     return (
         <div className={styles.profileContainer}>
-            <ProfileClient userId={parseInt(user_id)} profile={profile} />
+            <ProfileClient userId={user_id} profile={profile} />
 
             <div className={styles.bottomPart}>
                 <AvatarComponent />
