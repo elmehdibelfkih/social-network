@@ -6,7 +6,8 @@ import (
 	"social/pkg/utils"
 )
 
-func (c *Client) typing() {
+func (c *Client) typing(e Event) error{
+	var err error
 	typing := Event{
 		Source: "client",
 		Type:   "typing",
@@ -24,16 +25,16 @@ func (c *Client) typing() {
 		}
 		c.events <- afk
 	})
+	return  err
 }
 
-func (c *Client) onlineStatus() {
-	var event Event
-	event.Payload = &ClientMessage{}
-	event.Source = "client"
+func (c *Client) onlineStatus(e Event) error{
+	var err error
+	e.Payload = &ClientMessage{}
 	users, err := SelectUserFollowers(c.userId)
 	if err != nil {
-		utils.BackendErrorTarget(err, "onlineStatus")
-		return
+		utils.BackendErrorTarget(err, "websocket error")
+		return err
 	}
 
 	c.hub.mu.Lock()
@@ -49,6 +50,7 @@ func (c *Client) onlineStatus() {
 		}
 	}
 
-	event.Payload.OnlineStatus = users
-	c.events <- event
+	e.Payload.OnlineStatus = users
+	c.events <- e
+	return err
 }

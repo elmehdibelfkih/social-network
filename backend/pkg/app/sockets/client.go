@@ -65,18 +65,17 @@ func (c *Client) readMessages() {
 			continue
 		}
 		fmt.Println("received event:", event)
-
-		c.handleEvent(event)
+		c.events <- event
 	}
 }
 
 func (c *Client) writeMessages() {
 	ticker := time.NewTicker(pingInterval)
 	defer func() {
+		c.hub.removeClient(c)
 		ticker.Stop()
-		// c.hub.removeClient(c)
 	}()
-
+	//write loop
 	for {
 		select {
 		case event, ok := <-c.events:
@@ -87,10 +86,7 @@ func (c *Client) writeMessages() {
 				}
 				return
 			}
-			if err := c.connection.WriteJSON(event); err != nil {
-				log.Println("cannot send the msg", err)
-				return
-			}
+			c.handleEvent(event)
 		case <-ticker.C:
 			log.Println("ping")
 			c.connection.SetWriteDeadline(time.Now().Add(10 * time.Second))
@@ -102,22 +98,31 @@ func (c *Client) writeMessages() {
 	}
 }
 
-func (c *Client) handleEvent(e Event) {
+func (c *Client) write(event Event) error{
+	c.connection.SetWriteDeadline(time.Now().Add(10 * time.Second))
+	if err := c.connection.WriteJSON(event); err != nil {
+		log.Println("cannot send the msg", err)
+		return err
+	}
+}
+
+func (c *Client) handleEvent(e Event) error{
 	switch e.Type {
-	case "typing":
-		c.typing()
 	case "online_status":
-		c.onlineStatus()
-	case "seen":
-		return
-	case "notification":
-		return
-	case "chat":
-		return
+		return c.onlineStatus(e)
+	case "chat_typing":
+		return c.typing(e)
+	case "chat_seen":
+		return nil
+	case "chat_message":
+		return nil
+	case "notification":	
+		return nil
 	default:
 		c.events <- Event{
 			Source: "undefined",
 			Type:   "undefined",
 		}
+		return nil
 	}
 }
