@@ -14,7 +14,24 @@
     gap: 12px;
 }
 
-.editProfile,
+.editProfile {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    color: black;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
 .followButton {
     display: flex;
     align-items: center;
@@ -63,6 +80,11 @@
     display: flex;
     flex-direction: column;
     gap: 24px;
+}
+
+.bottomHeader {
+    display: flex;
+    justify-content: flex-end;
 }
 
 .dataPart {
@@ -211,4 +233,19 @@
 
 .toggleButton {
     flex-shrink: 0;
+}
+
+.avatarPlaceholder {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #8b4fc9 0%, #6a3fb5 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 48px;
+    font-weight: 600;
+    border: 4px solid white;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }

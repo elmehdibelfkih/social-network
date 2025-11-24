@@ -3,47 +3,36 @@
 import { useState, useEffect } from 'react'
 import styles from './styles.module.css'
 import { unfollowPerson, followPerson, getMedia } from './services/profile.client'
-import { FollowIcon, MessageIcon, SettingsIcon } from '../../components/ui/icons'
+import { FollowIcon, MessageIcon, SettingsIcon, UserIcon } from '../../components/ui/icons'
 import { ProfileData } from './types'
 import { FollowStatus } from '../../libs/globalTypes'
 import { useAuth } from '../../providers/authProvider'
-
-export function EditProfileButton({ profile }: { profile: ProfileData }) {
-    const [isOpen, setIsOpen] = useState(false)
-
-    const handleOpenModal = () => {
-        setIsOpen(true)
-    }
-    return (
-        <>
-            <button className={styles.editProfile} onClick={handleOpenModal}>
-                <SettingsIcon />
-                Edit Profile
-                {/* {isOpen && <EditProfileModal profile={profile} onClose={() => setIsOpen(false)} />} */}
-            </button>
-        </>
-    )
-}
 
 export function FollowButton({ targetUserId, initialStatus, isPrivate = false }: { targetUserId: string, initialStatus: FollowStatus, isPrivate?: boolean }) {
     const [status, setStatus] = useState<FollowStatus>(initialStatus);
 
     const handleFollow = async () => {
         if (status == 'follow' || status == 'none') {
-            const nextState = isPrivate ? 'pending' : 'following';
+            const previousStatus = status
+            const nextState = isPrivate ? 'pending' : 'accepted';
             setStatus(nextState);
 
-            await followPerson(targetUserId)
+            followPerson(targetUserId).catch(() => {
+                setStatus(previousStatus)
+            })
         } else {
+            const previousStatus = status
             setStatus('follow');
 
-            await unfollowPerson(targetUserId)
+            unfollowPerson(targetUserId).catch(() => {
+                setStatus(previousStatus)
+            })
         }
-    };
+    }
 
     const getButtonText = () => {
         switch (status) {
-            case 'following': return 'Following';
+            case 'accepted': return 'Following';
             case 'pending': return 'Requested';
             case 'declined': return 'Follow';
             default: return 'Follow';
@@ -70,19 +59,17 @@ export function MessageButton() {
     )
 }
 
-export function ProfileClient({ userId, profile }: { userId: string, profile: ProfileData }) {
+export function ProfileTopActions({ userId, profile }: { userId: string, profile: ProfileData }) {
     const { user } = useAuth()
 
     if (!user) {
-        return
+        return null
     }
-
     const isOwnProfile = user.userId == userId
+
     return (
         <div className={styles.topPart}>
-            {isOwnProfile ? (
-                <EditProfileButton profile={profile} />
-            ) : (
+            {!isOwnProfile && (
                 <>
                     <FollowButton
                         targetUserId={userId}
@@ -95,31 +82,36 @@ export function ProfileClient({ userId, profile }: { userId: string, profile: Pr
         </div>
     )
 }
-
-export function AvatarHolder() {
-    const { user } = useAuth()
+export function AvatarHolder({ avatarId }: { avatarId: number | null }) {
     const [avatarUrl, setAvatarUrl] = useState<string | null>(null)
-    console.log(avatarUrl)
 
     useEffect(() => {
-
-        getMedia(String(user.avatarId))
-            .then((response) => {
-                if (response.mediaEncoded) {
-                    setAvatarUrl(`data:image/png;base64,${response.mediaEncoded}`)
-                }
-            })
-            .catch((err) => {
-                console.error('Failed to fetch avatar:', err)
-            })
-    }, [user?.avatarId])
+        if (avatarId) {
+            getMedia(String(avatarId))
+                .then((response) => {
+                    if (response.payload.mediaEncoded) {
+                        setAvatarUrl(`data:image/png;base64,${response.payload.mediaEncoded}`)
+                    }
+                })
+                .catch(() => {
+                    setAvatarUrl(null)
+                })
+        }
+    }, [avatarId])
 
     return (
         <div className={styles.avatarContainer}>
-            <img
-                className={styles.avatar}
-                src={avatarUrl}
-            />
+            {avatarUrl ? (
+                <img
+                    className={styles.avatar}
+                    src={avatarUrl}
+                    alt="User avatar"
+                />
+            ) : (
+                <div className={styles.avatarPlaceholder}>
+                    <UserIcon />
+                </div>
+            )}
         </div>
     )
 }

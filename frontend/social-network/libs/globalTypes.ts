@@ -20,7 +20,7 @@ export interface PaginationParams {
 }
 
 export type PrivacyLevel = 'public' | 'followers' | 'private' | 'group' | 'restricted';
-export type FollowStatus = 'none' | 'follow' | 'following' | 'pending' | 'declined';
+export type FollowStatus = 'none' | 'follow' | 'accepted' | 'pending' | 'declined';
 export type ReactionType = 'like';
 export type MediaType = 'image/png' | 'image/jpeg' | 'image/gif';
 
@@ -35,7 +35,10 @@ export interface Session {
 }
 
 export interface MediaResponse {
-    mediaEncoded: string
+    success: boolean;
+    payload: {
+        mediaEncoded: string
+    }
 }
 
 export interface AuthResponse {

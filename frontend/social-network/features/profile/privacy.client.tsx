@@ -5,8 +5,8 @@ import styles from './styles.module.css'
 import { togglePrivacy } from './services/profile.client'
 import { useAuth } from '../../providers/authProvider'
 
-export default function PrivacyToggle() {
-    const [isPublic, setIsPublic] = useState(true)
+export default function PrivacyToggle({ privacy }: { privacy: string }) {
+    const [isPublic, setIsPublic] = useState(privacy == 'public' ? true : false)
     const { user } = useAuth()
 
     const handleToggle = async () => {
@@ -18,7 +18,6 @@ export default function PrivacyToggle() {
                 userId: user.userId,
                 body: payload
             })
-            console.log(resp)
             setIsPublic(!isPublic)
         } catch (error) {
             console.error("Failed to toggle privacy", error)
@@ -51,5 +50,31 @@ export default function PrivacyToggle() {
                 transition: 'left 0.3s'
             }} />
         </button>
+    )
+}
+
+export function ProfileSettings({ privacy, userId }: { privacy: string, userId: string }) {
+    const { user } = useAuth()
+    if (!user) return null
+    const isOwnProfile = user.userId == userId
+    if (!isOwnProfile) return null
+    return (
+        <div className={styles.settingsSection}>
+            <div className={styles.container}>
+                <div className={styles.privacyBlock}>
+                    <div className={styles.innerBlock}>
+                        <div className={styles.content}>
+                            <h4 className={styles.heading}>Profile Visibility</h4>
+                            <p className={styles.description}>
+                                {privacy === 'public'
+                                    ? 'Anyone can see your profile and posts'
+                                    : 'Only your followers can see your profile'}
+                            </p>
+                        </div>
+                        <PrivacyToggle privacy={privacy} />
+                    </div>
+                </div>
+            </div>
+        </div>
     )
 }
