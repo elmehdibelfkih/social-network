@@ -35,9 +35,3 @@ yarn.lock
 pnpm-lock.yaml
 dist
 .turbo
-
-
-# todo: add database etc 
-USERS_PROFILE_ROADMAP.md
-USERS_PROFILE_IMPLEMENTATION.md
-FEED_IMPLEMENTATION_PLAN.md
