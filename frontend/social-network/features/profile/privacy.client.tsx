@@ -5,8 +5,8 @@ import styles from './styles.module.css'
 import { togglePrivacy } from './services/profile.client'
 import { useAuth } from '../../providers/authProvider'
 
-export default function PrivacyToggle() {
-    const [isPublic, setIsPublic] = useState(true)
+export default function PrivacyToggle({ privacy }: { privacy: string }) {
+    const [isPublic, setIsPublic] = useState(privacy == 'public' ? true : false)
     const { user } = useAuth()
 
     const handleToggle = async () => {
@@ -18,7 +18,6 @@ export default function PrivacyToggle() {
                 userId: user.userId,
                 body: payload
             })
-            console.log(resp)
             setIsPublic(!isPublic)
         } catch (error) {
             console.error("Failed to toggle privacy", error)

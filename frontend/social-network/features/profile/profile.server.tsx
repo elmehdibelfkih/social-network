@@ -1,6 +1,6 @@
 import styles from './styles.module.css'
 import getProfileData from './services/profile.client'
-import { ProfileClient, AvatarHolder } from './profile.client'
+import { ProfileTopActions, AvatarHolder } from './profile.client'
 import { CalendarIcon, GlobeIcon } from '../../components/ui/icons'
 import PrivacySettings from './privacy.server'
 
@@ -10,7 +10,7 @@ export async function Profile({ user_id }: { user_id: string }) {
 
     return (
         <div className={styles.profileContainer}>
-            <ProfileClient userId={user_id} profile={profile} />
+            <ProfileTopActions userId={user_id} profile={profile} />
 
             <div className={styles.bottomPart}>
                 <div className={styles.dataPart}>
@@ -40,7 +40,7 @@ export async function Profile({ user_id }: { user_id: string }) {
                         </div>
                     </div>
                 </div>
-                <PrivacySettings privacy={profile.payload.privacy} joinDate={profile.payload.joinedAt} />
+                <PrivacySettings privacy={profile.payload.privacy} userId={user_id} />
 
             </div>
         </div>

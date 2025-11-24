@@ -19,7 +19,6 @@ export function EditProfileButton({ profile }: { profile: ProfileData }) {
             <button className={styles.editProfile} onClick={handleOpenModal}>
                 <SettingsIcon />
                 Edit Profile
-                {/* {isOpen && <EditProfileModal profile={profile} onClose={() => setIsOpen(false)} />} */}
             </button>
         </>
     )
@@ -30,7 +29,7 @@ export function FollowButton({ targetUserId, initialStatus, isPrivate = false }:
 
     const handleFollow = async () => {
         if (status == 'follow' || status == 'none') {
-            const nextState = isPrivate ? 'pending' : 'following';
+            const nextState = isPrivate ? 'pending' : 'accepted';
             setStatus(nextState);
 
             await followPerson(targetUserId)
@@ -43,7 +42,7 @@ export function FollowButton({ targetUserId, initialStatus, isPrivate = false }:
 
     const getButtonText = () => {
         switch (status) {
-            case 'following': return 'Following';
+            case 'accepted': return 'Following';
             case 'pending': return 'Requested';
             case 'declined': return 'Follow';
             default: return 'Follow';
@@ -70,19 +69,17 @@ export function MessageButton() {
     )
 }
 
-export function ProfileClient({ userId, profile }: { userId: string, profile: ProfileData }) {
+export function ProfileTopActions({ userId, profile }: { userId: string, profile: ProfileData }) {
     const { user } = useAuth()
 
     if (!user) {
         return
     }
-
     const isOwnProfile = user.userId == userId
+
     return (
         <div className={styles.topPart}>
-            {isOwnProfile ? (
-                <EditProfileButton profile={profile} />
-            ) : (
+            {!isOwnProfile && (
                 <>
                     <FollowButton
                         targetUserId={userId}
@@ -106,7 +103,6 @@ export function AvatarHolder() {
             getMedia(String(user.avatarId))
                 .then((response) => {
                     if (response.payload.mediaEncoded) {
-                        console.log("ccccc", response.payload.mediaEncoded)
                         setAvatarUrl(`data:image/png;base64,${response.payload.mediaEncoded}`)
                     }
                 })

@@ -1,12 +1,16 @@
+'use client'
 import styles from './styles.module.css'
 import PrivacyToggle from './privacy.client'
+import { useAuth } from '../../providers/authProvider'
 
-export default function ProfileSettings({ privacy, joinDate }: { privacy: string, joinDate: string }) {
+export default function ProfileSettings({ privacy, userId }: { privacy: string, userId: string }) {
+    const { user } = useAuth()
+    if (!user) return
+    const isOwnProfile = user.userId == userId
+    if (!isOwnProfile) return
     return (
         <div className={styles.settingsSection}>
             <div className={styles.container}>
-                <h2 className={styles.title}>Profile Settings</h2>
-
                 <div className={styles.privacyBlock}>
                     <div className={styles.innerBlock}>
                         <div className={styles.content}>
@@ -17,14 +21,7 @@ export default function ProfileSettings({ privacy, joinDate }: { privacy: string
                                     : 'Only your followers can see your profile'}
                             </p>
                         </div>
-                        <PrivacyToggle />
-                    </div>
-
-                    <div className={styles.innerBlock}>
-                        <div className={styles.content}>
-                            <h4 className={styles.heading}>Account Status</h4>
-                            <p className={styles.description}>{`Active since ${joinDate}`}</p>
-                        </div>
+                        <PrivacyToggle privacy={privacy} />
                     </div>
                 </div>
             </div>

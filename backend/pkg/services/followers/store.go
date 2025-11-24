@@ -3,10 +3,11 @@ package follow
 import (
 	"database/sql"
 	"errors"
+	"strings"
+
 	"social/pkg/config"
 	"social/pkg/db/database"
 	"social/pkg/utils"
-	"strings"
 
 	"github.com/mattn/go-sqlite3"
 )
@@ -18,7 +19,6 @@ func selectFollowStatus(followerId, followedId int64) (string, error) {
 		SELECT_FOLLOW_STATUS_QUERY,
 		followerId, followedId,
 	).Scan(&status)
-
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return "", nil
@@ -65,8 +65,9 @@ func isPublic(userId int64) (bool, error) {
 	}
 	return isPublic, nil
 }
+
 func followUser(followerId, followedId int64) error {
-	//todo: check if already ixist a notification
+	// todo: check if already ixist a notification
 	return database.WrapWithTransaction(func(tx *sql.Tx) error {
 		_, err := tx.Exec(FOLLOW_REQUEST_QUERY,
 			followerId, followedId, followedId,
@@ -91,7 +92,6 @@ func followUser(followerId, followedId int64) error {
 		}
 
 		isPublic, err := isPublic(followedId)
-
 		if err != nil {
 			utils.SQLiteErrorTarget(err, INSERT_NOTIFICATION)
 			return err
@@ -104,7 +104,6 @@ func followUser(followerId, followedId int64) error {
 		counter := followUnfollowUpdateCounterStruct(database.USER_ENTITY_TYPE, followedId, database.FOLLOWERS_ENTITY_NAME, "increment")
 
 		err = database.UpdateCounter(tx, counter)
-
 		if err != nil {
 			utils.SQLiteErrorTarget(err, database.USER_ENTITY_TYPE)
 			return err
@@ -126,7 +125,6 @@ func unfollowUser(followerId, followedId int64) error {
 		counter := followUnfollowUpdateCounterStruct(database.USER_ENTITY_TYPE, followedId, database.FOLLOWERS_ENTITY_NAME, "decrement")
 
 		err = database.UpdateCounter(tx, counter)
-
 		if err != nil {
 			utils.SQLiteErrorTarget(err, UNFOLLOW_REQUEST_QUERY)
 			return err
@@ -293,7 +291,6 @@ func acceptFollowRequest(followerId, followedId int64) error {
 		counter := followUnfollowUpdateCounterStruct(database.USER_ENTITY_TYPE, followedId, database.FOLLOWERS_ENTITY_NAME, "increment")
 
 		err = database.UpdateCounter(tx, counter)
-
 		if err != nil {
 			utils.SQLiteErrorTarget(err, UNFOLLOW_REQUEST_QUERY)
 			return err
