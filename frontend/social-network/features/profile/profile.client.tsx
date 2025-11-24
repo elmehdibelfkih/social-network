@@ -8,22 +8,6 @@ import { ProfileData } from './types'
 import { FollowStatus } from '../../libs/globalTypes'
 import { useAuth } from '../../providers/authProvider'
 
-export function EditProfileButton({ profile }: { profile: ProfileData }) {
-    const [isOpen, setIsOpen] = useState(false)
-
-    const handleOpenModal = () => {
-        setIsOpen(true)
-    }
-    return (
-        <>
-            <button className={styles.editProfile} onClick={handleOpenModal}>
-                <SettingsIcon />
-                Edit Profile
-            </button>
-        </>
-    )
-}
-
 export function FollowButton({ targetUserId, initialStatus, isPrivate = false }: { targetUserId: string, initialStatus: FollowStatus, isPrivate?: boolean }) {
     const [status, setStatus] = useState<FollowStatus>(initialStatus);
 
