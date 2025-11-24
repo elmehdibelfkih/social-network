@@ -35,7 +35,10 @@ export interface Session {
 }
 
 export interface MediaResponse {
-    mediaEncoded: string
+    success: boolean;
+    payload: {
+        mediaEncoded: string
+    }
 }
 
 export interface AuthResponse {

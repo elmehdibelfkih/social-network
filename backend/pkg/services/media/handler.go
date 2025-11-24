@@ -111,8 +111,17 @@ func HandleGetMedia(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Header().Set("Content-Type", media.Mime)
-	http.ServeFile(w, r, media.Path)
+	fileData, err := os.ReadFile(media.Path)
+	if err != nil {
+		utils.BackendErrorTarget(err, "handleGetMedia (ReadFile)")
+		utils.InternalServerError(w)
+		return
+	}
+
+	encoded := base64.StdEncoding.EncodeToString(fileData)
+	utils.WriteSuccess(w, http.StatusOK, map[string]string{
+		"mediaEncoded": encoded,
+	})
 }
 
 func HandleDeleteMedia(w http.ResponseWriter, r *http.Request) {

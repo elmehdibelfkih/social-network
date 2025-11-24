@@ -99,19 +99,21 @@ export function ProfileClient({ userId, profile }: { userId: string, profile: Pr
 export function AvatarHolder() {
     const { user } = useAuth()
     const [avatarUrl, setAvatarUrl] = useState<string | null>(null)
-    console.log(avatarUrl)
 
     useEffect(() => {
 
-        getMedia(String(user.avatarId))
-            .then((response) => {
-                if (response.mediaEncoded) {
-                    setAvatarUrl(`data:image/png;base64,${response.mediaEncoded}`)
-                }
-            })
-            .catch((err) => {
-                console.error('Failed to fetch avatar:', err)
-            })
+        if (user.avatarId) {
+            getMedia(String(user.avatarId))
+                .then((response) => {
+                    if (response.payload.mediaEncoded) {
+                        console.log("ccccc", response.payload.mediaEncoded)
+                        setAvatarUrl(`data:image/png;base64,${response.payload.mediaEncoded}`)
+                    }
+                })
+                .catch((err) => {
+                    console.error('Failed to fetch avatar:', err)
+                })
+        }
     }, [user?.avatarId])
 
     return (
