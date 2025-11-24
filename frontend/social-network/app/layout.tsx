@@ -1,25 +1,29 @@
-'use client';
+import type { ReactNode } from 'react';
 
-import Snackbar from '@/components/ui/snackbar';
-import { NavbarClient } from '@/features/navbar';
-import { AuthProvider } from '@/providers/authProvider';
+export const metadata = {
+  title: 'Social Network',
+  description: 'A modern social media platform for communication and sharing content.',
+  applicationName: 'Social Network',
+  generator: 'Next.js',
+  keywords: ['social network', 'friends', 'messages', 'posts', 'community'],
+  authors: [{ name: '101 team' }],
+  creator: '101 team',
+  publisher: 'SocialNetwork Inc',
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
+  icons: {
+    icon: '/favicon.ico',
+  },
+};
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
-      <body>
-        <header style={{ padding: 12 }}>
-          <NavbarClient />
-        </header>
-
-        <main>
-          <AuthProvider>
-            {children}
-          </AuthProvider>
-          <Snackbar />
-        </main>
-
-      </body>
+      <head />
+      <body>{children}</body>
     </html>
   );
 }
