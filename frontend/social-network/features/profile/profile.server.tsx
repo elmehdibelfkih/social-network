@@ -2,7 +2,7 @@ import styles from './styles.module.css'
 import getProfileData from './services/profile.client'
 import { ProfileTopActions, AvatarHolder } from './profile.client'
 import { CalendarIcon, GlobeIcon } from '../../components/ui/icons'
-import PrivacySettings from './privacy.server'
+import { ProfileSettings } from './privacy.client'
 
 export async function Profile({ user_id }: { user_id: string }) {
 
@@ -14,7 +14,7 @@ export async function Profile({ user_id }: { user_id: string }) {
 
             <div className={styles.bottomPart}>
                 <div className={styles.dataPart}>
-                    <AvatarHolder />
+                    <AvatarHolder avatarId={profile.payload.avatarId} />
 
                     <div className={styles.info}>
                         <h2 className={styles.fullname}>
@@ -40,7 +40,7 @@ export async function Profile({ user_id }: { user_id: string }) {
                         </div>
                     </div>
                 </div>
-                <PrivacySettings privacy={profile.payload.privacy} userId={user_id} />
+                <ProfileSettings privacy={profile.payload.privacy} userId={user_id} />
 
             </div>
         </div>

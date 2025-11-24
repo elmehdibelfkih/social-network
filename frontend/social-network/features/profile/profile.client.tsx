@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import styles from './styles.module.css'
 import { unfollowPerson, followPerson, getMedia } from './services/profile.client'
-import { FollowIcon, MessageIcon, SettingsIcon } from '../../components/ui/icons'
+import { FollowIcon, MessageIcon, SettingsIcon, UserIcon } from '../../components/ui/icons'
 import { ProfileData } from './types'
 import { FollowStatus } from '../../libs/globalTypes'
 import { useAuth } from '../../providers/authProvider'
@@ -29,16 +29,22 @@ export function FollowButton({ targetUserId, initialStatus, isPrivate = false }:
 
     const handleFollow = async () => {
         if (status == 'follow' || status == 'none') {
+            const previousStatus = status
             const nextState = isPrivate ? 'pending' : 'accepted';
             setStatus(nextState);
 
-            await followPerson(targetUserId)
+            followPerson(targetUserId).catch(() => {
+                setStatus(previousStatus)
+            })
         } else {
+            const previousStatus = status
             setStatus('follow');
 
-            await unfollowPerson(targetUserId)
+            unfollowPerson(targetUserId).catch(() => {
+                setStatus(previousStatus)
+            })
         }
-    };
+    }
 
     const getButtonText = () => {
         switch (status) {
@@ -73,7 +79,7 @@ export function ProfileTopActions({ userId, profile }: { userId: string, profile
     const { user } = useAuth()
 
     if (!user) {
-        return
+        return null
     }
     const isOwnProfile = user.userId == userId
 
@@ -92,32 +98,36 @@ export function ProfileTopActions({ userId, profile }: { userId: string, profile
         </div>
     )
 }
-
-export function AvatarHolder() {
-    const { user } = useAuth()
+export function AvatarHolder({ avatarId }: { avatarId: number | null }) {
     const [avatarUrl, setAvatarUrl] = useState<string | null>(null)
 
     useEffect(() => {
-
-        if (user.avatarId) {
-            getMedia(String(user.avatarId))
+        if (avatarId) {
+            getMedia(String(avatarId))
                 .then((response) => {
                     if (response.payload.mediaEncoded) {
                         setAvatarUrl(`data:image/png;base64,${response.payload.mediaEncoded}`)
                     }
                 })
-                .catch((err) => {
-                    console.error('Failed to fetch avatar:', err)
+                .catch(() => {
+                    setAvatarUrl(null)
                 })
         }
-    }, [user?.avatarId])
+    }, [avatarId])
 
     return (
         <div className={styles.avatarContainer}>
-            <img
-                className={styles.avatar}
-                src={avatarUrl}
-            />
+            {avatarUrl ? (
+                <img
+                    className={styles.avatar}
+                    src={avatarUrl}
+                    alt="User avatar"
+                />
+            ) : (
+                <div className={styles.avatarPlaceholder}>
+                    <UserIcon />
+                </div>
+            )}
         </div>
     )
 }
