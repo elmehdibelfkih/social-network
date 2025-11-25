@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 
 export const metadata = {
-  title: 'Social Network',
+  title: 'Sonet',
   description: 'A modern social media platform for communication and sharing content.',
   applicationName: 'Social Network',
   generator: 'Next.js',

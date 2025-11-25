@@ -38,14 +38,16 @@ async function apiClient<T>(endpoint: string, method: string, payload?: any): Pr
 
         if (!response.ok) {
             if (response.status === 401) {
-                console.log(body) ////////////////////////
+                console.log(body)
                 return undefined as T;
             }
+            console.log(response);
+            
 
             const errorMessage = body?.error?.errorMessage || "Something went wrong";
 
             if (!isServer) {
-                const { ShowSnackbar } = await import("../components/ui/snackbar");
+                const { ShowSnackbar } = await import("@/components/ui/snackbar/snackbar");
                 ShowSnackbar({ status: false, message: errorMessage });
             }
 
@@ -53,7 +55,7 @@ async function apiClient<T>(endpoint: string, method: string, payload?: any): Pr
         }
 
         if (!isServer && method !== 'GET') {
-            const { ShowSnackbar } = await import("../components/ui/snackbar");
+            const { ShowSnackbar } = await import("@/components/ui/snackbar/snackbar");
             ShowSnackbar({ status: true, message: "Operation successful" });
         }
 
@@ -61,7 +63,7 @@ async function apiClient<T>(endpoint: string, method: string, payload?: any): Pr
 
     } catch (error) {
         if (!isServer) {
-            const { ShowSnackbar } = await import("../components/ui/snackbar");
+            const { ShowSnackbar } = await import("@/components/ui/snackbar/snackbar");
             ShowSnackbar({ status: false, message: "Network Error" });
         }
         return Promise.reject(error instanceof Error ? error : new Error("Unknown Error"));

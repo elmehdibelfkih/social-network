@@ -3,8 +3,8 @@
 import { useState, useEffect } from 'react';
 import { Post } from './types';
 import { postsService } from './services/postsService';
-import { LikeButton } from '@/components/ui/like-button';
-import { Comments } from '@/components/ui/comments';
+import { LikeButton } from '@/components/ui/like-button/like-button';
+import { Comments } from '@/components/ui/comments/comments';
 import styles from './styles.module.css';
 
 interface PostsClientProps {

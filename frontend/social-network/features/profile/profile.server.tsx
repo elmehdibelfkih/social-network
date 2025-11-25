@@ -4,8 +4,7 @@ import { ProfileTopActions, AvatarHolder } from './profile.client'
 import { CalendarIcon, GlobeIcon } from '../../components/ui/icons'
 import { ProfileSettings } from './privacy.client'
 
-export async function Profile({ user_id }: { user_id: string }) {
-
+export  async function Profile({ user_id }: { user_id: string }) {
     const profile = await getProfileData(user_id)
 
     return (
