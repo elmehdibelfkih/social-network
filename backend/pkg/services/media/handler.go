@@ -15,7 +15,7 @@ import (
 )
 
 func HandleUploadMedia(w http.ResponseWriter, r *http.Request) {
-	userId := utils.GetUserIdFromContext(r)
+	// userId := utils.GetUserIdFromContext(r)
 
 	var req UploadMediaRequest
 	r.Body = http.MaxBytesReader(w, r.Body, MaxRequestSize)
@@ -74,7 +74,6 @@ func HandleUploadMedia(w http.ResponseWriter, r *http.Request) {
 
 	media := &Media{
 		ID:        mediaID,
-		OwnerId:   userId,
 		Path:      filePath,
 		Mime:      detectedMediaType,
 		Size:      len(data),
