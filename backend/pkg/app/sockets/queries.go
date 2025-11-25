@@ -14,4 +14,7 @@ const (
 			(u.privacy = 'private' AND f.follower_id = u.id AND f.followed_id = ? AND f.status = 'accepted');
  
 	`
+	SELECT_CHAT_USERS = `
+		SELECT user_id FROM chat_participants WHERE id = ?
+	`
 )

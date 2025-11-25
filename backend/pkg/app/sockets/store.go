@@ -9,6 +9,29 @@ import (
 
 // read
 
+func SelectChatParticipants(chatId int64) (map[int64]struct{},error){
+	var userIds map[int64]struct{}
+	err := database.WrapWithTransaction(func(tx *sql.Tx) error {
+		rows,err := tx.Query(SELECT_CHAT_USERS,chatId)
+		if err != 	nil {
+			utils.SQLiteErrorTarget(err,SELECT_CHAT_USERS)
+			return err
+		}
+		defer rows.Close()
+		for rows.Next() {
+			var id int64
+			err = rows.Scan(&id)
+			if err != nil {
+				utils.SQLiteErrorTarget(err,SELECT_CHAT_USERS)
+				return err
+			}
+			userIds[id] = struct{}{}
+		}
+		return nil
+	})
+	return userIds,err
+}
+
 func SelectUserFollowers(userId int64) (*OnlineStatus, error) {
 	var users *OnlineStatus
 	err := database.WrapWithTransaction(func(tx *sql.Tx) error {

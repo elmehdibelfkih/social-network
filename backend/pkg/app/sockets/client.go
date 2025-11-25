@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"social/pkg/utils"
 	"time"
 
 	"github.com/gorilla/websocket"
@@ -14,7 +15,8 @@ type Client struct {
 	connection   *websocket.Conn
 	userId       int64
 	sessionToken string
-	typingTimer  *time.Timer
+	typingTimer  map[int64]*time.Timer
+	userChats    map[int64]struct{} // user chatrooms
 	events       chan Event
 }
 
@@ -31,6 +33,8 @@ func NewClient(wsHub *Hub, conn *websocket.Conn, id int64, token string) *Client
 		userId:       id,
 		sessionToken: token,
 		events:       make(chan Event, 256),
+		typingTimer:  make(map[int64]*time.Timer),
+		userChats:    make(map[int64]struct{}),
 	}
 }
 
@@ -70,6 +74,7 @@ func (c *Client) readMessages() {
 }
 
 func (c *Client) writeMessages() {
+	var err error
 	ticker := time.NewTicker(pingInterval)
 	defer func() {
 		c.hub.removeClient(c)
@@ -81,16 +86,20 @@ func (c *Client) writeMessages() {
 		case event, ok := <-c.events:
 			c.connection.SetWriteDeadline(time.Now().Add(10 * time.Second))
 			if !ok {
-				if err := c.connection.WriteMessage(websocket.CloseMessage, nil); err != nil {
+				if err = c.connection.WriteMessage(websocket.CloseMessage, nil); err != nil {
 					log.Println("connection closed: ", err)
 				}
 				return
 			}
-			c.handleEvent(event)
+			err = c.handleEvent(event)
+			if err != nil {
+				utils.BackendErrorTarget(err, "websocket error")
+				return
+			}
 		case <-ticker.C:
 			log.Println("ping")
 			c.connection.SetWriteDeadline(time.Now().Add(10 * time.Second))
-			if err := c.connection.WriteMessage(websocket.PingMessage, []byte{}); err != nil {
+			if err = c.connection.WriteMessage(websocket.PingMessage, []byte{}); err != nil {
 				log.Println("write msg: ", err)
 				return
 			}
@@ -98,15 +107,17 @@ func (c *Client) writeMessages() {
 	}
 }
 
-func (c *Client) write(event Event) error{
+func (c *Client) write(event Event) error {
+	var err error
 	c.connection.SetWriteDeadline(time.Now().Add(10 * time.Second))
-	if err := c.connection.WriteJSON(event); err != nil {
+	if err = c.connection.WriteJSON(event); err != nil {
 		log.Println("cannot send the msg", err)
 		return err
 	}
+	return err
 }
 
-func (c *Client) handleEvent(e Event) error{
+func (c *Client) handleEvent(e Event) error {
 	switch e.Type {
 	case "online_status":
 		return c.onlineStatus(e)
@@ -116,7 +127,7 @@ func (c *Client) handleEvent(e Event) error{
 		return nil
 	case "chat_message":
 		return nil
-	case "notification":	
+	case "notification":
 		return nil
 	default:
 		c.events <- Event{

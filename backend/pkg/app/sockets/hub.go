@@ -7,11 +7,11 @@ import (
 var WSManger *Hub
 
 type Hub struct {
-	clients map[int64][]*Client
-	add     chan *Client
-	remove  chan *Client
-
-	mu sync.RWMutex
+	clients   map[int64][]*Client
+	add       chan *Client
+	remove    chan *Client
+	chatUsers map[int64]map[int64][]*Client //chatId an its users *Client
+	mu        sync.RWMutex
 }
 
 func InitWsHub() {
@@ -21,9 +21,10 @@ func InitWsHub() {
 
 func NewHub() *Hub {
 	return &Hub{
-		clients: make(map[int64][]*Client),
-		add:     make(chan *Client, 32),
-		remove:  make(chan *Client, 32),
+		clients:   make(map[int64][]*Client),
+		add:       make(chan *Client, 32),
+		remove:    make(chan *Client, 32),
+		chatUsers: make(map[int64]map[int64][]*Client),
 	}
 }
 

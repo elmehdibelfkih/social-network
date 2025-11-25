@@ -7,11 +7,19 @@ type Event struct {
 }
 
 type ClientMessage struct {
-	SourceId     int64         `json:"sourceId"`
-	ChatMessage  *ChatMessage  `json:"chatMessage"`
-	MarkSeen     *MarkSeen     `json:"markSeen"`
-	Notification *Notification `json:"notification"`
-	OnlineStatus *OnlineStatus `json:"onlineStatus"`
+	// SourceId        int64            `json:"sourceId"`
+	TypingIndicator *TypingIndicator `json:"typingIndicator"`
+	ChatMessage     *ChatMessage     `json:"chatMessage"`
+	MarkSeen        *MarkSeen        `json:"markSeen"`
+	Notification    *Notification    `json:"notification"`
+	OnlineStatus    *OnlineStatus    `json:"onlineStatus"`
+}
+
+type TypingIndicator struct {
+	FirstName string  `json:"firstName"`
+	LastName  string  `json:"lastName"`
+	Nickname  *string `json:"nickName"`
+	ChatId    int64   `json:"chatId"`
 }
 
 type ChatMessage struct {
