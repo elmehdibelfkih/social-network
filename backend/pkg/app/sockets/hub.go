@@ -42,9 +42,11 @@ func (h *Hub) Run() {
 func (h *Hub) addClient(c *Client) {
 	h.mu.Lock()
 	defer h.mu.Unlock()
-
+	firstConnection := len(h.clients[c.userId]) == 0
 	h.clients[c.userId] = append(h.clients[c.userId], c)
-	// log.Printf("WS connected: user %v", *c)
+	if firstConnection {
+		go c.handleEvent(Event{Type: "onlineUser"})
+	}
 }
 
 func (h *Hub) removeClient(c *Client) {
@@ -68,6 +70,6 @@ func (h *Hub) removeClient(c *Client) {
 		h.clients[c.userId] = clients
 		return
 	}
-
+	go c.handleEvent(Event{Type: "offlineUser"})
 	delete(h.clients, c.userId)
 }

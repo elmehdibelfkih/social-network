@@ -8,13 +8,36 @@ import (
 )
 
 // read
+func SelectUserData(userId int64) (UserData, error) {
+	var user UserData
+	err := database.WrapWithTransaction(func(tx *sql.Tx) error {
+		err := tx.QueryRow(
+			SELECT_USER_BY_ID,
+			userId,
+		).Scan(
+			&user.FirstName,
+			&user.LastName,
+			&user.Nickname,
+			&user.DateOfBirth,
+			&user.AvatarId,
+			&user.AboutMe,
+			&user.Privacy,
+		)
+		if err != nil {
+			utils.SQLiteErrorTarget(err, SELECT_USER_BY_ID)
+			return err
+		}
+		return err
+	})
+	return user, err
+}
 
-func SelectChatParticipants(chatId int64) (map[int64]struct{},error){
+func SelectChatParticipants(chatId int64) (map[int64]struct{}, error) {
 	var userIds map[int64]struct{}
 	err := database.WrapWithTransaction(func(tx *sql.Tx) error {
-		rows,err := tx.Query(SELECT_CHAT_USERS,chatId)
-		if err != 	nil {
-			utils.SQLiteErrorTarget(err,SELECT_CHAT_USERS)
+		rows, err := tx.Query(SELECT_CHAT_USERS, chatId)
+		if err != nil {
+			utils.SQLiteErrorTarget(err, SELECT_CHAT_USERS)
 			return err
 		}
 		defer rows.Close()
@@ -22,14 +45,14 @@ func SelectChatParticipants(chatId int64) (map[int64]struct{},error){
 			var id int64
 			err = rows.Scan(&id)
 			if err != nil {
-				utils.SQLiteErrorTarget(err,SELECT_CHAT_USERS)
+				utils.SQLiteErrorTarget(err, SELECT_CHAT_USERS)
 				return err
 			}
 			userIds[id] = struct{}{}
 		}
 		return nil
 	})
-	return userIds,err
+	return userIds, err
 }
 
 func SelectUserFollowers(userId int64) (*OnlineStatus, error) {

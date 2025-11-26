@@ -12,11 +12,22 @@ import (
 type Client struct {
 	hub          *Hub
 	connection   *websocket.Conn
+	user         UserData
 	userId       int64
 	sessionToken string
 	typingTimer  map[int64]*time.Timer
 	userChats    map[int64]struct{} // user chatrooms
 	events       chan Event
+}
+
+type UserData struct {
+	FirstName   string
+	LastName    string
+	Nickname    *string
+	AvatarId    *int64
+	AboutMe     *string
+	DateOfBirth string
+	Privacy     string
 }
 
 var (
@@ -25,7 +36,7 @@ var (
 	typingWait   = 3 * time.Second
 )
 
-func NewClient(wsHub *Hub, conn *websocket.Conn, id int64, token string) *Client {
+func NewClient(wsHub *Hub, conn *websocket.Conn, id int64, token string, user UserData) *Client {
 	return &Client{
 		hub:          wsHub,
 		connection:   conn,
@@ -34,6 +45,7 @@ func NewClient(wsHub *Hub, conn *websocket.Conn, id int64, token string) *Client
 		events:       make(chan Event, 256),
 		typingTimer:  make(map[int64]*time.Timer),
 		userChats:    make(map[int64]struct{}),
+		user:         user,
 	}
 }
 
@@ -110,6 +122,10 @@ func (c *Client) writeMessages() {
 
 func (c *Client) handleEvent(e Event) error {
 	switch e.Type {
+	case "onlineUser":
+		return c.ClientAdded(e)
+	case "offlineUser":
+		return c.ClientRemoved(e)
 	case "online_status":
 		return c.onlineStatus(e)
 	case "chat_typing":

@@ -20,9 +20,9 @@ func (c *Client) typing(e Event) error {
 		Type: "chat_typing",
 		Payload: &ClientMessage{
 			TypingIndicator: &TypingIndicator{
-				FirstName: "",
-				LastName:  "",
-				Nickname:  nil,
+				FirstName: c.user.FirstName,
+				LastName:  c.user.LastName,
+				Nickname:  c.user.Nickname,
 				ChatId:    e.Payload.ChatMessage.ChatId,
 			},
 		},
@@ -37,9 +37,9 @@ func (c *Client) typing(e Event) error {
 			Type: "chat_afk",
 			Payload: &ClientMessage{
 				TypingIndicator: &TypingIndicator{
-					FirstName: "",
-					LastName:  "",
-					Nickname:  nil,
+					FirstName: c.user.FirstName,
+					LastName:  c.user.LastName,
+					Nickname:  c.user.Nickname,
 					ChatId:    e.Payload.ChatMessage.ChatId,
 				},
 			},
@@ -72,6 +72,52 @@ func (c *Client) onlineStatus(e Event) error {
 
 	e.Payload.OnlineStatus = users
 	c.events <- e
+	return err
+}
+
+func (c *Client) ClientAdded(e Event) error {
+	users, err := SelectUserFollowers(c.userId)
+	if err != nil {
+		utils.BackendErrorTarget(err, "websocket error")
+		return err
+	}
+	e.Source = "server"
+	e.Type = "onlineUser"
+	e.Payload = &ClientMessage{
+		OnlineUser: &OnlineUser{
+			UserId: c.userId,
+			User:   c.user,
+			Online: true,
+		},
+	}
+	for _, u := range users.OnlineUsers {
+		for _, c := range c.hub.clients[u.UserId] { //todo:might be a problem
+			c.events <- e
+		}
+	}
+	return err
+}
+
+func (c *Client) ClientRemoved(e Event) error {
+	users, err := SelectUserFollowers(c.userId)
+	if err != nil {
+		utils.BackendErrorTarget(err, "websocket error")
+		return err
+	}
+	e.Source = "server"
+	e.Type = "offlineUser"
+	e.Payload = &ClientMessage{
+		OfflineUser: &OfflineUser{
+			UserId: c.userId,
+			User:   c.user,
+			Online: false,
+		},
+	}
+	for _, u := range users.OnlineUsers {
+		for _, c := range c.hub.clients[u.UserId] { //todo:might be a problem
+			c.events <- e
+		}
+	}
 	return err
 }
 

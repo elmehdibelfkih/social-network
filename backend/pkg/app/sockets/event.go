@@ -13,6 +13,8 @@ type ClientMessage struct {
 	MarkSeen        *MarkSeen        `json:"markSeen"`
 	Notification    *Notification    `json:"notification"`
 	OnlineStatus    *OnlineStatus    `json:"onlineStatus"`
+	OnlineUser      *OnlineUser      `json:"onlineUser"`
+	OfflineUser     *OfflineUser     `json:"offlineUser"`
 }
 
 type TypingIndicator struct {
@@ -69,4 +71,16 @@ type User struct {
 	AboutMe     *string `json:"aboutMe"`
 	Privacy     string  `json:"privacy"`
 	Online      bool    `json:"online"`
+}
+
+type OnlineUser struct {
+	UserId int64    `json:"userId"`
+	User   UserData `json:"user"`
+	Online bool     `json:"online"`
+}
+
+type OfflineUser struct {
+	UserId int64    `json:"userId"`
+	User   UserData `json:"user"`
+	Online bool     `json:"online"`
 }

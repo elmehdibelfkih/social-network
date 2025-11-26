@@ -26,6 +26,7 @@ func checkOrigin(r *http.Request) bool {
 }
 
 func UpgradeProtocol(w http.ResponseWriter, r *http.Request) {
+	var user UserData
 	userId := utils.GetUserIdFromContext(r)
 	if r.Header.Get("Upgrade") != "websocket" {
 		utils.BadRequest(w, "not a websocket upgrade request", "redirect")
@@ -41,13 +42,17 @@ func UpgradeProtocol(w http.ResponseWriter, r *http.Request) {
 
 	conn, err := websocketUpgrader.Upgrade(w, r, nil)
 	if err != nil {
-		utils.BackendErrorTarget(err, "no session")
-		utils.InternalServerError(w)
+		utils.BackendErrorTarget(err, "upgrade")
+		utils.BadRequest(w, "failed to upgrade", "redirect")
 		return
 	}
 
 	// create the client sturuct
-	c := NewClient(WSManger, conn, userId, sessionCookie)
+	if user, err = SelectUserData(userId); err != nil {
+		utils.BackendErrorTarget(err, "enable to get user data")
+	}
+
+	c := NewClient(WSManger, conn, userId, sessionCookie, user)
 
 	WSManger.add <- c
 
