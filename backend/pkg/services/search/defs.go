@@ -1,17 +1,15 @@
 package search
 
 type SearchResponse struct {
-	Query   string `json:"query"`
-	Type    string `json:"type"`
 	Results []any  `json:"results"`
 }
 
 type UserSearchResult struct {
 	ID         int64  `json:"id" db:"id"`
-	Username   string `json:"username" db:"nickname"`
-	Firstname  string `json:"firstname" db:"first_name"`
-	Lastname   string `json:"lastname" db:"last_name"`
-	AvatarPath string `json:"avatarPath" db:"avatar_path"`
+	Username   *string `json:"username" db:"nickname"`
+	Firstname  string `json:"firstName" db:"first_name"`
+	Lastname   string `json:"lastName" db:"last_name"`
+	AvatarPath *string `json:"avatarPath" db:"avatar_path"`
 }
 
 type GroupSearchResult struct {

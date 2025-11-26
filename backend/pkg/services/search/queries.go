@@ -5,7 +5,7 @@ const (
 		SELECT u.id, u.nickname, u.first_name, u.last_name, m.path AS avatar_path 
 		FROM users u
 		LEFT JOIN media m ON u.avatar_id = m.id
-		WHERE u.nickname LIKE ? OR u.firstname LIKE ? OR u.lastname LIKE ?
+		WHERE u.nickname LIKE ? OR u.first_name LIKE ? OR u.last_name LIKE ?
 		LIMIT 10;
 	`
 

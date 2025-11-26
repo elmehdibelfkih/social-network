@@ -65,7 +65,7 @@ export interface UserStats {
 
 export interface Follower {
     userId: number;
-    nickname: string;
+    username: string;
     firstName: string;
     lastName: string;
     avatarId: number;
