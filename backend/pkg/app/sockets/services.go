@@ -10,14 +10,9 @@ import (
 func (c *Client) typing(e Event) error {
 	var err error
 	var chatId = e.Payload.TypingIndicator.ChatId
-	// var userIds map[int64]struct{}
 	if e.Payload.TypingIndicator == nil {
 		return errors.New("no typing indicator on the payload")
 	}
-	// userIds, err = SelectChatParticipants(e.Payload.TypingIndicator.ChatId)
-	// if err != nil {
-	// 	return err
-	// }
 	if _, exists := c.userChats[chatId]; !exists {
 		return errors.New("your not a part of this chat")
 	}
@@ -89,10 +84,7 @@ func (c *Client) BroadcastAllWithoutSelf(e Event, clients map[int64][]*Client) e
 			continue
 		}
 		for _, c := range userConnections {
-			err = c.write(e)
-			if err != nil {
-				return err
-			}
+			c.events <- e
 		}
 	}
 	return err

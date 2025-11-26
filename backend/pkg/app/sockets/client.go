@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
-	"social/pkg/utils"
 	"time"
 
 	"github.com/gorilla/websocket"
@@ -59,7 +58,7 @@ func (c *Client) readMessages() {
 		_, bytes, err := c.connection.ReadMessage()
 		if err != nil {
 			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
-				log.Printf("error reading message: %v", err)
+				log.Println("error reading message:", err)
 			}
 			break
 		}
@@ -69,7 +68,10 @@ func (c *Client) readMessages() {
 			continue
 		}
 		fmt.Println("received event:", event)
-		c.events <- event
+		if err = c.handleEvent(event); err != nil {
+			log.Println("error Handling the event:", err)
+			return
+		}
 	}
 }
 
@@ -91,9 +93,8 @@ func (c *Client) writeMessages() {
 				}
 				return
 			}
-			err = c.handleEvent(event)
-			if err != nil {
-				utils.BackendErrorTarget(err, "websocket error")
+			if err = c.connection.WriteJSON(event); err != nil {
+				log.Println("cannot send the msg", err)
 				return
 			}
 		case <-ticker.C:
@@ -105,16 +106,6 @@ func (c *Client) writeMessages() {
 			}
 		}
 	}
-}
-
-func (c *Client) write(event Event) error {
-	var err error
-	c.connection.SetWriteDeadline(time.Now().Add(10 * time.Second))
-	if err = c.connection.WriteJSON(event); err != nil {
-		log.Println("cannot send the msg", err)
-		return err
-	}
-	return err
 }
 
 func (c *Client) handleEvent(e Event) error {
