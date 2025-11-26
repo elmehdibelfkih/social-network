@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import styles from './styles.module.css'
-import { unfollowPerson, followPerson, getMedia } from './services/profile.client'
+import { unfollowPerson, followPerson, getMedia } from './profile.client'
 import { FollowIcon, MessageIcon, SettingsIcon, UserIcon } from '../../components/ui/icons'
 import { ProfileData } from './types'
 import { FollowStatus } from '../../libs/globalTypes'

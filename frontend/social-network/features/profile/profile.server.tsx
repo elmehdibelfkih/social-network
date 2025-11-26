@@ -1,5 +1,5 @@
 import styles from './styles.module.css'
-import getProfileData from './services/profile.client'
+import getProfileData from './profile.client'
 import { ProfileTopActions, AvatarHolder } from './profile.client'
 import { CalendarIcon, GlobeIcon } from '../../components/ui/icons'
 import { ProfileSettings } from './privacy.client'

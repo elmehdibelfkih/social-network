@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import styles from './styles.module.css'
-import { togglePrivacy } from './services/profile.client'
+import { togglePrivacy } from './profile.client'
 import { useAuth } from '../../providers/authProvider'
 
 export default function PrivacyToggle({ privacy }: { privacy: string }) {

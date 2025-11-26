@@ -1,6 +1,6 @@
 import { http } from '@/libs/apiFetch';
-import { MediaResponse } from '../../../libs/globalTypes';
-import { ProfileData, FollowResponse, PrivacyToggleResponse } from '../types';
+import { MediaResponse } from '../../libs/globalTypes';
+import { ProfileData, FollowResponse, PrivacyToggleResponse } from './types';
 
 export default async function getProfileData(userId: string): Promise<ProfileData> {
     return http.get(`/api/v1/users/${userId}/profile`);
