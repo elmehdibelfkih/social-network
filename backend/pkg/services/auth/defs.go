@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"database/sql"
 	"strconv"
 	"strings"
 
@@ -89,7 +90,7 @@ type RevokeSessionResponseJson struct {
 
 type AvatarMediaSqlRow struct {
 	MediaId   int64
-	OwnerId   int64
+	OwnerId   sql.NullInt64
 	Path      string
 	Mime      string
 	Size      int64
