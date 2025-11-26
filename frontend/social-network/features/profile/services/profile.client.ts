@@ -1,4 +1,4 @@
-import { http } from '../../../libs/apiClient';
+import { http } from '@/libs/apiFetch';
 import { MediaResponse } from '../../../libs/globalTypes';
 import { ProfileData, FollowResponse, PrivacyToggleResponse } from '../types';
 

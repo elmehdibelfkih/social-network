@@ -10,8 +10,8 @@ import (
 )
 
 func getStoragePathForPurpose(purpose string) string {
-	baseDir := "../data/media"
-	dir := filepath.Join(baseDir, purpose)
+	baseDir := "../data/uploads"
+	dir := filepath.Join(baseDir, purpose+"s")
 	os.MkdirAll(dir, 0755)
 	return dir
 }
@@ -23,22 +23,22 @@ func getMediaID(r *http.Request) (int64, error) {
 func canGetMedia(userID, mediaID int64) bool {
 	var ownerID int64
 	var purpose string
-	
+
 	err := config.DB.QueryRow(QUERY_GET_MEDIA_OWNER_AND_PURPOSE, mediaID).Scan(&ownerID, &purpose)
 	if err != nil {
 		return false
 	}
-	
+
 	// Owner can always access
 	if ownerID == userID {
 		return true
 	}
-	
+
 	// Avatar images are public
 	if purpose == "avatar" {
 		return true
 	}
-	
+
 	// Post images from public posts are accessible
 	if purpose == "post" {
 		var postID, authorID int64
@@ -48,7 +48,7 @@ func canGetMedia(userID, mediaID int64) bool {
 			return true
 		}
 	}
-	
+
 	return false
 }
 

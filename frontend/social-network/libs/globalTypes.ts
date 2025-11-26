@@ -1,18 +1,3 @@
-export interface ApiErrorDetails {
-    success: boolean;
-    payload: {
-        StatusCode: number;
-        StatusText: string;
-        ErrorMessage: string;
-        ErrorTitle?: string;
-        ErrorDescription?: string;
-        errorType?: 'redirect' | 'alert';
-    }
-}
-
-export type ApiResponse<T> =
-    | { success: true; payload: T }
-    | { success: false; error: ApiErrorDetails };
 
 export interface PaginationParams {
     page?: number;
@@ -35,24 +20,18 @@ export interface Session {
 }
 
 export interface MediaResponse {
-    success: boolean;
-    payload: {
-        mediaEncoded: string
-    }
+    mediaEncoded: string
 }
 
 export interface AuthResponse {
-    success: boolean;
-    payload: {
-        userId: number;
-        email: string;
-        firstName: string;
-        lastName: string;
-        dateOfBirth: string;
-        nickname: string | null;
-        aboutMe: string | null;
-        avatarId: number | null;
-    }
+    userId: number;
+    email: string;
+    firstName: string;
+    lastName: string;
+    dateOfBirth: string;
+    nickname: string | null;
+    aboutMe: string | null;
+    avatarId: number | null;
 }
 
 export interface UserProfile {
@@ -65,11 +44,9 @@ export interface UserProfile {
     avatarId: number | null;
     dateOfBirth?: string;
     joinedAt?: string;
-
     status?: FollowStatus;
     privacy?: 'public' | 'private';
     chatId?: number | null;
-
     stats?: {
         postsCount: number;
         followersCount: number;
@@ -111,12 +88,10 @@ export interface Post {
     content: string;
     mediaIds: number[] | null;
     privacy: PrivacyLevel;
-
     isLikedByUser: boolean;
     stats: PostStats;
     groupId: number | null;
     allowedList?: number[] | null;
-
     createdAt: string;
     updatedAt: string;
 }
@@ -149,14 +124,11 @@ export interface MediaUploadRequest {
 }
 
 export interface MediaUploadResponse {
-    success: boolean;
-    payload: {
-        message: string;
-        mediaId: number;
-        mediaPath: string;
-        fileType: string;
-        uploadedAt: string;
-    }
+    message: string;
+    mediaId: number;
+    mediaPath: string;
+    fileType: string;
+    uploadedAt: string;
 }
 
 export interface Group {

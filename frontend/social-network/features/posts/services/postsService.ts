@@ -1,5 +1,5 @@
 import { Post } from '../types';
-import { http } from '../../../libs/apiClient';
+import { http } from '../../../libs/apiFetch';
 
 export const postsService = {
   async getFeed(page = 1, limit = 20): Promise<Post[]> {

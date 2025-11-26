@@ -1,5 +1,5 @@
 import { NavbarClient } from './navbar.client';
-// import { http } from '@/libs/apiClient';
+// import { http } from '@/libs/apiFetch';
 // import { User } from './types';
 
 

@@ -1,14 +1,14 @@
-import { http } from '../../../libs/apiClient';
+import { http } from '@/libs/apiFetch';
 import type {
   LoginRequest,
   RegisterRequest
 } from '../types';
 
-import { Session, AuthResponse, MediaUploadResponse } from '../../../libs/globalTypes';
+import { Session, AuthResponse, MediaUploadResponse } from '@/libs/globalTypes';
 
 export const authService = {
   async register(data: RegisterRequest): Promise<AuthResponse> {
-    return http.post('/api/v1/auth/register', data)
+    return http.post<AuthResponse>('/api/v1/auth/register', data)
   },
 
   async login(data: LoginRequest): Promise<AuthResponse> {

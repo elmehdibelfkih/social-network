@@ -19,11 +19,11 @@
 {
   "success": false,
   "error": {
-    "StatusCode": 404,
-    "StatusText": "Not Found",
-    "ErrorMessage": "The page you are looking for might have been removed, had its name changed, or is temporarily unavailable.",
-    "ErrorTitle": "Oops! Page Not Found",
-    "ErrorDescription": "We couldn't find the page you were looking for. Please check the URL for any mistakes or go back to the homepage.",
+    "statusCode": 404,
+    "statusText": "Not Found",
+    "errorMessage": "The page you are looking for might have been removed, had its name changed, or is temporarily unavailable.",
+    "errorTitle": "Oops! Page Not Found",
+    "errorDescription": "We couldn't find the page you were looking for. Please check the URL for any mistakes or go back to the homepage.",
     "errorType": "redirect"
   }
 }

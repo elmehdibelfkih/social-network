@@ -73,8 +73,8 @@ export function ProfileTopActions({ userId, profile }: { userId: string, profile
                 <>
                     <FollowButton
                         targetUserId={userId}
-                        initialStatus={profile.payload.status || 'none'}
-                        isPrivate={profile.payload.privacy === 'private'}
+                        initialStatus={profile.status || 'none'}
+                        isPrivate={profile.privacy === 'private'}
                     />
                     <MessageButton />
                 </>
@@ -89,8 +89,8 @@ export function AvatarHolder({ avatarId }: { avatarId: number | null }) {
         if (avatarId) {
             getMedia(String(avatarId))
                 .then((response) => {
-                    if (response.payload.mediaEncoded) {
-                        setAvatarUrl(`data:image/png;base64,${response.payload.mediaEncoded}`)
+                    if (response.mediaEncoded) {
+                        setAvatarUrl(`data:image/png;base64,${response.mediaEncoded}`)
                     }
                 })
                 .catch(() => {

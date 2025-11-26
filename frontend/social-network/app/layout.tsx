@@ -1,3 +1,4 @@
+import Snackbar from '@/components/ui/snackbar/snackbar';
 import type { ReactNode } from 'react';
 
 export const metadata = {
@@ -25,6 +26,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <head />
       <body>
         {children}
+        <Snackbar />
       </body>
     </html>
   );
