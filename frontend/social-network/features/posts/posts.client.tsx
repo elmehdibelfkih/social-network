@@ -17,7 +17,13 @@ export function PostsClient({ newPost, onNewPostDisplayed }: PostsClientProps) {
   const [openComments, setOpenComments] = useState<number | null>(null);
 
   useEffect(() => {
-    postsService.getFeed().then(setPosts);
+    const loadTestPost = async () => {
+      const testPost = await postsService.getPost(1);
+      if (testPost) {
+        setPosts([testPost]);
+      }
+    };
+    loadTestPost();
   }, []);
 
   useEffect(() => {

@@ -2,20 +2,17 @@ import { Post } from '../types';
 import { http } from '../../../libs/apiClient';
 
 export const postsService = {
-  async getFeed(page = 1, limit = 20): Promise<Post[]> {
+  async getPost(postId: number): Promise<Post | null> {
     try {
-      const response = await http.get(`/api/v1/feed?page=${page}&limit=${limit}`);
-      if (!response) {
-        return [];
-      }
-      return Array.isArray(response) ? response : (Array.isArray(response.payload) ? response.payload : []);
+      const response = await http.get(`/api/v1/posts/${postId}`) as any;
+      return response?.payload || null;
     } catch (error) {
-      return [];
+      return null;
     }
   },
 
   async createPost(data: { content: string; privacy: 'public' | 'private' | 'followers'; mediaIds?: number[] }): Promise<any> {
-    const response = await http.post('/api/v1/posts', data);
+    const response = await http.post('/api/v1/posts', data) as any;
     return response.payload;
   },
 

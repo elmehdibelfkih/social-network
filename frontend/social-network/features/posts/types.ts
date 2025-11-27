@@ -4,6 +4,7 @@ export interface Post {
   authorNickname?: string;
   authorFirstName: string;
   authorLastName: string;
+  authorAvatarId?: number;
   content: string;
   mediaIds?: number[];
   privacy: string;

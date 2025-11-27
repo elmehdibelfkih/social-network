@@ -152,3 +152,19 @@
 .interactionItem.liked img {
   opacity: 1;
 }
+
+.loadingIndicator {
+  text-align: center;
+  padding: 20px;
+  color: #666;
+  font-size: 14px;
+}
+
+.endMessage {
+  text-align: center;
+  padding: 20px;
+  color: #999;
+  font-size: 14px;
+  border-top: 1px solid #eee;
+  margin-top: 20px;
+}
