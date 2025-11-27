@@ -30,14 +30,14 @@ type RawApiResponse<T> =
   | { success: false; error: ApiError };
 
 export type ApiFetchOpts = {
-  redirectOnError?: boolean;       
-  errorRoute?: string;             
-  throwOnError?: boolean;          
-  clientNavigate?: (path: string) => void; 
-  nextRevalidate?: number;         
-  cache?: RequestCache;            
-  redirectTitle?: string;          
-  errorMessage?: string;           
+  redirectOnError?: boolean;
+  errorRoute?: string;
+  throwOnError?: boolean;
+  clientNavigate?: (path: string) => void;
+  nextRevalidate?: number;
+  cache?: RequestCache;
+  redirectTitle?: string;
+  errorMessage?: string;
 };
 
 function buildErrorTarget(
@@ -148,10 +148,10 @@ export async function apiFetch<T>(
     errorMessage: 'Unknown API Error',
     errorType: 'unknown'
   };
-  
+
   if (!response.ok && rawBody && rawBody.success === false) {
     const apiErrorData = rawBody.error || {};
-    
+
     apiError = {
       statusCode: apiErrorData.statusCode || status,
       statusText: apiErrorData.statusText || response.statusText,

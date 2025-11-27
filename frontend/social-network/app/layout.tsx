@@ -1,3 +1,4 @@
+import AddFriends from '@/components/ui/AddFriends/addFriends';
 import Snackbar from '@/components/ui/snackbar/snackbar';
 import '@/styles/globals.css'; 
 import type { ReactNode } from 'react';
