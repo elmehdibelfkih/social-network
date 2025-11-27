@@ -11,8 +11,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <main>
           <AuthProvider>
             {children}
-            <AddFriends title={'fgkdjgk0'} desc='fgsgdg' componentId='fdfdf' onComplete={null} purpose='group' />
-
             <AuthForm />
           </AuthProvider>
         </main>

@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react'
 import { Follower } from '@/libs/globalTypes'
 import { getMedia } from '@/features/profile/services/profile.client'
 import { UserIcon } from '../icons'
+import { useDebounce } from '@/libs/debounce'
 
 interface AddFriendsProps {
     title: string
@@ -19,39 +20,29 @@ export default function AddFriends({ title, desc, componentId, purpose, onComple
     const { user } = useAuth()
     const [followers, setFollowers] = useState<Follower[]>([])
     const [searchQuery, setSearchQuery] = useState('')
+    const debounceValue = useDebounce(searchQuery, 350)
     const [selectedFollowers, setSelectedFollowers] = useState<Set<number>>(new Set())
 
     useEffect(() => {
         const fetchFollowers = async () => {
-            try {
-                const resp = await http.get<Follower[]>(`/api/v1/users/${user.userId}/followers`)
+            if (!user?.userId) return
 
-                setFollowers(resp || [])
+            try {
+                const endpoint = debounceValue.length === 0
+                    ? `/api/v1/users/${user.userId}/followers`
+                    : `/api/v1/search?q=${debounceValue}&type=users`
+
+                const resp = await http.get<(Follower)[]>(endpoint)
+
+                setFollowers(resp)
             } catch (error) {
                 console.error('Failed to fetch followers:', error)
                 setFollowers([])
             }
         }
-        if (user?.userId) fetchFollowers()
-    }, [user?.userId])
 
-    useEffect(() => {
-        const fetchSearchedFollower = async () => {
-            if (searchQuery.length == 0) {
-                const resp = await http.get<Follower[]>(`/api/v1/users/${user.userId}/followers`)
-
-                setFollowers(resp || [])
-            }
-            try {
-                const resp = await http.get<Follower[]>(`/api/v1/search?q=${searchQuery}&type=users`)
-
-                setFollowers(resp)
-            } catch (error) {
-                console.error('Failed to search:', error)
-            }
-        }
-        if (searchQuery.length !== 0) fetchSearchedFollower()
-    }, [searchQuery])
+        fetchFollowers()
+    }, [debounceValue, user?.userId])
 
     const handleInvite = async () => {
         const userIds = Array.from(selectedFollowers);
@@ -112,7 +103,9 @@ export default function AddFriends({ title, desc, componentId, purpose, onComple
             </div>
             <div className={styles.friendsList}>
                 {followers?.length === 0 ? (
-                    <p className={styles.noResults}>No followers found</p>
+                    <p className={styles.noResults}>
+                        {searchQuery ? 'No results found' : 'No followers found'}
+                    </p>
                 ) : (
                     followers?.map((follower) => (
                         <FriendBlock
@@ -133,7 +126,7 @@ export default function AddFriends({ title, desc, componentId, purpose, onComple
                         onClick={handleInvite}>
                         {purpose === "group"
                             ? `Invite Selected (${selectedFollowers.size})`
-                            : `Allowed Selected (${selectedFollowers.size})`
+                            : `Allow Selected (${selectedFollowers.size})`
                         }
                     </button>
                 </div>
@@ -174,7 +167,7 @@ function FriendBlock({ friend, isSelected, onToggle }: FriendBlockProps) {
             onClick={onToggle}
         >
             {avatarUrl ? (
-                <img src={avatarUrl} className={styles.avatar} alt={`${friend.firstName} ${friend.lastName}`} />
+                <img src={avatarUrl} className={styles.avatar} />
             ) : (
                 <div className={styles.avatarPlaceholder}>
                     <UserIcon />
@@ -182,11 +175,11 @@ function FriendBlock({ friend, isSelected, onToggle }: FriendBlockProps) {
             )}
             <div className={styles.friendInfo}>
                 <h3>{friend.firstName} {friend.lastName}</h3>
-                <h4>@{friend.username}</h4>
+                <h4>@{friend.nickname || 'No nickname'}</h4>
             </div>
-            <button className={styles.selectBtn}>
+            <span className={styles.selectText}>
                 {isSelected ? '✓ Selected' : 'Select'}
-            </button>
+            </span>
         </div>
     )
 }

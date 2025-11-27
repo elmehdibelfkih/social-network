@@ -7,7 +7,7 @@ import (
 
 func SearchUsers(q string) ([]any, error) {
 	searchKeyword := "%" + q + "%"
-	rows, err := config.DB.Query(QUERY_GET_SEARCH_USER, searchKeyword, searchKeyword, searchKeyword)
+	rows, err := config.DB.Query(QUERY_GET_SEARCH_USER, searchKeyword, searchKeyword, searchKeyword, searchKeyword)
 	if err != nil {
 		utils.SQLiteErrorTarget(err, QUERY_GET_SEARCH_USER)
 		return nil, err
@@ -18,7 +18,7 @@ func SearchUsers(q string) ([]any, error) {
 	for rows.Next() {
 		var res UserSearchResult
 
-		err := rows.Scan(&res.ID, &res.Username, &res.Firstname, &res.Lastname, &res.AvatarPath)
+		err := rows.Scan(&res.ID, &res.Username, &res.Firstname, &res.Lastname, &res.AvatarId)
 		if err != nil {
 			utils.SQLiteErrorTarget(err, "searchUsers (scan)")
 			return nil, err
@@ -41,7 +41,7 @@ func SearchGroups(q string) ([]any, error) {
 	for rows.Next() {
 		var res GroupSearchResult
 
-		err := rows.Scan(&res.ID, &res.Description, &res.Name, &res.AvatarPath)
+		err := rows.Scan(&res.ID, &res.Description, &res.Name, &res.AvatarId)
 		if err != nil {
 			utils.SQLiteErrorTarget(err, "searchGroups (scan)")
 			return nil, err
@@ -65,7 +65,7 @@ func SearchPosts(q string, searcherID int64) ([]any, error) {
 	for rows.Next() {
 		var res PostSearchResult
 
-		err := rows.Scan(&res.ID, &res.Author.ID, &res.Content, &res.CreatedAt, &res.Author.Username, &res.Author.AvatarPath)
+		err := rows.Scan(&res.ID, &res.Author.ID, &res.Content, &res.CreatedAt, &res.Author.Username, &res.Author.AvatarId)
 		if err != nil {
 			utils.SQLiteErrorTarget(err, "searchPosts (scan)")
 			return nil, err

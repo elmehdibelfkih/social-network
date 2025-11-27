@@ -65,10 +65,10 @@ export interface UserStats {
 
 export interface Follower {
     userId: number;
-    username: string;
+    nickname: string | null;
     firstName: string;
     lastName: string;
-    avatarId: number;
+    avatarId: number | null;
     followedAt?: string;
     status: FollowStatus;
     chatId: number | null;
