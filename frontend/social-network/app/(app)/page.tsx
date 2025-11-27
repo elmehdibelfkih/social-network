@@ -7,8 +7,8 @@ import { JSX } from "react";
 import { getUserId } from "@/libs/helpers";
 
 export default async function HomePage(): Promise<JSX.Element> {
-  // const res2 =  await http.get<MiniProfileAPIResponse>('/api/v1/users/8139399070093312/profile');
   const userId = await getUserId();  
+  const res2 =  await http.get<MiniProfileAPIResponse>(`/api/v1/users/${userId}/profile`);
   return (
     <>
        <ProfileSummaryServer userId={userId} />
@@ -23,7 +23,7 @@ export default async function HomePage(): Promise<JSX.Element> {
           
         </p>
        </div>
-       {/* <MiniProfile data={res2} /> */}
+       <MiniProfile data={res2} />
     </>
   );
 }

@@ -1,8 +1,9 @@
-import { AvatarHolder } from './profile_summary.client'
+// import { AvatarHolder } from './profile_summary.client'
 import { getProfileServer } from './profile_summary.services'
 import { formatDisplayName, formatHandle } from './profile_summary.hooks'
 import type { ProfileAPIResponse } from './types'
 import styles from './styles.module.css'
+import { AvatarHolder } from '@/components/ui/avatar_holder/avatarholder.client'
 
 type Props = { userId: string | number }
 
@@ -28,16 +29,16 @@ export default async function ProfileSummaryServer({ userId }: Props) {
 
   const joinedLabel = profile.joinedAt
     ? new Date(profile.joinedAt).toLocaleDateString(undefined, {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-      })
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    })
     : ''
 
   return (
     <aside className={styles.profileCard} aria-label="Your profile summary">
       <div className={styles.header}>
-        <AvatarHolder avatarId={profile.avatarId ?? null} />
+        <AvatarHolder avatarId={profile.avatarId ?? null} size={90} />
         <div className={styles.textWrap}>
           <h3 className={styles.displayName}>{displayName}</h3>
           <div className={styles.username}>{handle}</div>

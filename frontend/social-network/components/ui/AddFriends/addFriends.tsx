@@ -4,9 +4,9 @@ import styles from './style.module.css'
 import { useAuth } from '@/providers/authProvider'
 import { useEffect, useState } from 'react'
 import { Follower } from '@/libs/globalTypes'
-import { getMedia } from '@/features/profile/services/profile.client'
 import { UserIcon } from '../icons'
 import { useDebounce } from '@/libs/debounce'
+import { getMedia } from '@/features/profile/profileSrevice'
 
 interface AddFriendsProps {
     title: string
