@@ -2,7 +2,7 @@
 
 import { useState, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
-import { authService } from './services/auth';
+import { authService } from './auth';
 import styles from './styles.module.css';
 import { useAuth } from '@/providers/authProvider';
 

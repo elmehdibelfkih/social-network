@@ -2,7 +2,7 @@ import { http } from '@/libs/apiFetch';
 import type {
   LoginRequest,
   RegisterRequest
-} from '../types';
+} from './types';
 
 import { Session, AuthResponse, MediaUploadResponse } from '@/libs/globalTypes';
 

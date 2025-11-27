@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Post } from './types';
-import { postsService } from './services/postsService';
+import { postsService } from './postsService';
 import styles from './styles.module.css';
 
 interface FeedProps {

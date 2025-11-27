@@ -1,0 +1,161 @@
+
+/* Card (small width — 20% of viewport or less; capped) */
+.profileCard {
+  width: min(20vw, 260px); /* <= 20% of page, capped at 260px */
+  min-width: 160px;
+  background: var(--white);
+  border-radius: var(--border-radius-lg);
+  padding: 18px;
+  box-shadow: 0 6px 18px rgba(16, 24, 40, 0.06);
+  border: 1px solid rgba(16, 24, 40, 0.04);
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  color: var(--gray-900);
+}
+
+/* Header: avatar + name + handle */
+.header {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Avatar wrapper — circular, smaller than before */
+.avatarWrap {
+  width: 64px;   /* reduced size */
+  height: 64px;
+  border-radius: 50%;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--gray-50);
+  box-shadow: 0 6px 18px rgba(16, 24, 40, 0.06);
+  border: 3px solid var(--white); /* thin white ring */
+  flex: 0 0 auto;
+}
+
+/* Avatar image sizing */
+.avatar {
+  width: 64px;
+  height: 64px;
+  object-fit: cover;
+  border-radius: 50%;
+  display: block;
+}
+
+/* Placeholder for avatar */
+.placeholder {
+  width: 64px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(180deg, var(--gray-100), var(--gray-50));
+  color: var(--gray-400);
+}
+
+/* Text under avatar */
+.textWrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  text-align: center;
+  width: 100%;
+  padding: 0 6px;
+}
+
+.displayName {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--gray-900);
+  line-height: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: 100%;
+}
+
+.username {
+  margin: 0;
+  font-size: 13px;
+  color: var(--gray-500);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+}
+
+.privacy {
+  margin-top: 4px;
+  color: var(--gray-400);
+  display:inline-flex;
+  align-items:center;
+  gap: 6px;
+}
+
+.joined {
+  font-size: 12px;
+  color: var(--gray-500);
+  margin-top: 4px;
+}
+
+/* Divider line */
+.divider {
+  width: 100%;
+  height: 1px;
+  background: rgba(16, 24, 40, 0.04);
+  border-radius: 1px;
+}
+
+/* Stats area: three blocks horizontally */
+.statsContainer {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 6px 4px 2px 4px;
+  box-sizing: border-box;
+}
+
+/* Each stat block centered */
+.statBlock {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+}
+
+/* Label and value */
+.statLabel {
+  font-size: 12px;
+  color: var(--gray-600);
+}
+
+.statValue {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--primary-purple);
+  margin-top: 4px;
+}
+
+/* Mobile adjustments */
+@media (max-width: 520px) {
+  .profileCard {
+    width: min(46vw, 300px);
+    padding: 14px;
+  }
+  .avatarWrap { width: 56px; height: 56px; border-width: 2px; }
+  .avatar, .placeholder { width: 56px; height: 56px; }
+  .displayName { font-size: 15px; }
+  .username { font-size: 12px; }
+  .statValue { font-size: 13px; }
+}

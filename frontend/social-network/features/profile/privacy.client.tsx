@@ -2,8 +2,8 @@
 
 import { useState } from 'react'
 import styles from './styles.module.css'
-import { togglePrivacy } from './profile.client'
-import { useAuth } from '../../providers/authProvider'
+import { togglePrivacy } from './profileSrevice'
+import { useAuth } from '@/providers/authProvider'
 
 export default function PrivacyToggle({ privacy }: { privacy: string }) {
     const [isPublic, setIsPublic] = useState(privacy == 'public' ? true : false)

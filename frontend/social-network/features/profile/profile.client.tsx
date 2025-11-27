@@ -2,11 +2,11 @@
 
 import { useState, useEffect } from 'react'
 import styles from './styles.module.css'
-import { unfollowPerson, followPerson, getMedia } from './profile.client'
-import { FollowIcon, MessageIcon, SettingsIcon, UserIcon } from '../../components/ui/icons'
+import { unfollowPerson, followPerson, getMedia } from './profileSrevice'
+import { FollowIcon, MessageIcon, SettingsIcon, UserIcon } from '@/components/ui/icons'
 import { ProfileData } from './types'
-import { FollowStatus } from '../../libs/globalTypes'
-import { useAuth } from '../../providers/authProvider'
+import { FollowStatus } from '@/libs/globalTypes'
+import { useAuth } from '@/providers/authProvider'
 
 export function FollowButton({ targetUserId, initialStatus, isPrivate = false }: { targetUserId: string, initialStatus: FollowStatus, isPrivate?: boolean }) {
     const [status, setStatus] = useState<FollowStatus>(initialStatus);

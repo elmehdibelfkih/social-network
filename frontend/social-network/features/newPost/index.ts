@@ -1,1 +1,1 @@
-export { createPost } from './services/post'
+export { createPost } from './post'
