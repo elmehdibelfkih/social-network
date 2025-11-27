@@ -7,14 +7,23 @@ import { JSX } from "react";
 import { getUserId } from "@/libs/helpers";
 
 export default async function HomePage(): Promise<JSX.Element> {
-  const res2 =  await http.get<MiniProfileAPIResponse>('/api/v1/users/7997950437494784/profile');
-  const userId = await getUserId();
-  console.log(res2);
-  
+  // const res2 =  await http.get<MiniProfileAPIResponse>('/api/v1/users/8139399070093312/profile');
+  const userId = await getUserId();  
   return (
     <>
-       {/* <MiniProfile data={res2} /> */}
        <ProfileSummaryServer userId={userId} />
+       <div>
+        <p>
+
+
+
+
+
+
+          
+        </p>
+       </div>
+       {/* <MiniProfile data={res2} /> */}
     </>
   );
 }
