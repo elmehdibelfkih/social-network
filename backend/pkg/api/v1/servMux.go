@@ -1,6 +1,7 @@
 package v1
 
 import (
+	"net/http"
 	"social/pkg/app/dependencies/middleware"
 	"social/pkg/app/dependencies/router"
 	socket "social/pkg/app/sockets"
@@ -112,5 +113,24 @@ func SocialMux() *router.Router {
 	socialMux.HandleFunc("GET", "/api/v1/users/{user_id}/feed", utils.MiddlewareChain(feed.GetFeedUser, middleware.AuthMiddleware))
 	socialMux.HandleFunc("GET", "/api/v1/groups/{group_id}/feed", utils.MiddlewareChain(feed.GetFeedGroup, feed.IsGroupMember, middleware.AuthMiddleware))
 
+	socialMux.HandleFunc("GET", "/api/v1/users/id", utils.MiddlewareChain(GetId, middleware.AuthMiddleware))
+
 	return socialMux
+}
+
+func GetId(w http.ResponseWriter, r *http.Request) {
+	viewerUserId := utils.GetUserIdFromContext(r)
+	if viewerUserId == -1 {
+		utils.BadRequest(w, "Invalid user ID.", "redirect")
+		return
+	}
+	type Id struct {
+		Id int64 `json:"Id"`
+	}
+
+	var id Id
+	id.Id = viewerUserId
+
+	// Return success response
+	utils.WriteSuccess(w, http.StatusOK, id)
 }

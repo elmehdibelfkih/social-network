@@ -202,7 +202,21 @@ No need for a request body.
 
 ``` json
 {
-
+  "userId": 1289843874339, // the user id of the profile owner 
+  "status": "follow",  // pending/accepted/declined or null
+  "nickname": "nickname", // or null
+  "firstName": "first",
+  "lastName": "last",
+  "avatarId": 1289843874780,
+  "aboutMe": "Full-stack developer and cloud enthusiast.", // or null
+  "dateOfBirth": "2001-01-01",
+  "privacy": "public",
+  "stats": {
+    "postsCount": 123,
+    "followersCount": 890,
+    "followingCount": 215
+  },
+  "joinedAt": "2022-05-12T09:00:00Z"
 }
 ```
 

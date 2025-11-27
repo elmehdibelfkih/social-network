@@ -2,20 +2,22 @@
 set -euo pipefail
 
 # Usage:
-#   ./make_feature.sh <feature-name>
+#   ./createFeature.sh <feature-name>
 # Example:
-#   ./make_feature.sh userProfile
+#   ./createFeature.sh userProfile
 #
-# Creates directory "userProfile" with:
-#   userProfile.server.tsx
-#   userProfile.client.tsx
-#   userProfile.hooks.ts
-#   userProfile.services.ts
+# Creates directory: frontend/social-network/features/<feature-name>
+# Creates files inside that directory:
+#   <feature-name>.server.tsx
+#   <feature-name>.client.tsx
+#   <feature-name>.hooks.ts
+#   <feature-name>.services.ts
 #   types.ts
 #   styles.module.css
 #   index.ts
 #
-# Abort if the target directory already exists to avoid accidental overwrite.
+# The filenames use the feature-name exactly as passed (no normalization).
+# Internal exported component/type names are PascalCase derived from the feature name.
 
 if [[ $# -ne 1 ]]; then
   echo "Usage: $0 <feature-name>"
@@ -23,129 +25,103 @@ if [[ $# -ne 1 ]]; then
 fi
 
 FEATURE_RAW="$1"
-FEATURE_DIR="${FEATURE_RAW}"
+FEATURE_ROOT="frontend/social-network/features"
+TARGET_DIR="${FEATURE_ROOT}/${FEATURE_RAW}"
 
 # Prevent accidental overwrite
-if [[ -e "$FEATURE_DIR" ]]; then
-  echo "Error: '$FEATURE_DIR' already exists. Aborting."
+if [[ -e "$TARGET_DIR" ]]; then
+  echo "Error: target directory '$TARGET_DIR' already exists. Aborting."
   exit 3
 fi
 
-# Create directory
-mkdir -p "$FEATURE_DIR"
+# Ensure parent features directory exists
+mkdir -p "$FEATURE_ROOT"
 
-# Derive PascalCase name for component/type usage
-# Split on non-alphanumeric characters, capitalize first letter of each part.
-IFS=$' _-.' read -ra PARTS <<< "$FEATURE_RAW"
-COMPONENT_NAME=""
-for p in "${PARTS[@]}"; do
-  [[ -z "$p" ]] && continue
-  # Uppercase first char, keep rest as-is
-  first="${p:0:1}"
-  rest="${p:1}"
-  # Use tr for portability to uppercase the first char
+# Create target directory
+mkdir -p "$TARGET_DIR"
+
+# Derive PascalCase name for internal symbols
+# Split on non-alphanumeric characters (space, dash, underscore, dot)
+IFS=$' \t\n_-.' read -ra PARTS <<< "$FEATURE_RAW"
+PASCAL=""
+for part in "${PARTS[@]}"; do
+  [[ -z "$part" ]] && continue
+  first="${part:0:1}"
+  rest="${part:1}"
+  # uppercase first char, keep rest as-is (portable via tr)
   first_upper="$(tr '[:lower:]' '[:upper:]' <<< "${first}")"
-  COMPONENT_NAME+="${first_upper}${rest}"
+  PASCAL+="${first_upper}${rest}"
 done
 
 # File paths
-SERVER_FILE="$FEATURE_DIR/${FEATURE_RAW}.server.tsx"
-CLIENT_FILE="$FEATURE_DIR/${FEATURE_RAW}.client.tsx"
-HOOKS_FILE="$FEATURE_DIR/${FEATURE_RAW}.hooks.ts"
-SERVICES_FILE="$FEATURE_DIR/${FEATURE_RAW}.services.ts"
-TYPES_FILE="$FEATURE_DIR/types.ts"
-STYLES_FILE="$FEATURE_DIR/styles.module.css"
-INDEX_FILE="$FEATURE_DIR/index.ts"
+SERVER_FILE="$TARGET_DIR/${FEATURE_RAW}.server.tsx"
+CLIENT_FILE="$TARGET_DIR/${FEATURE_RAW}.client.tsx"
+HOOKS_FILE="$TARGET_DIR/${FEATURE_RAW}.hooks.ts"
+SERVICES_FILE="$TARGET_DIR/${FEATURE_RAW}.services.ts"
+TYPES_FILE="$TARGET_DIR/types.ts"
+STYLES_FILE="$TARGET_DIR/styles.module.css"
+INDEX_FILE="$TARGET_DIR/index.ts"
 
-# Create server component (server-only; no client hooks)
+# Minimal server component (server-only)
 cat > "$SERVER_FILE" <<EOF
 // ${FEATURE_RAW}.server.tsx
-// Server component - runs on server, returns markup only.
+// Minimal server component (no "use client")
 
 import type { ReactNode } from "react";
-import { get${COMPONENT_NAME}Data } from "./${FEATURE_RAW}.services";
 
-interface ${COMPONENT_NAME}ServerProps {
+interface ${PASCAL}ServerProps {
   children?: ReactNode;
 }
 
-export default async function ${COMPONENT_NAME}Server(_props: ${COMPONENT_NAME}ServerProps) {
-  const data = await get${COMPONENT_NAME}Data();
-  return (
-    <section>
-      <pre>{JSON.stringify(data, null, 2)}</pre>
-    </section>
-  );
+export default function ${PASCAL}Server(_props: ${PASCAL}ServerProps) {
+  return <div className="${FEATURE_RAW}">{/* server-rendered: ${PASCAL}Server */}</div>;
 }
 EOF
 
-# Create client component (client-only)
+# Minimal client component (client-only)
 cat > "$CLIENT_FILE" <<EOF
 "use client";
 // ${FEATURE_RAW}.client.tsx
-// Client component - may use hooks, event handlers, browser APIs.
+// Minimal client component
 
-import React, { useEffect, useState } from "react";
-import type { ${COMPONENT_NAME}Type } from "./types";
-
-export default function ${COMPONENT_NAME}Client() {
-  const [state, setState] = useState<${COMPONENT_NAME}Type | null>(null);
-
-  useEffect(() => {
-    // client-side initialization
-  }, []);
-
-  return (
-    <div>
-      <button onClick={() => console.log("clicked")}>Action</button>
-      <pre>{JSON.stringify(state, null, 2)}</pre>
-    </div>
-  );
+export default function ${PASCAL}Client() {
+  return <div className="${FEATURE_RAW}">{/* client UI: ${PASCAL}Client */}</div>;
 }
 EOF
 
-# Create hooks file (single file for feature-specific hooks)
+# Minimal hooks file
 cat > "$HOOKS_FILE" <<EOF
 // ${FEATURE_RAW}.hooks.ts
-// Feature-specific hooks (client or shared)
+// Minimal hook(s) for ${FEATURE_RAW}
 
-import { useState, useEffect } from "react";
-import type { ${COMPONENT_NAME}Type } from "./types";
-
-export function use${COMPONENT_NAME}() {
-  const [data, setData] = useState<${COMPONENT_NAME}Type | null>(null);
-
-  useEffect(() => {
-    // optionally load or subscribe to data
-  }, []);
-
-  return { data, setData };
+export function use${PASCAL}() {
+  // stub: return nothing by default
+  return null;
 }
 EOF
 
-# Create services file (thin API wrapper)
+# Minimal services file
 cat > "$SERVICES_FILE" <<EOF
 // ${FEATURE_RAW}.services.ts
-// Thin service layer for ${FEATURE_RAW} (wrap APIs / libs)
+// Minimal service stubs for ${FEATURE_RAW}
 
-export async function get${COMPONENT_NAME}Data(): Promise<Record<string, any>> {
-  // Replace with real API client call, e.g. libs/apiClient.get(...)
-  return { message: "stub data for ${COMPONENT_NAME}" };
+export async function fetch${PASCAL}(): Promise<null> {
+  // replace with real API call
+  return null;
 }
 EOF
 
-# Create types.ts
+# Minimal types file
 cat > "$TYPES_FILE" <<EOF
 // types.ts
 // Local types for ${FEATURE_RAW}
 
-export type ${COMPONENT_NAME}Type = {
-  id?: string;
-  // add fields here
+export type ${PASCAL} = {
+  // add fields
 };
 EOF
 
-# Create styles.module.css
+# Minimal styles module
 cat > "$STYLES_FILE" <<EOF
 /* styles.module.css */
 /* Scoped styles for ${FEATURE_RAW} */
@@ -155,21 +131,21 @@ cat > "$STYLES_FILE" <<EOF
 }
 EOF
 
-# Create index.ts (exports)
+# Minimal index file (re-exports)
 cat > "$INDEX_FILE" <<EOF
 // index.ts
-export { default as ${COMPONENT_NAME}Server } from "./${FEATURE_RAW}.server";
-export { default as ${COMPONENT_NAME}Client } from "./${FEATURE_RAW}.client";
+export { default as ${PASCAL}Server } from "./${FEATURE_RAW}.server";
+export { default as ${PASCAL}Client } from "./${FEATURE_RAW}.client";
 export * from "./${FEATURE_RAW}.hooks";
 export * from "./${FEATURE_RAW}.services";
 export * from "./types";
 EOF
 
-# Set safe permissions for created files
-chmod -R u+rwX,go-rw "$FEATURE_DIR"
+# Set permissions
+chmod -R u+rwX,go-rw "$TARGET_DIR"
 
-echo "Feature scaffold created at: $FEATURE_DIR"
-echo "Files created:"
+# Output created files
+echo "Created feature at: $TARGET_DIR"
 echo " - $SERVER_FILE"
 echo " - $CLIENT_FILE"
 echo " - $HOOKS_FILE"

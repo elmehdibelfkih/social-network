@@ -1,14 +1,16 @@
 import { Profile } from '@/features/profile';
 
 interface PageProps {
-  params: Promise<{ user_id: string }>;
+  user_id: string;
 }
 
-export default async function ProfilePage({ params }: PageProps) {
+export default async function ProfilePage(  { children, params }: { children: React.ReactNode; params: PageProps }
+) {
   const { user_id } = await params;
   return (
-    <div>
-      
-    </div>
+    <>
+      <Profile user_id={user_id} />
+      {children}
+    </>
   );
 }
