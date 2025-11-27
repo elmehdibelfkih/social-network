@@ -13,8 +13,7 @@ export function ChatSection() {
             const data = e.data;
             console.log("received from sharedworker:", data);
         };
-        console.log("howa")
-        port.postMessage(JSON.stringify({ type: 'online_status', payload: null }));
+        port.postMessage(JSON.stringify({ source: 'client', type: 'online_status', payload: null }));
     }, []);
     const [users, useUsersState] = useState([] as User[]);
     return (

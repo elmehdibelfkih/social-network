@@ -121,25 +121,107 @@ func (c *Client) writeMessages() {
 }
 
 func (c *Client) handleEvent(e Event) error {
+	fmt.Println(e.Type)
 	switch e.Type {
 	case "onlineUser":
-		return c.ClientAdded(e)
+		if err := c.ClientAdded(e); err != nil {
+			c.events <- Event{
+				Source:  "server",
+				Type:    "error",
+				Payload: nil,
+				Error: &EventError{
+					Content: err,
+				},
+			}
+			return err
+		}
+		return nil
 	case "offlineUser":
-		return c.ClientRemoved(e)
+		if err := c.ClientRemoved(e); err != nil {
+			c.events <- Event{
+				Source:  "server",
+				Type:    "error",
+				Payload: nil,
+				Error: &EventError{
+					Content: err,
+				},
+			}
+			return err
+		}
+		return nil
 	case "online_status":
-		return c.onlineStatus(e)
+		if err := c.onlineStatus(e); err != nil {
+			c.events <- Event{
+				Source:  "server",
+				Type:    "error",
+				Payload: nil,
+				Error: &EventError{
+					Content: err,
+				},
+			}
+			return err
+		}
+		return nil
 	case "chat_typing":
-		return c.typing(e)
+		if err := c.typing(e); err != nil {
+			c.events <- Event{
+				Source:  "server",
+				Type:    "error",
+				Payload: nil,
+				Error: &EventError{
+					Content: err,
+				},
+			}
+			return err
+		}
+		return nil
 	case "chat_seen":
+		if err := c.seen(e); err != nil {
+			c.events <- Event{
+				Source:  "server",
+				Type:    "error",
+				Payload: nil,
+				Error: &EventError{
+					Content: err,
+				},
+			}
+			return err
+		}
 		return nil
 	case "chat_message":
+		if err := c.message(e); err != nil {
+			c.events <- Event{
+				Source:  "server",
+				Type:    "error",
+				Payload: nil,
+				Error: &EventError{
+					Content: err,
+				},
+			}
+			return err
+		}
 		return nil
 	case "notification":
+		if err := c.notification(e); err != nil {
+			c.events <- Event{
+				Source:  "server",
+				Type:    "error",
+				Payload: nil,
+				Error: &EventError{
+					Content: err,
+				},
+			}
+			return err
+		}
 		return nil
 	default:
 		c.events <- Event{
-			Source: "undefined",
-			Type:   "undefined",
+			Source:  "server",
+			Type:    "error",
+			Payload: nil,
+			Error: &EventError{
+				Content: fmt.Errorf("undefined event type"),
+			},
 		}
 		return nil
 	}

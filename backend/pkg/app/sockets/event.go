@@ -4,6 +4,11 @@ type Event struct {
 	Source  string         `json:"source"`
 	Type    string         `json:"type"`
 	Payload *ClientMessage `json:"payload"`
+	Error   *EventError    `json:"error"`
+}
+
+type EventError struct {
+	Content error
 }
 
 type ClientMessage struct {

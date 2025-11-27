@@ -58,7 +58,7 @@ func SelectChatParticipants(chatId int64) (map[int64]struct{}, error) {
 func SelectUserFollowers(userId int64) (*OnlineStatus, error) {
 	var users *OnlineStatus
 	err := database.WrapWithTransaction(func(tx *sql.Tx) error {
-		rows, err := tx.Query(SELECT_FOLLOWERS_BY_USER_ID, userId)
+		rows, err := tx.Query(SELECT_FOLLOWERS_BY_USER_ID, userId, userId, userId)
 		if err != nil {
 			utils.SQLiteErrorTarget(err, SELECT_FOLLOWERS_BY_USER_ID)
 			return err
