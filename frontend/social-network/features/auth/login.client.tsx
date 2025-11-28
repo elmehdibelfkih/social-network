@@ -4,7 +4,9 @@ import { useState, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import { authService } from './index';
 import styles from './styles.module.css';
-import { useAuth } from '../../providers/authProvider';
+import { useAuth } from '@/providers/authProvider';
+import { User } from "@/features/navbar/types";
+
 
 export function LoginForm({ onAuthSuccess }: { onAuthSuccess?: () => void }) {
     const router = useRouter();
@@ -23,15 +25,17 @@ export function LoginForm({ onAuthSuccess }: { onAuthSuccess?: () => void }) {
 
         try {
             const resp = await authService.login(formData);
-            setUser({
-                userId: resp.userId,
+            const User  = {
+                userId: String(resp.userId),
                 avatarId: resp.avatarId,
                 nickname: resp.nickname,
                 firstName: resp.firstName,
                 lastName: resp.lastName
-            })
-            router.push('/feed');
-            router.refresh();
+            };
+
+            localStorage.setItem('social_network-user', JSON.stringify(User));
+            setUser(User);
+            router.push('/');
         } catch (error) {
             setIsLoading(false);
             console.error("Login failed:", error);

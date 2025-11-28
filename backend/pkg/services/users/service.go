@@ -51,7 +51,7 @@ func GetUserProfile(w http.ResponseWriter, profileUserId, viewerUserId int64, co
 		utils.InternalServerError(w)
 		return response, false
 	}
-	//followes && following COUNT
+	// followes && following COUNT
 	followersCount, err := SelectFollowersCount(profileUserId)
 	if err != nil {
 		utils.BackendErrorTarget(err, context)

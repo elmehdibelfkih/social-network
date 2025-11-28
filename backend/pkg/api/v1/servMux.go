@@ -1,6 +1,7 @@
 package v1
 
 import (
+	"net/http"
 	"social/pkg/app/dependencies/middleware"
 	"social/pkg/app/dependencies/router"
 	socket "social/pkg/app/sockets"
@@ -60,7 +61,7 @@ func SocialMux() *router.Router {
 
 	// media
 	socialMux.HandleFunc("POST", "/api/v1/media/upload", media.HandleUploadMedia)
-	socialMux.HandleFunc("GET", "/api/v1/media/{media_id}", utils.MiddlewareChain(media.HandleGetMedia, media.MediaMiddleware, middleware.AuthMiddleware))
+	socialMux.HandleFunc("GET", "/api/v1/media/{media_id}", utils.MiddlewareChain(media.HandleGetMedia, middleware.AuthMiddleware, media.MediaMiddleware))
 	socialMux.HandleFunc("DELETE", "/api/v1/media/{media_id}", utils.MiddlewareChain(media.HandleDeleteMedia, media.MediaMiddleware, middleware.AuthMiddleware))
 
 	// follow
@@ -101,16 +102,35 @@ func SocialMux() *router.Router {
 	socialMux.HandleFunc("POST", "/api/v1/notifications/mark-all-read", utils.MiddlewareChain(notifications.HandleMarkAllNotifAsRead, middleware.AuthMiddleware))
 	socialMux.HandleFunc("POST", "/api/v1/notifications/{id}/mark-read", utils.MiddlewareChain(notifications.HandleMarkNotifAsRead, middleware.AuthMiddleware, notifications.NotifMiddleware))
 
-	//search
+	// search
 	socialMux.HandleFunc("GET", "/api/v1/search", utils.MiddlewareChain(search.HandleSearch, middleware.UserContext, middleware.AuthMiddleware))
 
-	//ws
+	// ws
 	socialMux.HandleFunc("GET", "/ws", utils.MiddlewareChain(socket.UpgradeProtocol, middleware.AuthMiddleware))
 
 	// Feed   ( personal && Specific user feed && Group feed )
 	socialMux.HandleFunc("GET", "/api/v1/feed", utils.MiddlewareChain(feed.GetFeed, middleware.AuthMiddleware))
 	socialMux.HandleFunc("GET", "/api/v1/users/{user_id}/feed", utils.MiddlewareChain(feed.GetFeedUser, middleware.AuthMiddleware))
-	socialMux.HandleFunc("GET", "/api/v1/groups/{group_id}/feed", utils.MiddlewareChain(feed.GetFeedGroup, middleware.AuthMiddleware))
+	socialMux.HandleFunc("GET", "/api/v1/groups/{group_id}/feed", utils.MiddlewareChain(feed.GetFeedGroup, feed.IsGroupMember, middleware.AuthMiddleware))
+
+	socialMux.HandleFunc("GET", "/api/v1/users/id", utils.MiddlewareChain(GetId, middleware.AuthMiddleware))
 
 	return socialMux
+}
+
+func GetId(w http.ResponseWriter, r *http.Request) {
+	viewerUserId := utils.GetUserIdFromContext(r)
+	if viewerUserId == -1 {
+		utils.BadRequest(w, "Invalid user ID.", "redirect")
+		return
+	}
+	type Id struct {
+		Id int64 `json:"Id"`
+	}
+
+	var id Id
+	id.Id = viewerUserId
+
+	// Return success response
+	utils.WriteSuccess(w, http.StatusOK, id)
 }

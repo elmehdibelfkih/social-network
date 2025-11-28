@@ -1,0 +1,251 @@
+.profileContainer {
+    max-width: 900px;
+    margin: 0 auto;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.topPart {
+    padding: 80px 24px 24px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+}
+
+.editProfile {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    color: black;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.followButton {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    color: white;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.messageButton {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    color: rgb(0, 0, 0);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.editProfile:hover,
+.followButton:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-1px);
+}
+
+.bottomPart {
+    background: white;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.bottomHeader {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.dataPart {
+    display: flex;
+    gap: 24px;
+    align-items: flex-start;
+    width: 100%;
+}
+
+.avatarContainer {
+    margin-top: -60px;
+}
+
+.avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    border: 4px solid white;
+    object-fit: cover;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.info {
+    flex: 1;
+    padding-top: 8px;
+}
+
+.settingsSection {
+    margin-top: 30px;
+    align-self: center;
+    max-width: 680px;
+    width: 100%;
+}
+
+.fullname {
+    font-size: 28px;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin: 0 0 4px 0;
+}
+
+.nickname {
+    font-size: 16px;
+    font-weight: 400;
+    color: #666;
+    margin: 0 0 12px 0;
+}
+
+.aboutMe {
+    font-size: 15px;
+    color: #333;
+    line-height: 1.5;
+    margin: 0 0 16px 0;
+}
+
+.stats {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 16px;
+    font-size: 14px;
+    color: #666;
+}
+
+.stats span b {
+    color: #1a1a1a;
+    font-weight: 600;
+}
+
+.meta {
+    display: flex;
+    gap: 16px;
+    font-size: 14px;
+    color: #666;
+}
+
+.joinDate,
+.privacy {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.joinDate svg,
+.privacy svg {
+    width: 16px;
+    height: 16px;
+}
+
+.privacy {
+    text-transform: capitalize;
+}
+
+.public {
+    color: #01a63f;
+}
+
+.private {
+    color: #F7773D;
+}
+
+.container {
+    max-width: 680px;
+    padding: 20px;
+    background-color: #f5e6d3;
+    border-radius: 12px;
+}
+
+.title {
+    color: #7b3ff2;
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 20px;
+}
+
+.privacyBlock {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.innerBlock {
+    background-color: white;
+    padding: 20px 24px;
+    border-radius: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.content {
+    flex: 1;
+}
+
+.heading {
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0 0 4px 0;
+    color: #000;
+}
+
+.description {
+    font-size: 14px;
+    color: #666;
+    margin: 0;
+}
+
+.toggleButton {
+    flex-shrink: 0;
+}
+
+.avatarPlaceholder {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #8b4fc9 0%, #6a3fb5 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 48px;
+    font-weight: 600;
+    border: 4px solid white;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}

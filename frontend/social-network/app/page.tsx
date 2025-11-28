@@ -4,7 +4,7 @@ import { JSX, useEffect, useState } from "react";
 import { NavbarClient } from "../features/navbar";
 import { NewPost } from '../features/newPost/newPost.client';
 import { PostsClient } from "../features/posts";
-import { http } from '../libs/apiClient';
+import { http } from '@/libs/apiFetch';
 import { ChatSection } from '../features/chat/chat.client';
 
 type AuthResponse = {

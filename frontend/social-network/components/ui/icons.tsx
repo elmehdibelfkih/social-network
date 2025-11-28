@@ -27,6 +27,17 @@ export function CalendarIcon() {
         </svg>
     )
 }
+
+export function FollowIcon() {
+    return (
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+            <path d="M16 3.128a4 4 0 0 1 0 7.744" />
+            <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+            <circle cx="9" cy="7" r="4" />
+        </svg>
+    )
+}
 export function ImageIcon() {
     return (
         <svg
@@ -84,5 +95,24 @@ export function SuccessIcon() {
             <g id="SVGRepo_bgCarrier" strokeWidth="0"></g><g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round"></g>
             <g id="SVGRepo_iconCarrier"> <path fillRule="evenodd" clipRule="evenodd" d="M22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12ZM16.0303 8.96967C16.3232 9.26256 16.3232 9.73744 16.0303 10.0303L11.0303 15.0303C10.7374 15.3232 10.2626 15.3232 9.96967 15.0303L7.96967 13.0303C7.67678 12.7374 7.67678 12.2626 7.96967 11.9697C8.26256 11.6768 8.73744 11.6768 9.03033 11.9697L10.5 13.4393L12.7348 11.2045L14.9697 8.96967C15.2626 8.67678 15.7374 8.67678 16.0303 8.96967Z" fill="#000000">
             </path> </g></svg>
+    )
+}
+
+export function MessageIcon() {
+    return (
+        <svg fill="#000000" width="16px" height="16px" viewBox="0 0 1920 1920" xmlns="http://www.w3.org/2000/svg">
+            <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
+            <g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round"></g>
+            <g id="SVGRepo_iconCarrier"> <path d="M0 1694.235h1920V226H0v1468.235ZM112.941 376.664V338.94H1807.06v37.723L960 1111.233l-847.059-734.57ZM1807.06 526.198v950.513l-351.134-438.89-88.32 70.475 378.353 472.998H174.042l378.353-472.998-88.32-70.475-351.134 438.89V526.198L960 1260.768l847.059-734.57Z" fillRule="evenodd">
+            </path> </g></svg>
+    )
+}
+
+export function UserIcon() {
+    return (
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 500">
+            <g fill="#167364"><path d="M109.7 257.6s433.6 432.9 665.7 0c-217.3-467.1-665.7 0-665.7 0Z"></path>
+            <path d="M890.1 254.4a6 6 0 0 0-7.4-3.9c-.4.1-37.8 11.2-106.5 2.3-249.7-32.5-438.6-8.9-440.5-8.6a5.8 5.8 0 0 0-5.1 6.7 6 6 0 0 0 6.7 5.2c1.9-.2 189.4-23.7 437.4 8.6a407 407 0 0 0 53.2 3.6c37.3 0 57.2-6 58.3-6.3a6 6 0 0 0 3.9-7.4Z" fill="#6DA89E">
+            </path></g></svg>
     )
 }

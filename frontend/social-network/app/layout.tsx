@@ -1,24 +1,33 @@
-'use client';
-import { AuthProvider } from '../providers/authProvider';
-import Snackbar from '../components/ui/snackbar';
-import AuthForm from '../features/auth/auth.client';
-import SharedWorekerClient from '../components/ui/worker';
+import Snackbar from '@/components/ui/snackbar/snackbar';
+import '@/styles/globals.css'; 
+import type { ReactNode } from 'react';
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export const metadata = {
+  title: 'Sonet',
+  description: 'A modern social media platform for communication and sharing content.',
+  applicationName: 'Social Network',
+  generator: 'Next.js',
+  keywords: ['social network', 'friends', 'messages', 'posts', 'community'],
+  authors: [{ name: '101 team' }],
+  creator: '101 team',
+  publisher: 'SocialNetwork Inc',
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
+  icons: {
+    icon: '/favicon.ico',
+  },
+};
 
+export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
-      <body>
-        <header style={{ padding: 12 }}>
-          <h1>Logo</h1>
-        </header>
-
-        <main>
-           <SharedWorekerClient/>
-          {children}
-          <Snackbar />
-        </main>
-
+      <head />
+      <body className="app-root">
+        {children}
+        <Snackbar />
       </body>
     </html>
   );

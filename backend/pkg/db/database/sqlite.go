@@ -43,6 +43,7 @@ const UPDATE_COUNT = `
       entity_type,
       entity_id,
       followers_count,
+      followees_count,
       posts_count,
       comments_count,
       reactions_count,

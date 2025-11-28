@@ -6,7 +6,7 @@ export type RegisterRequest = {
     dateOfBirth: string
     nickname?: string
     aboutme?: string
-    avatarId?: Number
+    avatarId?: number
 }
 
 export type LoginRequest = {

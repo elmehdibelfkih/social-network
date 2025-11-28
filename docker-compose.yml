@@ -1,0 +1,14 @@
+services:
+  social-api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    image: social-api:latest
+    container_name: social-api
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+    volumes:
+      - ./logs:/app/logs
+      - ./data:/app/data
+      - ./backend/pkg/db/migrations:/app/backend/pkg/db/migrations

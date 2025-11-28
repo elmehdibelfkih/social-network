@@ -1,15 +1,3 @@
-export interface ApiErrorDetails {
-    StatusCode: number;
-    StatusText: string;
-    ErrorMessage: string;
-    ErrorTitle?: string;
-    ErrorDescription?: string;
-    errorType?: 'redirect' | 'alert';
-}
-
-export type ApiResponse<T> =
-    | { success: true; payload: T }
-    | { success: false; error: ApiErrorDetails };
 
 export interface PaginationParams {
     page?: number;
@@ -17,7 +5,7 @@ export interface PaginationParams {
 }
 
 export type PrivacyLevel = 'public' | 'followers' | 'private' | 'group' | 'restricted';
-export type FollowStatus = 'pending' | 'accepted' | 'declined' | null;
+export type FollowStatus = 'none' | 'follow' | 'accepted' | 'pending' | 'declined';
 export type ReactionType = 'like';
 export type MediaType = 'image/png' | 'image/jpeg' | 'image/gif';
 
@@ -29,6 +17,10 @@ export interface Session {
     createdAt: string;
     expiresAt: string;
     current?: boolean;
+}
+
+export interface MediaResponse {
+    mediaEncoded: string
 }
 
 export interface AuthResponse {
@@ -52,11 +44,9 @@ export interface UserProfile {
     avatarId: number | null;
     dateOfBirth?: string;
     joinedAt?: string;
-
     status?: FollowStatus;
     privacy?: 'public' | 'private';
     chatId?: number | null;
-
     stats?: {
         postsCount: number;
         followersCount: number;
@@ -98,12 +88,10 @@ export interface Post {
     content: string;
     mediaIds: number[] | null;
     privacy: PrivacyLevel;
-
     isLikedByUser: boolean;
     stats: PostStats;
     groupId: number | null;
     allowedList?: number[] | null;
-
     createdAt: string;
     updatedAt: string;
 }

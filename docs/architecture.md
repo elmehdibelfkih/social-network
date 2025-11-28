@@ -19,8 +19,8 @@ src/
 │   └── componentExample/
 │       ├── *.server.tsx # → Server component: fetches data, runs on server, returns markup only. No hooks or event handlers.
 │       ├── *.client.tsx # → Client component: begins with "use client". Uses useState, useEffect, event handlers, third-party browser libs, file inputs, sockets.
-│       ├── hooks/ # → Client-only or shared hooks tied to that feature.
-│       ├── services/ # → Thin API wrapper calling libs/apiClient. Encapsulates endpoints used by the feature.
+│       ├── hooks # → Client-only or shared hooks tied to that feature.
+│       ├── services # → Thin API wrapper calling libs/apiClient. Encapsulates endpoints used by the feature.
 │       ├── types.ts # → Local TypeScript types for the feature. Prefer referencing shared models from src/types/models.ts if available.
 │       ├── styles.module.css # → Scoped CSS module (or CSS-in-TS variant). Theme tokens live in styles/variables.css.
 │       └── index.ts # → Re-export public components.

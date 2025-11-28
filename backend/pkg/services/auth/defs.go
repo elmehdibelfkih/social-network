@@ -1,9 +1,11 @@
 package auth
 
 import (
-	"social/pkg/utils"
+	"database/sql"
 	"strconv"
 	"strings"
+
+	"social/pkg/utils"
 )
 
 // all optional fields revieve a pointer
@@ -32,7 +34,7 @@ type RegisterResponseJson struct {
 
 // api/v1/auth/login
 type LoginRequestJson struct {
-	Identifier string `json:"identifier"` // flexible login field 
+	Identifier string `json:"identifier"` // flexible login field
 	Password   string `json:"password"`
 	RememberMe bool   `json:"rememberMe"`
 }
@@ -70,13 +72,13 @@ type SessionsResponseJson struct {
 }
 
 type SessionItemJson struct {
-	SessionId int64  `json:"sessionId"`
-	UserId    int64  `json:"userId"`
-	IpAddress string `json:"ipAddress"`
-	Device    string `json:"device"`
-	CreatedAt string `json:"createdAt"`
+	SessionId int64  `json:"sessionId" db:"session_id"`
+	UserId    int64  `json:"userId" db:"user_id"`
+	IpAddress string `json:"ipAddress" db:"ip_address"`
+	Device    string `json:"device" db:"device"`
+	CreatedAt string `json:"createdAt" db:"created_at"`
 	Current   bool   `json:"current"`
-	ExpiresAt string `json:"-"`
+	ExpiresAt string `json:"-"  db:"session_expires_at"`
 }
 
 // api/v1/sessions/:session_id
@@ -88,7 +90,7 @@ type RevokeSessionResponseJson struct {
 
 type AvatarMediaSqlRow struct {
 	MediaId   int64
-	OwnerId   int64
+	OwnerId   sql.NullInt64
 	Path      string
 	Mime      string
 	Size      int64
@@ -123,12 +125,12 @@ func (v *RegisterRequestJson) Validate() (bool, string) {
 	if !utils.DateValidation(v.DateOfBirth) {
 		return false, "invalid Date"
 	}
-	if v.Nickname != nil {
+	if v.Nickname != nil && *v.Nickname != "" {
 		if ok, str := utils.FirstNameLastName(*v.Nickname); !ok {
 			return false, str
 		}
 	}
-	if v.AboutMe != nil {
+	if v.AboutMe != nil && *v.AboutMe != "" {
 		if ok, str := utils.TextContentValidationEscape(v.AboutMe, 5, 2048); !ok {
 			return false, str
 		}

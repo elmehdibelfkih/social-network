@@ -37,7 +37,7 @@ func HandleCreatePost(w http.ResponseWriter, r *http.Request) {
 	}
 		fmt.Println("444444")
 	// Create post
-	now := time.Now()
+	now := time.Now().Format(time.RFC3339)
 	post := &Post{
 		ID:        utils.GenerateID(),
 		AuthorID:  userID,
@@ -135,7 +135,7 @@ func HandleUpdatePost(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Update post
-	if err := UpdatePost(postID, userID, req.Content, req.Privacy, time.Now()); err != nil {
+	if err := UpdatePost(postID, userID, req.Content, req.Privacy, time.Now().Format(time.RFC3339)); err != nil {
 		if err == sql.ErrNoRows {
 			utils.NotFoundError(w, "Post not found or you don't have permission to update it")
 			return
@@ -286,7 +286,7 @@ func HandleCreateComment(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Create comment
-	now := time.Now()
+	now := time.Now().Format(time.RFC3339)
 	comment := &Comment{
 		ID:        utils.GenerateID(),
 		PostID:    postID,
@@ -403,13 +403,13 @@ func HandleLikePost(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Check if already liked
-	if CheckPostReactionExists(userID, postID) {
+	if CheckPostReactionExists(postID, userID) {
 		utils.BadRequest(w, "You have already liked this post", utils.ErrorTypeAlert)
 		return
 	}
 
 	// Create reaction
-	if err := CreatePostReaction(userID, postID, ReactionLike); err != nil {
+	if err := CreatePostReaction(postID, userID, ReactionLike); err != nil {
 		utils.SQLiteErrorTarget(err, "HandleLikePost (CreatePostReaction)")
 		utils.InternalServerError(w)
 		return
@@ -420,7 +420,7 @@ func HandleLikePost(w http.ResponseWriter, r *http.Request) {
 		PostID:    postID,
 		UserID:    userID,
 		Reaction:  ReactionLike,
-		CreatedAt: time.Now(),
+		CreatedAt: time.Now().Format(time.RFC3339),
 	})
 }
 
@@ -433,7 +433,7 @@ func HandleUnlikePost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := DeletePostReaction(userID, postID); err != nil {
+	if err := DeletePostReaction(postID, userID); err != nil {
 		if err == sql.ErrNoRows {
 			utils.NotFoundError(w, "Like not found")
 			return
