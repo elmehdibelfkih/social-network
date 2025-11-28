@@ -1,21 +1,17 @@
 @import '../../styles/variables.css';
 
-/* ---------- Mini Profile Card ---------- */
-/* Horizontal rectangular card layout */
-
-/* Main container card */
 .miniCardLarge {
   width: 100%;
-  max-width: 520px;
+  max-width: 380px;
   background: var(--white);
   border-radius: var(--border-radius-lg);
-  padding: var(--spacing-lg);
+  padding: var(--spacing-xl) var(--spacing-lg) var(--spacing-lg);
   box-shadow: var(--shadow-md);
   border: 1px solid var(--gray-200);
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   align-items: center;
-  gap: var(--spacing-lg);
+  gap: 0;
   box-sizing: border-box;
   color: var(--gray-900);
   font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
@@ -26,22 +22,20 @@
   box-shadow: var(--shadow-lg);
 }
 
-/* Left section: Avatar + Info */
 .miniHeaderLarge {
   display: flex;
-  flex-direction: row;
-  gap: var(--spacing-md);
+  flex-direction: column;
+  gap: var(--spacing-sm);
   align-items: center;
-  flex: 1;
-  min-width: 0;
+  width: 100%;
+  text-align: center;
 }
 
-/* Avatar wrapper */
 .avatarWrap {
-  width: 64px;
-  height: 64px;
-  min-width: 64px;
-  min-height: 64px;
+  width: 80px;
+  height: 80px;
+  min-width: 80px;
+  min-height: 80px;
   border-radius: var(--border-radius-full);
   overflow: hidden;
   display: inline-flex;
@@ -49,9 +43,10 @@
   justify-content: center;
   background: var(--gray-100);
   box-shadow: var(--shadow-sm);
-  border: 2px solid var(--white);
+  border: 3px solid var(--white);
   flex-shrink: 0;
   box-sizing: border-box;
+  margin-bottom: var(--spacing-xs);
 }
 
 .avatar {
@@ -72,35 +67,35 @@
   justify-content: center;
   background: var(--gray-100);
   color: var(--gray-400);
-  font-size: 1.5rem;
+  font-size: 2rem;
 }
 
 /* Info section (name, handle, etc.) */
 .miniInfoLarge {
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  min-width: 0;
-  flex: 1;
+  gap: 4px;
+  align-items: center;
+  width: 100%;
 }
 
 .miniTitleRow {
   display: flex;
   gap: var(--spacing-xs);
   align-items: center;
-  min-width: 0;
+  justify-content: center;
 }
 
 .miniName {
   margin: 0;
-  font-size: 1rem;
+  font-size: 1.125rem;
   line-height: 1.3;
   font-weight: 700;
   color: var(--gray-900);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  min-width: 0;
+  max-width: 100%;
 }
 
 .miniLock {
@@ -114,8 +109,8 @@
   display: flex;
   gap: var(--spacing-sm);
   align-items: center;
+  justify-content: center;
   flex-wrap: wrap;
-  min-width: 0;
 }
 
 .miniHandle {
@@ -124,12 +119,12 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  min-width: 0;
+  max-width: 100%;
 }
 
 .badge {
   font-size: 0.7rem;
-  padding: 2px var(--spacing-sm);
+  padding: 3px var(--spacing-sm);
   border-radius: var(--border-radius-full);
   background: var(--gray-100);
   border: 1px solid var(--gray-200);
@@ -140,6 +135,51 @@
   flex-shrink: 0;
   white-space: nowrap;
   line-height: 1;
+  font-weight: 500;
+}
+
+/* Status badges row */
+.statusBadges {
+  display: flex;
+  gap: var(--spacing-sm);
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: var(--spacing-xs);
+}
+
+.badgeOffline,
+.badgeOnline,
+.badgePrivacy {
+  font-size: 0.75rem;
+  padding: 4px 12px;
+  border-radius: var(--border-radius-full);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  flex-shrink: 0;
+  white-space: nowrap;
+  line-height: 1;
+  font-weight: 500;
+  border: 1px solid;
+}
+
+.badgeOffline {
+  background: var(--gray-50);
+  border-color: var(--gray-200);
+  color: var(--gray-600);
+}
+
+.badgeOnline {
+  background: #ecfdf5;
+  border-color: #86efac;
+  color: #16a34a;
+}
+
+.badgePrivacy {
+  background: var(--gray-50);
+  border-color: var(--gray-200);
+  color: var(--gray-600);
 }
 
 .aboutMe {
@@ -158,16 +198,20 @@
 /* Stats section */
 .miniStatsLarge {
   display: flex;
-  flex-direction: column;
-  gap: var(--spacing-xs);
-  align-items: flex-start;
-  flex-shrink: 0;
+  flex-direction: row;
+  gap: var(--spacing-lg);
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  margin-top: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+  padding: var(--spacing-sm) 0;
 }
 
 .miniStat {
   display: flex;
   flex-direction: row;
-  gap: var(--spacing-xs);
+  gap: 4px;
   align-items: baseline;
   white-space: nowrap;
 }
@@ -175,12 +219,12 @@
 .miniStatValue {
   font-weight: 700;
   color: var(--gray-900);
-  font-size: 0.875rem;
+  font-size: 0.9375rem;
   line-height: 1;
 }
 
 .miniStatLabel {
-  font-size: 0.875rem;
+  font-size: 0.9375rem;
   color: var(--gray-600);
   line-height: 1;
   font-weight: 400;
@@ -189,19 +233,21 @@
 /* Actions section */
 .miniActionsLarge {
   display: flex;
-  flex-direction: column;
-  gap: var(--spacing-xs);
-  align-items: stretch;
-  flex-shrink: 0;
+  flex-direction: row;
+  gap: var(--spacing-sm);
+  align-items: center;
+  justify-content: center;
+  width: 100%;
 }
 
 .viewProfileBtnLarge {
-  min-width: 110px;
+  flex: 1;
+  max-width: 200px;
   text-decoration: none;
   background: var(--white);
   border: 1px solid var(--gray-300);
-  padding: var(--spacing-sm) var(--spacing-md);
-  font-size: 0.875rem;
+  padding: var(--spacing-sm) var(--spacing-lg);
+  font-size: 0.9375rem;
   border-radius: var(--border-radius);
   text-align: center;
   color: var(--gray-900);
@@ -230,12 +276,12 @@
   display: flex;
   gap: var(--spacing-sm);
   align-items: center;
-  justify-content: flex-start;
+  justify-content: center;
 }
 
 .iconBtn {
-  width: 38px;
-  height: 38px;
+  width: 40px;
+  height: 40px;
   border-radius: var(--border-radius);
   background: var(--white);
   border: 1px solid var(--gray-300);
@@ -246,7 +292,7 @@
   color: var(--gray-600);
   transition: all var(--transition-base);
   flex-shrink: 0;
-  font-size: 0.95rem;
+  font-size: 1rem;
   line-height: 1;
 }
 
@@ -267,8 +313,8 @@
 }
 
 .followBtn {
-  width: 38px;
-  height: 38px;
+  width: 40px;
+  height: 40px;
   border-radius: var(--border-radius);
   display: inline-flex;
   align-items: center;
@@ -278,7 +324,7 @@
   padding: 0;
   box-sizing: border-box;
   font-weight: 700;
-  font-size: 1.1rem;
+  font-size: 1.125rem;
   transition: all var(--transition-base);
   flex-shrink: 0;
   line-height: 1;
@@ -345,6 +391,7 @@
 
 /* Reduce motion */
 @media (prefers-reduced-motion: reduce) {
+
   .miniCardLarge,
   .avatarWrap,
   .viewProfileBtnLarge,
@@ -354,76 +401,16 @@
   }
 }
 
-/* Large screens - more spacing */
-@media (min-width: 1200px) {
-  .miniCardLarge {
-    max-width: 540px;
-    gap: var(--spacing-xl);
-  }
-}
-
-/* Tablet */
-@media (max-width: 900px) {
-  .miniCardLarge {
-    max-width: 550px;
-    gap: var(--spacing-md);
-    padding: var(--spacing-md);
-  }
-
-  .miniStatsLarge {
-    gap: var(--spacing-sm);
-  }
-
-  .miniStatValue,
-  .miniStatLabel {
-    font-size: 0.8125rem;
-  }
-}
-
-/* Small tablet - stack stats vertically */
+/* Responsive adjustments */
 @media (max-width: 768px) {
   .miniCardLarge {
-    flex-wrap: wrap;
-    max-width: 500px;
-  }
-
-  .miniHeaderLarge {
-    flex: 1 1 100%;
-  }
-
-  .miniStatsLarge {
-    order: 3;
-  }
-
-  .miniActionsLarge {
-    order: 2;
-    flex-direction: row;
-    width: 100%;
-  }
-
-  .viewProfileBtnLarge {
-    flex: 1;
-  }
-
-  .actionIcons {
-    flex-shrink: 0;
+    max-width: 100%;
   }
 }
 
-/* Mobile - vertical layout */
-@media (max-width: 600px) {
+@media (max-width: 480px) {
   .miniCardLarge {
-    flex-direction: column;
-    align-items: stretch;
-    text-align: center;
-    gap: var(--spacing-md);
-    max-width: 100%;
-  }
-
-  .miniHeaderLarge {
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
+    padding: var(--spacing-lg) var(--spacing-md) var(--spacing-md);
   }
 
   .avatarWrap {
@@ -433,75 +420,32 @@
     min-height: 72px;
   }
 
-  .miniInfoLarge {
-    align-items: center;
-    text-align: center;
-  }
-
-  .miniTitleRow {
-    justify-content: center;
-  }
-
-  .miniHandleRow {
-    justify-content: center;
-  }
-
-  .miniStatsLarge {
-    justify-content: center;
-    width: 100%;
-    order: 2;
-  }
-
-  .miniActionsLarge {
-    order: 3;
-    flex-direction: column;
-    width: 100%;
-  }
-
-  .viewProfileBtnLarge {
-    width: 100%;
-  }
-
-  .actionIcons {
-    width: 100%;
-    justify-content: center;
-  }
-}
-
-/* Small mobile */
-@media (max-width: 480px) {
-  .miniCardLarge {
-    padding: var(--spacing-sm);
-  }
-
-  .avatarWrap {
-    width: 64px;
-    height: 64px;
-    min-width: 64px;
-    min-height: 64px;
-  }
-
   .miniName {
-    font-size: 0.9375rem;
+    font-size: 1rem;
   }
 
   .miniHandle {
     font-size: 0.8125rem;
   }
 
+  .miniStatsLarge {
+    gap: var(--spacing-md);
+  }
+
   .miniStatValue,
   .miniStatLabel {
-    font-size: 0.75rem;
+    font-size: 0.875rem;
   }
 
   .viewProfileBtnLarge {
-    font-size: 0.8125rem;
+    font-size: 0.875rem;
+    padding: var(--spacing-sm) var(--spacing-md);
   }
 
   .iconBtn,
   .followBtn {
-    width: 36px;
-    height: 36px;
-    font-size: 0.875rem;
+    width: 38px;
+    height: 38px;
+    font-size: 0.9375rem;
   }
 }

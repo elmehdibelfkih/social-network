@@ -14,13 +14,6 @@ export default async function HomePage(): Promise<JSX.Element> {
        <ProfileSummaryServer userId={userId} />
        <div>
         <p>
-
-
-
-
-
-
-          
         </p>
        </div>
        <MiniProfile data={res2} />

@@ -30,7 +30,7 @@ export type AvatarHolderProps = React.HTMLAttributes<HTMLDivElement> & {
 
 export function AvatarHolder({
   avatarId = null,
-  size = 48,
+  size = 64,
   alt = "avatar",
   className = "",
   style,

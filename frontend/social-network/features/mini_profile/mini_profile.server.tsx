@@ -41,6 +41,8 @@ export default async function MiniProfile({ userId, data }: Props) {
     ? new Date(profile.joinedAt).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })
     : ''
 
+  let isOnline = false;
+
   return (
     <aside className={styles.miniCardLarge} aria-label={`Mini profile for ${name}`}>
       <div className={styles.miniHeaderLarge}>
@@ -60,6 +62,15 @@ export default async function MiniProfile({ userId, data }: Props) {
           <div className={styles.miniHandleRow}>
             <div className={styles.miniHandle}>{handle}</div>
             {profile.privacy !== 'public' && <span className={styles.badge}>Private</span>}
+          </div>
+
+          <div className={styles.statusBadges}>
+            <span className={isOnline ? styles.badgeOnline : styles.badgeOffline}>
+              {isOnline ? 'Online' : 'Offline'}
+            </span>
+            <span className={styles.badgePrivacy}>
+              {profile.privacy === 'public' ? 'Public' : 'Private'}
+            </span>
           </div>
 
           {profile.aboutMe ? <p className={styles.aboutMe}>{profile.aboutMe}</p> : null}
