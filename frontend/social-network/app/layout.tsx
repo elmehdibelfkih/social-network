@@ -1,4 +1,5 @@
 import Snackbar from '@/components/ui/snackbar/snackbar';
+import SharedWorekerClient from '@/components/ui/worker';
 import '@/styles/globals.css'; 
 import type { ReactNode } from 'react';
 
@@ -27,6 +28,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <head />
       <body className="app-root">
         {children}
+        <SharedWorekerClient/>
         <Snackbar />
       </body>
     </html>

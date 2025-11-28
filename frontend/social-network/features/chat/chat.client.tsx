@@ -14,7 +14,7 @@ export function ChatSection() {
         port.onmessage = (e) => {
             const data = e.data;
             console.log("received from sharedworker:", data);
-            setUsers(data.payload)
+            setUsers(data.payload.onlineStatus)
         };
         port.postMessage(JSON.stringify({ source: 'client', type: 'online_status', payload: null }));
     }, []);
@@ -25,7 +25,7 @@ export function ChatSection() {
                 <h2>Contacts</h2>
             </div>
             <div className={styles.scrollArea}>
-                {users.map((u) => (
+                {users?.map((u) => (
                     <ChatCard
                         key={u.UserId}
                         profileImage={

@@ -1,10 +1,10 @@
-import { Post } from '../types';
-import { http } from '../../../libs/apiFetch';
+import { Post } from '@/features/posts/types';
+import { http } from '@/libs/apiFetch';
 
 export const postsService = {
   async getFeed(page = 1, limit = 20): Promise<Post[]> {
     try {
-      const response = await http.get(`/api/v1/feed?page=${page}&limit=${limit}`);
+      const response = await http.get<Post>(`/api/v1/feed?page=${page}&limit=${limit}`);
       if (!response) {
         return [];
       }

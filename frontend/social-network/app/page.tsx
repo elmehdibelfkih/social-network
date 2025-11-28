@@ -3,7 +3,7 @@
 import { JSX, useEffect, useState } from "react";
 import { NavbarClient } from "../features/navbar";
 import { NewPost } from '../features/newPost/newPost.client';
-import { PostsClient } from "../features/posts";
+// import { PostsClient } from "../features/posts";
 import { http } from '@/libs/apiFetch';
 import { ChatSection } from '../features/chat/chat.client';
 
@@ -55,7 +55,7 @@ export default function HomePage(): JSX.Element {
         {error && <p style={{ color: 'red' }}>Error: {error}</p>}
         <NavbarClient />
         <NewPost userAvatar="/pic.png" />
-        <PostsClient />
+        {/* <PostsClient /> */}
       </main>
     );
   }
@@ -66,7 +66,7 @@ export default function HomePage(): JSX.Element {
       <NavbarClient />
       <ChatSection />
       <NewPost userAvatar="/svg/pic.png" />
-      <PostsClient />
+      {/* <PostsClient /> */}
     </main>
   );
 }
