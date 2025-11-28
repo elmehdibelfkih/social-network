@@ -11,11 +11,14 @@ type Props = {
   data?: ProfileAPIResponse
 }
 
-export default async function MiniProfile({ userId, data }: Props) {
+export default function MiniProfile({ userId, data }: Props) {
   let profile: ProfileAPIResponse | null = data ?? null
 
   if (!profile && userId != null) {
-    profile = await getProfileServer(userId)
+    const fetchProfile = async () => {
+      profile = await getProfileServer(userId)
+    }
+    fetchProfile()
   }
 
   if (!profile) {
