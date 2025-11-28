@@ -25,7 +25,7 @@ const (
 	`
 
 	QUERY_GET_USER_POSTS = `
-		SELECT id, author_id, group_id, content, privacy, created_at, updated_at, pinned
+		SELECT id, author_id, group_id, content, visibility, created_at, updated_at
 		FROM posts
 		WHERE author_id = ?
 		ORDER BY created_at DESC

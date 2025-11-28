@@ -1,12 +1,16 @@
-// profile_feed.server.tsx
-// Minimal server component (no "use client")
+import { PostsSection } from "./posts_section.client";
 
-import type { ReactNode } from "react";
+// type Props = {
+//   params: { userId: string }
+// }
 
-interface ProfileFeedServerProps {
-  children?: ReactNode;
-}
+export default async function ProfileFeed({ userId }: { userId: string }) {
+  // const userId = userID
 
-export default function ProfileFeedServer(_props: ProfileFeedServerProps) {
-  return <div className="profile_feed">{/* server-rendered: ProfileFeedServer */}</div>;
+  return (
+    <div>
+      <PostsSection userId={userId} />
+      </>
+    </div>
+  )
 }

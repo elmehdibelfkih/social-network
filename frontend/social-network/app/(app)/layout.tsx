@@ -8,6 +8,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
     <>
       <AuthProvider>
         <NavbarClient />
+        {/* <ProfileFeed userId={"7940237930139648"} /> */}
         {children}
       </AuthProvider>
     </>

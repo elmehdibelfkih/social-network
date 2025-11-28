@@ -5,18 +5,20 @@ import { ProfileAPIResponse as MiniProfileAPIResponse } from "@/features/mini_pr
 import { http } from "@/libs/apiFetch";
 import { JSX } from "react";
 import { getUserId } from "@/libs/helpers";
+import ProfileFeed from "@/features/profile_feed/profile_feed.server";
 
 export default async function HomePage(): Promise<JSX.Element> {
-  const userId = await getUserId();  
-  const res2 =  await http.get<MiniProfileAPIResponse>(`/api/v1/users/${userId}/profile`);
+  const userId = await getUserId();
+  const res2 = await http.get<MiniProfileAPIResponse>(`/api/v1/users/${userId}/profile`);
   return (
     <>
-       <ProfileSummaryServer userId={userId} />
-       <div>
+      <ProfileSummaryServer userId={userId} />
+      <div>
         <p>
         </p>
-       </div>
-       <MiniProfile data={res2} />
+      </div>
+      <MiniProfile data={res2} />
+      <ProfileFeed userId={userId.toString()} />
     </>
   );
 }
