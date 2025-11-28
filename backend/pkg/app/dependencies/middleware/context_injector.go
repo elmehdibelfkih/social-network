@@ -11,7 +11,6 @@ import (
 func UserContext(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		userId, err := checkSession(r)
-		println("=>", userId)
 		if err != nil {
 			next(w, r)
 			return

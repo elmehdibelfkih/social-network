@@ -3,7 +3,7 @@ package socket
 // select
 const (
 	SELECT_USER_BY_ID = `
-		SELECT first_name, last_name ,nickname, date_of_birth, avatar_id, about_me, privacy WHERE id = ?
+		SELECT first_name, last_name ,nickname, date_of_birth, avatar_id, about_me, privacy FROM users WHERE id = ?
 	`
 	SELECT_FOLLOWERS_BY_USER_ID = `
 		SELECT u.id, u.nickname, u.email, u.first_name, u.last_name, u.date_of_birth, u.avatar_id, u.about_me, u.privacy

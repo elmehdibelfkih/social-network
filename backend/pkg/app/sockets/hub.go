@@ -12,6 +12,7 @@ type Hub struct {
 	remove    chan *Client
 	chatUsers map[int64]map[int64][]*Client //chatId an its users *Client
 	mu        sync.RWMutex
+	
 }
 
 func InitWsHub() {

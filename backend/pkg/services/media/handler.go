@@ -41,7 +41,6 @@ func HandleUploadMedia(w http.ResponseWriter, r *http.Request) {
 		utils.BadRequest(w, "The provided file data is not valid base64.", utils.ErrorTypeAlert)
 		return
 	}
-	fmt.Println(len(data))
 
 	if len(data) > MaxMediaSize {
 		utils.MediaTooLargeError(w, fmt.Sprintf("File size cannot exceed %d MB.", MaxMediaSize/1024/1024))

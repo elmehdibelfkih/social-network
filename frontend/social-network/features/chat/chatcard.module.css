@@ -1,0 +1,53 @@
+
+.contactItem {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  cursor: pointer;
+  gap: 12px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  transition: background 0.2s;
+}
+
+.contactItem:hover {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.info {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.name {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #111;
+}
+
+.nickname {
+  font-size: 0.85rem;
+  color: #666;
+}
+
+.statusDot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-left: auto;
+}
+
+.online .statusDot {
+  background: #18c964;
+}
+
+.offline .statusDot {
+  background: #999;
+}

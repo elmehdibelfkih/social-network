@@ -217,11 +217,9 @@ func (c *Client) handleEvent(e Event) error {
 	default:
 		c.events <- Event{
 			Source:  "server",
-			Type:    "error",
+			Type:    "default:" + e.Type,
 			Payload: nil,
-			Error: &EventError{
-				Content: fmt.Errorf("undefined event type"),
-			},
+			Error:   nil,
 		}
 		return nil
 	}

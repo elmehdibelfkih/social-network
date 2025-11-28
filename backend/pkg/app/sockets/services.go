@@ -129,6 +129,7 @@ func (c *Client) typing(e Event) error {
 
 func (c *Client) seen(e Event) error {
 	var err error
+	
 	return err
 }
 
