@@ -112,6 +112,79 @@ func followUser(followerId, followedId int64) error {
 	})
 }
 
+func followBack(followerId, followedId int64) (bool, error) {
+	var exist bool
+	err := config.DB.QueryRow(
+		FOLLOW_BACK,
+		followedId,
+		followerId,
+	).Scan(
+		exist,
+	)
+	if err != nil {
+		utils.SQLiteErrorTarget(err, FOLLOW_BACK)
+	}
+	return exist, err
+}
+
+func createConversation(followerId, followedId int64) error {
+	var chatId int64
+	return database.WrapWithTransaction(func(tx *sql.Tx) error {
+		chatId = utils.GenerateID()
+		_, err := tx.Exec(
+			CREATE_CHAT_ROW,
+			chatId,
+		)
+		if err != nil {
+			utils.SQLiteErrorTarget(err, CREATE_CHAT_ROW)
+			return err
+		}
+		_, err = tx.Exec(
+			ADD_CHAT_PARTICIPANT,
+			chatId,
+			followedId,
+			0,
+		)
+		if err != nil {
+			utils.SQLiteErrorTarget(err, ADD_CHAT_PARTICIPANT)
+			return err
+		}
+		_, err = tx.Exec(
+			ADD_CHAT_PARTICIPANT,
+			chatId,
+			followerId,
+			0,
+		)
+		if err != nil {
+			utils.SQLiteErrorTarget(err, ADD_CHAT_PARTICIPANT)
+			return err
+		}
+		return nil
+	})
+}
+
+func createChatId(followerId, followedId int64) error {
+	return database.WrapWithTransaction(func(tx *sql.Tx) error {
+		public, err := isPublic(followedId)
+		if err != nil {
+			return err
+		}
+		if public {
+			return createConversation(followerId, followedId)
+		}
+		if !public {
+			follower, err := followBack(followerId, followedId)
+			if err != nil {
+				return err
+			}
+			if follower {
+				return createConversation(followerId, followedId)
+			}
+		}
+		return nil
+	})
+}
+
 func unfollowUser(followerId, followedId int64) error {
 	return database.WrapWithTransaction(func(tx *sql.Tx) error {
 		_, err := tx.Exec(UNFOLLOW_REQUEST_QUERY,

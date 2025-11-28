@@ -1,6 +1,17 @@
 package follow
 
 const (
+	CREATE_CHAT_ROW = `
+		INSERT INTO chats (id) VALUES (?)	
+	`
+	ADD_CHAT_PARTICIPANT = `
+		INSERT INTO chat_participants (chat_id, user_id, unread_count) VALUES (?, ?, ?) 
+	`
+	FOLLOW_BACK = `
+		SELECT EXISTS (
+			SELECT 1 FROM follows WHERE follower_id = ? AND followed_id = ?
+		);
+	`
 	FOLLOW_REQUEST_QUERY = `
 	INSERT INTO follows (follower_id, followed_id, status, followed_at)
 	SELECT ?, ?, 
