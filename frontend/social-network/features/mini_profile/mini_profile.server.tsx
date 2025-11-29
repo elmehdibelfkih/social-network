@@ -4,6 +4,7 @@ import styles from './styles.module.css'
 import type { ProfileAPIResponse } from './types'
 import { MiniProfileActions } from './mini_profile.client'
 import { AvatarHolder } from '@/components/ui/avatar_holder/avatarholder.client'
+import { getUserId } from '@/libs/helpers'
 
 
 type Props = {
@@ -42,6 +43,7 @@ export default async function MiniProfile({ userId, data }: Props) {
     : ''
 
   let isOnline = false;
+  let isMyprofile = profile.userId !== await getUserId() 
 
   return (
     <aside className={styles.miniCardLarge} aria-label={`Mini profile for ${name}`}>
@@ -101,12 +103,12 @@ export default async function MiniProfile({ userId, data }: Props) {
         <a className={styles.viewProfileBtnLarge} href={`/profile/${profile.userId}`}>
           View Profile
         </a>
-
-        <MiniProfileActions
+        
+        {isMyprofile? <MiniProfileActions
           userId={profile.userId}
           initialStatus={profile.status ?? null}
           initialChatId={profile.chatId ?? null}
-        />
+        /> : null}
       </div>
     </aside>
   )

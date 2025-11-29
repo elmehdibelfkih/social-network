@@ -2,29 +2,12 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import styles from "./styles.module.css";
-import type { MediaResponse } from "@/libs/globalTypes";
-import { http } from "@/libs/apiFetch";
+import { fetchMediaClient } from "@/libs/apiFetch";
 
-/** Minimal safe fetcher that handles both raw payload and {payload} wrappers */
-async function fetchMediaClient(mediaId: string): Promise<MediaResponse | null> {
-  try {
-    const res = await http.get(`/api/v1/media/${encodeURIComponent(mediaId)}`);
-    if (!res) return null;
-    // support wrappers like { success, payload }
-    if (typeof res === "object" && "payload" in (res as any)) {
-      return (res as any).payload as MediaResponse;
-    }
-    return res as MediaResponse;
-  } catch {
-    return null;
-  }
-}
 
 export type AvatarHolderProps = React.HTMLAttributes<HTMLDivElement> & {
   avatarId?: number | null;
-  /** pixel size of the avatar (width & height). Default 48 */
   size?: number;
-  /** image alt text */
   alt?: string;
 };
 

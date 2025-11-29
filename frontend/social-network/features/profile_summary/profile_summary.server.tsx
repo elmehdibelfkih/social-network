@@ -1,4 +1,3 @@
-// import { AvatarHolder } from './profile_summary.client'
 import { getProfileServer } from './profile_summary.services'
 import { formatDisplayName, formatHandle } from './profile_summary.hooks'
 import type { ProfileAPIResponse } from './types'
