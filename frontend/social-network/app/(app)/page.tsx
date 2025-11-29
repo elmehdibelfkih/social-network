@@ -18,7 +18,6 @@ export default async function HomePage(): Promise<JSX.Element> {
         </p>
       </div>
       <MiniProfile data={res2} />
-      <ProfileFeed userId={userId.toString()} />
     </>
   );
 }

@@ -2,7 +2,6 @@ package posts
 
 import (
 	"database/sql"
-	"fmt"
 	"net/http"
 	"time"
 
@@ -10,7 +9,6 @@ import (
 	"social/pkg/utils"
 )
 
-// HandleCreatePost handles POST /api/v1/posts
 func HandleCreatePost(w http.ResponseWriter, r *http.Request) {
 	userID := utils.GetUserIdFromContext(r)
 	var req CreatePostRequest
@@ -43,7 +41,6 @@ func HandleCreatePost(w http.ResponseWriter, r *http.Request) {
 		Privacy:   req.Privacy,
 		CreatedAt: now,
 		UpdatedAt: now,
-		Pinned:    0,
 	}
 	if err := CreatePost(post); err != nil {
 		utils.SQLiteErrorTarget(err, "HandleCreatePost (CreatePost)")
@@ -78,7 +75,6 @@ func HandleCreatePost(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-// HandleGetPost handles GET /api/v1/posts/{post_id}
 func HandleGetPost(w http.ResponseWriter, r *http.Request) {
 	postID, err := getPostID(r)
 	if err != nil {
@@ -222,9 +218,7 @@ func HandleGetUserPosts(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	
 	page, limit, offset := getPaginationParams(r)
-	fmt.Println("xxxxxxxxxxx", page, limit, offset)
 
 	posts, totalPosts, err := GetUserPosts(targetUserID, limit, offset)
 	if err != nil {
@@ -249,8 +243,6 @@ func HandleGetUserPosts(w http.ResponseWriter, r *http.Request) {
 	if postResponses == nil {
 		postResponses = []GetPostResponse{}
 	}
-
-	
 
 	utils.WriteSuccess(w, http.StatusOK, ListUserPostsResponse{
 		UserID:     targetUserID,

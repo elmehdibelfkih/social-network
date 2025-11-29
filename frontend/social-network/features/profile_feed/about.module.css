@@ -1,0 +1,80 @@
+.aboutContainer {
+  padding: 2rem;
+}
+
+.section {
+  margin-bottom: 2rem;
+}
+
+.section:last-child {
+  margin-bottom: 0;
+}
+
+.sectionTitle {
+  margin: 0 0 1rem 0;
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #111827;
+}
+
+.bioText {
+  margin: 0;
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: #374151;
+}
+
+.divider {
+  height: 1px;
+  background: #e5e7eb;
+  margin: 2rem 0;
+}
+
+.contactItem {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.9375rem;
+  color: #374151;
+}
+
+.contactItem svg {
+  color: #6b7280;
+  flex-shrink: 0;
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.statCard {
+  background: #f9fafb;
+  padding: 1.25rem;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+}
+
+.statLabel {
+  font-size: 0.8125rem;
+  color: #6b7280;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+.statValue {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #111827;
+}
+
+@media (max-width: 640px) {
+  .aboutContainer {
+    padding: 1.5rem;
+  }
+
+  .statsGrid {
+    grid-template-columns: 1fr;
+  }
+}
