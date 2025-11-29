@@ -1,7 +1,7 @@
 import { getProfileServer } from './mini_profile.services'
 import { displayName, handleName } from './mini_profile.hooks'
 import styles from './styles.module.css'
-import type { ProfileAPIResponse } from './types'
+import type { ProfileAPIResponse } from '@/libs/globalTypes'
 import { MiniProfileActions } from './mini_profile.client'
 import { AvatarHolder } from '@/components/ui/avatar_holder/avatarholder.client'
 import { getUserId } from '@/libs/helpers'
