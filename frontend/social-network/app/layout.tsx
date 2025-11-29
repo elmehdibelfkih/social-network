@@ -28,8 +28,8 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     <html lang="en">
       <head />
       <body className="app-root">
-        {children}
         <SharedWorekerClient/>
+        {children}
         <Snackbar />
       </body>
     </html>

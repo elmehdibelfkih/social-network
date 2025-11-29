@@ -1,7 +1,7 @@
 'use client';
 
 import { JSX, useEffect, useState } from "react";
-import { NavbarClient } from "../features/navbar";
+import { Navbar } from "../features/navbar";
 import { NewPost } from '../features/newPost/newPost.client';
 // import { PostsClient } from "../features/posts";
 import { http } from '@/libs/apiFetch';
@@ -53,7 +53,7 @@ export default function HomePage(): JSX.Element {
       <main>
         <p>No session found.</p>
         {error && <p style={{ color: 'red' }}>Error: {error}</p>}
-        <NavbarClient />
+        <Navbar />
         <NewPost userAvatar="/pic.png" />
         {/* <PostsClient /> */}
       </main>
@@ -63,7 +63,7 @@ export default function HomePage(): JSX.Element {
   // authenticated — safe to access session fields
   return (
     <main>
-      <NavbarClient />
+      <Navbar />
       <ChatSection />
       <NewPost userAvatar="/svg/pic.png" />
       {/* <PostsClient /> */}
