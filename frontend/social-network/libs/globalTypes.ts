@@ -19,10 +19,6 @@ export interface Session {
     current?: boolean;
 }
 
-export interface MediaResponse {
-    mediaEncoded: string
-}
-
 export interface AuthResponse {
     userId: number;
     email: string;
@@ -65,10 +61,10 @@ export interface UserStats {
 
 export interface Follower {
     userId: number;
-    nickname: string;
+    nickname: string | null;
     firstName: string;
     lastName: string;
-    avatarId: number;
+    avatarId: number | null;
     followedAt?: string;
     status: FollowStatus;
     chatId: number | null;
@@ -207,3 +203,29 @@ export interface Notification {
 }
 
 export type SearchResultItem = Post | Group | Follower;
+
+export type MediaResponse = { mediaEncoded?: string }
+export interface UserId {
+    Id: number;
+}
+
+/////////////////////////////////////////////////
+
+export type ProfileAPIResponse = {
+  userId: number
+  status: 'pending' | 'accepted' | 'declined' | 'follow' | null
+  nickname: string | null
+  firstName: string | null
+  lastName: string | null
+  avatarId: number | null
+  aboutMe: string | null
+  dateOfBirth: string | null
+  privacy: 'public' | 'private' | string
+  stats: {
+    postsCount: number
+    followersCount: number
+    followingCount: number
+  }
+  joinedAt: string | null
+  chatId?: number | null
+}

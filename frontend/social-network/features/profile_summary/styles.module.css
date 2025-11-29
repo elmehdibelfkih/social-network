@@ -1,92 +1,66 @@
 
-/* Card (small width — 20% of viewport or less; capped) */
+@import '../../styles/variables.css';
+
+/* Profile Card - Small, elegant, centered sidebar card */
+/* Max width: 25% of viewport or 280px, whichever is smaller */
 .profileCard {
-  width: min(20vw, 260px); /* <= 20% of page, capped at 260px */
-  min-width: 160px;
+  width: min(25vw, 280px);
   background: var(--white);
   border-radius: var(--border-radius-lg);
-  padding: 18px;
-  box-shadow: 0 6px 18px rgba(16, 24, 40, 0.06);
-  border: 1px solid rgba(16, 24, 40, 0.04);
+  padding: var(--spacing-lg);
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--gray-200);
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12px;
+  gap: var(--spacing-lg);
   font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   color: var(--gray-900);
+  transition: box-shadow var(--transition-base);
 }
 
-/* Header: avatar + name + handle */
+.profileCard:hover {
+  box-shadow: var(--shadow-lg);
+}
+
+/* Header: centered avatar */
 .header {
-  width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
+  gap: var(--spacing-md);
+  width: 100%;
 }
 
-/* Avatar wrapper — circular, smaller than before */
-.avatarWrap {
-  width: 64px;   /* reduced size */
-  height: 64px;
-  border-radius: 50%;
-  overflow: hidden;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--gray-50);
-  box-shadow: 0 6px 18px rgba(16, 24, 40, 0.06);
-  border: 3px solid var(--white); /* thin white ring */
-  flex: 0 0 auto;
-}
-
-/* Avatar image sizing */
-.avatar {
-  width: 64px;
-  height: 64px;
-  object-fit: cover;
-  border-radius: 50%;
-  display: block;
-}
-
-/* Placeholder for avatar */
-.placeholder {
-  width: 64px;
-  height: 64px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(180deg, var(--gray-100), var(--gray-50));
-  color: var(--gray-400);
-}
-
-/* Text under avatar */
+/* Text wrapper - centered and truncation-safe */
 .textWrap {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 6px;
+  gap: var(--spacing-xs);
   text-align: center;
   width: 100%;
-  padding: 0 6px;
+  min-width: 0; /* allow flex overflow to truncate */
 }
 
+/* Display name - large, bold, truncated */
 .displayName {
   margin: 0;
-  font-size: 16px;
+  font-size: 1.0625rem; /* 17px */
   font-weight: 700;
   color: var(--gray-900);
-  line-height: 1;
+  line-height: 1.2;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   width: 100%;
 }
 
+/* Username/handle - subtle */
 .username {
   margin: 0;
-  font-size: 13px;
+  font-size: 0.8125rem; /* 13px */
   color: var(--gray-500);
   white-space: nowrap;
   overflow: hidden;
@@ -94,35 +68,39 @@
   width: 100%;
 }
 
+/* Privacy indicator */
 .privacy {
-  margin-top: 4px;
-  color: var(--gray-400);
-  display:inline-flex;
-  align-items:center;
-  gap: 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  font-size: 0.75rem;
+  color: var(--gray-500);
+  margin-top: var(--spacing-xs);
 }
 
+/* Joined date */
 .joined {
-  font-size: 12px;
+  font-size: 0.75rem;
   color: var(--gray-500);
-  margin-top: 4px;
+  margin-top: var(--spacing-xs);
 }
 
 /* Divider line */
 .divider {
-  width: 100%;
+  width: calc(100% + (var(--spacing-lg) * 2)); /* extend to edges */
   height: 1px;
-  background: rgba(16, 24, 40, 0.04);
-  border-radius: 1px;
+  background: var(--gray-200);
+  border: none;
+  margin: 0 calc(var(--spacing-lg) * -1);
 }
 
 /* Stats area: three blocks horizontally */
 .statsContainer {
   width: 100%;
   display: flex;
-  justify-content: space-between;
-  gap: 8px;
-  padding: 6px 4px 2px 4px;
+  justify-content: space-around;
+  gap: var(--spacing-md);
+  padding: 0;
   box-sizing: border-box;
 }
 
@@ -131,31 +109,74 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  gap: var(--spacing-xs);
   flex: 1;
 }
 
-/* Label and value */
+/* Stat label - uppercase, small, muted */
 .statLabel {
-  font-size: 12px;
+  font-size: 0.7rem;
   color: var(--gray-600);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  line-height: 1;
+  font-weight: 600;
 }
 
+/* Stat value - bold, purple */
 .statValue {
-  font-size: 14px;
+  font-size: 1.125rem;
   font-weight: 700;
   color: var(--primary-purple);
-  margin-top: 4px;
+  line-height: 1.2;
 }
 
-/* Mobile adjustments */
-@media (max-width: 520px) {
+/* Responsive adjustments */
+@media (max-width: 900px) {
   .profileCard {
-    width: min(46vw, 300px);
-    padding: 14px;
+    width: min(30vw, 260px);
   }
-  .avatarWrap { width: 56px; height: 56px; border-width: 2px; }
-  .avatar, .placeholder { width: 56px; height: 56px; }
-  .displayName { font-size: 15px; }
-  .username { font-size: 12px; }
-  .statValue { font-size: 13px; }
+}
+
+@media (max-width: 600px) {
+  .profileCard {
+    width: min(45vw, 240px);
+    padding: var(--spacing-md);
+    gap: var(--spacing-md);
+  }
+
+  .divider {
+    width: calc(100% + (var(--spacing-md) * 2));
+    margin: 0 calc(var(--spacing-md) * -1);
+  }
+
+  .displayName {
+    font-size: 1rem;
+  }
+
+  .username {
+    font-size: 0.75rem;
+  }
+
+  .statValue {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .profileCard {
+    width: min(80vw, 220px);
+  }
+
+  .displayName {
+    font-size: 0.9375rem;
+  }
+
+  .statLabel {
+    font-size: 0.65rem;
+  }
+
+  .statValue {
+    font-size: 0.9375rem;
+  }
 }

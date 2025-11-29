@@ -27,11 +27,9 @@ func HandleSearch(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response := SearchResponse{
-		Query:   q,
-		Type:    searchType,
-		Results: results,
-	}
+	// response := SearchResponse{
+	// 	Results: results,
+	// }
 
-	utils.WriteSuccess(w, http.StatusOK, response)
+	utils.WriteSuccess(w, http.StatusOK, results)
 }

@@ -1,13 +1,22 @@
-import { NavbarClient } from './navbar.client';
-// import { http } from '@/libs/apiFetch';
-// import { User } from './types';
+import { SocialIcon } from '@/components/ui/icons';
+import NavbarCenter, { NavProfile, NotificationClient } from './navbar.client';
+import styles from './styles.module.css';
 
-
-
-// export async function getProfileData(userId: string): Promise<User> {
-//     return http.get(`/api/v1/users/${userId}/profile`);
-// }
-
-export function NavbarServer() {
-  return <NavbarClient />;
+export function Navbar() {
+  // return <NavbarClient />;
+  return (
+    <nav className={styles.navbar}>
+      <div className={styles.navbarLeft}>
+        <a href="/" aria-label="Go to homepage" className={styles.logoLink}>
+          <div className={styles.logoIcon}>
+            <SocialIcon/>
+          </div>
+          <span className={styles.brandText}>Social Network</span>
+        </a>
+      </div>
+      <NavbarCenter />
+      <NotificationClient />
+      <NavProfile />
+    </nav>
+  );
 }

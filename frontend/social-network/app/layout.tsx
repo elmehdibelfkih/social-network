@@ -1,3 +1,4 @@
+import AddFriends from '@/components/ui/AddFriends/addFriends';
 import Snackbar from '@/components/ui/snackbar/snackbar';
 import SharedWorekerClient from '@/components/ui/worker';
 import '@/styles/globals.css'; 

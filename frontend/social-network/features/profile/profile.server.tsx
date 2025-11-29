@@ -1,22 +1,21 @@
 import styles from './styles.module.css'
 import getProfileData from './profileSrevice'
-import { ProfileTopActions, AvatarHolder } from './profile.client'
+import { ProfileTopActions } from './profile.client'
 import { CalendarIcon, GlobeIcon } from '../../components/ui/icons'
 import { ProfileSettings } from './privacy.client'
+import AvatarHolder from '@/components/ui/avatar_holder/avatarholder.client'
 
-export  async function Profile({ user_id }: { user_id: string }) {
+export async function Profile({ user_id }: { user_id: string }) {
     const profile = await getProfileData(user_id)
     console.log(profile);
-    
+
     if (profile == null) return
     return (
         <div className={styles.profileContainer}>
             <ProfileTopActions userId={user_id} profile={profile} />
-
             <div className={styles.bottomPart}>
                 <div className={styles.dataPart}>
-                    <AvatarHolder avatarId={profile.avatarId} />
-
+                    <AvatarHolder avatarId={profile.avatarId ?? null} size={150} />
                     <div className={styles.info}>
                         <h2 className={styles.fullname}>
                             {profile.firstName} {profile.lastName}
@@ -28,7 +27,6 @@ export  async function Profile({ user_id }: { user_id: string }) {
                             <span><b>{profile.stats.followersCount}</b> Followers</span>
                             <span><b>{profile.stats.followingCount}</b> Following</span>
                         </div>
-
                         <div className={styles.meta}>
                             <span className={styles.joinDate}>
                                 <CalendarIcon />
@@ -42,7 +40,6 @@ export  async function Profile({ user_id }: { user_id: string }) {
                     </div>
                 </div>
                 <ProfileSettings privacy={profile.privacy} userId={user_id} />
-
             </div>
         </div>
     )

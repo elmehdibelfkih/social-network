@@ -16,4 +16,3 @@ export type ProfileAPIResponse = {
   joinedAt: string | null
 }
 
-export type MediaResponse = { mediaEncoded?: string }

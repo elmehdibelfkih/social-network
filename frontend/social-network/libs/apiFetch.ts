@@ -1,6 +1,7 @@
 import { redirect as nextRedirect } from 'next/navigation';
 
 import { ShowSnackbar } from '@/components/ui/snackbar/snackbar';
+import { MediaResponse } from './globalTypes';
 
 const BASE_URL = process.env.NEXT_PUBLIC_GO_API_URL ?? '';
 const isServer = typeof window === 'undefined';
@@ -30,14 +31,14 @@ type RawApiResponse<T> =
   | { success: false; error: ApiError };
 
 export type ApiFetchOpts = {
-  redirectOnError?: boolean;       
-  errorRoute?: string;             
-  throwOnError?: boolean;          
-  clientNavigate?: (path: string) => void; 
-  nextRevalidate?: number;         
-  cache?: RequestCache;            
-  redirectTitle?: string;          
-  errorMessage?: string;           
+  redirectOnError?: boolean;
+  errorRoute?: string;
+  throwOnError?: boolean;
+  clientNavigate?: (path: string) => void;
+  nextRevalidate?: number;
+  cache?: RequestCache;
+  redirectTitle?: string;
+  errorMessage?: string;
 };
 
 function buildErrorTarget(
@@ -148,10 +149,10 @@ export async function apiFetch<T>(
     errorMessage: 'Unknown API Error',
     errorType: 'unknown'
   };
-  
+
   if (!response.ok && rawBody && rawBody.success === false) {
     const apiErrorData = rawBody.error || {};
-    
+
     apiError = {
       statusCode: apiErrorData.statusCode || status,
       statusText: apiErrorData.statusText || response.statusText,
@@ -206,5 +207,20 @@ export const http = {
   patch: <T>(url: string, payload?: any, opts?: ApiFetchOpts) => apiFetch<T>(url, 'PATCH', payload, opts),
   delete: <T>(url: string, opts?: ApiFetchOpts) => apiFetch<T>(url, 'DELETE', undefined, opts),
 };
+
+
+export async function fetchMediaClient(mediaId: string): Promise<MediaResponse | null> {
+  try {
+    const res = await http.get(`/api/v1/media/${encodeURIComponent(mediaId)}`);
+    if (!res) return null;
+    if (typeof res === "object" && "payload" in (res as any)) {
+      return (res as any).payload as MediaResponse;
+    }
+    return res as MediaResponse;
+  } catch {
+    return null;
+  }
+}
+
 
 export default apiFetch;

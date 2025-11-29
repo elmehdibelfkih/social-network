@@ -112,7 +112,73 @@ export function UserIcon() {
     return (
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 500">
             <g fill="#167364"><path d="M109.7 257.6s433.6 432.9 665.7 0c-217.3-467.1-665.7 0-665.7 0Z"></path>
-            <path d="M890.1 254.4a6 6 0 0 0-7.4-3.9c-.4.1-37.8 11.2-106.5 2.3-249.7-32.5-438.6-8.9-440.5-8.6a5.8 5.8 0 0 0-5.1 6.7 6 6 0 0 0 6.7 5.2c1.9-.2 189.4-23.7 437.4 8.6a407 407 0 0 0 53.2 3.6c37.3 0 57.2-6 58.3-6.3a6 6 0 0 0 3.9-7.4Z" fill="#6DA89E">
-            </path></g></svg>
+                <path d="M890.1 254.4a6 6 0 0 0-7.4-3.9c-.4.1-37.8 11.2-106.5 2.3-249.7-32.5-438.6-8.9-440.5-8.6a5.8 5.8 0 0 0-5.1 6.7 6 6 0 0 0 6.7 5.2c1.9-.2 189.4-23.7 437.4 8.6a407 407 0 0 0 53.2 3.6c37.3 0 57.2-6 58.3-6.3a6 6 0 0 0 3.9-7.4Z" fill="#6DA89E">
+                </path></g></svg>
     )
 }
+
+export function ProfileIcon() {
+    return (
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z" />
+            <path d="M6.376 18.91a6 6 0 0 1 11.249.003" />
+            <circle cx="12" cy="11" r="4" />
+        </svg>
+    )
+}
+
+export function LogoutIcon() {
+    return (
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m16 17 5-5-5-5" />
+            <path d="M21 12H9" />
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+        </svg>
+    )
+}
+
+export function HomeIcon() {
+    return (
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8" />
+            <path d="M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+        </svg>
+    )
+}
+
+export function SearchIcon() {
+    return (
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m21 21-4.34-4.34" /><circle cx="11" cy="11" r="8" />
+        </svg>
+    )
+}
+
+export function GroupsIcon() {
+    return (
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+            <path d="M16 3.128a4 4 0 0 1 0 7.744" />
+            <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+            <circle cx="9" cy="7" r="4" />
+        </svg>
+    )
+}
+
+export function SocialIcon() {
+    return (
+        <svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2" />
+        </svg>
+    )
+}
+
+export function BellIcon() {
+    return (
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M10.268 21a2 2 0 0 0 3.464 0"/>
+            <path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"/>
+        </svg>
+    )
+}
+
