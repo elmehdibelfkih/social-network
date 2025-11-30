@@ -39,6 +39,7 @@ export type ApiFetchOpts = {
   cache?: RequestCache;
   redirectTitle?: string;
   errorMessage?: string;
+  skipAuthRedirect?: boolean;  // NEW: Skip 401 auto-redirect
 };
 
 function buildErrorTarget(
@@ -92,7 +93,8 @@ export async function apiFetch<T>(
     nextRevalidate,
     cache,
     redirectTitle,
-    errorMessage
+    errorMessage,
+    skipAuthRedirect = false,  // NEW
   } = opts;
 
   const url = `${BASE_URL}${endpoint}`;
@@ -108,6 +110,7 @@ export async function apiFetch<T>(
       const cookieHeader = cookieStore.toString();
       if (cookieHeader) headers['Cookie'] = cookieHeader;
     } catch (e) {
+      // Ignore cookie errors
     }
   }
 
@@ -156,14 +159,22 @@ export async function apiFetch<T>(
     apiError = {
       statusCode: apiErrorData.statusCode || status,
       statusText: apiErrorData.statusText || response.statusText,
-      errorMessage: apiErrorData.errorMessage || apiErrorData.errorMessage || 'Request failed',
-      errorTitle: apiErrorData.errorTitle || apiErrorData.errorTitle,
-      errorDescription: apiErrorData.errorDescription || apiErrorData.errorDescription,
+      errorMessage: apiErrorData.errorMessage || 'Request failed',
+      errorTitle: apiErrorData.errorTitle,
+      errorDescription: apiErrorData.errorDescription,
       errorType: apiErrorData.errorType || 'unknown'
     };
   }
 
-  if (apiError.statusCode === 401) {
+  // Don't redirect to /auth if:
+  // 1. We're already calling an auth endpoint
+  // 2. skipAuthRedirect is true (for media/optional fetches)
+  const shouldSkipAuthRedirect = 
+    endpoint.includes('/auth') || 
+    endpoint.includes('/login') ||
+    skipAuthRedirect;
+
+  if (apiError.statusCode === 401 && !shouldSkipAuthRedirect) {
     performRedirect('/auth', clientNavigate);
   }
 
@@ -211,13 +222,21 @@ export const http = {
 
 export async function fetchMediaClient(mediaId: string): Promise<MediaResponse | null> {
   try {
-    const res = await http.get(`/api/v1/media/${encodeURIComponent(mediaId)}`);
-    if (!res) return null;
-    if (typeof res === "object" && "payload" in (res as any)) {
-      return (res as any).payload as MediaResponse;
+    const res = await http.get<MediaResponse>(
+      `/api/v1/media/${encodeURIComponent(mediaId)}`,
+      { 
+        redirectOnError: false, 
+        throwOnError: false,
+        skipAuthRedirect: true  // CRITICAL: Don't redirect on media 401
+      }
+    );
+    if (!res) {
+      console.warn(`No media response for ID: ${mediaId}`);
+      return null;
     }
-    return res as MediaResponse;
-  } catch {
+    return res;
+  } catch (err) {
+    console.error(`Failed to fetch media ${mediaId}:`, err);
     return null;
   }
 }
