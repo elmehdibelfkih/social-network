@@ -83,6 +83,11 @@ func AcceptFollowHandler(w http.ResponseWriter, r *http.Request) {
 		utils.InternalServerError(w)
 		return
 	}
+	err = createChatId(targetUserId, userId)
+	if err != nil {
+		utils.IdentifySqlError(w, err)
+		return
+	}
 	acceptFollowResponse(w, r)
 }
 

@@ -53,12 +53,12 @@ func SocialMux() *router.Router {
 	socialMux.HandleFunc("GET", "/api/v1/groups/{group_id}/events", utils.MiddlewareChain(groups.GetGroupEvents, middleware.AuthMiddleware, groups.IsMemeber))
 
 	// chat
-	socialMux.HandleFunc("GET", "/api/v1/chats", utils.MiddlewareChain(chat.GetUserChats, middleware.UserContext, middleware.AuthMiddleware))
-	socialMux.HandleFunc("GET", "/api/v1/chats/{chat_id}/messages", utils.MiddlewareChain(chat.GetmassageByPagination, middleware.UserContext, middleware.AuthMiddleware, chat.ChatAccessMiddleware))
-	socialMux.HandleFunc("POST", "/api/v1/chats/{chat_id}/messages", utils.MiddlewareChain(chat.SendMessageHandler, middleware.UserContext, middleware.AuthMiddleware, chat.FollowRelationshipMiddleware))
-	socialMux.HandleFunc("DELETE", "/api/v1/chats/{chat_id}/messages/{msg_id}", utils.MiddlewareChain(chat.DeleteMessageHandler, middleware.UserContext, middleware.AuthMiddleware, chat.ChatAccessMiddleware))
-	socialMux.HandleFunc("GET", "/api/v1/chats/{chat_id}/participants", utils.MiddlewareChain(chat.GetParticipantsHandler, middleware.UserContext, middleware.AuthMiddleware, chat.ChatAccessMiddleware))
-
+	socialMux.HandleFunc("GET", "/api/v1/chats", utils.MiddlewareChain(chat.GetUserChats, middleware.AuthMiddleware))
+	socialMux.HandleFunc("GET", "/api/v1/chats/{chat_id}/messages", utils.MiddlewareChain(chat.GetmassageByPagination, middleware.AuthMiddleware, chat.ChatAccessMiddleware))
+	socialMux.HandleFunc("POST", "/api/v1/chats/{chat_id}/messages", utils.MiddlewareChain(chat.SendMessageHandler, middleware.AuthMiddleware, chat.FollowRelationshipMiddleware))
+	socialMux.HandleFunc("DELETE", "/api/v1/chats/{chat_id}/messages/{msg_id}", utils.MiddlewareChain(chat.DeleteMessageHandler, middleware.AuthMiddleware, chat.ChatAccessMiddleware))
+	socialMux.HandleFunc("GET", "/api/v1/chats/{chat_id}/participants", utils.MiddlewareChain(chat.GetParticipantsHandler, middleware.AuthMiddleware, chat.ChatAccessMiddleware))
+	socialMux.HandleFunc("PUT", "/api/v1/chats/{chat_id}/messages/{message_id}", utils.MiddlewareChain(chat.SeenMessageHandler, middleware.AuthMiddleware))
 	// media
 	socialMux.HandleFunc("POST", "/api/v1/media/upload", media.HandleUploadMedia)
 	socialMux.HandleFunc("GET", "/api/v1/media/{media_id}", utils.MiddlewareChain(media.HandleGetMedia, middleware.AuthMiddleware, media.MediaMiddleware))
