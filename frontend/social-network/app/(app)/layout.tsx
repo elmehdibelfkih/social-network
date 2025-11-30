@@ -1,6 +1,7 @@
 import { ReactNode } from "react";
 import { NavbarClient } from "@/features/navbar";
 import { AuthProvider } from "@/providers/authProvider";
+import Snackbar from "@/components/ui/snackbar/snackbar";
 
 
 export default function AppLayout({ children }: { children: ReactNode }) {

@@ -1,5 +1,5 @@
 'use client';
-import AddFriends from '@/components/ui/AddFriends/addFriends';
+import Snackbar from '@/components/ui/snackbar/snackbar';
 import AuthForm from '@/features/auth/auth.client';
 import { AuthProvider } from '@/providers/authProvider';
 
@@ -10,7 +10,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         <main>
           <AuthProvider>
-            {children}
+            <Snackbar />
             <AuthForm />
           </AuthProvider>
         </main>

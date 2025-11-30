@@ -12,21 +12,8 @@ export function AboutSection({ profile }: { profile: ProfileData }) {
         )
     }
 
-    const memberSince = profile.joinedAt
-        ? new Date(profile.joinedAt).toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric'
-        })
-        : 'Unknown'
-
-    const dateOfBirth = profile.dateOfBirth
-        ? new Date(profile.dateOfBirth).toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric'
-        })
-        : null
+    const memberSince = formatDate(profile.joinedAt) || 'Unknown'
+    const dateOfBirth = formatDate(profile.dateOfBirth)
 
     return (
         <div className={styles.aboutContainer}>
@@ -71,4 +58,12 @@ export function AboutSection({ profile }: { profile: ProfileData }) {
             </div>
         </div>
     )
+}
+
+const formatDate = (date: string | null) => {
+    if (!date) return null
+    return new Date(date).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long'
+    })
 }

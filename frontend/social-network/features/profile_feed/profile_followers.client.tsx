@@ -5,6 +5,7 @@ import { Follower } from "@/libs/globalTypes"
 import { getFollowers, getFollowing } from "./profile_feed.services"
 import MiniProfile from "../mini_profile"
 import type { ProfileAPIResponse } from "../mini_profile/types"
+import styles from "./styles.module.css"
 
 interface FollowersListProps {
     userId: string
@@ -69,10 +70,10 @@ export function FollowersList({ userId, type }: FollowersListProps) {
     }
 
     return (
-        <>
+        <div className={styles.followersGrid}>
             {followers.map((follower) => (
                 <MiniProfile key={follower.userId} data={followerToProfile(follower)} />
             ))}
-        </>
+        </div>
     )
 }

@@ -59,8 +59,6 @@ export function PostsSection({ userId }: { userId: string }) {
         return <div>No posts yet</div>
     }
 
-    console.log("posts.length", posts.length)
-
     return (
         <>
             {
