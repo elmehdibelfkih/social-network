@@ -1,11 +1,10 @@
 'use client'
-
 import { useEffect, useState } from "react"
-import { Follower } from "@/libs/globalTypes"
+import { Follower, ProfileAPIResponse } from "@/libs/globalTypes"
 import { getFollowers, getFollowing } from "./profile_feed.services"
 import MiniProfile from "../mini_profile"
-import type { ProfileAPIResponse } from "../mini_profile/types"
 import styles from "./styles.module.css"
+import { useAuth } from "@/providers/authProvider"
 
 interface FollowersListProps {
     userId: string
@@ -38,6 +37,8 @@ function followerToProfile(follower: Follower): ProfileAPIResponse {
 export function FollowersList({ userId, type }: FollowersListProps) {
     const [followers, setFollowers] = useState<Follower[]>([])
     const [isLoading, setIsLoading] = useState(false)
+    const { user } = useAuth()
+
 
     const loadFollowers = async () => {
         setIsLoading(true)
@@ -72,7 +73,7 @@ export function FollowersList({ userId, type }: FollowersListProps) {
     return (
         <div className={styles.followersGrid}>
             {followers.map((follower) => (
-                <MiniProfile key={follower.userId} data={followerToProfile(follower)} />
+                <MiniProfile key={follower.userId} data={followerToProfile(follower)} isMyprofile={String(follower.userId) !== user.userId} />
             ))}
         </div>
     )

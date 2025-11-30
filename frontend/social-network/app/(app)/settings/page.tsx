@@ -1,6 +1,6 @@
 import { getUserId } from '@/libs/helpers';
 
-export default async function GroupePage({ children }: { children: React.ReactNode }) {
+export default async function SettingsPage({ children }: { children: React.ReactNode }) {
   const userId = await getUserId()
 
   return (

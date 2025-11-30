@@ -1,11 +1,11 @@
 import styles from './styles.module.css'
-import getProfileData from './profileSrevice'
-import { ProfileTopActions, AvatarHolder } from './profile.client'
+import { ProfileTopActions } from './profile.client'
 import { CalendarIcon, GlobeIcon } from '../../components/ui/icons'
 import { ProfileSettings } from './privacy.client'
 import { ProfileData } from './types'
+import AvatarHolder from '@/components/ui/avatar_holder/avatarholder.client'
 
-export async function Profile({ profile }: { profile: ProfileData }) {
+export function Profile({ profile }: { profile: ProfileData }) {
 
     if (profile == null) return
     return (
@@ -14,8 +14,7 @@ export async function Profile({ profile }: { profile: ProfileData }) {
 
             <div className={styles.bottomPart}>
                 <div className={styles.dataPart}>
-                    <AvatarHolder avatarId={profile.avatarId} />
-
+                    <AvatarHolder avatarId={profile.avatarId ?? null} size={150} />
                     <div className={styles.info}>
                         <h2 className={styles.fullname}>
                             {profile.firstName} {profile.lastName}
@@ -27,7 +26,6 @@ export async function Profile({ profile }: { profile: ProfileData }) {
                             <span><b>{profile.stats.followersCount}</b> Followers</span>
                             <span><b>{profile.stats.followingCount}</b> Following</span>
                         </div>
-
                         <div className={styles.meta}>
                             <span className={styles.joinDate}>
                                 <CalendarIcon />

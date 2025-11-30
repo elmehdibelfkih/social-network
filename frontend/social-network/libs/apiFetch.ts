@@ -1,6 +1,7 @@
 import { redirect as nextRedirect } from 'next/navigation';
 
 import { ShowSnackbar } from '@/components/ui/snackbar/snackbar';
+import { MediaResponse } from './globalTypes';
 
 const BASE_URL = process.env.NEXT_PUBLIC_GO_API_URL ?? '';
 const isServer = typeof window === 'undefined';
@@ -206,5 +207,20 @@ export const http = {
   patch: <T>(url: string, payload?: any, opts?: ApiFetchOpts) => apiFetch<T>(url, 'PATCH', payload, opts),
   delete: <T>(url: string, opts?: ApiFetchOpts) => apiFetch<T>(url, 'DELETE', undefined, opts),
 };
+
+
+export async function fetchMediaClient(mediaId: string): Promise<MediaResponse | null> {
+  try {
+    const res = await http.get(`/api/v1/media/${encodeURIComponent(mediaId)}`);
+    if (!res) return null;
+    if (typeof res === "object" && "payload" in (res as any)) {
+      return (res as any).payload as MediaResponse;
+    }
+    return res as MediaResponse;
+  } catch {
+    return null;
+  }
+}
+
 
 export default apiFetch;
