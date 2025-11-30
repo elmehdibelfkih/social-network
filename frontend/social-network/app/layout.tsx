@@ -1,23 +1,34 @@
-// app/layout.tsx
-'use client';
-// import '../styles/global.css';
-import AuthForm from '../features/auth/auth.client';
-import { NewPost } from '../features/newPost/newPost.client';
-import { Profile } from '../features/profile';
-import Snackbar from '../components/ui/snackbar';
+import AddFriends from '@/components/ui/AddFriends/addFriends';
+import Snackbar from '@/components/ui/snackbar/snackbar';
+import '@/styles/globals.css'; 
+import type { ReactNode } from 'react';
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export const metadata = {
+  title: 'Sonet',
+  description: 'A modern social media platform for communication and sharing content.',
+  applicationName: 'Social Network',
+  generator: 'Next.js',
+  keywords: ['social network', 'friends', 'messages', 'posts', 'community'],
+  authors: [{ name: '101 team' }],
+  creator: '101 team',
+  publisher: 'SocialNetwork Inc',
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
+  icons: {
+    icon: '/favicon.ico',
+  },
+};
+
+export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
-      <body>
-        <header >
-          {/* <NewPost userAvatar='https://placehold.co/140x140/8b4fc9/ffffff?text=ABDNOUR' /> */}
-          {/* <Profile userId='948590438590' /> */}
-          {/* <Snackbar /> */}
-          {/* <AuthForm /> */}
-        </header>
-
-        <main>{children}</main>
+      <head />
+      <body className="app-root">
+        {children}
+        <Snackbar />
       </body>
     </html>
   );

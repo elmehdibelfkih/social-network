@@ -1,5 +1,22 @@
-import { NavbarClient } from './navbar.client';
+import { SocialIcon } from '@/components/ui/icons';
+import NavbarCenter, { NavProfile, NotificationClient } from './navbar.client';
+import styles from './styles.module.css';
 
-export function NavbarServer() {
-  return <NavbarClient />;
+export function Navbar() {
+  // return <NavbarClient />;
+  return (
+    <nav className={styles.navbar}>
+      <div className={styles.navbarLeft}>
+        <a href="/" aria-label="Go to homepage" className={styles.logoLink}>
+          <div className={styles.logoIcon}>
+            <SocialIcon/>
+          </div>
+          <span className={styles.brandText}>Social Network</span>
+        </a>
+      </div>
+      <NavbarCenter />
+      <NotificationClient />
+      <NavProfile />
+    </nav>
+  );
 }

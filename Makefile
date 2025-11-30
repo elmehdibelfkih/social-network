@@ -25,26 +25,40 @@ COMMENTS_DATA_PATH = $(PROJECT_ROOT)/data/uploads/comments
 DOCKER_COMPOSE_PATH = $(PROJECT_ROOT)/docker-compose.yml
 
 FRONTEND_PATH = $(PROJECT_ROOT)/frontend/social-network
+#=============================================================
 
-
+# local dev ==================================================
 dev: start-backend start-frontend
-
-stop-dev:
-	@echo "$(RED)Stopping processes gracefully....$(RESET)"
-	@fuser -k -s 8080/tcp || true
-	@fuser -k -s 3000/tcp || true
-	@echo "$(GREEN)Cleanup complete.$(RESET)"
-
+stop-dev: stop-backend stop-frontend
 start-backend: setup
 	@echo "$(GREEN)Starting backend (Port 8080).$(RESET)"
 	@echo "$(MAGENTA)Logs redirected to$(RESET) $(BACKEND_LOGS_PATH)..."
 	@(cd "./backend/" && nohup go run ./cmd/main.go < /dev/null >> $(BACKEND_LOGS_PATH) 2>&1 &)
-
-start-frontend: setup
+start-frontend: setup next-setup
 	@echo "$(GREEN)Starting frontend (Port 3000).$(RESET)"
 	@echo "$(MAGENTA)Logs redirected to$(RESET) $(FRONTEND_LOGS_PATH)..."
 	@(cd $(FRONTEND_PATH) && nohup npm run dev < /dev/null >> $(FRONTEND_LOGS_PATH) 2>&1 &)
+stop-backend:
+	@echo "$(RED)Stopping backend process gracefully....$(RESET)"
+	@fuser -k -s 8080/tcp || true
+	@echo "$(GREEN)frontend stoped$(RESET)"
+stop-frontend:
+	@echo "$(RED)Stopping frontend process gracefully....$(RESET)"
+	@fuser -k -s 3000/tcp || true
+	@echo "$(GREEN)backend stoped$(RESET)"
+restart-backend:
+	@echo "$(RED)Stopping backend process gracefully....$(RESET)"
+	@fuser -k -s 8080/tcp || true
+	@$(MAKE) start-backend
+restart-frontend:
+	@echo "$(RED)Stopping frontend process gracefully....$(RESET)"
+	@fuser -k -s 8080/tcp || true
+	@$(MAKE) start-frontend
+re-dev: stop-dev dev
+re-purge-dev: stop-dev purge dev
+#=============================================================
 
+# deps  ======================================================
 setup:
 	@mkdir -p $(LOGS_PATH)
 	@	: >> $(SQLITE_LOGS_PATH)
@@ -58,55 +72,62 @@ setup:
 	@mkdir -p $(POSTS_DATA_PATH)
 	@mkdir -p $(MESSAGES_DATA_PATH)
 	@mkdir -p $(COMMENTS_DATA_PATH)
+next-setup:
 	@cd $(FRONTEND_PATH) && npm install
 	@cd $(FRONTEND_PATH) && cp example.env .env
+confirm:
+	@echo -n "$(MAGENTA)Are you absolutely sure you want to run $(MAKECMDGOALS)?$(RESET) [$(RED)yes$(RESET)/$(GREEN)no$(RESET)]: " && \
+	read REPLY; \
+	if echo "$$REPLY" | grep -iq "^yes"; then \
+		echo "✅ Confirmation received. Continuing..."; \
+	else \
+		echo "❌ Operation cancelled by user."; \
+		exit 1; \
+	fi
+#=============================================================
 
-
+# docker =====================================================
 up: setup
 	docker compose -f $(DOCKER_COMPOSE_PATH) up -d
-
-
 build: setup
 	docker compose -f $(DOCKER_COMPOSE_PATH) build
-
-
 down:
 	docker compose -f $(DOCKER_COMPOSE_PATH) down
-
 status:
 	docker compose -f $(DOCKER_COMPOSE_PATH) ps
-	docker logs
+prune:
+	docker system prune -a --volumes
+#=============================================================
 
-
-
-
-clean-logs:
+# clean ======================================================
+clean-logs: confirm
 	@echo "$(YELLOW)Cleaning logs files...$(RESET)"
 	@rm -rf $(LOGS_PATH)
-
-
-clean-data:
+clean-data: confirm
 	@echo "$(YELLOW)Cleaning data...$(RESET)"
 	@rm -rf $(DATA_PATH)
-
-
 clean-next:
-	@echo "$(YELLOW)Cleaning Next.js project files...$(RESET)"
+	@echo "$(YELLOW)Cleaning Next.js artifacts and generated files...$(RESET)"
 	@rm -rf $(FRONTEND_PATH)/node_modules
 	@rm -f $(FRONTEND_PATH)/package-lock.json
-	@rm -f $(FRONTEND_PATH)/npm-debug.log
-	@rm -f $(FRONTEND_PATH)/.env
-	@rm -f $(FRONTEND_PATH)/next-env.d.ts
-	@rm -f $(FRONTEND_PATH)/tsconfig.json
+	@rm -f $(FRONTEND_PATH)/yarn.lock
+	@rm -f $(FRONTEND_PATH)/pnpm-lock.yaml
 	@rm -rf $(FRONTEND_PATH)/.next
 	@rm -rf $(FRONTEND_PATH)/out
-	@rm -rf $(FRONTEND_PATH)/dist
 	@rm -rf $(FRONTEND_PATH)/build
+	@rm -rf $(FRONTEND_PATH)/dist
+	@rm -rf $(FRONTEND_PATH)/.vercel
+	@rm -rf $(FRONTEND_PATH)/.turbo
+	@rm -f $(FRONTEND_PATH)/.env
+	@rm -f $(FRONTEND_PATH)/npm-debug.log
+	@rm -f $(FRONTEND_PATH)/yarn-error.log
+	@rm -f $(FRONTEND_PATH)/next-env.d.ts
+	@find $(FRONTEND_PATH) -type f -name ".DS_Store" -delete
+purge: stop-dev clean-logs clean-data clean-next
+	@echo "$(GREEN)purge: done$(RESET)"
+#=============================================================
 
 
-prune:clean-logs clean-data clean-next
+# re-prune: prune dev
 
-
-re-prune: prune dev
-
-.PHONY: dev 
+# .PHONY: dev 

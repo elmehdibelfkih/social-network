@@ -2,12 +2,11 @@ package users
 
 import (
 	"net/http"
+
 	"social/pkg/utils"
 )
 
-// return profile based on privacy rules (public / private)
 func GetProfile(w http.ResponseWriter, r *http.Request) {
-	// Extract user_id from URL path
 	profileUserId := utils.GetWildCardValue(w, r, "user_id")
 	if profileUserId == 0 {
 		utils.BadRequest(w, "Invalid user ID.", "redirect")
@@ -67,7 +66,7 @@ func PutProfile(w http.ResponseWriter, r *http.Request) {
 	utils.WriteSuccess(w, http.StatusOK, response)
 }
 
-//  toggles the profile privacy between "public" and "private".
+// toggles the profile privacy between "public" and "private".
 func PatchProfile(w http.ResponseWriter, r *http.Request) {
 	// Extract user_id from URL path
 	profileUserId := utils.GetWildCardValue(w, r, "user_id")
@@ -82,7 +81,8 @@ func PatchProfile(w http.ResponseWriter, r *http.Request) {
 		utils.Unauthorized(w, "You must be logged in to update your profile privacy.")
 		return
 	}
-		
+
+	//  var currentUserId int64 = 55
 	// Validate user owns the profile
 	if currentUserId != profileUserId {
 		utils.Unauthorized(w, "You can only update your own profile privacy.")
@@ -100,7 +100,6 @@ func PatchProfile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Return success response
 	utils.WriteSuccess(w, http.StatusOK, response)
 }
 

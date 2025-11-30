@@ -36,14 +36,6 @@ func GetUserProfile(w http.ResponseWriter, profileUserId, viewerUserId int64, co
 		}
 	}
 
-	// Privacy check: if private, only owner or accepted followers can view
-	if profile.Privacy == "private" && viewerUserId != profileUserId {
-		if followStatus == nil || *followStatus != "accepted" {
-			utils.Unauthorized(w, "This profile is private. You must follow this user to view their profile.")
-			return response, false
-		}
-	}
-
 	// Get stats
 	postsCount, err := SelectPostsCount(profileUserId)
 	if err != nil {
@@ -51,7 +43,7 @@ func GetUserProfile(w http.ResponseWriter, profileUserId, viewerUserId int64, co
 		utils.InternalServerError(w)
 		return response, false
 	}
-	//followes && following COUNT
+	// followes && following COUNT
 	followersCount, err := SelectFollowersCount(profileUserId)
 	if err != nil {
 		utils.BackendErrorTarget(err, context)

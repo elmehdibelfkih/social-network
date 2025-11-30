@@ -3,7 +3,7 @@ package media
 // NediaManager defines the interface for media DB operations
 type Media struct {
 	ID        int64  `db:"id"`
-	OwnerId   int64  `db:"owner_id"`
+	OwnerId   *int64  `db:"owner_id"`
 	Path      string `db:"path"`
 	Mime      string `db:"mime"`
 	Size      int    `db:"size"`

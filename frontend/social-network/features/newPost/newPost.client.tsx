@@ -2,9 +2,9 @@
 
 import { useState, useRef } from 'react';
 import styles from './styles.module.css';
-import { ImageIcon, GlobeIcon, DropdownIcon } from '../../components/ui/icons';
-import { postsService } from '../posts/services/postsService';
-import { Post } from '../posts/types';
+import { ImageIcon, GlobeIcon, DropdownIcon } from '@/components/ui/icons';
+import { postsService } from '@/features/posts/postsService';
+import { Post } from '@/features/posts/types';
 
 interface NewPostProps {
     userAvatar: string;

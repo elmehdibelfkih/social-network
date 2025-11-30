@@ -1,30 +1,38 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Post } from './types';
-import { postsService } from './services/postsService';
-import { LikeButton } from '../../components/ui/like-button';
-import { Comments } from '../../components/ui/comments';
+import { Post as PostType } from './types';
+import { postsService } from './postsService';
+import { Post } from './Post';
 import styles from './styles.module.css';
 
-interface PostsClientProps {
-  newPost?: Post | null;
+interface PostsProps {
+  userId?: number;
+  groupId?: number;
+  following?: boolean;
+  newPost?: PostType | null;
   onNewPostDisplayed?: () => void;
+  limit?: number;
+  showCreatePost?: boolean;
+  emptyMessage?: string;
 }
 
-export function PostsClient({ newPost, onNewPostDisplayed }: PostsClientProps) {
-  const [posts, setPosts] = useState<Post[]>([]);
-  const [openComments, setOpenComments] = useState<number | null>(null);
+export function Posts({
+  userId,
+  groupId,
+  following = false,
+  newPost,
+  onNewPostDisplayed,
+  limit,
+  showCreatePost = false,
+  emptyMessage = 'No posts yet.'
+}: PostsProps) {
+  const [posts, setPosts] = useState<PostType[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const loadTestPost = async () => {
-      const testPost = await postsService.getPost(1);
-      if (testPost) {
-        setPosts([testPost]);
-      }
-    };
-    loadTestPost();
-  }, []);
+    loadPosts();
+  }, [userId, groupId, following]);
 
   useEffect(() => {
     if (newPost) {
@@ -33,96 +41,35 @@ export function PostsClient({ newPost, onNewPostDisplayed }: PostsClientProps) {
     }
   }, [newPost, onNewPostDisplayed]);
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffMs = now.getTime() - date.getTime();
-    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-    
-    if (diffHours < 1) return 'Just now';
-    if (diffHours < 24) return `${diffHours} hours ago`;
-    return date.toLocaleDateString();
+  const loadPosts = async () => {
+    setLoading(true);
+    try {
+      const fetched = await postsService.getPosts({ userId, groupId, following });
+      setPosts(fetched || []);
+    } catch (err) {
+      console.error('Error loading posts:', err);
+    } finally {
+      setLoading(false);
+    }
   };
+
+  if (loading) {
+    return (
+      <div className={styles.postsContainer}>
+        <div className={styles.loadingIndicator}>Loading posts...</div>
+      </div>
+    );
+  }
+
+  const displayPosts = limit ? posts.slice(0, limit) : posts;
 
   return (
     <div className={styles.postsContainer}>
-      {posts.length === 0 ? (
-        <div>No posts yet. Create the first one!</div>
+      {displayPosts.length === 0 ? (
+        <div className={styles.emptyState}>{emptyMessage}</div>
       ) : (
-        posts.map((post) => (
-          <div key={post.postId} className={styles.postCard}>
-            <div className={styles.postUserSection}>
-              <div className={styles.postUserAvatar}>
-                <img src="/users.svg" alt="User Avatar" />
-              </div>
-              <div className={styles.postUserInfo}>
-                <h4>{post.authorFirstName} {post.authorLastName}</h4>
-                <span>{formatDate(post.createdAt)} · {post.privacy}</span>
-              </div>
-            </div>
-
-            <div className={styles.postCaption}>
-              <p>{post.content}</p>
-            </div>
-
-            {post.mediaIds && post.mediaIds.length > 0 && (
-              <div className={styles.postImages}>
-                {post.mediaIds.map((mediaId) => (
-                  <img
-                    key={mediaId}
-                    src={`${process.env.NEXT_PUBLIC_GO_API_URL}/api/v1/media/${mediaId}`}
-                    alt="Post image"
-                    className={styles.postImage}
-
-                    onError={(e) => {
-                      console.error('Failed to load image:', mediaId);
-                      e.currentTarget.style.display = 'none';
-                    }}
-                  />
-                ))}
-              </div>
-            )}
-
-            <div className={styles.postInteraction}>
-              <LikeButton
-                postId={post.postId}
-                isLiked={post.isLikedByUser}
-                likeCount={post.stats.reactionCount}
-                onLikeChange={(isLiked, newCount) => {
-                  setPosts(prev => prev.map(p => 
-                    p.postId === post.postId 
-                      ? { ...p, isLikedByUser: isLiked, stats: { ...p.stats, reactionCount: newCount } }
-                      : p
-                  ));
-                }}
-              />
-              <button 
-                className={styles.interactionItem}
-                onClick={() => setOpenComments(post.postId)}
-              >
-                <img src="/icons/comment.svg" alt="comment icon" />
-                <span>{post.stats.commentCount} comments</span>
-              </button>
-              <button className={styles.interactionItem}>
-                <img src="/icons/share.svg" alt="share icon" />
-                <span>Share</span>
-              </button>
-            </div>
-            
-            <Comments
-              postId={post.postId}
-              isOpen={openComments === post.postId}
-              onClose={() => setOpenComments(null)}
-              commentCount={post.stats.commentCount}
-              onCommentAdded={() => {
-                setPosts(prev => prev.map(p => 
-                  p.postId === post.postId 
-                    ? { ...p, stats: { ...p.stats, commentCount: p.stats.commentCount + 1 } }
-                    : p
-                ));
-              }}
-            />
-          </div>
+        displayPosts.map(post => (
+          <Post key={post.postId} post={post} />
         ))
       )}
     </div>

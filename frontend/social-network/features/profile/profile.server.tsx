@@ -1,56 +1,49 @@
 import styles from './styles.module.css'
-import getProfileData from './services/profile'
-import EditProfileButton from './profile.client'
-import { CalendarIcon, GlobeIcon } from '@/components/ui/icons'
+import getProfileData from './profileSrevice'
+import { ProfileTopActions } from './profile.client'
+import { CalendarIcon, GlobeIcon } from '../../components/ui/icons'
+import { ProfileSettings } from './privacy.client'
+import AvatarHolder from '@/components/ui/avatar_holder/avatarholder.client'
 
-export async function Profile({ userId }: { userId: string }) {
-    const profile = await getProfileData(userId)
+export async function Profile({ user_id }: { user_id: string }) {
+    const profile = await getProfileData(user_id)
+    console.log(profile);
 
-    // TODO: should compare the userIds to find out if own profile or visiting other's
-
+    if (profile == null) return
     return (
         <div className={styles.profileContainer}>
-            <div className={styles.topPart}>
-                <EditProfileButton profile={profile} />
-            </div>
-
+            <ProfileTopActions userId={user_id} profile={profile} />
             <div className={styles.bottomPart}>
-                <AvatarComponent avatarUrl={profile.avatarId} />
+                <div className={styles.dataPart}>
+                    <AvatarHolder avatarId={profile.avatarId ?? null} size={150} />
+                    <div className={styles.info}>
+                        <h2 className={styles.fullname}>
+                            {profile.firstName} {profile.lastName}
+                        </h2>
+                        <h3 className={styles.nickname}>@{profile.nickname}</h3>
+                        <p className={styles.aboutMe}>{profile.aboutMe}</p>
 
-                <div className={styles.info}>
-                    <h2 className={styles.fullname}>{profile.firstname} {profile.lastname}</h2>
-                    <h3 className={styles.nickname}>@{profile.nickname}</h3>
-                    <p className={styles.aboutMe}>{profile.aboutMe}</p>
-
-                    <div className={styles.stats}>
-                        <span><b>{profile.stats.followersCount}</b> Followers</span>
-                        <span><b>{profile.stats.followingCount}</b> Following</span>
-                    </div>
-
-                    <div className={styles.meta}>
-                        <span className={styles.joinDate}>
-                            <CalendarIcon />
-                            Joined {profile.joinedAt}
-                        </span>
-                        <span className={styles.privacy}>
-                            <GlobeIcon fillColor='#01a63f' />
-                            {profile.privacy} profile
-                        </span>
+                        <div className={styles.stats}>
+                            <span><b>{profile.stats.followersCount}</b> Followers</span>
+                            <span><b>{profile.stats.followingCount}</b> Following</span>
+                        </div>
+                        <div className={styles.meta}>
+                            <span className={styles.joinDate}>
+                                <CalendarIcon />
+                                Joined {new Date(profile.joinedAt).toLocaleDateString()}
+                            </span>
+                            <span className={`${styles.privacy} ${styles[profile.privacy]}`}>
+                                <GlobeIcon fillColor={profile.privacy === 'public' ? '#01a63f' : '#F7773D'} />
+                                {profile.privacy} profile
+                            </span>
+                        </div>
                     </div>
                 </div>
+                <ProfileSettings privacy={profile.privacy} userId={user_id} />
             </div>
         </div>
     )
 }
 
-function AvatarComponent({ avatarUrl }: { avatarUrl?: string }) {
-    return (
-        <div className={styles.avatarContainer}>
-            <img
-                className={styles.avatar}
-                src={avatarUrl}
-            />
-        </div>
-    )
-}
+
 

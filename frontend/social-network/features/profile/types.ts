@@ -1,6 +1,8 @@
-type ProfileData = {
+import { FollowStatus } from "../../libs/globalTypes";
+
+export type ProfileData = {
     userId: number;
-    status: "pending" | "accepted" | "declined" | null;
+    status: FollowStatus;
     nickname: string | null;
     firstName: string;
     lastName: string;
@@ -16,3 +18,16 @@ type ProfileData = {
     };
     joinedAt: string;
 };
+
+export type FollowResponse = {
+    message: string
+    status: string
+    targetUserId: number
+    followerId: number
+    chatId: number | null
+}
+
+export type PrivacyToggleResponse = {
+    message: string
+    privacy: string
+}

@@ -2,8 +2,10 @@
 
 import { useState, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
-import { authService } from './services/auth';
+import { authService } from './auth';
 import styles from './styles.module.css';
+import { useAuth } from '@/providers/authProvider';
+
 
 export function RegisterForm({ onAuthSuccess }: { onAuthSuccess?: () => void }) {
     const router = useRouter();
@@ -16,16 +18,29 @@ export function RegisterForm({ onAuthSuccess }: { onAuthSuccess?: () => void }) 
         dateOfBirth: '',
         nickname: '',
         aboutMe: '',
-        avatarId: 0,
+        avatarId: null,
     });
+    const { setUser } = useAuth()
 
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setIsLoading(true);
 
         try {
-            await authService.register(formData);
-            onAuthSuccess?.();
+            const resp = await authService.register(formData);
+
+            const newUser = {
+                userId: String(resp.userId),
+                avatarId: resp.avatarId,
+                nickname: resp.nickname,
+                firstName: resp.firstName,
+                lastName: resp.lastName
+            };
+
+            localStorage.setItem('social_network-user', JSON.stringify(newUser));
+            setUser(newUser);
+
+            router.push('/');
         } catch (error) {
             console.error("Failed to register:", error);
         } finally {
@@ -38,9 +53,9 @@ export function RegisterForm({ onAuthSuccess }: { onAuthSuccess?: () => void }) 
         if (!avatar) return;
 
         try {
-            const avatarId = await authService.uploadAvatar(avatar);
-
-            setFormData(prev => ({ ...prev, avatarId }));
+            const avatarResp = await authService.uploadAvatar(avatar);
+            const avatarId = avatarResp.mediaId
+            setFormData(prev => ({ ...prev, avatarId: avatarId }));
         } catch (error) {
             console.error("Failed to upload avatar:", error);
         }

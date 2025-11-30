@@ -4,6 +4,9 @@ import { useState, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import { authService } from './index';
 import styles from './styles.module.css';
+import { useAuth } from '@/providers/authProvider';
+import { User } from "@/features/navbar/types";
+
 
 export function LoginForm({ onAuthSuccess }: { onAuthSuccess?: () => void }) {
     const router = useRouter();
@@ -14,13 +17,25 @@ export function LoginForm({ onAuthSuccess }: { onAuthSuccess?: () => void }) {
         rememberMe: false
     });
 
+    const { setUser } = useAuth()
+
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setIsLoading(true);
 
         try {
-            await authService.login(formData);
-            onAuthSuccess?.();
+            const resp = await authService.login(formData);
+            const User  = {
+                userId: String(resp.userId),
+                avatarId: resp.avatarId,
+                nickname: resp.nickname,
+                firstName: resp.firstName,
+                lastName: resp.lastName
+            };
+
+            localStorage.setItem('social_network-user', JSON.stringify(User));
+            setUser(User);
+            router.push('/');
         } catch (error) {
             setIsLoading(false);
             console.error("Login failed:", error);

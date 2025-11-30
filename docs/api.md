@@ -19,11 +19,11 @@
 {
   "success": false,
   "error": {
-    "StatusCode": 404,
-    "StatusText": "Not Found",
-    "ErrorMessage": "The page you are looking for might have been removed, had its name changed, or is temporarily unavailable.",
-    "ErrorTitle": "Oops! Page Not Found",
-    "ErrorDescription": "We couldn't find the page you were looking for. Please check the URL for any mistakes or go back to the homepage.",
+    "statusCode": 404,
+    "statusText": "Not Found",
+    "errorMessage": "The page you are looking for might have been removed, had its name changed, or is temporarily unavailable.",
+    "errorTitle": "Oops! Page Not Found",
+    "errorDescription": "We couldn't find the page you were looking for. Please check the URL for any mistakes or go back to the homepage.",
     "errorType": "redirect"
   }
 }
@@ -203,16 +203,14 @@ No need for a request body.
 ``` json
 {
   "userId": 1289843874339, // the user id of the profile owner 
-  "status": "accepted", // pending/accepted/declined or null
+  "status": "follow",  // pending/accepted/declined or null
   "nickname": "nickname", // or null
   "firstName": "first",
   "lastName": "last",
-  "avatarId": 1289843874780, // or null
-  "avatarId": 1289843874780, // or null
+  "avatarId": 1289843874780,
   "aboutMe": "Full-stack developer and cloud enthusiast.", // or null
   "dateOfBirth": "2001-01-01",
   "privacy": "public",
-  "chatId": 34567864535677, // or null
   "stats": {
     "postsCount": 123,
     "followersCount": 890,
@@ -506,7 +504,7 @@ No need for a request body.
 
 ## 🔴 Feed
 
-### GET `GET /api/v1/feed?page=1&limit=20` => paginated personal feed (public + followees + groups + allowed private)
+### GET `/api/v1/feed?page=1&limit=20` => paginated personal feed (public + followees + groups + allowed private)
 
 ***status code in success: 200***
 
