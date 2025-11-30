@@ -1,6 +1,17 @@
 package follow
 
 const (
+	UPDATE_CHAT_STATUS = `
+	UPDATE chats
+	SET status = 'suspended',
+    updated_at = CURRENT_TIMESTAMP
+	WHERE id = ? AND group_id IS NULL
+	`
+	SELECT_SHARED_CHATS = `
+	SELECT chat_id FROM chat_participants WHERE user_id = ?
+	INTERSECT
+	SELECT chat_id FROM chat_participants WHERE user_id = ?;
+	`
 	CREATE_CHAT_ROW = `
 		INSERT INTO chats (id) VALUES (?)	
 	`

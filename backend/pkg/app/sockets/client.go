@@ -49,6 +49,13 @@ func NewClient(wsHub *Hub, conn *websocket.Conn, id int64, token string, user Us
 	}
 }
 
+func (c *Client) getClientChats() {
+	if err := SelectUserChats(c); err != nil {
+		log.Println(err)
+		return 
+	}
+}
+
 func (c *Client) pongHandler(pongMsg string) error {
 	log.Println("pong")
 	return c.connection.SetReadDeadline(time.Now().Add(pongWait))

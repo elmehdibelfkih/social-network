@@ -12,7 +12,6 @@ type Hub struct {
 	remove    chan *Client
 	chatUsers map[int64]map[int64][]*Client //chatId an its users *Client
 	mu        sync.RWMutex
-	
 }
 
 func InitWsHub() {
@@ -40,9 +39,23 @@ func (h *Hub) Run() {
 	}
 }
 
+func (h *Hub) AddChatUser(chatId, userId int64) {
+	if len(h.clients[userId]) > 0 {
+		src := h.clients[userId]
+		dst := append([]*Client(nil), src...)
+		h.chatUsers[chatId][userId] = dst
+		for _, c := range h.chatUsers[chatId][userId] {
+			c.userChats[chatId] = struct{}{}
+		}
+	}
+}
+
 func (h *Hub) addClient(c *Client) {
 	h.mu.Lock()
 	defer h.mu.Unlock()
+	for chatId := range c.userChats {
+		h.chatUsers[chatId][c.userId] = append(h.chatUsers[chatId][c.userId], c)
+	}
 	firstConnection := len(h.clients[c.userId]) == 0
 	h.clients[c.userId] = append(h.clients[c.userId], c)
 	if firstConnection {
@@ -73,4 +86,7 @@ func (h *Hub) removeClient(c *Client) {
 	}
 	go c.handleEvent(Event{Type: "offlineUser"})
 	delete(h.clients, c.userId)
+	for _, chat := range h.chatUsers {
+		delete(chat, c.userId)
+	}
 }

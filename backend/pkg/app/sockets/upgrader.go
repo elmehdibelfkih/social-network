@@ -53,7 +53,7 @@ func UpgradeProtocol(w http.ResponseWriter, r *http.Request) {
 	}
 
 	c := NewClient(WSManger, conn, userId, sessionCookie, user)
-
+	c.getClientChats()
 	WSManger.add <- c
 
 	go c.readMessages()

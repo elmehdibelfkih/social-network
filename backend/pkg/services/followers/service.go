@@ -39,7 +39,6 @@ func followResponse(w http.ResponseWriter, r *http.Request) {
 	userId := utils.GetUserIdFromContext(r)
 	targetUserId := utils.GetWildCardValue(w, r, "user_id")
 	var response FollowResponseJson
-
 	status, err := selectFollowStatus(userId, targetUserId)
 	if err != nil {
 		utils.InternalServerError(w)

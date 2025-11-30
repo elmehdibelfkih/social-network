@@ -5,6 +5,7 @@ import (
 	"errors"
 	"strings"
 
+	socket "social/pkg/app/sockets"
 	"social/pkg/config"
 	"social/pkg/db/database"
 	"social/pkg/utils"
@@ -159,30 +160,94 @@ func createConversation(followerId, followedId int64) error {
 			utils.SQLiteErrorTarget(err, ADD_CHAT_PARTICIPANT)
 			return err
 		}
+		socket.WSManger.AddChatUser(chatId, followerId)
+		socket.WSManger.AddChatUser(chatId, followedId)
+
 		return nil
 	})
 }
 
 func createChatId(followerId, followedId int64) error {
-	return database.WrapWithTransaction(func(tx *sql.Tx) error {
-		public, err := isPublic(followedId)
+	public, err := isPublic(followedId)
+	if err != nil {
+		return err
+	}
+	if public {
+		return createConversation(followerId, followedId)
+	}
+	if !public {
+		follower, err := followBack(followerId, followedId)
 		if err != nil {
 			return err
 		}
-		if public {
+		if follower {
 			return createConversation(followerId, followedId)
 		}
-		if !public {
-			follower, err := followBack(followerId, followedId)
+	}
+	return nil
+}
+
+func suspendConversation(followerId, followedId int64) error {
+	return database.WrapWithTransaction(func(tx *sql.Tx) error {
+		rows, err := tx.Query(
+			SELECT_SHARED_CHATS,
+			followerId,
+			followedId,
+		)
+		if err != nil {
+			utils.SQLiteErrorTarget(err, SELECT_SHARED_CHATS)
+			return err
+		}
+		defer rows.Close()
+
+		for rows.Next() {
+			var chatId int64
+			err = rows.Scan(&chatId)
 			if err != nil {
+				utils.SQLiteErrorTarget(err, SELECT_SHARED_CHATS)
 				return err
 			}
-			if follower {
-				return createConversation(followerId, followedId)
+			_, err = tx.Exec(UPDATE_CHAT_STATUS, chatId)
+			if err != nil {
+				utils.SQLiteErrorTarget(err, UPDATE_CHAT_STATUS)
+				return err
 			}
 		}
 		return nil
 	})
+}
+
+func suspendChatId(followerId, followedId int64) error {
+	follow1, err := followBack(followerId, followedId)
+	if err != nil {
+		return err
+	}
+	follow2, err := followBack(followedId, followerId)
+	if err != nil {
+		return err
+	}
+	if !follow1 && !follow2 {
+		return suspendConversation(followerId, followedId)
+	}
+	if !follow1 {
+		public, err := isPublic(followedId)
+		if err != nil {
+			return err
+		}
+		if !public {
+			return suspendConversation(followerId, followedId)
+		}
+	}
+	if !follow2 {
+		public, err := isPublic(followerId)
+		if err != nil {
+			return err
+		}
+		if !public {
+			return suspendConversation(followerId, followedId)
+		}
+	}
+	return nil
 }
 
 func unfollowUser(followerId, followedId int64) error {

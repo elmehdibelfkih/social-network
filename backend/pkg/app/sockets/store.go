@@ -8,6 +8,32 @@ import (
 )
 
 // read
+
+func SelectUserChats(c *Client) error {
+	return database.WrapWithTransaction(func(tx *sql.Tx) error {
+		rows, err := tx.Query(
+			SELECT_USER_CHATS,
+			c.userId,
+		)
+		if err != nil {
+			utils.SQLiteErrorTarget(err, SELECT_USER_CHATS)
+			return err
+		}
+		defer rows.Close()
+
+		for rows.Next() {
+			var chatId int64
+			err = rows.Scan(&chatId)
+			if err != nil {
+				utils.SQLiteErrorTarget(err, SELECT_USER_CHATS)
+				return err
+			}
+			c.userChats[chatId] = struct{}{}
+		}
+		return nil
+	})
+}
+
 func SelectUserData(userId int64) (UserData, error) {
 	var user UserData
 	err := database.WrapWithTransaction(func(tx *sql.Tx) error {

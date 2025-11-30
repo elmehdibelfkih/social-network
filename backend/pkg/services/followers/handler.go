@@ -12,7 +12,12 @@ func FollowHandler(w http.ResponseWriter, r *http.Request) {
 	targetUserId := utils.GetWildCardValue(w, r, "user_id")
 	err := followUser(userId, targetUserId)
 	if err != nil {
-		utils.InternalServerError(w)
+		utils.IdentifySqlError(w, err)
+		return
+	}
+	err = createChatId(userId, targetUserId)
+	if err != nil {
+		utils.IdentifySqlError(w, err)
 		return
 	}
 	followResponse(w, r)
@@ -25,7 +30,12 @@ func UnfollowHandler(w http.ResponseWriter, r *http.Request) {
 	targetUserId := utils.GetWildCardValue(w, r, "user_id")
 	err := unfollowUser(userId, targetUserId)
 	if err != nil {
-		utils.InternalServerError(w)
+		utils.IdentifySqlError(w, err)
+		return
+	}
+	err = suspendChatId(userId, targetUserId)
+	if err != nil {
+		utils.IdentifySqlError(w, err)
 		return
 	}
 	unfollowResponse(w, r)

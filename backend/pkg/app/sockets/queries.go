@@ -2,6 +2,9 @@ package socket
 
 // select
 const (
+	SELECT_USER_CHATS = `
+		SELECT chat_id FROM chat_participants WHERE user_id = ? AND status = 'active'
+	`
 	SELECT_USER_BY_ID = `
 		SELECT first_name, last_name ,nickname, date_of_birth, avatar_id, about_me, privacy FROM users WHERE id = ?
 	`
@@ -18,6 +21,6 @@ const (
  
 	`
 	SELECT_CHAT_USERS = `
-		SELECT user_id FROM chat_participants WHERE id = ?
+		SELECT user_id FROM chat_participants WHERE chat_id = ?
 	`
 )

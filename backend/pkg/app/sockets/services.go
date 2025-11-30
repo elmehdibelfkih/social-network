@@ -88,15 +88,19 @@ func (c *Client) onlineStatus(e Event) error {
 
 func (c *Client) typing(e Event) error {
 	var err error
-	var chatId = e.Payload.TypingIndicator.ChatId
+	if e.Payload == nil {
+		return errors.New("no payload")
+	}
 	if e.Payload.TypingIndicator == nil {
 		return errors.New("no typing indicator on the payload")
 	}
+	var chatId = e.Payload.TypingIndicator.ChatId
 	if _, exists := c.userChats[chatId]; !exists {
 		return errors.New("your not a part of this chat")
 	}
 	c.BroadcastAllWithoutSelf(Event{
-		Type: "chat_typing",
+		Source: "server",
+		Type:   "chat_typing",
 		Payload: &ClientMessage{
 			TypingIndicator: &TypingIndicator{
 				FirstName: c.user.FirstName,
@@ -113,7 +117,8 @@ func (c *Client) typing(e Event) error {
 
 	c.typingTimer[chatId] = time.AfterFunc(typingWait, func() {
 		c.BroadcastAllWithoutSelf(Event{
-			Type: "chat_afk",
+			Source: "server",
+			Type:   "chat_afk",
 			Payload: &ClientMessage{
 				TypingIndicator: &TypingIndicator{
 					FirstName: c.user.FirstName,
@@ -129,17 +134,64 @@ func (c *Client) typing(e Event) error {
 
 func (c *Client) seen(e Event) error {
 	var err error
-	
+	if e.Payload == nil {
+		return errors.New("no payload")
+	}
+	if e.Payload.MarkSeen == nil {
+		return errors.New("no seen mark on the payload")
+	}
+	var chatId = e.Payload.MarkSeen.ChatId
+	if _, exists := c.userChats[chatId]; !exists {
+		return errors.New("your not a part of this chat")
+	}
+	c.BroadcastAllWithoutSelf(Event{
+		Source: "server",
+		Type:   "chat_seen",
+		Payload: &ClientMessage{
+			MarkSeen: e.Payload.MarkSeen,
+		},
+	}, c.hub.chatUsers[chatId])
 	return err
 }
 
 func (c *Client) message(e Event) error {
 	var err error
+	if e.Payload == nil {
+		return errors.New("no payload")
+	}
+	if e.Payload.ChatMessage == nil {
+		return errors.New("no seen mark on the payload")
+	}
+	var chatId = e.Payload.ChatMessage.ChatId
+	if _, exists := c.userChats[chatId]; !exists {
+		return errors.New("your not a part of this chat")
+	}
+	c.BroadcastAllWithoutSelf(Event{
+		Source: "server",
+		Type:   "chat_seen",
+		Payload: &ClientMessage{
+			ChatMessage: e.Payload.ChatMessage,
+		},
+	}, c.hub.chatUsers[chatId])
 	return err
 }
 
 func (c *Client) notification(e Event) error {
 	var err error
+	if e.Payload == nil {
+		return errors.New("no payload")
+	}
+	if e.Payload.Notification == nil {
+		return errors.New("no seen mark on the payload")
+	}
+	var targetId = e.Payload.Notification.UserId
+	c.BroadcastToSingleUser(Event{
+		Source: "server",
+		Type:   "notification",
+		Payload: &ClientMessage{
+			Notification: e.Payload.Notification,
+		},
+	}, c.hub.clients[targetId])
 	return err
 }
 
@@ -154,6 +206,14 @@ func (c *Client) BroadcastAllWithoutSelf(e Event, clients map[int64][]*Client) e
 		for _, c := range userConnections {
 			c.events <- e
 		}
+	}
+	return err
+}
+
+func (c *Client) BroadcastToSingleUser(e Event, clients []*Client) error {
+	var err error
+	for _, c := range clients {
+		c.events <- e
 	}
 	return err
 }
