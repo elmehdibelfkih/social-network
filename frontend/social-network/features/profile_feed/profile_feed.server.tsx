@@ -5,8 +5,9 @@ import styles from './styles.module.css'
 import { PostsSection } from './posts_section.client'
 import { AboutSection } from './profile_about.server'
 import { FollowersList } from './profile_followers.client'
+import { ProfileData } from '../profile/types'
 
-export default function ProfileFeed({ userId, tab }: { userId: string, tab: string }) {
+export default function ProfileFeed({ profile, tab }: { profile: ProfileData, tab: string }) {
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
@@ -47,10 +48,10 @@ export default function ProfileFeed({ userId, tab }: { userId: string, tab: stri
       </div>
 
       <div className={styles.tabContent}>
-        {tab === 'posts' && <PostsSection userId={userId} />}
-        {tab === 'about' && <AboutSection userId={userId} />}
-        {tab === 'followers' && <FollowersList userId={userId} type="followers" />}
-        {tab === 'following' && <FollowersList userId={userId} type="following" />}
+        {tab === 'posts' && <PostsSection userId={String(profile.userId)} />}
+        {tab === 'about' && <AboutSection profile={profile} />}
+        {tab === 'followers' && <FollowersList userId={String(profile.userId)} type="followers" />}
+        {tab === 'following' && <FollowersList userId={String(profile.userId)} type="following" />}
       </div>
     </div>
   )

@@ -3,15 +3,14 @@ import getProfileData from './profileSrevice'
 import { ProfileTopActions, AvatarHolder } from './profile.client'
 import { CalendarIcon, GlobeIcon } from '../../components/ui/icons'
 import { ProfileSettings } from './privacy.client'
+import { ProfileData } from './types'
 
-export  async function Profile({ user_id }: { user_id: string }) {
-    const profile = await getProfileData(user_id)
-    console.log(profile);
-    
+export async function Profile({ profile }: { profile: ProfileData }) {
+
     if (profile == null) return
     return (
         <div className={styles.profileContainer}>
-            <ProfileTopActions userId={user_id} profile={profile} />
+            <ProfileTopActions userId={String(profile.userId)} profile={profile} />
 
             <div className={styles.bottomPart}>
                 <div className={styles.dataPart}>
@@ -41,7 +40,7 @@ export  async function Profile({ user_id }: { user_id: string }) {
                         </div>
                     </div>
                 </div>
-                <ProfileSettings privacy={profile.privacy} userId={user_id} />
+                <ProfileSettings privacy={profile.privacy} userId={String(profile.userId)} />
 
             </div>
         </div>

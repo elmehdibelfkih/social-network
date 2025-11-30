@@ -1,4 +1,5 @@
 import { Profile } from '@/features/profile';
+import getProfileData from '@/features/profile/profileSrevice';
 import ProfileFeed from '@/features/profile_feed/profile_feed.server';
 
 interface PageProps {
@@ -10,10 +11,12 @@ export default async function ProfilePage({ params, searchParams }: PageProps) {
   const { user_id } = await params;
   const { tab } = await searchParams;
 
+  const profile = await getProfileData(user_id)
+
   return (
     <>
-      <Profile user_id={user_id} />
-      <ProfileFeed userId={user_id.toString()} tab={tab || 'posts'} />
+      <Profile profile={profile} />
+      <ProfileFeed profile={profile} tab={tab || 'posts'} />
     </>
   );
 }

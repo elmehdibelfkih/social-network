@@ -2,16 +2,7 @@ import styles from './about.module.css'
 import getProfileData from '../profile/profileSrevice'
 import { ProfileData } from '../profile/types'
 
-type AboutSectionProps = {
-    userId: string
-}
-
-export function AboutSection({ userId }: AboutSectionProps) {
-
-    const fetchProfileData: ProfileData = async () => {
-        await getProfileData(userId)
-    }
-    let profile = fetchProfileData()
+export function AboutSection({ profile }: { profile: ProfileData }) {
 
     if (!profile) {
         return (
@@ -71,14 +62,6 @@ export function AboutSection({ userId }: AboutSectionProps) {
                     <div className={styles.statCard}>
                         <div className={styles.statLabel}>Total Posts</div>
                         <div className={styles.statValue}>{profile.stats.postsCount}</div>
-                    </div>
-                    <div className={styles.statCard}>
-                        <div className={styles.statLabel}>Followers</div>
-                        <div className={styles.statValue}>{profile.stats.followersCount}</div>
-                    </div>
-                    <div className={styles.statCard}>
-                        <div className={styles.statLabel}>Following</div>
-                        <div className={styles.statValue}>{profile.stats.followingCount}</div>
                     </div>
                     <div className={styles.statCard}>
                         <div className={styles.statLabel}>Member Since</div>
