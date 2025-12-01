@@ -79,10 +79,10 @@ export interface Post {
     postId: number;
     authorId: number;
     authorNickname: string | null;
-    authorlastName: string;
+    authorLastName: string;
     authorFirstName: string;
     content: string;
-    mediaIds: number[] | null;
+    mediaIds?: number[] | null;
     privacy: PrivacyLevel;
     isLikedByUser: boolean;
     stats: PostStats;
@@ -92,12 +92,14 @@ export interface Post {
     updatedAt: string;
 }
 
+
+
 export interface Comment {
     commentId: number;
     postId?: number;
     authorId: number;
     authorNickname: string;
-    authorlastName: string;
+    authorLastName: string;
     authorFirstName: string;
     content: string;
     mediaIds: number[] | null;

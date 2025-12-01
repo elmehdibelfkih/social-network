@@ -9,6 +9,7 @@ import { ProfileAPIResponse } from "@/libs/globalTypes";
 export default async function HomePage(): Promise<JSX.Element> {
   const userId = await getUserId();
   const res2 = await http.get<ProfileAPIResponse>(`/api/v1/users/${userId}/profile`);
+
   return (
     <>
       <ProfileSummaryServer userId={userId} />

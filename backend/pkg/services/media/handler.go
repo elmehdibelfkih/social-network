@@ -48,7 +48,6 @@ func HandleUploadMedia(w http.ResponseWriter, r *http.Request) {
 
 	detectedMediaType := http.DetectContentType(data)
 	if !AllowedMimeTypes[detectedMediaType] {
-		println("2")
 		utils.UnsupportedMediaType(w)
 		return
 	}
@@ -79,6 +78,8 @@ func HandleUploadMedia(w http.ResponseWriter, r *http.Request) {
 		Purpose:   req.Purpose,
 		CreatedAt: time.Now().String(),
 	}
+
+	fmt.Println(media)
 
 	if err := CreateMedia(media); err != nil {
 		os.Remove(filePath)

@@ -23,7 +23,6 @@ func CreatePost(post *Post) error {
 			post.Privacy,
 			post.CreatedAt,
 			post.UpdatedAt,
-			post.Pinned,
 		)
 		if err != nil {
 			if e, ok := err.(sqlite3.Error); ok && e.Code == sqlite3.ErrConstraint {
@@ -71,7 +70,6 @@ func GetPostByID(postID int64) (*Post, error) {
 		&post.Privacy,
 		&post.CreatedAt,
 		&post.UpdatedAt,
-		&post.Pinned,
 	)
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -198,7 +196,6 @@ func GetUserPosts(userID int64, limit, offset int) ([]Post, int, error) {
 			&post.Privacy,
 			&post.CreatedAt,
 			&post.UpdatedAt,
-			&post.Pinned,
 		)
 		if err != nil {
 			utils.SQLiteErrorTarget(err, "GetUserPosts (scan)")

@@ -1,5 +1,5 @@
-import { Post } from './types';
-import { http } from '../../libs/apiFetch';
+import { http } from "@/libs/apiFetch";
+import { Post } from "@/libs/globalTypes";
 
 export const postsService = {
   async getFeed(page = 1, limit = 20): Promise<Post[]> {
@@ -8,7 +8,7 @@ export const postsService = {
       if (!response) {
         return [];
       }
-      return Array.isArray(response) ? response : (Array.isArray(response.payload) ? response.payload : []);
+      return Array.isArray(response) ? response : (Array.isArray(response) ? response : []);
     } catch (error) {
       return [];
     }
@@ -16,7 +16,7 @@ export const postsService = {
 
   async createPost(data: { content: string; privacy: 'public' | 'private' | 'followers'; mediaIds?: number[] }): Promise<any> {
     const response = await http.post('/api/v1/posts', data);
-    return response.payload;
+    return response;
   },
 
   async uploadMedia(file: File): Promise<{ mediaId: number }> {

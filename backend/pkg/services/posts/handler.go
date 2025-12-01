@@ -2,14 +2,13 @@ package posts
 
 import (
 	"database/sql"
-	"fmt"
 	"net/http"
+	"time"
+
 	"social/pkg/config"
 	"social/pkg/utils"
-	"time"
 )
 
-// HandleCreatePost handles POST /api/v1/posts
 func HandleCreatePost(w http.ResponseWriter, r *http.Request) {
 	userID := utils.GetUserIdFromContext(r)
 	var req CreatePostRequest
@@ -17,25 +16,21 @@ func HandleCreatePost(w http.ResponseWriter, r *http.Request) {
 		utils.BadRequest(w, "Invalid request body", utils.ErrorTypeAlert)
 		return
 	}
-		fmt.Println("111111")
 	// Validate privacy
 	if !validatePrivacy(req.Privacy) {
 		utils.BadRequest(w, "Invalid privacy setting", utils.ErrorTypeAlert)
 		return
 	}
-		fmt.Println("222222")
 	// Validate group post
 	if req.Privacy == PrivacyGroup && req.GroupID == nil {
 		utils.BadRequest(w, "Group ID is required for group posts", utils.ErrorTypeAlert)
 		return
 	}
-		fmt.Println("3333333")
 	// Validate restricted post
 	if req.Privacy == PrivacyRestricted && len(req.AllowedList) == 0 {
 		utils.BadRequest(w, "Allowed list is required for restricted posts", utils.ErrorTypeAlert)
 		return
 	}
-		fmt.Println("444444")
 	// Create post
 	now := time.Now().Format(time.RFC3339)
 	post := &Post{
@@ -46,15 +41,12 @@ func HandleCreatePost(w http.ResponseWriter, r *http.Request) {
 		Privacy:   req.Privacy,
 		CreatedAt: now,
 		UpdatedAt: now,
-		Pinned:    0,
 	}
-		fmt.Println("5555555")
 	if err := CreatePost(post); err != nil {
 		utils.SQLiteErrorTarget(err, "HandleCreatePost (CreatePost)")
 		utils.InternalServerError(w)
 		return
 	}
-		fmt.Println("6666666")
 	// Insert media associations
 	if len(req.MediaIDs) > 0 {
 		if err := InsertPostMedia(post.ID, req.MediaIDs); err != nil {
@@ -63,7 +55,6 @@ func HandleCreatePost(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-		fmt.Println("777777")
 	// Insert allowed viewers for restricted posts
 	if req.Privacy == PrivacyRestricted && len(req.AllowedList) > 0 {
 		if err := InsertPostAllowedViewers(post.ID, req.AllowedList); err != nil {
@@ -72,7 +63,7 @@ func HandleCreatePost(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-		fmt.Println("8888888")
+
 	utils.WriteSuccess(w, http.StatusCreated, CreatePostResponse{
 		Message:   "Post created successfully.",
 		PostID:    post.ID,
@@ -84,7 +75,6 @@ func HandleCreatePost(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-// HandleGetPost handles GET /api/v1/posts/{post_id}
 func HandleGetPost(w http.ResponseWriter, r *http.Request) {
 	postID, err := getPostID(r)
 	if err != nil {
@@ -220,7 +210,6 @@ func HandleDeletePost(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-// HandleGetUserPosts handles GET /api/v1/users/{user_id}/posts
 func HandleGetUserPosts(w http.ResponseWriter, r *http.Request) {
 	requesterID := utils.GetUserIdFromContext(r)
 	targetUserID, err := getUserID(r)

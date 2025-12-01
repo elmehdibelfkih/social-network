@@ -54,7 +54,7 @@ export function RegisterForm({ onAuthSuccess }: { onAuthSuccess?: () => void }) 
 
         try {
             const avatarResp = await authService.uploadAvatar(avatar);
-            const avatarId = avatarResp.mediaId
+            const avatarId = avatarResp?.mediaId
             setFormData(prev => ({ ...prev, avatarId: avatarId }));
         } catch (error) {
             console.error("Failed to upload avatar:", error);

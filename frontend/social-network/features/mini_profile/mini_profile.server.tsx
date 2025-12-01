@@ -10,13 +10,17 @@ import { getUserId } from '@/libs/helpers'
 type Props = {
   userId?: string | number
   data?: ProfileAPIResponse
+  isMyprofile: boolean
 }
 
-export default async function MiniProfile({ userId, data }: Props) {
+export default function MiniProfile({ userId, data, isMyprofile }: Props) {
   let profile: ProfileAPIResponse | null = data ?? null
 
   if (!profile && userId != null) {
-    profile = await getProfileServer(userId)
+    const fetchProfile = async () => {
+      profile = await getProfileServer(userId)
+    }
+    fetchProfile()
   }
 
   if (!profile) {
@@ -43,7 +47,6 @@ export default async function MiniProfile({ userId, data }: Props) {
     : ''
 
   let isOnline = false;
-  let isMyprofile = profile.userId !== await getUserId() 
 
   return (
     <aside className={styles.miniCardLarge} aria-label={`Mini profile for ${name}`}>
@@ -103,8 +106,8 @@ export default async function MiniProfile({ userId, data }: Props) {
         <a className={styles.viewProfileBtnLarge} href={`/profile/${profile.userId}`}>
           View Profile
         </a>
-        
-        {isMyprofile? <MiniProfileActions
+
+        {isMyprofile ? <MiniProfileActions
           userId={profile.userId}
           initialStatus={profile.status ?? null}
           initialChatId={profile.chatId ?? null}
