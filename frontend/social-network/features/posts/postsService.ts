@@ -45,8 +45,14 @@ export const postsService = {
     privacy: 'public' | 'private' | 'followers'; 
     mediaIds?: number[];
     groupId?: number;
+    allowedList?: number[];
   }): Promise<any> {
-    const response = await http.post('/api/v1/posts', data) as any;
+    const payload: any = { content: data.content, privacy: data.privacy };
+    if (data.mediaIds && data.mediaIds.length > 0) payload.mediaIds = data.mediaIds;
+    if (data.groupId) payload.groupId = data.groupId;
+    if (data.allowedList && data.allowedList.length > 0) payload.allowedList = data.allowedList;
+
+    const response = await http.post('/api/v1/posts', payload) as any;
     return response;
   },
   async uploadMedia(file: File): Promise<{ mediaId: number }> {

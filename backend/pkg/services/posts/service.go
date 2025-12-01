@@ -250,13 +250,19 @@ func buildPostResponse(post *Post) (*GetPostResponse, error) {
 		allowedList = []int64{}
 	}
 
+	// Normalize privacy for API responses: if DB uses legacy 'privatey', present 'private' to clients
+	respPrivacy := post.Privacy
+	if respPrivacy == "privatey" {
+		respPrivacy = PrivacyPrivate
+	}
+
 	return &GetPostResponse{
 		PostID:         post.ID,
 		AuthorID:       post.AuthorID,
 		AuthorNickname: nickname,
 		Content:        post.Content,
 		MediaIDs:       mediaIDs,
-		Privacy:        post.Privacy,
+		Privacy:        respPrivacy,
 		GroupID:        post.GroupID,
 		AllowedList:    allowedList,
 		CreatedAt:      post.CreatedAt,

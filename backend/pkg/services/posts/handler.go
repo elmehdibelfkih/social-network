@@ -36,14 +36,20 @@ func HandleCreatePost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 		fmt.Println("444444")
-	// Create post
+	// Create post (map canonical privacy -> storage value if DB uses legacy token)
 	now := time.Now().Format(time.RFC3339)
+	insertPrivacy := req.Privacy
+	if req.Privacy == PrivacyPrivate {
+		// compatibility: database currently uses the legacy 'privatey' value
+		insertPrivacy = "privatey"
+	}
+
 	post := &Post{
 		ID:        utils.GenerateID(),
 		AuthorID:  userID,
 		GroupID:   req.GroupID,
 		Content:   req.Content,
-		Privacy:   req.Privacy,
+		Privacy:   insertPrivacy,
 		CreatedAt: now,
 		UpdatedAt: now,
 		Pinned:    0,
@@ -73,11 +79,12 @@ func HandleCreatePost(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 		fmt.Println("8888888")
+	// Return canonical privacy value in API response
 	utils.WriteSuccess(w, http.StatusCreated, CreatePostResponse{
 		Message:   "Post created successfully.",
 		PostID:    post.ID,
 		AuthorID:  post.AuthorID,
-		Privacy:   post.Privacy,
+		Privacy:   req.Privacy,
 		GroupID:   post.GroupID,
 		MediaIDs:  req.MediaIDs,
 		CreatedAt: post.CreatedAt,
@@ -134,8 +141,14 @@ func HandleUpdatePost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Update post (map canonical privacy -> storage value if DB uses legacy token)
+	updatePrivacy := req.Privacy
+	if req.Privacy == PrivacyPrivate {
+		updatePrivacy = "privatey"
+	}
+
 	// Update post
-	if err := UpdatePost(postID, userID, req.Content, req.Privacy, time.Now().Format(time.RFC3339)); err != nil {
+	if err := UpdatePost(postID, userID, req.Content, updatePrivacy, time.Now().Format(time.RFC3339)); err != nil {
 		if err == sql.ErrNoRows {
 			utils.NotFoundError(w, "Post not found or you don't have permission to update it")
 			return
