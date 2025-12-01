@@ -133,9 +133,8 @@ func unfollowUser(followerId, followedId int64) error {
 		return nil
 	})
 }
-
 func GetFollowersByUserID(userID int64) ([]map[string]any, error) {
-	rows, err := config.DB.Query(GET_FOLLOWERS_QUERY, userID)
+	rows, err := config.DB.Query(GET_FOLLOWERS_QUERY, userID, userID, userID)
 	if err != nil {
 		utils.SQLiteErrorTarget(err, GET_FOLLOWERS_QUERY)
 		return nil, err
@@ -151,24 +150,69 @@ func GetFollowersByUserID(userID int64) ([]map[string]any, error) {
 			firstName  sql.NullString
 			lastName   sql.NullString
 			avatarId   sql.NullInt64
-			followedAt string
-			status     string
+			followedAt sql.NullString
+			status     sql.NullString
+			chatId     sql.NullInt64
 		)
 
-		err = rows.Scan(&userId, &nickname, &firstName, &lastName, &avatarId, &followedAt, &status)
-		if err != nil {
+		if err := rows.Scan(
+			&userId,
+			&nickname,
+			&firstName,
+			&lastName,
+			&avatarId,
+			&followedAt,
+			&status,
+			&chatId,
+		); err != nil {
 			utils.SQLiteErrorTarget(err, GET_FOLLOWERS_QUERY)
 			return nil, err
 		}
 
+		var avatarVal any = nil
+		if avatarId.Valid {
+			avatarVal = avatarId.Int64
+		}
+
+		var nickVal any = nil
+		if nickname.Valid {
+			nickVal = nickname.String
+		}
+
+		var firstVal any = nil
+		if firstName.Valid {
+			firstVal = firstName.String
+		}
+
+		var lastVal any = nil
+		if lastName.Valid {
+			lastVal = lastName.String
+		}
+
+		var followedAtVal any = nil
+		if followedAt.Valid {
+			followedAtVal = followedAt.String
+		}
+
+		var statusVal any = nil
+		if status.Valid {
+			statusVal = status.String
+		}
+
+		var chatVal any = nil
+		if chatId.Valid {
+			chatVal = chatId.Int64
+		}
+
 		follower := map[string]any{
 			"userId":     userId,
-			"nickname":   nickname.String,
-			"firstName":  firstName.String,
-			"lastName":   lastName.String,
-			"avatarId":   avatarId.Int64,
-			"followedAt": followedAt,
-			"status":     status,
+			"nickname":   nickVal,
+			"firstName":  firstVal,
+			"lastName":   lastVal,
+			"avatarId":   avatarVal,
+			"followedAt": followedAtVal,
+			"status":     statusVal,
+			"chatId":     chatVal,
 		}
 
 		followers = append(followers, follower)
