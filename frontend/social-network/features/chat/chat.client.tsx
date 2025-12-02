@@ -6,7 +6,7 @@ import styles from './styles.module.css';
 import ChatCard from './chat.card.client';
 
 export function ChatSection() {
-    const [users, setUsers] = useState<User[] | null>(null);
+    const [users, setUsers] = useState<User[]>([]);
     useEffect(() => {
         const port = chatService.getGlobalPort();
         if (!port) return;
@@ -14,10 +14,31 @@ export function ChatSection() {
         port.onmessage = (e) => {
             const data = e.data;
             console.log("received from sharedworker:", data);
-            setUsers(data?.payload?.onlineStatus)
+            switch (data.type) {
+                case 'online_status':
+                    setUsers(data?.payload?.onlineStatus.onlineUsers)
+                    break;
+                case 'onlineUser': {
+                    const updated = data?.payload?.onlineUser.user;
+                    console.log("howa", updated)
+                    setUsers(prev => prev.map(u => u.userId === updated.userId ? { ...updated } : u));
+                    break;
+                }
+                case 'offlineUser': {
+                    const updated = data?.payload?.offlineUser.user;
+                    setUsers(prev => prev.map(u => u.userId === updated.userId ? { ...updated } : u));
+                    break;
+                }
+                default:
+                    break;
+            }
+            // console.log(users)
         };
         port.postMessage(JSON.stringify({ source: 'client', type: 'online_status', payload: null }));
     }, []);
+    useEffect(() => {
+        console.log("users state has been changed", users)
+    }, [users])
     return (
         <div className={styles.wrapper}>
             <div className={styles.header}>
@@ -25,17 +46,17 @@ export function ChatSection() {
                 <h2>Contacts</h2>
             </div>
             <div className={styles.scrollArea}>
-                {   
+                {
                     users?.map((u) => (
                         <ChatCard
-                            key={u.UserId}
+                            key={u.userId}
                             profileImage={
-                                u.AvatarId ? "/svg/users.svg" : "/svg/users.svg"
+                                u.avatarId ? "/svg/users.svg" : "/svg/users.svg"
                             }
-                            firstName={u.FirstName}
-                            lastName={u.LastName}
-                            nickname={u.Nickname ?? ""}
-                            isOnline={u.Online}
+                            firstName={u.firstName}
+                            lastName={u.lastName}
+                            nickname={u.nickname ?? ""}
+                            isOnline={u.online}
                         />
                     ))}
             </div>

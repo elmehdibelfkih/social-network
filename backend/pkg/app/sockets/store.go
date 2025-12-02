@@ -82,7 +82,7 @@ func SelectChatParticipants(chatId int64) (map[int64]struct{}, error) {
 }
 
 func SelectUserFollowers(userId int64) (*OnlineStatus, error) {
-	var users *OnlineStatus
+	var users OnlineStatus
 	err := database.WrapWithTransaction(func(tx *sql.Tx) error {
 		rows, err := tx.Query(SELECT_FOLLOWERS_BY_USER_ID, userId, userId, userId)
 		if err != nil {
@@ -111,5 +111,5 @@ func SelectUserFollowers(userId int64) (*OnlineStatus, error) {
 		}
 		return nil
 	})
-	return users, err
+	return &users, err
 }

@@ -1,16 +1,17 @@
 
 
 export interface User {
-    UserId: number
-    Email: string
-    FirstName: string
-    LastName: string
-    DateOfBirth: string
-    Nickname: string | null
-    AboutMe: string | null
-    AvatarId: number | null
-    Online: boolean
+    userId: number
+    email: string
+    firstName: string
+    lastName: string
+    dateOfBirth: string
+    nickname: string | null
+    aboutMe: string | null
+    avatarId: number | null
+    online: boolean
 }
+
 
 export interface SocketMessage {
     type: string;

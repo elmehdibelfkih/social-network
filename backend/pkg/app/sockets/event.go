@@ -62,7 +62,7 @@ type Notification struct {
 }
 
 type OnlineStatus struct {
-	OnlineUsers []User
+	OnlineUsers []User `json:"onlineUsers"`
 }
 
 type User struct {
@@ -79,13 +79,9 @@ type User struct {
 }
 
 type OnlineUser struct {
-	UserId int64    `json:"userId"`
-	User   UserData `json:"user"`
-	Online bool     `json:"online"`
+	User User `json:"user"`
 }
 
 type OfflineUser struct {
-	UserId int64    `json:"userId"`
-	User   UserData `json:"user"`
-	Online bool     `json:"online"`
+	User User `json:"user"`
 }

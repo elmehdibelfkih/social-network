@@ -20,7 +20,7 @@ class WebSocketManger {
             this.reconnectTimer = null;
         }
         this.ws.onmessage = (e) => {
-            console.log("recieved from server", e.data)
+            console.log("recieved from server", JSON.parse(e.data))
             this.#broadcast(e.data)
         }
         this.ws.onerror = (err) => {
@@ -29,7 +29,7 @@ class WebSocketManger {
         }
         this.ws.onclose = () => {
             console.log("closing websocket")
-            this.#broadcast(JSON.stringify({ source: "shared_worker", type: "websocket_close" }))
+            this.#broadcast(JSON.parse({ source: "shared_worker", type: "websocket_close" }))
             this.ws = null;
             this.#tryReconnect();
         }
@@ -39,7 +39,7 @@ class WebSocketManger {
         const alivePorts = []
         for (const p of this.ports) {
             try {
-                p.postMessage(data);
+                p.postMessage(JSON.parse(data));
                 alivePorts.push(p)
             } catch {
                 console.warn("dead port found!")
@@ -52,7 +52,7 @@ class WebSocketManger {
         if (this.reconnectTimer) return // we are already trying o reconnect 
         this.reconnectTimer = setTimeout(() => {
             this.#initWebsocket()
-            if (this.ws && this.ws.readyState == WebSocket.OPEN) this.#sendOrQueue(JSON.stringify({}))
+            if (this.ws && this.ws.readyState == WebSocket.OPEN) this.#sendOrQueue(JSON.stringify({source: "shared_worker", type: "reconnect"}))
         }, this.reconnectDelay)
     }
 

@@ -9,6 +9,7 @@ import (
 
 func (c *Client) ClientAdded(e Event) error {
 	users, err := SelectUserFollowers(c.userId)
+
 	if err != nil {
 		utils.BackendErrorTarget(err, "websocket error")
 		return err
@@ -17,9 +18,18 @@ func (c *Client) ClientAdded(e Event) error {
 	e.Type = "onlineUser"
 	e.Payload = &ClientMessage{
 		OnlineUser: &OnlineUser{
-			UserId: c.userId,
-			User:   c.user,
-			Online: true,
+			User: User{
+				UserId:      c.userId,
+				Email:       "",
+				FirstName:   c.user.FirstName,
+				LastName:    c.user.LastName,
+				Nickname:    c.user.Nickname,
+				DateOfBirth: c.user.DateOfBirth,
+				AvatarId:    c.user.AvatarId,
+				AboutMe:     c.user.AboutMe,
+				Privacy:     c.user.Privacy,
+				Online:      true,
+			},
 		},
 	}
 	if users != nil {
@@ -42,9 +52,18 @@ func (c *Client) ClientRemoved(e Event) error {
 	e.Type = "offlineUser"
 	e.Payload = &ClientMessage{
 		OfflineUser: &OfflineUser{
-			UserId: c.userId,
-			User:   c.user,
-			Online: false,
+			User: User{
+				UserId:      c.userId,
+				Email:       "",
+				FirstName:   c.user.FirstName,
+				LastName:    c.user.LastName,
+				Nickname:    c.user.Nickname,
+				DateOfBirth: c.user.DateOfBirth,
+				AvatarId:    c.user.AvatarId,
+				AboutMe:     c.user.AboutMe,
+				Privacy:     c.user.Privacy,
+				Online:      false,
+			},
 		},
 	}
 	if users != nil {

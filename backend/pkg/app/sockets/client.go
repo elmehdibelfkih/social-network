@@ -21,13 +21,13 @@ type Client struct {
 }
 
 type UserData struct {
-	FirstName   string
-	LastName    string
-	Nickname    *string
-	AvatarId    *int64
-	AboutMe     *string
-	DateOfBirth string
-	Privacy     string
+	FirstName   string  `json:"firstName"`
+	LastName    string  `json:"lastName"`
+	Nickname    *string `json:"nickname"`
+	AvatarId    *int64  `json:"avatarId"`
+	AboutMe     *string `json:"aboutMe"`
+	DateOfBirth string  `json:"dateOfBirth"`
+	Privacy     string  `json:"privacy"`
 }
 
 var (
@@ -52,7 +52,7 @@ func NewClient(wsHub *Hub, conn *websocket.Conn, id int64, token string, user Us
 func (c *Client) getClientChats() {
 	if err := SelectUserChats(c); err != nil {
 		log.Println(err)
-		return 
+		return
 	}
 }
 

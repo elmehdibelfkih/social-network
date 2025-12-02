@@ -59,7 +59,7 @@ func (h *Hub) addClient(c *Client) {
 	firstConnection := len(h.clients[c.userId]) == 0
 	h.clients[c.userId] = append(h.clients[c.userId], c)
 	if firstConnection {
-		go c.handleEvent(Event{Type: "onlineUser"})
+		go c.handleEvent(Event{Source: "server", Type: "onlineUser"})
 	}
 }
 
@@ -84,7 +84,7 @@ func (h *Hub) removeClient(c *Client) {
 		h.clients[c.userId] = clients
 		return
 	}
-	go c.handleEvent(Event{Type: "offlineUser"})
+	go c.handleEvent(Event{Source: "server", Type: "offlineUser"})
 	delete(h.clients, c.userId)
 	for _, chat := range h.chatUsers {
 		delete(chat, c.userId)
