@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect } from "react";
-import { chatService } from "../../features/chat/services/chat";
+import { chatService } from "@/features/chat/services/chat";
 
 export default function SharedWorekerClient() {
     useEffect(() => {

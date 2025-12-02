@@ -3,6 +3,8 @@ package chat
 import (
 	"database/sql"
 	"fmt"
+	"social/pkg/db/database"
+	"social/pkg/utils"
 	"time"
 )
 
@@ -137,50 +139,27 @@ func GetChatParticipants(db *sql.DB, chatId, userId int64) ([]ChatParticipant, e
 	return participants, nil
 }
 
-func InsertMessage(db *sql.DB, chatId, senderId int64, text string) (*SendMessageResponse, error) {
-	tx, err := db.Begin()
-	if err != nil {
-		return nil, err
-	}
-	defer tx.Rollback()
-
-	var exists bool
-	err = tx.QueryRow(checkChatParticipantQuery, chatId, senderId).Scan(&exists)
-	if err == sql.ErrNoRows {
-		return nil, fmt.Errorf("user is not a participant in this chat")
-	}
-	if err != nil {
-		return nil, fmt.Errorf("failed to check chat participation: %v", err)
-	}
-
-	_, err = tx.Exec(insertMessageQuery, chatId, senderId, text)
-	if err != nil {
-		return nil, err
-	}
-
-	var messageId int64
-	err = tx.QueryRow(getLastInsertedMessageID).Scan(&messageId)
-	if err != nil {
-		return nil, err
-	}
-
-	_, err = tx.Exec(updateChatTimestampQuery, chatId)
-	if err != nil {
-		return nil, err
-	}
-
-	err = tx.Commit()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &SendMessageResponse{
-		MessageID: messageId,
-		ChatID:    chatId,
-		SenderID:  senderId,
-		Text:      text,
-		CreatedAt: time.Now().UTC().Format("2006-01-02T15:04:05Z"),
-	}
-
-	return response, nil
+func InsertMessage(c *ChatMessage) error {
+	return database.WrapWithTransaction(func(tx *sql.Tx) error {
+		err := tx.QueryRow(INSERT_MESSAGE,
+			utils.GenerateID(),
+			c.ChatId,
+			c.SenderId,
+			c.Content,
+			c.SeenState,
+		).Scan(
+			&c.MessageId,
+			&c.ChatId,
+			&c.SenderId,
+			&c.Content,
+			&c.SeenState,
+			&c.CreatedAt,
+			&c.UpdatedAt,
+		)
+		if err != nil {
+			utils.SQLiteErrorTarget(err, INSERT_MESSAGE)
+			return err
+		}
+		return nil
+	})
 }

@@ -30,7 +30,7 @@ type TypingIndicator struct {
 }
 
 type ChatMessage struct {
-	Id        int64  `json:"id"`
+	MessageId int64  `json:"id"`
 	ChatId    int64  `json:"chatId"`
 	SenderId  int64  `json:"SenderId"`
 	Content   string `json:"content"`
@@ -40,7 +40,7 @@ type ChatMessage struct {
 }
 
 type MarkSeen struct {
-	Id        int64  `json:"id"`
+	MessageId int64  `json:"id"`
 	ChatId    int64  `json:"chatId"`
 	SenderId  int64  `json:"SenderId"`
 	Content   string `json:"content"`

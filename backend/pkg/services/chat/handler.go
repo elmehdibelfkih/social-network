@@ -90,29 +90,20 @@ func GetParticipantsHandler(w http.ResponseWriter, r *http.Request) {
 // POST /api/v1/chats/{chat_id}/messages
 func SendMessageHandler(w http.ResponseWriter, r *http.Request) {
 	userId := utils.GetUserIdFromContext(r)
-	if userId == 0 {
-		utils.Unauthorized(w, "Unauthorized")
-		return
-	}
-
 	chatId := utils.GetWildCardValue(w, r, "chat_id")
 	if chatId == 0 {
 		return
 	}
-
-	var req SendMessageRequest
-	if err := utils.JsonStaticDecode(r, &req); err != nil {
-		utils.BackendErrorTarget(err, "SendMessageHandler")
-		utils.BadRequest(w, "Invalid request body", "alert")
+	var body ChatMessage
+	if !utils.ValidateJsonRequest(w, r, &body, "login handler") {
 		return
 	}
-
-	if req.Text == "" {
-		utils.BadRequest(w, "Text cannot be empty", "alert")
+	if ok, str := body.Validate(); !ok {
+		utils.BadRequest(w, str, "alert")
 		return
 	}
-
-	msg, err := InsertMessage(config.DB, chatId, userId, req.Text)
+	body.SenderId = userId
+	msg, err := InsertMessage(&body)
 	if err != nil {
 		utils.BackendErrorTarget(err, "SendMessageHandler")
 		utils.InternalServerError(w)
@@ -156,4 +147,3 @@ func SeenMessageHandler(w http.ResponseWriter, r *http.Request) {
 
 	utils.JsonResponseEncode(w, http.StatusOK, msg)
 }
-

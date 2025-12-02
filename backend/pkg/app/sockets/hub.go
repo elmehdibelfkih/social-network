@@ -84,7 +84,7 @@ func (h *Hub) removeClient(c *Client) {
 		h.clients[c.userId] = clients
 		return
 	}
-	go c.handleEvent(Event{Source: "server", Type: "offlineUser"})
+	go c.handleEvent(Event{Source: "server", Type: "offlineUser"}) //might cause a panic
 	delete(h.clients, c.userId)
 	for _, chat := range h.chatUsers {
 		delete(chat, c.userId)
