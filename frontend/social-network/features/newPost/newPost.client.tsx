@@ -3,7 +3,7 @@
 import { useState, useRef } from 'react';
 import styles from './styles.module.css';
 import { ImageIcon, GlobeIcon, DropdownIcon } from '@/components/ui/icons';
-import { postsService } from '@/features/posts/services/postsService';
+import { postsService } from '@/features/posts/postsService';
 import { Post } from '@/features/posts/types';
 
 interface NewPostProps {
@@ -30,19 +30,19 @@ export function NewPost({ userAvatar, onPostCreated }: NewPostProps) {
 
         try {
             let mediaIds: number[] = [];
-            
+
             if (selectedFiles.length > 0) {
                 const uploadPromises = selectedFiles.map(file => postsService.uploadMedia(file));
                 const uploadResults = await Promise.all(uploadPromises);
                 mediaIds = uploadResults.map(result => result.mediaId);
             }
 
-            const postData = await postsService.createPost({ 
-                content: content.trim(), 
+            const postData = await postsService.createPost({
+                content: content.trim(),
                 privacy: privacy,
                 mediaIds: mediaIds.length > 0 ? mediaIds : undefined
             });
-            
+
             const newPost: Post = {
                 postId: postData.postId,
                 authorId: postData.authorId,
@@ -56,7 +56,7 @@ export function NewPost({ userAvatar, onPostCreated }: NewPostProps) {
                 createdAt: postData.createdAt,
                 updatedAt: postData.createdAt
             };
-            
+
             onPostCreated?.(newPost);
             setContent("");
             setSelectedFiles([]);
@@ -99,25 +99,25 @@ export function NewPost({ userAvatar, onPostCreated }: NewPostProps) {
                         </div>
                     )}
                     <div className={styles.privacyContainer}>
-                        <button 
-                            className={styles.privacyButton} 
+                        <button
+                            className={styles.privacyButton}
                             type='button'
                             onClick={() => setShowPrivacyDropdown(!showPrivacyDropdown)}
                         >
                             <GlobeIcon fillColor='#737373' />
-                            <span>{privacy === 'public' ? 'Public' : 'private' }</span>
+                            <span>{privacy === 'public' ? 'Public' : 'private'}</span>
                             <DropdownIcon />
                         </button>
                         {showPrivacyDropdown && (
                             <div className={styles.privacyDropdown}>
-                                <button 
+                                <button
                                     type='button'
                                     onClick={() => { setPrivacy('public'); setShowPrivacyDropdown(false); }}
                                     className={privacy === 'public' ? styles.active : ''}
                                 >
                                     Public
                                 </button>
-                                <button 
+                                <button
                                     type='button'
                                     onClick={() => { setPrivacy('private'); setShowPrivacyDropdown(false); }}
                                     className={privacy === 'private' ? styles.active : ''}

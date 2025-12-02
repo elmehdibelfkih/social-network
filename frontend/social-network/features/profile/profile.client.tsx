@@ -1,12 +1,12 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import styles from './styles.module.css'
-import { unfollowPerson, followPerson, getMedia } from './services/profile.client'
-import { FollowIcon, MessageIcon, SettingsIcon, UserIcon } from '../../components/ui/icons'
+import { unfollowPerson, followPerson } from './profileSrevice'
+import { FollowIcon, MessageIcon } from '@/components/ui/icons'
 import { ProfileData } from './types'
-import { FollowStatus } from '../../libs/globalTypes'
-import { useAuth } from '../../providers/authProvider'
+import { FollowStatus } from '@/libs/globalTypes'
+import { useAuth } from '@/providers/authProvider'
 
 export function FollowButton({ targetUserId, initialStatus, isPrivate = false }: { targetUserId: string, initialStatus: FollowStatus, isPrivate?: boolean }) {
     const [status, setStatus] = useState<FollowStatus>(initialStatus);
@@ -78,39 +78,6 @@ export function ProfileTopActions({ userId, profile }: { userId: string, profile
                     />
                     <MessageButton />
                 </>
-            )}
-        </div>
-    )
-}
-export function AvatarHolder({ avatarId }: { avatarId: number | null }) {
-    const [avatarUrl, setAvatarUrl] = useState<string | null>(null)
-
-    useEffect(() => {
-        if (avatarId) {
-            getMedia(String(avatarId))
-                .then((response) => {
-                    if (response.mediaEncoded) {
-                        setAvatarUrl(`data:image/png;base64,${response.mediaEncoded}`)
-                    }
-                })
-                .catch(() => {
-                    setAvatarUrl(null)
-                })
-        }
-    }, [avatarId])
-
-    return (
-        <div className={styles.avatarContainer}>
-            {avatarUrl ? (
-                <img
-                    className={styles.avatar}
-                    src={avatarUrl}
-                    alt="User avatar"
-                />
-            ) : (
-                <div className={styles.avatarPlaceholder}>
-                    <UserIcon />
-                </div>
             )}
         </div>
     )

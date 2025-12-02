@@ -27,7 +27,7 @@ func SelectAvatarMediaId(mediaId int64) (bool, error) {
 		utils.SQLiteErrorTarget(err, SELECT_MEDIA_BY_MEDIA_ID)
 		return false, err
 	}
-	if m.OwnerId != -1 || m.Purpose != "avatar" {
+	if (m.OwnerId.Valid && m.OwnerId.Int64 != -1) || m.Purpose != "avatar" {
 		return false, nil
 	}
 

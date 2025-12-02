@@ -1,8 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Post } from './types';
-import { postsService } from './services/postsService';
+import { Post } from '@/libs/globalTypes';
+import { postsService } from './postsService';
 import { LikeButton } from '@/components/ui/like-button/like-button';
 import { Comments } from '@/components/ui/comments/comments';
 import styles from './styles.module.css';
@@ -32,7 +32,7 @@ export function PostsClient({ newPost, onNewPostDisplayed }: PostsClientProps) {
     const now = new Date();
     const diffMs = now.getTime() - date.getTime();
     const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-    
+
     if (diffHours < 1) return 'Just now';
     if (diffHours < 24) return `${diffHours} hours ago`;
     return date.toLocaleDateString();
@@ -83,14 +83,14 @@ export function PostsClient({ newPost, onNewPostDisplayed }: PostsClientProps) {
                 isLiked={post.isLikedByUser}
                 likeCount={post.stats.reactionCount}
                 onLikeChange={(isLiked, newCount) => {
-                  setPosts(prev => prev.map(p => 
-                    p.postId === post.postId 
+                  setPosts(prev => prev.map(p =>
+                    p.postId === post.postId
                       ? { ...p, isLikedByUser: isLiked, stats: { ...p.stats, reactionCount: newCount } }
                       : p
                   ));
                 }}
               />
-              <button 
+              <button
                 className={styles.interactionItem}
                 onClick={() => setOpenComments(post.postId)}
               >
@@ -102,15 +102,15 @@ export function PostsClient({ newPost, onNewPostDisplayed }: PostsClientProps) {
                 <span>Share</span>
               </button>
             </div>
-            
+
             <Comments
               postId={post.postId}
               isOpen={openComments === post.postId}
               onClose={() => setOpenComments(null)}
               commentCount={post.stats.commentCount}
               onCommentAdded={() => {
-                setPosts(prev => prev.map(p => 
-                  p.postId === post.postId 
+                setPosts(prev => prev.map(p =>
+                  p.postId === post.postId
                     ? { ...p, stats: { ...p.stats, commentCount: p.stats.commentCount + 1 } }
                     : p
                 ));

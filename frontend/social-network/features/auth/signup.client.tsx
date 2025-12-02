@@ -2,7 +2,7 @@
 
 import { useState, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
-import { authService } from './services/auth';
+import { authService } from './auth';
 import styles from './styles.module.css';
 import { useAuth } from '@/providers/authProvider';
 
@@ -54,7 +54,7 @@ export function RegisterForm({ onAuthSuccess }: { onAuthSuccess?: () => void }) 
 
         try {
             const avatarResp = await authService.uploadAvatar(avatar);
-            const avatarId = avatarResp.mediaId
+            const avatarId = avatarResp?.mediaId
             setFormData(prev => ({ ...prev, avatarId: avatarId }));
         } catch (error) {
             console.error("Failed to upload avatar:", error);

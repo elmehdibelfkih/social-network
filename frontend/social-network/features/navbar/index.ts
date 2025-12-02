@@ -1,3 +1,3 @@
-export { User } from './navbar.client';
-export { NavbarClient } from './navbar.client';
-export { NavbarServer } from './navbar.server';
+// export { User } from './navbar.client';
+// export { Navbar } from './navbar.client';
+export { Navbar } from './navbar.server';

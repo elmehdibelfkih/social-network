@@ -15,8 +15,6 @@ import (
 )
 
 func HandleUploadMedia(w http.ResponseWriter, r *http.Request) {
-	// userId := utils.GetUserIdFromContext(r)
-
 	var req UploadMediaRequest
 	r.Body = http.MaxBytesReader(w, r.Body, MaxRequestSize)
 	defer r.Body.Close()
@@ -50,7 +48,6 @@ func HandleUploadMedia(w http.ResponseWriter, r *http.Request) {
 
 	detectedMediaType := http.DetectContentType(data)
 	if !AllowedMimeTypes[detectedMediaType] {
-		println("2")
 		utils.UnsupportedMediaType(w)
 		return
 	}
@@ -75,11 +72,14 @@ func HandleUploadMedia(w http.ResponseWriter, r *http.Request) {
 	media := &Media{
 		ID:        mediaID,
 		Path:      filePath,
+		OwnerId:   nil,
 		Mime:      detectedMediaType,
 		Size:      len(data),
 		Purpose:   req.Purpose,
 		CreatedAt: time.Now().String(),
 	}
+
+	fmt.Println(media)
 
 	if err := CreateMedia(media); err != nil {
 		os.Remove(filePath)
