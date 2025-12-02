@@ -221,20 +221,25 @@ export const http = {
 
 
 export async function fetchMediaClient(mediaId: string): Promise<MediaResponse | null> {
+  // Media endpoint returns raw bytes (image) with proper Content-Type.
+  // Use a direct fetch to get a Blob and expose it as an object URL so
+  // components can use it as an <img src="..." />. This avoids the
+  // apiFetch JSON parsing which expects wrapped JSON responses.
+  const mediaUrl = `${BASE_URL}/api/v1/media/${encodeURIComponent(mediaId)}`;
   try {
-    const res = await http.get<MediaResponse>(
-      `/api/v1/media/${encodeURIComponent(mediaId)}`,
-      { 
-        redirectOnError: false, 
-        throwOnError: false,
-        skipAuthRedirect: true  // CRITICAL: Don't redirect on media 401
-      }
-    );
-    if (!res) {
-      console.warn(`No media response for ID: ${mediaId}`);
+    const resp = await fetch(mediaUrl, {
+      method: 'GET',
+      credentials: 'include',
+    });
+
+    if (!resp.ok) {
+      console.warn(`Media fetch failed (${resp.status}) for ID: ${mediaId}`);
       return null;
     }
-    return res;
+
+    const blob = await resp.blob();
+    const objectUrl = URL.createObjectURL(blob);
+    return { url: objectUrl };
   } catch (err) {
     console.error(`Failed to fetch media ${mediaId}:`, err);
     return null;

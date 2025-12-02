@@ -204,7 +204,7 @@ export interface Notification {
 
 export type SearchResultItem = Post | Group | Follower;
 
-export type MediaResponse = { mediaEncoded?: string }
+export type MediaResponse = { mediaEncoded?: string; url?: string }
 export interface UserId {
     Id: number;
 }
