@@ -1,7 +1,7 @@
 import AddFriends from '@/components/ui/AddFriends/addFriends';
 import Snackbar from '@/components/ui/snackbar/snackbar';
 import SharedWorekerClient from '@/components/ui/worker';
-import '@/styles/globals.css'; 
+import '@/styles/globals.css';
 import type { ReactNode } from 'react';
 
 export const metadata = {
@@ -28,8 +28,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     <html lang="en">
       <head />
       <body className="app-root">
-        <SharedWorekerClient/>
+        <SharedWorekerClient />
         {children}
+        <div id="chat-portals"></div>
         <Snackbar />
       </body>
     </html>

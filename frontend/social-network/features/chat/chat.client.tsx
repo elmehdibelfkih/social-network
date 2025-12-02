@@ -2,10 +2,23 @@
 import { useState, useEffect } from 'react';
 import { User } from './types';
 import { chatService } from './services/chat';
-import styles from './styles.module.css';
+import styles from './styles/styles.module.css';
 import ChatCard from './chat.card.client';
+import FloatingChat from './chat.popup.client';
 
 export function ChatSection() {
+    const [openChats, setOpenChats] = useState<number[]>([]);
+    const handleOpenChat = (chatId: number) => {
+        console.log("howa")
+        setOpenChats(prev =>
+            prev.includes(chatId) ? prev : [...prev, chatId]
+        );
+    };
+    const handleCloseChat = (chatId: number) => {
+        setOpenChats(prev => prev.filter(id => id !== chatId));
+    };
+
+
     const [users, setUsers] = useState<User[]>([]);
     useEffect(() => {
         const port = chatService.getGlobalPort();
@@ -20,7 +33,6 @@ export function ChatSection() {
                     break;
                 case 'onlineUser': {
                     const updated = data?.payload?.onlineUser.user;
-                    console.log("howa", updated)
                     setUsers(prev => prev.map(u => u.userId === updated.userId ? { ...updated } : u));
                     break;
                 }
@@ -46,19 +58,30 @@ export function ChatSection() {
                 <h2>Contacts</h2>
             </div>
             <div className={styles.scrollArea}>
-                {
-                    users?.map((u) => (
-                        <ChatCard
-                            key={u.userId}
-                            profileImage={
-                                u.avatarId ? "/svg/users.svg" : "/svg/users.svg"
-                            }
-                            firstName={u.firstName}
-                            lastName={u.lastName}
-                            nickname={u.nickname ?? ""}
-                            isOnline={u.online}
-                        />
-                    ))}
+                {users?.map((u) => (
+                    <ChatCard
+                        key={u.userId}
+                        chatId={u.chatId}
+                        unreadCount={u.unreadCount}
+                        profileImage={
+                            u.avatarId ? "/svg/users.svg" : "/svg/users.svg"
+                        }
+                        firstName={u.firstName}
+                        lastName={u.lastName}
+                        nickname={u.nickname ?? ""}
+                        isOnline={u.online}
+                        onClick={handleOpenChat}
+                    />
+                ))}
+
+                {openChats.map(chatId => (
+                    <FloatingChat
+                        key={chatId}
+                        chatId={chatId}
+                        onClose={() => handleCloseChat(chatId)}
+                    />
+                ))}
+
             </div>
         </div>
     );

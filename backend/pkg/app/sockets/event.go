@@ -66,6 +66,10 @@ type OnlineStatus struct {
 }
 
 type User struct {
+	ChatId      int64   `json:"chatId"`
+	UnreadCount int64   `json:"unreadCount"`
+	Role        string  `json:"role"`
+	LastReadAt  string  `json:"lastReadAt"`
 	UserId      int64   `json:"userId"`
 	Nickname    *string `json:"nickname"`
 	Email       string  `json:"email"`

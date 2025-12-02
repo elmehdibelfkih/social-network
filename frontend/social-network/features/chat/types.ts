@@ -1,6 +1,9 @@
 
 
 export interface User {
+    chatId: number
+    role: string
+    unreadCount: number
     userId: number
     email: string
     firstName: string

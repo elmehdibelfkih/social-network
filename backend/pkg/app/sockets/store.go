@@ -107,6 +107,19 @@ func SelectUserFollowers(userId int64) (*OnlineStatus, error) {
 				utils.SQLiteErrorTarget(err, SELECT_FOLLOWERS_BY_USER_ID)
 				return err
 			}
+			err = tx.QueryRow(
+				SELECT_SHARED_CHAT,
+				userId,
+				u.UserId,
+			).Scan(
+				&u.ChatId,
+				&u.Role,
+				&u.UnreadCount,
+			)
+			if err != nil {
+				utils.SQLiteErrorTarget(err, SELECT_SHARED_CHAT)
+				return err
+			}
 			users.OnlineUsers = append(users.OnlineUsers, u)
 		}
 		return nil

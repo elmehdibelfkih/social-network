@@ -1,28 +1,31 @@
 'use client'
 import React from "react";
-import styles from "./chatcard.module.css";
+import styles from "./styles/chatcard.module.css";
 
 export interface ChatContactProps {
+  chatId: number;
+  unreadCount: number;
   profileImage: string;
   firstName: string;
   lastName: string;
   nickname?: string;
   isOnline: boolean;
+  onClick?: (chatId: number) => void;
 }
 
 export const ChatCard: React.FC<ChatContactProps> = ({
+  chatId,
+  unreadCount,
   profileImage,
   firstName,
   lastName,
   nickname,
   isOnline,
+  onClick,
 }) => {
   return (
     <div
-      className={`${styles.contactItem} ${
-        isOnline ? styles.online : styles.offline
-      }`}
-    >
+      className={`${styles.contactItem} ${isOnline ? styles.online : styles.offline}`} onClick={() => onClick?.(chatId)} >
       <img
         src={profileImage}
         alt={`${firstName} ${lastName}`}
