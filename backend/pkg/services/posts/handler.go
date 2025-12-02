@@ -41,7 +41,7 @@ func HandleCreatePost(w http.ResponseWriter, r *http.Request) {
 	insertPrivacy := req.Privacy
 	if req.Privacy == PrivacyPrivate {
 		// compatibility: database currently uses the legacy 'privatey' value
-		insertPrivacy = "privatey"
+		insertPrivacy = "private"
 	}
 
 	post := &Post{

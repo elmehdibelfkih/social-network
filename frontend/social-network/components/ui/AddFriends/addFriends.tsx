@@ -11,12 +11,13 @@ import { getMedia } from '@/features/profile/profileSrevice'
 interface AddFriendsProps {
     title: string
     desc: string
-    componentId: string
+    groupId: string | null
     purpose: 'group' | 'post'
     onComplete?: (selectedUserIds: number[]) => void
+    onClose?: () => void
 }
 
-export default function AddFriends({ title, desc, componentId, purpose, onComplete }: AddFriendsProps) {
+export default function AddFriends({ title, desc, groupId, purpose, onComplete, onClose }: AddFriendsProps) {
     const { user } = useAuth()
     const [followers, setFollowers] = useState<Follower[]>([])
     const [searchQuery, setSearchQuery] = useState('')
@@ -48,9 +49,7 @@ export default function AddFriends({ title, desc, componentId, purpose, onComple
         const userIds = Array.from(selectedFollowers);
 
         if (purpose === "post") {
-            if (onComplete) {
-                onComplete(userIds);
-            }
+            onComplete(userIds);
             setSelectedFollowers(new Set());
             return;
         }
@@ -59,15 +58,13 @@ export default function AddFriends({ title, desc, componentId, purpose, onComple
             try {
                 for (const userId of userIds) {
                     try {
-                        await http.post(`/api/v1/groups/${componentId}/invite/${userId}`);
+                        await http.post(`/api/v1/groups/${groupId}/invite/${userId}`);
                     } catch (error) {
                         console.error(`Failed to invite user ${userId}:`, error);
                     }
                 }
                 setSelectedFollowers(new Set());
-                if (onComplete) {
-                    onComplete(userIds);
-                }
+                onComplete(userIds);
             } catch (error) {
                 console.error('Failed to complete operation:', error);
             }
@@ -89,8 +86,19 @@ export default function AddFriends({ title, desc, componentId, purpose, onComple
     return (
         <div className={styles.outerContainer}>
             <div className={styles.header}>
-                <h3>{title}</h3>
-                <h4>{desc}</h4>
+                <div>
+                    <h3>{title}</h3>
+                    <h4>{desc}</h4>
+                </div>
+                {onClose && (
+                    <button
+                        className={styles.closeButton}
+                        onClick={onClose}
+                        type="button"
+                    >
+                        ✕
+                    </button>
+                )}
             </div>
             <div className={styles.searchContainer}>
                 <input

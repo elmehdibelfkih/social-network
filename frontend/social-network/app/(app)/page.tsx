@@ -5,24 +5,24 @@ import { http } from "@/libs/apiFetch";
 import { JSX } from "react";
 import { getUserId } from "@/libs/helpers";
 import { ProfileAPIResponse } from "@/libs/globalTypes";
-import NewPostServer from "@/features/newPost/newPostWrapper.client";
+import { NewPost } from "@/features/newPost";
 
 export default async function HomePage(): Promise<JSX.Element> {
   const userId = await getUserId();
   const res2 = await http.get<ProfileAPIResponse>(`/api/v1/users/${userId}/profile`);
-  
+
   return (
     <div className="homepage-layout">
       <aside className="sidebar-left">
         <ProfileSummaryServer userId={userId} />
       </aside>
-      
+
       <main className="main-feed">
 
 
-      <div>
-        <NewPostServer avatarId={res2?.avatarId ?? null} />
-      </div>
+        <div>
+          <NewPost />
+        </div>
         {
           (() => {
             // Inject a sample post for testing directly into Posts
@@ -42,11 +42,11 @@ export default async function HomePage(): Promise<JSX.Element> {
               updatedAt: '2025-12-01T13:36:20+01:00'
             } as any;
 
-              return <div><PostView post={samplePost} /></div>;
+            return <div><PostView post={samplePost} /></div>;
           })()
         }
       </main>
-      
+
       <aside className="sidebar-right">
         <MiniProfile data={res2} />
       </aside>

@@ -80,6 +80,12 @@
   color: #1e40af;
 }
 
+.privacyBadge[data-privacy="restricted"] {
+  background-color: #fef3c7;
+  border-color: #f59e0b;
+  color: #92400e;
+}
+
 .privacyBadgeIcon {
   font-size: 16px;
 }
@@ -278,6 +284,52 @@
   color: #059669;
   font-size: 18px;
   font-weight: bold;
+}
+
+/* Followers Selector */
+.followersSelector {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.followersSelector button {
+  background-color: #f3f4f6;
+  color: #374151;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.followersSelector button:hover:not(:disabled) {
+  background-color: #e5e7eb;
+  border-color: #d1d5db;
+}
+
+.followersSelector button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.addFriendsPopup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  z-index: 9999;
+  max-height: 90vh;
+  overflow-y: auto;
 }
 
 /* Action Button */

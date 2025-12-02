@@ -6,13 +6,8 @@ import { ImageIcon, GlobeIcon, DropdownIcon, LockIcon, UsersIcon } from '@/compo
 import { AvatarHolder } from '@/components/ui/avatar_holder/avatarholder.client';
 import AddFriends from '@/components/ui/AddFriends/addFriends';
 import { postsService } from './services/postsService';
-import type { Post, PrivacyLevel } from './types';
-
-interface NewPostProps {
-  avatarId?: number | null;
-  onPostCreated?: (post: Post) => void;
-  serverAction?: (formData: FormData) => Promise<any>;
-}
+import type { PrivacyLevel } from './types';
+import { useAuth } from '@/providers/authProvider';
 
 const privacyOptions = [
   {
@@ -32,10 +27,17 @@ const privacyOptions = [
     label: 'Private',
     description: 'Only you can see this',
     icon: 'lock'
+  },
+  {
+    value: 'restricted' as PrivacyLevel,
+    label: 'Restricted',
+    description: 'Only share with...',
+    icon: 'users'
   }
 ] as const;
 
-export function NewPost({ avatarId = null, onPostCreated, serverAction }: NewPostProps) {
+export function NewPost() {
+  const { user } = useAuth()
   const [content, setContent] = useState('');
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [privacy, setPrivacy] = useState<PrivacyLevel>('public');
@@ -58,6 +60,7 @@ export function NewPost({ avatarId = null, onPostCreated, serverAction }: NewPos
     setContent('');
     setSelectedFiles([]);
     setPrivacy('public');
+    setSelectedFollowers([]);
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
@@ -73,49 +76,6 @@ export function NewPost({ avatarId = null, onPostCreated, serverAction }: NewPos
     setIsSubmitting(true);
 
     try {
-      // Server Action Path (RSC)
-      if (typeof serverAction === 'function') {
-        const formData = new FormData();
-        formData.append('content', content.trim());
-        formData.append('privacy', privacy); // Ensure exact value: 'public' | 'private' | 'followers'
-        if (privacy === 'followers' && selectedFollowers.length > 0) {
-          formData.append('allowedList', JSON.stringify(selectedFollowers));
-        }
-        
-        for (const file of selectedFiles) {
-          formData.append('media', file);
-        }
-
-        console.log('📤 Submitting via Server Action with privacy:', privacy);
-
-        const postData = await serverAction(formData);
-
-        if (postData) {
-          const newPost: Post = {
-            postId: postData.postId ?? postData.postID ?? 0,
-            authorId: postData.authorId ?? 0,
-            authorFirstName: postData.authorFirstName ?? 'Current',
-            authorLastName: postData.authorLastName ?? 'User',
-            authorNickname: postData.authorNickname ?? null,
-            content: content.trim(),
-            privacy: privacy, // Use the state value directly
-            mediaIds: postData.mediaIds ?? null,
-            isLikedByUser: false,
-            stats: {
-              reactionCount: postData.reactionCount ?? 0,
-              commentCount: postData.commentCount ?? 0
-            },
-            createdAt: postData.createdAt ?? new Date().toISOString(),
-            updatedAt: postData.updatedAt ?? postData.createdAt ?? new Date().toISOString()
-          };
-
-          onPostCreated?.(newPost);
-          resetForm();
-        }
-        return;
-      }
-
-      // Client-side API Path
       let mediaIds: number[] = [];
 
       if (selectedFiles.length > 0) {
@@ -128,25 +88,15 @@ export function NewPost({ avatarId = null, onPostCreated, serverAction }: NewPos
 
       console.log('📤 Creating post with privacy:', privacy);
 
-      const postData = await postsService.createPost({
+      await postsService.createPost({
         content: content.trim(),
-        privacy: privacy, // This will be validated in the service
+        privacy: privacy,
         mediaIds: mediaIds.length > 0 ? mediaIds : undefined,
-        allowedList: privacy === 'followers' && selectedFollowers.length > 0 ? selectedFollowers : undefined
+        allowedList: privacy === 'restricted' && selectedFollowers.length > 0 ? selectedFollowers : undefined
       });
 
-      console.log('✅ Post created successfully:', postData);
-
-      const newPost: Post = {
-        ...postData,
-        authorFirstName: postData.authorFirstName || 'Current',
-        authorLastName: postData.authorLastName || 'User'
-      };
-
-      onPostCreated?.(newPost);
       resetForm();
     } catch (error) {
-      console.error('❌ Failed to create post:', error);
       alert('Failed to create post. Please try again.');
     } finally {
       setIsSubmitting(false);
@@ -170,7 +120,7 @@ export function NewPost({ avatarId = null, onPostCreated, serverAction }: NewPos
   return (
     <form onSubmit={handleSubmit} className={styles.form}>
       <div className={styles.leftPart}>
-        <AvatarHolder avatarId={avatarId} size={48} />
+        <AvatarHolder avatarId={user.avatarId} size={48} />
       </div>
 
       <div className={styles.rightPart}>
@@ -184,17 +134,15 @@ export function NewPost({ avatarId = null, onPostCreated, serverAction }: NewPos
           />
         </div>
 
-        {/* Privacy Info Badge */}
         {privacy !== 'public' && (
           <div className={styles.privacyBadge} data-privacy={privacy}>
             <span className={styles.privacyBadgeIcon}>
-              {privacy === 'private' ? '🔒' : '👥'}
+              {privacy === 'private' ? '🔒' : privacy === 'restricted' ? '🔐' : '👥'}
             </span>
             <span>{getCurrentPrivacyOption().description}</span>
           </div>
         )}
 
-        {/* Selected Files */}
         {selectedFiles.length > 0 && (
           <div className={styles.selectedFiles}>
             {selectedFiles.map((file, index) => (
@@ -214,7 +162,6 @@ export function NewPost({ avatarId = null, onPostCreated, serverAction }: NewPos
         )}
 
         <div className={styles.bottomPart}>
-          {/* Photo Upload Button */}
           <button
             className={styles.uploadImageButton}
             type="button"
@@ -235,7 +182,6 @@ export function NewPost({ avatarId = null, onPostCreated, serverAction }: NewPos
             disabled={isSubmitting}
           />
 
-          {/* Privacy Dropdown */}
           <div className={styles.privacyContainer}>
             <button
               className={styles.privacyButton}
@@ -260,16 +206,17 @@ export function NewPost({ avatarId = null, onPostCreated, serverAction }: NewPos
                       key={option.value}
                       type="button"
                       onClick={() => {
-                          setPrivacy(option.value);
-                          setShowPrivacyDropdown(false);
-                          // close followers popup and clear selection when switching away
+                        setPrivacy(option.value);
+                        setShowPrivacyDropdown(false);
+
+                        if (option.value === 'restricted') {
+                          setShowAddFriends(true);
+                        } else {
                           setShowAddFriends(false);
-                          if (option.value !== 'followers') setSelectedFollowers([]);
-                          console.log('✅ Privacy changed to:', option.value);
-                        }}
-                      className={`${styles.privacyOption} ${
-                        privacy === option.value ? styles.active : ''
-                      }`}
+                        }
+                      }}
+                      className={`${styles.privacyOption} ${privacy === option.value ? styles.active : ''
+                        }`}
                     >
                       <div className={styles.privacyOptionIcon}>
                         {option.icon === 'globe' && <GlobeIcon fillColor={privacy === option.value ? '#059669' : '#6b7280'} />}
@@ -294,34 +241,22 @@ export function NewPost({ avatarId = null, onPostCreated, serverAction }: NewPos
             )}
           </div>
 
-          {/* Followers selection UI: only visible when privacy === 'followers' */}
-          {privacy === 'followers' && (
-            <div className={styles.followersSelector}>
-              <button
-                type="button"
-                className={styles.actionButton}
-                onClick={() => setShowAddFriends((s) => !s)}
-                disabled={isSubmitting}
-                style={{ padding: '6px 12px', fontSize: '0. nine rem' }}
-              >
-                {selectedFollowers.length > 0 ? `Allowed: ${selectedFollowers.length}` : 'Select followers...'}
-              </button>
-
-              {showAddFriends && (
-                <div className={styles.addFriendsPopup}>
-                  <AddFriends
-                    title="Allow followers"
-                    desc="Select followers to allow this post"
-                    componentId={String(0)}
-                    purpose="post"
-                    onComplete={(ids) => { setSelectedFollowers(ids); setShowAddFriends(false); }}
-                  />
-                </div>
-              )}
+          {privacy === 'restricted' && showAddFriends && (
+            <div className={styles.addFriendsPopup}>
+              <AddFriends
+                title="Allowed followers"
+                desc="Select allowed followers to see this publication"
+                groupId={String(0)}
+                purpose="post"
+                onComplete={(ids) => {
+                  setSelectedFollowers(ids);
+                  setShowAddFriends(false);
+                }}
+                onClose={() => setShowAddFriends(false)}
+              />
             </div>
           )}
 
-          {/* Submit Button */}
           <button
             className={styles.actionButton}
             type="submit"
@@ -331,6 +266,6 @@ export function NewPost({ avatarId = null, onPostCreated, serverAction }: NewPos
           </button>
         </div>
       </div>
-    </form>
+    </form >
   );
 }

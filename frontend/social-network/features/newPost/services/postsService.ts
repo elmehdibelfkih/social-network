@@ -4,13 +4,13 @@ import { PrivacyLevel } from '@/libs/globalTypes';
 
 export const postsService = {
   async createPost(input: CreatePostInput): Promise<Post> {
-    // Validate and normalize privacy value
-    const validPrivacy: PrivacyLevel = 
-      input.privacy === 'public' || 
-      input.privacy === 'private' || 
-      input.privacy === 'followers'
+    const validPrivacy: PrivacyLevel =
+      input.privacy === 'public' ||
+        input.privacy === 'private' ||
+        input.privacy === 'followers' ||
+        input.privacy === 'restricted'
         ? input.privacy
-        : 'public'; // fallback to public if invalid
+        : 'public';
 
     const payload: any = {
       content: input.content.trim(),
@@ -19,10 +19,8 @@ export const postsService = {
     if (input.mediaIds && input.mediaIds.length > 0) payload.mediaIds = input.mediaIds;
     if (input.allowedList && input.allowedList.length > 0) payload.allowedList = input.allowedList;
 
-    console.log('📤 Creating post with payload:', payload);
-
     const response = await http.post<Post>('/api/v1/posts', payload);
-    
+
     if (!response) {
       throw new Error('Failed to create post');
     }

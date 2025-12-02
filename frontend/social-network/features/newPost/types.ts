@@ -1,4 +1,4 @@
-export type PrivacyLevel = 'public' | 'private' | 'followers';
+export type PrivacyLevel = 'public' | 'private' | 'followers' | 'restricted';
 
 export interface Post {
   postId: number;
