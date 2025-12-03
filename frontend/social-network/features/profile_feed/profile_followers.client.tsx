@@ -52,7 +52,9 @@ export function FollowersList({ userId, type }: FollowersListProps) {
         } finally {
             setIsLoading(false)
         }
+        
     }
+    console.log(followers);
 
     useEffect(() => {
         loadFollowers()

@@ -9,7 +9,7 @@ import { postsService } from './services/postsService';
 import type { PrivacyLevel } from './types';
 import { useAuth } from '@/providers/authProvider';
 
-const privacyOptions = [
+export const privacyOptions = [
   {
     value: 'public' as PrivacyLevel,
     label: 'Public',
@@ -68,25 +68,17 @@ export function NewPost() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (!content.trim()) {
-      return;
-    }
-
+    if (!content.trim())  return;
     setIsSubmitting(true);
 
-    // try {
+    try {
       let mediaIds: number[] = [];
 
       if (selectedFiles.length > 0) {
-        console.log('📤 Uploading media files...');
         const uploadPromises = selectedFiles.map(file => postsService.uploadMedia(file));
         const uploadResults = await Promise.all(uploadPromises);
         mediaIds = uploadResults.map(result => result.mediaId);
-        console.log('✅ Media uploaded:', mediaIds);
       }
-
-      console.log('📤 Creating post with privacy:', privacy);
 
       await postsService.createPost({
         content: content.trim(),
@@ -96,11 +88,12 @@ export function NewPost() {
       });
 
       resetForm();
-    // } catch (error) {
-    //   alert('Failed to create post. Please try again.'+ error.toString());
-    // } finally {
-    //   setIsSubmitting(false);
-    // }
+    } catch (error) {
+      // alert('Failed to create post. Please try again.'+ error.toString());
+      setIsSubmitting(false);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const getPrivacyIcon = () => {

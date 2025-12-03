@@ -334,7 +334,7 @@
 
 /* Action Button */
 .actionButton {
-  background-color: #b9a2d8;
+  background-color: var(--primary-purple);
   color: #ffffff;
   border: none;
   border-radius: 8px;

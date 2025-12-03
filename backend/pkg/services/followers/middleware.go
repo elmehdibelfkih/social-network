@@ -105,7 +105,7 @@ func FollowersFolloweesListMiddleWare(next http.HandlerFunc) http.HandlerFunc {
 			utils.InternalServerError(w)
 			return
 		}
-		if !isPublic && status != "accepted" {
+		if !isPublic && status != "accepted" && userId != targetUserId {
 			utils.BadRequest(w, "This acoount is private", "alert")
 			return
 		}

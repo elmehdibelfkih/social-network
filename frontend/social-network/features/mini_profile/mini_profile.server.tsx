@@ -4,7 +4,6 @@ import styles from './styles.module.css'
 import type { ProfileAPIResponse } from '@/libs/globalTypes'
 import { MiniProfileActions } from './mini_profile.client'
 import { AvatarHolder } from '@/components/ui/avatar_holder/avatarholder.client'
-import { getUserId } from '@/libs/helpers'
 
 
 type Props = {
@@ -19,7 +18,7 @@ export default function MiniProfile({ userId, data, isMyprofile }: Props) {
   if (!profile && userId != null) {
     const fetchProfile = async () => {
       profile = await getProfileServer(userId)
-    }
+    }    
     fetchProfile()
   }
 
@@ -46,6 +45,7 @@ export default function MiniProfile({ userId, data, isMyprofile }: Props) {
     ? new Date(profile.joinedAt).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })
     : ''
 
+  // todo
   let isOnline = false;
 
   return (
@@ -66,7 +66,7 @@ export default function MiniProfile({ userId, data, isMyprofile }: Props) {
 
           <div className={styles.miniHandleRow}>
             <div className={styles.miniHandle}>{handle}</div>
-            {profile.privacy !== 'public' && <span className={styles.badge}>Private</span>}
+            {/* {profile.privacy !== 'public' && <span className={styles.badge}>Private</span>} */}
           </div>
 
           <div className={styles.statusBadges}>
