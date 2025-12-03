@@ -1,5 +1,5 @@
 import { getProfileServer } from './mini_profile.services'
-import { displayName, handleName } from './mini_profile.hooks'
+import { displayName, handleName } from '@/libs/helpers'
 import styles from './styles.module.css'
 import type { ProfileAPIResponse } from '@/libs/globalTypes'
 import { MiniProfileActions } from './mini_profile.client'
