@@ -14,7 +14,6 @@ type ChatMessage struct {
 	SeenState     string `json:"seenState"`
 	CreatedAt     string `json:"createdAt"`
 	UpdatedAt     string `json:"updatedAt"`
-	LastMessageId *int64 `json:"lastMessageId"`
 }
 
 // "PUT", "/api/v1/chats/{chat_id}/messages/{message_id}"

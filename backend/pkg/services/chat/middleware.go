@@ -12,14 +12,17 @@ func ChatAccessMiddleware(next http.HandlerFunc) http.HandlerFunc {
 		chatId := utils.GetWildCardValue(w, r, "chat_id")
 
 		// Check if user is participant in the chat
-		var exists bool
-		err := config.DB.QueryRow("SELECT 1 FROM chat_participants WHERE chat_id = ? AND user_id = ?", chatId, userId).Scan(&exists)
+		exist, err := SelectChatById(chatId, userId)
 		if err != nil {
 			utils.BackendErrorTarget(err, "ChatAccessMiddleware")
 			utils.ForbiddenError(w, "Access denied")
 			return
 		}
-
+		if !exist {
+			utils.BackendErrorTarget(err, "ChatAccessMiddleware")
+			utils.ForbiddenError(w, "Access denied")
+			return
+		}
 		next(w, r)
 	}
 }

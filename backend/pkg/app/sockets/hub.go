@@ -90,3 +90,7 @@ func (h *Hub) removeClient(c *Client) {
 		delete(chat, c.userId)
 	}
 }
+
+func (h *Hub) ChatOnlineUsers(chatId int64) int{
+	return len(h.chatUsers[chatId])
+}
