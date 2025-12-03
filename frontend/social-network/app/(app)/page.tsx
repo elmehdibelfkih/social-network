@@ -5,6 +5,7 @@ import { http } from "@/libs/apiFetch";
 import { JSX } from "react";
 import { getUserId } from "@/libs/helpers";
 import { ProfileAPIResponse } from "@/libs/globalTypes";
+import { NewPost } from "@/features/newPost";
 
 export default async function HomePage(): Promise<JSX.Element> {
   const userId = await getUserId();
@@ -14,10 +15,13 @@ export default async function HomePage(): Promise<JSX.Element> {
     <>
       <ProfileSummaryServer userId={userId} />
       <div>
+          <NewPost />
+      </div>
+      <div>
         <p>
         </p>
       </div>
-      <MiniProfile data={res2} />
+      <MiniProfile data={res2} isMyprofile={false} />
     </>
   );
 }

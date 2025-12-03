@@ -14,6 +14,7 @@ import (
 
 // CreatePost creates a new post in the database
 func CreatePost(post *Post) error {
+	fmt.Printf("%+v\n", post)
 	err := database.WrapWithTransaction(func(tx *sql.Tx) error {
 		_, err := tx.Exec(QUERY_CREATE_POST,
 			post.ID,
@@ -31,6 +32,7 @@ func CreatePost(post *Post) error {
 			utils.SQLiteErrorTarget(err, "CreatePost")
 			return fmt.Errorf("failed to create post: %w", err)
 		}
+		fmt.Println("hani hana")
 
 		// Increment posts_count
 		// if err := database.UpdateCounter(tx, database.DBCounterSetter{
