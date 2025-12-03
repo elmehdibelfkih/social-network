@@ -5,6 +5,8 @@ import { getPosts } from "./profile_feed.services"
 import { useEffect, useState } from "react"
 import { Post } from "@/libs/globalTypes"
 import { PostsClient } from "../posts"
+import styles from "./styles.module.css"
+import { ProfileIcon, UserIcon } from "@/components/ui/icons"
 
 export function PostsSection({ userId }: { userId: string }) {
     const searchParams = useSearchParams()
@@ -55,18 +57,26 @@ export function PostsSection({ userId }: { userId: string }) {
         return () => window.removeEventListener("scroll", handleScroll);
     }, [hasMore, page])
 
-    if (posts.length === 0 && !isLoading) {
-        return <div>No posts yet</div>
-    }
-
     return (
-        <>
+        <div className={styles.postsContainer}>
             {
-                posts.map((post) => (
-                    <PostsClient key={post.postId} newPost={post} />
-                ))
+                (posts.length === 0 && !isLoading) ?
+                    <EmptyContent />
+                    :
+                    posts.map((post) => (
+                        <PostsClient key={post.postId} newPost={post} />
+                    ))
             }
             {isLoading && <div>Loading...</div>}
-        </>
+        </div>
+    )
+}
+
+function EmptyContent() {
+    return (
+        <div className={styles.emptyContent}>
+            <h3>No posts yet</h3>
+            <p>Share your first post</p>
+        </div>
     )
 }
