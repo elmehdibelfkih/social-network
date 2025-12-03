@@ -1,5 +1,5 @@
 .page {
-    max-width: 600px;
+    max-width: 900px;
     margin: 0 auto;
 }
 
@@ -84,6 +84,65 @@
     border-color: #7c3aed;
 }
 
+.emptyContainer {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 2rem;
+    margin-top: 1rem;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e5e7eb;
+}
+
+.loadingText {
+    margin: 0;
+    color: #6b7280;
+    font-size: 1rem;
+}
+
+.errorText {
+    margin: 0;
+    color: #ef4444;
+    font-size: 1rem;
+}
+
+.emptyText {
+    margin: 0;
+    color: #6b7280;
+    font-size: 1rem;
+}
+
+.resultsContainer {
+    margin-top: 14px;
+}
+
+.resultsTitle {
+    margin: 0 0 1rem 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #374151;
+}
+
+.resultsGrid {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.searchedCard {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e5e7eb;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.searchedCard:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
 @media (max-width: 640px) {
     .searchCard {
         padding: 1.5rem;
@@ -99,5 +158,15 @@
 
     .filterButton {
         width: 100%;
+    }
+
+    .loadingContainer,
+    .errorContainer,
+    .emptyContainer {
+        padding: 1.5rem;
+    }
+
+    .searchedCard {
+        padding: 0.75rem;
     }
 }

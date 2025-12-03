@@ -6,4 +6,5 @@ export type User = {
   avatarId: number
   status: 'pending' | 'accepted'
   chatId: number | null
+  privacy?: 'public' | 'private'
 }
