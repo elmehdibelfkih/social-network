@@ -40,8 +40,34 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
+.postsContainer {
+  padding: 2rem;
+}
+
 .tabContent {
   min-height: 300px;
+}
+
+.emptyContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+  text-align: center;
+  color: #888;
+  grid-column: 1 / -1;
+}
+
+.emptyContent h3 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.emptyContent p {
+  margin: 0;
+  font-size: 0.95rem;
 }
 
 .followersGrid {
