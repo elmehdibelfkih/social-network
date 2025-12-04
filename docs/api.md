@@ -359,25 +359,35 @@ No need for a request body.
 
   [
     {
-      "userId": 1289843874323,
-      "nickname": "alice123",
-      "firstName": "Alice",
-      "lastName": "Johnson",
-      "avatarId": 5956843825683,
-      "followedAt": "2025-10-10T12:00:00Z",
-      "status": "accepted", // pending/accepted/declined or null
-      "chatId": 45678654356756 // or null
+      "userId": 1823393649397760,
+      "status": "accepted",
+      "nickname": "Kirsten Grant",
+      "firstName": "Jaquelyn",
+      "lastName": "Mcguire",
+      "avatarId": 1823389853552640,
+      "privacy": "public",
+      "chatId": null,
+      "stats": {
+          "postsCount": 0,
+          "followersCount": 3,
+          "followingCount": 2
+      }
     },
     {
-      "userId": 1289843874334,
-      "nickname": "bob_dev",
-      "firstName": "Bob",
-      "lastName": "Smith",
-      "avatarId": 5956843825683,
-      "followedAt": "2025-10-12T15:30:00Z",
-      "status": "accepted", // pending/accepted/declined or null
-      "chatId": 32456786543567 // or null
-    }
+      "userId": 565768679875975957,
+      "status": "accepted",
+      "nickname": "hola nahoda",
+      "firstName": "sdfdf",
+      "lastName": "eegtrytr",
+      "avatarId": 76537574867477698695,
+      "privacy": "public",
+      "chatId": null,
+      "stats": {
+          "postsCount": 10,
+          "followersCount": 4,
+          "followingCount": 2
+      }
+    },
   ]
 
 ```
@@ -394,25 +404,35 @@ No need for a request body.
 
   [
     {
-      "userId": 1289843874323,
-      "nickname": "alice123",
-      "firstName": "Alice",
-      "lastName": "Johnson",
-      "avatarId": 5956843825683,
-      "followedAt": "2025-10-10T12:00:00Z",
-      "status": "accepted", // pending/accepted
-      "chatId": null
+      "userId": 1823393649397760,
+      "status": "accepted",
+      "nickname": "Kirsten Grant",
+      "firstName": "Jaquelyn",
+      "lastName": "Mcguire",
+      "avatarId": 1823389853552640,
+      "privacy": "public",
+      "chatId": null,
+      "stats": {
+          "postsCount": 0,
+          "followersCount": 3,
+          "followingCount": 2
+      }
     },
     {
-      "userId": 1289843874334,
-      "nickname": "bob_dev",
-      "firstName": "Bob",
-      "lastName": "Smith",
-      "avatarId": 5956843825683,
-      "followedAt": "2025-10-12T15:30:00Z",
-      "status": "accepted", // pending/accepted
-      "chatId": 4567876543 // or null
-    }
+      "userId": 565768679875975957,
+      "status": "accepted",
+      "nickname": "hola nahoda",
+      "firstName": "sdfdf",
+      "lastName": "eegtrytr",
+      "avatarId": 76537574867477698695,
+      "privacy": "public",
+      "chatId": null,
+      "stats": {
+          "postsCount": 10,
+          "followersCount": 4,
+          "followingCount": 2
+      }
+    },
   ]
 
 ```
@@ -429,25 +449,35 @@ No need for a request body.
 
   [
     {
-      "userId": 6249843274333,
-      "nickname": "alice123",
-      "firstName": "Alice",
-      "lastName": "Johnson",
-      "avatarId": 5956843825683,
-      "followedAt": "2025-10-20T14:30:00Z",
-      "status": "pending", // pending/accepted/declined or null
-      "chatId": null
+      "userId": 1823393649397760,
+      "status": "accepted",
+      "nickname": "Kirsten Grant",
+      "firstName": "Jaquelyn",
+      "lastName": "Mcguire",
+      "avatarId": 1823389853552640,
+      "privacy": "public",
+      "chatId": null,
+      "stats": {
+          "postsCount": 0,
+          "followersCount": 3,
+          "followingCount": 2
+      }
     },
     {
-      "userId": 3489443834339,
-      "nickname": "bob_dev",
-      "firstName": "Bob",
-      "lastName": "Smith",
-      "avatarId": 5956843825683,
-      "followedAt": "2025-10-21T10:15:00Z",
-      "status": "pending", // pending/accepted/declined or null
-      "chatId": 98765434567 // or null
-    }
+      "userId": 565768679875975957,
+      "status": "accepted",
+      "nickname": "hola nahoda",
+      "firstName": "sdfdf",
+      "lastName": "eegtrytr",
+      "avatarId": 76537574867477698695,
+      "privacy": "public",
+      "chatId": null,
+      "stats": {
+          "postsCount": 10,
+          "followersCount": 4,
+          "followingCount": 2
+      }
+    },
   ]
 
 ```
@@ -1882,13 +1912,19 @@ No need for a request body.
 ``` json
  [
     {
-      "userId": 1289843874323,
-      "nickname": "alice123",
-      "firstName": "Alice",
-      "lastName": "Johnson",
-      "avatarId": 5956843825683,
-      "status": "accepted", // pending/accepted
-      "chatId": null
+      "userId": 1823393649397760,
+      "status": "accepted",
+      "nickname": "Kirsten Grant",
+      "firstName": "Jaquelyn",
+      "lastName": "Mcguire",
+      "avatarId": 1823389853552640,
+      "privacy": "public",
+      "chatId": null,
+      "stats": {
+          "postsCount": 0,
+          "followersCount": 3,
+          "followingCount": 2
+      }
     },
     {
       "postId": 3389843874075,

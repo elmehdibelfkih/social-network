@@ -12,7 +12,6 @@ import (
 	"github.com/mattn/go-sqlite3"
 )
 
-// Helper functions to convert sql.Null* to pointers
 func toStringPtr(ns sql.NullString) *string {
 	if !ns.Valid {
 		return nil
@@ -177,14 +176,14 @@ func GetFollowersByUserID(userID int64) ([]UserFollowItem, error) {
 
 	for rows.Next() {
 		var (
-			userId   int64
-			status   sql.NullString
-			nickname sql.NullString
+			userId    int64
+			status    sql.NullString
+			nickname  sql.NullString
 			firstName string
 			lastName  string
-			avatarId sql.NullInt64
-			privacy  string
-			chatId   sql.NullInt64
+			avatarId  sql.NullInt64
+			privacy   string
+			chatId    sql.NullInt64
 		)
 
 		if err := rows.Scan(
@@ -201,7 +200,6 @@ func GetFollowersByUserID(userID int64) ([]UserFollowItem, error) {
 			return nil, err
 		}
 
-		// Populate Stats
 		stats, err := getState(userId)
 		if err != nil {
 			utils.SQLiteErrorTarget(err, "getState")
