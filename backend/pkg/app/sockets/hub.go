@@ -42,6 +42,9 @@ func (h *Hub) Run() {
 func (h *Hub) AddChatUser(chatId, userId int64) {
 	if len(h.clients[userId]) > 0 {
 		src := h.clients[userId]
+		if src == nil {
+			return
+		}
 		dst := append([]*Client(nil), src...)
 		h.chatUsers[chatId][userId] = dst
 		for _, c := range h.chatUsers[chatId][userId] {
@@ -91,6 +94,6 @@ func (h *Hub) removeClient(c *Client) {
 	}
 }
 
-func (h *Hub) ChatOnlineUsers(chatId int64) int{
+func (h *Hub) ChatOnlineUsers(chatId int64) int {
 	return len(h.chatUsers[chatId])
 }

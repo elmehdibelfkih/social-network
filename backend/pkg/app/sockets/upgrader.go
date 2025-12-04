@@ -50,6 +50,8 @@ func UpgradeProtocol(w http.ResponseWriter, r *http.Request) {
 	// create the client sturuct
 	if user, err = SelectUserData(userId); err != nil {
 		utils.BackendErrorTarget(err, "enable to get user data")
+		utils.IdentifySqlError(w, err)
+		return
 	}
 
 	c := NewClient(WSManger, conn, userId, sessionCookie, user)

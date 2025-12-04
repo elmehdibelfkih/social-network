@@ -9,7 +9,6 @@ import FloatingChat from './chat.popup.client';
 export function ChatSection() {
     const [openChats, setOpenChats] = useState<number[]>([]);
     const handleOpenChat = (chatId: number) => {
-        console.log("howa")
         setOpenChats(prev =>
             prev.includes(chatId) ? prev : [...prev, chatId]
         );
@@ -73,7 +72,6 @@ export function ChatSection() {
                         onClick={handleOpenChat}
                     />
                 ))}
-
                 {openChats.map(chatId => (
                     <FloatingChat
                         key={chatId}

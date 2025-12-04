@@ -18,8 +18,9 @@ export default function FloatingChat({ chatId, onClose }: FloatingChatProps) {
     if (!portalNode) return null;
     return createPortal(
         <div className={styles.popupStyle}>
-            <button onClick={onClose}>X</button>
-            <h3>{chatId}</h3>
+            <button className={styles.button} onClick={onClose}>
+                <img src="/svg/x.svg" alt="" />
+            </button>
             <ChatConversation
                 key={chatId}
                 chatId={chatId}

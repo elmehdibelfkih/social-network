@@ -145,14 +145,6 @@ func (c *Client) handleEvent(e Event) error {
 		return nil
 	case "offlineUser":
 		if err := c.ClientRemoved(e); err != nil {
-			c.events <- Event{
-				Source:  "server",
-				Type:    "error",
-				Payload: nil,
-				Error: &EventError{
-					Content: err,
-				},
-			}
 			return err
 		}
 		return nil

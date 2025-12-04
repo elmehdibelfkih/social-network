@@ -22,3 +22,11 @@ body {
   min-height: 100vh;
   background-color: var(--background-cream);
 }
+
+#chat-portals {
+  position: fixed;
+  width: 100%;
+  height: 50%;
+  display: flex;
+  margin-bottom: 5%;
+}

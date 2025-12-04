@@ -15,7 +15,7 @@ export const chatService = {
         return globalPort
     }
 
-    async register(data: RegisterRequest): Promise<AuthResponse> {
-        return http.post<AuthResponse>('/api/v1/auth/register', data)
-    },
+    // async register(data: RegisterRequest): Promise<AuthResponse> {
+    //     return http.post<AuthResponse>('/api/v1/auth/register', data)
+    // },
 }
