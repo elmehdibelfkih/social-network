@@ -13,12 +13,14 @@ type Props = {
 }
 
 export default function MiniProfile({ userId, data, isMyprofile }: Props) {
+  console.log("data >",data);
+
   let profile: ProfileAPIResponse | null = data ?? null
 
   if (!profile && userId != null) {
     const fetchProfile = async () => {
       profile = await getProfileServer(userId)
-    }    
+    }
     fetchProfile()
   }
 

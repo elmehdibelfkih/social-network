@@ -23,12 +23,8 @@ function followerToProfile(follower: Follower): ProfileAPIResponse {
         avatarId: follower.avatarId,
         aboutMe: null,
         dateOfBirth: null,
-        privacy: 'public',
-        stats: {
-            postsCount: 0,
-            followersCount: 0,
-            followingCount: 0
-        },
+        privacy: follower.privacy,
+        stats: follower.stats,
         joinedAt: follower.followedAt ?? null,
         chatId: follower.chatId
     }
@@ -54,7 +50,7 @@ export function FollowersList({ userId, type }: FollowersListProps) {
         }
         
     }
-    console.log(followers);
+    console.log("===???>",followers);
 
     useEffect(() => {
         loadFollowers()
@@ -69,6 +65,7 @@ export function FollowersList({ userId, type }: FollowersListProps) {
             {followers.length === 0 && !isLoading ?
                 <EmptyContent type={type} />
                 : followers.map((follower) => (
+                    
                     <MiniProfile key={follower.userId} data={followerToProfile(follower)} isMyprofile={String(follower.userId) !== user.userId} />
                 ))}
         </div>
