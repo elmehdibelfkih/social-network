@@ -1,5 +1,6 @@
 import React from 'react';
 import { Users, Calendar, UserPlus } from 'lucide-react';
+import styles from '@/components/ui/group-card/group-card.module.css'
 
 // Types
 interface Group {
@@ -51,7 +52,7 @@ const GroupCard: React.FC<GroupCardProps> = ({
   };
 
   return (
-    <div className="group-card">
+    <div className={styles.groupcard}>
       {/* Purple Header */}
       <div className="group-card-header"></div>
 

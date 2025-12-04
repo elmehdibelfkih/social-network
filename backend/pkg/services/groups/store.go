@@ -70,7 +70,7 @@ func SelectGroupsById(limit, lastItemId int64, l *BrowseGroupsResponseJson) erro
 			"group",
 			item.GroupId,
 		).Scan(
-			item.MemberCount,
+			&item.MemberCount,
 		)
 		if err != nil {
 			utils.SQLiteErrorTarget(err, SELECT_GROUP_MEMBERS_COUNT)
@@ -125,10 +125,10 @@ func SelectGroupMember(groupId, userId int64) (bool, error) {
 
 func SelectGroupAcceptedMember(groupId, userId int64) (bool, error) {
 	var exist bool
-	_, err := config.DB.Query(SELECT_GROUP_MEMBER_ACCEPTED,
+	err := config.DB.QueryRow(SELECT_GROUP_MEMBER_ACCEPTED,
 		groupId,
 		userId,
-	)
+	).Scan(&exist)
 	if err != nil {
 		utils.SQLiteErrorTarget(err, SELECT_GROUP_MEMBER_ACCEPTED)
 	}

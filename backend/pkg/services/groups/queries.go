@@ -23,17 +23,17 @@ const (
 	`
 	SELECT_GROUP_MEMBER_BY_ID = `
 		SELECT EXISTS (
-			SELECT 1 FROM group_members WHERE group_id = ? AND user_id = ? AND status IN ('pending', 'accepted');
+			SELECT 1 FROM group_members WHERE group_id = ? AND user_id = ? AND status IN ('pending', 'accepted')
 		);
 	`
 	SELECT_GROUP_MEMBER_ACCEPTED = `
 		SELECT EXISTS (
-			SELECT 1 FROM group_members WHERE group_id = ? AND user_id = ? AND status = 'accepted';
+			SELECT 1 FROM group_members WHERE group_id = ? AND user_id = ? AND status = 'accepted'
 		);
 	`
 	SELECT_GROUP_MEMBER_PENDING = `
 		SELECT EXISTS (
-			SELECT 1 FROM group_members WHERE group_id = ? AND user_id = ? AND status = 'pending';
+			SELECT 1 FROM group_members WHERE group_id = ? AND user_id = ? AND status = 'pending'
 		);
 	`
 	SELECT_GROUP_MEMBERS_COUNT = `

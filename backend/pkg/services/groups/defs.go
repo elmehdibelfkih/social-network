@@ -215,10 +215,10 @@ func (v *UpdateGroupRequestJson) Validate() (bool, string) {
 }
 
 func (v *CreateEventRequestJson) Validate() (bool, string) {
-	if ok, str := utils.TextContentValidationEscape(&v.Title, 32, 5); !ok {
+	if ok, str := utils.TextContentValidationEscape(&v.Title, 5, 32); !ok {
 		return false, str
 	}
-	if ok, str := utils.TextContentValidationEscape(&v.Description, 4096, 5); !ok {
+	if ok, str := utils.TextContentValidationEscape(&v.Description, 5, 4096); !ok {
 		return false, str
 	}
 	if !utils.DateValidation(v.StartAt) {
@@ -227,7 +227,7 @@ func (v *CreateEventRequestJson) Validate() (bool, string) {
 	if !utils.DateValidation(v.EndAt) {
 		return false, "invalid Date"
 	}
-	if ok, str := utils.TextContentValidationEscape(&v.Location, 32, 5); !ok {
+	if ok, str := utils.TextContentValidationEscape(&v.Location, 5, 32); !ok {
 		return false, str
 	}
 	return true, "OK"
