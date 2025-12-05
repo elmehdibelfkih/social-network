@@ -4,10 +4,9 @@ import (
 	"database/sql"
 	"fmt"
 	"net/http"
-	"strconv"
-
 	"social/pkg/config"
 	"social/pkg/utils"
+	"strconv"
 )
 
 // getPostID extracts and validates post_id from URL path

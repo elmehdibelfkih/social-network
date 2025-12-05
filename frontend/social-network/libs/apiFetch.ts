@@ -39,7 +39,6 @@ export type ApiFetchOpts = {
   cache?: RequestCache;
   redirectTitle?: string;
   errorMessage?: string;
-  skipAuthRedirect?: boolean;  // NEW: Skip 401 auto-redirect
 };
 
 function buildErrorTarget(
@@ -93,8 +92,7 @@ export async function apiFetch<T>(
     nextRevalidate,
     cache,
     redirectTitle,
-    errorMessage,
-    skipAuthRedirect = false,  // NEW
+    errorMessage
   } = opts;
 
   const url = `${BASE_URL}${endpoint}`;
@@ -110,7 +108,6 @@ export async function apiFetch<T>(
       const cookieHeader = cookieStore.toString();
       if (cookieHeader) headers['Cookie'] = cookieHeader;
     } catch (e) {
-      // Ignore cookie errors
     }
   }
 
@@ -159,22 +156,14 @@ export async function apiFetch<T>(
     apiError = {
       statusCode: apiErrorData.statusCode || status,
       statusText: apiErrorData.statusText || response.statusText,
-      errorMessage: apiErrorData.errorMessage || 'Request failed',
-      errorTitle: apiErrorData.errorTitle,
-      errorDescription: apiErrorData.errorDescription,
+      errorMessage: apiErrorData.errorMessage || apiErrorData.errorMessage || 'Request failed',
+      errorTitle: apiErrorData.errorTitle || apiErrorData.errorTitle,
+      errorDescription: apiErrorData.errorDescription || apiErrorData.errorDescription,
       errorType: apiErrorData.errorType || 'unknown'
     };
   }
 
-  // Don't redirect to /auth if:
-  // 1. We're already calling an auth endpoint
-  // 2. skipAuthRedirect is true (for media/optional fetches)
-  const shouldSkipAuthRedirect = 
-    endpoint.includes('/auth') || 
-    endpoint.includes('/login') ||
-    skipAuthRedirect;
-
-  if (apiError.statusCode === 401 && !shouldSkipAuthRedirect) {
+  if (apiError.statusCode === 401) {
     performRedirect('/auth', clientNavigate);
   }
 
@@ -221,27 +210,17 @@ export const http = {
 
 
 export async function fetchMediaClient(mediaId: string): Promise<MediaResponse | null> {
-  // Media endpoint returns raw bytes (image) with proper Content-Type.
-  // Use a direct fetch to get a Blob and expose it as an object URL so
-  // components can use it as an <img src="..." />. This avoids the
-  // apiFetch JSON parsing which expects wrapped JSON responses.
-  const mediaUrl = `${BASE_URL}/api/v1/media/${encodeURIComponent(mediaId)}`;
   try {
-    const resp = await fetch(mediaUrl, {
-      method: 'GET',
-      credentials: 'include',
+    const res = await http.get(`/api/v1/media/${encodeURIComponent(mediaId)}`, {
+      redirectOnError: false,
+      throwOnError: false
     });
-
-    if (!resp.ok) {
-      console.warn(`Media fetch failed (${resp.status}) for ID: ${mediaId}`);
-      return null;
+    if (!res) return null;
+    if (typeof res === "object" && "payload" in (res as any)) {
+      return (res as any).payload as MediaResponse;
     }
-
-    const blob = await resp.blob();
-    const objectUrl = URL.createObjectURL(blob);
-    return { url: objectUrl };
-  } catch (err) {
-    console.error(`Failed to fetch media ${mediaId}:`, err);
+    return res as MediaResponse;
+  } catch {
     return null;
   }
 }

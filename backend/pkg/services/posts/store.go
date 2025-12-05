@@ -14,6 +14,7 @@ import (
 
 // CreatePost creates a new post in the database
 func CreatePost(post *Post) error {
+	fmt.Printf("%+v\n", post)
 	err := database.WrapWithTransaction(func(tx *sql.Tx) error {
 		_, err := tx.Exec(QUERY_CREATE_POST,
 			post.ID,
@@ -23,7 +24,6 @@ func CreatePost(post *Post) error {
 			post.Privacy,
 			post.CreatedAt,
 			post.UpdatedAt,
-			post.Pinned,
 		)
 		if err != nil {
 			if e, ok := err.(sqlite3.Error); ok && e.Code == sqlite3.ErrConstraint {
@@ -32,6 +32,7 @@ func CreatePost(post *Post) error {
 			utils.SQLiteErrorTarget(err, "CreatePost")
 			return fmt.Errorf("failed to create post: %w", err)
 		}
+		fmt.Println("hani hana")
 
 		// Increment posts_count
 		// if err := database.UpdateCounter(tx, database.DBCounterSetter{
@@ -71,7 +72,6 @@ func GetPostByID(postID int64) (*Post, error) {
 		&post.Privacy,
 		&post.CreatedAt,
 		&post.UpdatedAt,
-		&post.Pinned,
 	)
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -198,7 +198,6 @@ func GetUserPosts(userID int64, limit, offset int) ([]Post, int, error) {
 			&post.Privacy,
 			&post.CreatedAt,
 			&post.UpdatedAt,
-			&post.Pinned,
 		)
 		if err != nil {
 			utils.SQLiteErrorTarget(err, "GetUserPosts (scan)")

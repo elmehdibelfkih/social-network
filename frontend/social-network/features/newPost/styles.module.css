@@ -15,6 +15,27 @@
   flex-shrink: 0;
 }
 
+.userInfo {
+  margin-bottom: 12px;
+}
+
+.miniHandle {
+  font-size: 1.0625rem;
+  font-weight: 700;
+  line-height: 1.2;
+  color: #1f2937;
+  margin-bottom: 2px;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif;
+}
+
+.miniName {
+  font-size: 14px;
+  font-weight: 400;
+  color: #6b7280;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif;
+  margin: 0;
+}
+
 .rightPart {
   flex: 1;
   display: flex;
@@ -111,6 +132,14 @@
   border: 1px solid #e5e7eb;
   border-radius: 6px;
   font-size: 13px;
+}
+
+.previewImage {
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+  border-radius: 4px;
+  flex-shrink: 0;
 }
 
 .fileName {
@@ -334,7 +363,7 @@
 
 /* Action Button */
 .actionButton {
-  background-color: #b9a2d8;
+  background-color: var(--primary-purple);
   color: #ffffff;
   border: none;
   border-radius: 8px;
@@ -371,4 +400,45 @@
     margin-left: 0;
     width: 100%;
   }
+}
+
+/* Noscript form styles */
+.noJsFileInput {
+  display: none;
+}
+
+.noJsPrivacySelect {
+  background: transparent;
+  border: none;
+  font-size: 14px;
+  color: #374151;
+  outline: none;
+}
+
+.uploadImageButton label {
+  cursor: pointer;
+}
+
+.uploadImageButton svg {
+  color: #8a63d2;
+}
+
+.privacyButton {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.privacyButton svg {
+  color: #6b7280;
+}
+
+/* Add to styles.module.css */
+.loadingContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  color: #6b7280;
+  font-size: 14px;
 }

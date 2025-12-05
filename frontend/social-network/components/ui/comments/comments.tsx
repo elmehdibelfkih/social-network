@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import styles from './comments.module.css';
+import AvatarHolder from '@/components/ui/avatar_holder/avatarholder.client';
+
 
 interface Comment {
   commentId: number;
@@ -23,6 +25,7 @@ export function Comments({ postId, isOpen, onClose, commentCount, onCommentAdded
   const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState('');
   const [loading, setLoading] = useState(false);
+  const [userProfiles, setUserProfiles] = useState<{[key: number]: {avatarId: number | null}}>({});
 
   useEffect(() => {
     if (isOpen) {
@@ -37,7 +40,28 @@ export function Comments({ postId, isOpen, onClose, commentCount, onCommentAdded
       });
       if (response.ok) {
         const data = await response.json();
-        setComments(data.payload?.comments || []);
+        const commentsData = data.payload?.comments || [];
+        setComments(commentsData);
+        
+        // Fetch user profiles for avatars
+        const uniqueUserIds = [...new Set(commentsData.map((c: Comment) => c.authorId))];
+        const profiles: {[key: number]: {avatarId: number | null}} = {};
+        
+        await Promise.all(uniqueUserIds.map(async (userId: number) => {
+          try {
+            const profileResponse = await fetch(`${process.env.NEXT_PUBLIC_GO_API_URL}/api/v1/users/${userId}/profile`, {
+              credentials: 'include'
+            });
+            if (profileResponse.ok) {
+              const profileData = await profileResponse.json();
+              profiles[userId] = { avatarId: profileData.payload?.avatarId || null };
+            }
+          } catch (error) {
+            profiles[userId] = { avatarId: null };
+          }
+        }));
+        
+        setUserProfiles(profiles);
       }
     } catch (error) {
       console.error('Failed to fetch comments:', error);
@@ -98,7 +122,7 @@ export function Comments({ postId, isOpen, onClose, commentCount, onCommentAdded
           {Array.isArray(comments) && comments.map((comment) => (
             <div key={comment.commentId} className={styles.comment}>
               <div className={styles.commentAvatar}>
-                <img src="/users.svg" alt="User Avatar" />
+        <AvatarHolder avatarId={userProfiles[comment.authorId]?.avatarId ?? null} size={40} />
               </div>
               <div className={styles.commentContent}>
                 <div className={styles.commentHeader}>

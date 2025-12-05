@@ -1,43 +1,22 @@
 'use client';
-
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import styles from './styles.module.css';
+import {} from '../mini_profile/styles.module.css';
 import { ImageIcon, GlobeIcon, DropdownIcon, LockIcon, UsersIcon } from '@/components/ui/icons';
-import { AvatarHolder } from '@/components/ui/avatar_holder/avatarholder.client';
 import AddFriends from '@/components/ui/AddFriends/addFriends';
 import { postsService } from './services/postsService';
 import type { PrivacyLevel } from './types';
 import { useAuth } from '@/providers/authProvider';
+import AvatarHolder from '@/components/ui/avatar_holder/avatarholder.client';
 
-const privacyOptions = [
-  {
-    value: 'public' as PrivacyLevel,
-    label: 'Public',
-    description: 'Anyone can see this post',
-    icon: 'globe'
-  },
-  {
-    value: 'followers' as PrivacyLevel,
-    label: 'Followers',
-    description: 'Only your followers can see',
-    icon: 'users'
-  },
-  {
-    value: 'private' as PrivacyLevel,
-    label: 'Private',
-    description: 'Only you can see this',
-    icon: 'lock'
-  },
-  {
-    value: 'restricted' as PrivacyLevel,
-    label: 'Restricted',
-    description: 'Only share with...',
-    icon: 'users'
-  }
+export const privacyOptions = [
+  { value: 'public', label: 'Public', description: 'Anyone can see this post', icon: 'globe' },
+  { value: 'followers', label: 'Followers', description: 'Only your followers can see', icon: 'users' },
+  { value: 'private', label: 'Private', description: 'Only share with...', icon: 'users' }
 ] as const;
 
-export function NewPost() {
-  const { user } = useAuth()
+export function NewPostClient() {
+  const { user } = useAuth();
   const [content, setContent] = useState('');
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [privacy, setPrivacy] = useState<PrivacyLevel>('public');
@@ -46,32 +25,18 @@ export function NewPost() {
   const [showAddFriends, setShowAddFriends] = useState(false);
   const [selectedFollowers, setSelectedFollowers] = useState<number[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  
 
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []);
-    setSelectedFiles(files);
-  };
+  const [isMounted, setIsMounted] = useState(false);
+  useEffect(() => setIsMounted(true), []);
+  if (!isMounted || !user) return null;
 
-  const removeFile = (index: number) => {
-    setSelectedFiles(prev => prev.filter((_, i) => i !== index));
-  };
-
-  const resetForm = () => {
-    setContent('');
-    setSelectedFiles([]);
-    setPrivacy('public');
-    setSelectedFollowers([]);
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
-    }
-  };
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) =>
+    setSelectedFiles(Array.from(e.target.files || []));
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (!content.trim()) {
-      return;
-    }
+    if (!content.trim()) return;
 
     setIsSubmitting(true);
 
@@ -79,80 +44,72 @@ export function NewPost() {
       let mediaIds: number[] = [];
 
       if (selectedFiles.length > 0) {
-        console.log('📤 Uploading media files...');
-        const uploadPromises = selectedFiles.map(file => postsService.uploadMedia(file));
-        const uploadResults = await Promise.all(uploadPromises);
-        mediaIds = uploadResults.map(result => result.mediaId);
-        console.log('✅ Media uploaded:', mediaIds);
+        const uploaded = await Promise.all(selectedFiles.map(postsService.uploadMedia));
+        mediaIds = uploaded.map(r => r.mediaId);
       }
-
-      console.log('📤 Creating post with privacy:', privacy);
 
       await postsService.createPost({
         content: content.trim(),
-        privacy: privacy,
-        mediaIds: mediaIds.length > 0 ? mediaIds : undefined,
-        allowedList: privacy === 'restricted' && selectedFollowers.length > 0 ? selectedFollowers : undefined
+        privacy,
+        mediaIds: mediaIds.length ? mediaIds : undefined,
+        allowedList:
+          privacy === 'private' && selectedFollowers.length ? selectedFollowers : undefined
       });
 
-      resetForm();
-    } catch (error) {
-      alert('Failed to create post. Please try again.');
+      setContent('');
+      setSelectedFiles([]);
+      setPrivacy('public');
+      setSelectedFollowers([]);
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const getPrivacyIcon = () => {
-    const option = privacyOptions.find(opt => opt.value === privacy);
-    switch (option?.icon) {
-      case 'globe': return <GlobeIcon fillColor="#737373" />;
-      case 'lock': return <LockIcon />;
-      case 'users': return <UsersIcon />;
-      default: return <GlobeIcon fillColor="#737373" />;
-    }
-  };
-
-  const getCurrentPrivacyOption = () => {
-    return privacyOptions.find(opt => opt.value === privacy) || privacyOptions[0];
+  const getPrivacyIcon = (icon: string) => {
+    if (icon === 'globe') return <GlobeIcon fillColor="currentColor" />;
+    if (icon === 'users') return <UsersIcon  />;
+    if (icon === 'lock') return <LockIcon  />;
   };
 
   return (
     <form onSubmit={handleSubmit} className={styles.form}>
       <div className={styles.leftPart}>
-        <AvatarHolder avatarId={user.avatarId} size={48} />
+        <AvatarHolder avatarId={user?.avatarId ?? null} size={60} />
       </div>
-
+      
       <div className={styles.rightPart}>
+        <div className={styles.userInfo}>
+          <div className={styles.miniHandle}>{user.firstName + ' ' + user.lastName}</div>
+          <h4 className={styles.miniName}>{'@'+user.nickname}</h4>
+        </div>
+        
+        {/* Textarea */}
         <div className={styles.topPart}>
           <textarea
-            placeholder="What's on your mind?"
             className={styles.textArea}
             value={content}
             onChange={(e) => setContent(e.target.value)}
-            disabled={isSubmitting}
+            placeholder="What's on your mind?"
           />
         </div>
 
-        {privacy !== 'public' && (
-          <div className={styles.privacyBadge} data-privacy={privacy}>
-            <span className={styles.privacyBadgeIcon}>
-              {privacy === 'private' ? '🔒' : privacy === 'restricted' ? '🔐' : '👥'}
-            </span>
-            <span>{getCurrentPrivacyOption().description}</span>
-          </div>
-        )}
-
+        {/* File list */}
         {selectedFiles.length > 0 && (
           <div className={styles.selectedFiles}>
-            {selectedFiles.map((file, index) => (
-              <div key={index} className={styles.fileItem}>
-                <span className={styles.fileName}>📎 {file.name}</span>
+            {selectedFiles.map((file, i) => (
+              <div key={i} className={styles.fileItem}>
+                <img 
+                  src={URL.createObjectURL(file)} 
+                  alt={file.name}
+                  className={styles.previewImage}
+                />
+                <span className={styles.fileName}>{file.name}</span>
                 <button
                   type="button"
-                  onClick={() => removeFile(index)}
                   className={styles.removeFileButton}
-                  aria-label="Remove file"
+                  onClick={() =>
+                    setSelectedFiles(prev => prev.filter((_, idx) => idx !== i))
+                  }
                 >
                   ×
                 </button>
@@ -161,15 +118,16 @@ export function NewPost() {
           </div>
         )}
 
+        {/* Bottom controls */}
         <div className={styles.bottomPart}>
+
+          {/* Upload button */}
           <button
-            className={styles.uploadImageButton}
             type="button"
+            className={styles.uploadImageButton}
             onClick={() => fileInputRef.current?.click()}
-            disabled={isSubmitting}
           >
-            <ImageIcon />
-            <span>Photo</span>
+            <ImageIcon /> Photo
           </button>
 
           <input
@@ -177,61 +135,52 @@ export function NewPost() {
             type="file"
             accept="image/*"
             multiple
+            hidden
             onChange={handleFileSelect}
-            style={{ display: 'none' }}
-            disabled={isSubmitting}
           />
 
+          {/* PRIVACY */}
           <div className={styles.privacyContainer}>
             <button
-              className={styles.privacyButton}
               type="button"
+              className={styles.privacyButton}
               onClick={() => setShowPrivacyDropdown(!showPrivacyDropdown)}
-              disabled={isSubmitting}
             >
-              {getPrivacyIcon()}
-              <span>{getCurrentPrivacyOption().label}</span>
+              {getPrivacyIcon(privacyOptions.find(p => p.value === privacy)?.icon || '')}
+              {privacyOptions.find(p => p.value === privacy)?.label}
               <DropdownIcon />
             </button>
 
             {showPrivacyDropdown && (
               <>
+                {/* Backdrop */}
                 <div
                   className={styles.dropdownBackdrop}
                   onClick={() => setShowPrivacyDropdown(false)}
                 />
-                <div className={styles.privacyDropdown}>
-                  {privacyOptions.map((option) => (
-                    <button
-                      key={option.value}
-                      type="button"
-                      onClick={() => {
-                        setPrivacy(option.value);
-                        setShowPrivacyDropdown(false);
 
-                        if (option.value === 'restricted') {
-                          setShowAddFriends(true);
-                        } else {
-                          setShowAddFriends(false);
-                        }
+                <div className={styles.privacyDropdown}>
+                  {privacyOptions.map(opt => (
+                    <button
+                      key={opt.value}
+                      type="button"
+                      className={`${styles.privacyOption} ${privacy === opt.value ? styles.active : ''}`}
+                      onClick={() => {
+                        setPrivacy(opt.value);
+                        setShowPrivacyDropdown(false);
+                        if (opt.value === 'private') setShowAddFriends(true);
                       }}
-                      className={`${styles.privacyOption} ${privacy === option.value ? styles.active : ''
-                        }`}
                     >
                       <div className={styles.privacyOptionIcon}>
-                        {option.icon === 'globe' && <GlobeIcon fillColor={privacy === option.value ? '#059669' : '#6b7280'} />}
-                        {option.icon === 'lock' && <LockIcon />}
-                        {option.icon === 'users' && <UsersIcon />}
+                        {getPrivacyIcon(opt.icon)}
                       </div>
+
                       <div className={styles.privacyOptionContent}>
-                        <div className={styles.privacyOptionLabel}>
-                          {option.label}
-                        </div>
-                        <div className={styles.privacyOptionDesc}>
-                          {option.description}
-                        </div>
+                        <div className={styles.privacyOptionLabel}>{opt.label}</div>
+                        <div className={styles.privacyOptionDesc}>{opt.description}</div>
                       </div>
-                      {privacy === option.value && (
+
+                      {privacy === opt.value && (
                         <div className={styles.privacyOptionCheck}>✓</div>
                       )}
                     </button>
@@ -241,12 +190,13 @@ export function NewPost() {
             )}
           </div>
 
-          {privacy === 'restricted' && showAddFriends && (
+          {/* Add friends (restricted mode) */}
+          {showAddFriends && (
             <div className={styles.addFriendsPopup}>
               <AddFriends
                 title="Allowed followers"
-                desc="Select allowed followers to see this publication"
-                groupId={String(0)}
+                desc="Choose who can see"
+                groupId="0"
                 purpose="post"
                 onComplete={(ids) => {
                   setSelectedFollowers(ids);
@@ -257,15 +207,16 @@ export function NewPost() {
             </div>
           )}
 
+          {/* Action button */}
           <button
-            className={styles.actionButton}
             type="submit"
+            className={styles.actionButton}
             disabled={isSubmitting || !content.trim()}
           >
             {isSubmitting ? 'Posting...' : 'Post'}
           </button>
         </div>
       </div>
-    </form >
+    </form>
   );
 }

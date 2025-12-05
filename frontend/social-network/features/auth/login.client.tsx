@@ -25,8 +25,7 @@ export function LoginForm({ onAuthSuccess }: { onAuthSuccess?: () => void }) {
 
         try {
             const resp = await authService.login(formData);
-            
-            const User = {
+            const User  = {
                 userId: String(resp.userId),
                 avatarId: resp.avatarId,
                 nickname: resp.nickname,
@@ -36,12 +35,7 @@ export function LoginForm({ onAuthSuccess }: { onAuthSuccess?: () => void }) {
 
             localStorage.setItem('social_network-user', JSON.stringify(User));
             setUser(User);
-
-            // Give the cookie time to be set properly
-            await new Promise(resolve => setTimeout(resolve, 200));
-
-            // Use window.location for full page reload to ensure cookies are sent
-            window.location.href = '/';
+            router.push('/');
         } catch (error) {
             setIsLoading(false);
             console.error("Login failed:", error);

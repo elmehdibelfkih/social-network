@@ -134,12 +134,12 @@
 }
 
 .commentInput:focus {
-  border-color: #1877f2;
+  border-color: #8a63d2;
 }
 
 .submitButton {
   padding: 8px 16px;
-  background: #1877f2;
+  background: #8a63d2;
   color: white;
   border: none;
   border-radius: 20px;
@@ -155,5 +155,5 @@
 }
 
 .submitButton:not(:disabled):hover {
-  background: #166fe5;
+  background: #8a63d2;
 }

@@ -1,77 +1,87 @@
-'use client';
+'use client'
+import { useState } from 'react'
+import { postsService } from './postsService'
+import { Comments } from '@/components/ui/comments/comments'
+import styles from './styles.module.css'
 
-import { useState, useEffect } from 'react';
-import { Post as PostType } from './types';
-import { postsService } from './postsService';
-import { Post } from './Post';
-import styles from './styles.module.css';
-
-interface PostsProps {
-  userId?: number;
-  groupId?: number;
-  following?: boolean;
-  newPost?: PostType | null;
-  onNewPostDisplayed?: () => void;
-  limit?: number;
-  showCreatePost?: boolean;
-  emptyMessage?: string;
+type Props = {
+  postId: number
+  isLiked: boolean
+  authorId: number
+  initialCommentCount: number
 }
 
-export function Posts({
-  userId,
-  groupId,
-  following = false,
-  newPost,
-  onNewPostDisplayed,
-  limit,
-  showCreatePost = false,
-  emptyMessage = 'No posts yet.'
-}: PostsProps) {
-  const [posts, setPosts] = useState<PostType[]>([]);
-  const [loading, setLoading] = useState(true);
+export function PostsClient({ postId, isLiked, authorId, initialCommentCount }: Props) {
+  const [liked, setLiked] = useState(isLiked)
+  const [isLoading, setIsLoading] = useState(false)
+  const [showComments, setShowComments] = useState(false)
+  const [commentCount, setCommentCount] = useState(initialCommentCount)
 
-  useEffect(() => {
-    loadPosts();
-  }, [userId, groupId, following]);
-
-  useEffect(() => {
-    if (newPost) {
-      setPosts(prev => [newPost, ...prev]);
-      onNewPostDisplayed?.();
+  const handleLike = async () => {
+    if (isLoading) return
+    
+    setIsLoading(true)
+    
+    const success = liked 
+      ? await postsService.unlikePost(postId)
+      : await postsService.likePost(postId)
+    
+    if (success) {
+      setLiked(!liked)
     }
-  }, [newPost, onNewPostDisplayed]);
-
-  const loadPosts = async () => {
-    setLoading(true);
-    try {
-      const fetched = await postsService.getPosts({ userId, groupId, following });
-      setPosts(fetched || []);
-    } catch (err) {
-      console.error('Error loading posts:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  if (loading) {
-    return (
-      <div className={styles.postsContainer}>
-        <div className={styles.loadingIndicator}>Loading posts...</div>
-      </div>
-    );
+    
+    setIsLoading(false)
   }
 
-  const displayPosts = limit ? posts.slice(0, limit) : posts;
+  const handleComment = () => {
+    setShowComments(true)
+  }
+
+  const handleCommentAdded = () => {
+    setCommentCount(prev => prev + 1)
+  }
+
+  const handleShare = () => {
+    // TODO: Open share modal
+    console.log('Share post:', postId)
+  }
 
   return (
-    <div className={styles.postsContainer}>
-      {displayPosts.length === 0 ? (
-        <div className={styles.emptyState}>{emptyMessage}</div>
-      ) : (
-        displayPosts.map(post => (
-          <Post key={post.postId} post={post} />
-        ))
-      )}
+    <div className={styles.actions}>
+      <button 
+        className={`${styles.actionButton} ${liked ? styles.liked : ''}`}
+        onClick={handleLike}
+        disabled={isLoading}
+      >
+        <svg width="20" height="20" viewBox="0 0 24 24" fill={liked ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2">
+          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+        </svg>
+        Like
+      </button>
+
+      <button className={styles.actionButton} onClick={handleComment}>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+        </svg>
+        Comment
+      </button>
+
+      <button className={styles.actionButton} onClick={handleShare}>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
+          <polyline points="16,6 12,2 8,6"/>
+          <line x1="12" y1="2" x2="12" y2="15"/>
+        </svg>
+        Share
+      </button>
+
+      <Comments
+        postId={postId}
+        isOpen={showComments}
+        onClose={() => setShowComments(false)}
+        commentCount={commentCount}
+        onCommentAdded={handleCommentAdded}
+      />
     </div>
-  );
+  )
 }

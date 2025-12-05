@@ -3,12 +3,12 @@ package posts
 const (
 	// Post queries
 	QUERY_CREATE_POST = `
-		INSERT INTO posts (id, author_id, group_id, content, privacy, created_at, updated_at, pinned)
-		VALUES (?, ?, ?, ?, ?, ?, ?, ?);
+		INSERT INTO posts (id, author_id, group_id, content, privacy, created_at, updated_at)
+		VALUES (?, ?, ?, ?, ?, ?, ?);
 	`
 
 	QUERY_GET_POST_BY_ID = `
-		SELECT id, author_id, group_id, content, privacy, created_at, updated_at, pinned
+		SELECT id, author_id, group_id, content, privacy, created_at, updated_at
 		FROM posts
 		WHERE id = ?;
 	`
@@ -25,7 +25,7 @@ const (
 	`
 
 	QUERY_GET_USER_POSTS = `
-		SELECT id, author_id, group_id, content, privacy, created_at, updated_at, pinned
+		SELECT id, author_id, group_id, content, privacy, created_at, updated_at
 		FROM posts
 		WHERE author_id = ?
 		ORDER BY created_at DESC
@@ -172,5 +172,4 @@ const (
 		INSERT INTO counters (entity_type, entity_id, reaction, created_at, updated_at)
 		VALUES (?, ?, ?, ?, ?);
 	`
-
 )

@@ -9,7 +9,6 @@ type Post struct {
 	Privacy   string `db:"privacy"`
 	CreatedAt string `db:"created_at"`
 	UpdatedAt string `db:"updated_at"`
-	Pinned    int    `db:"pinned"`
 }
 
 // Comment represents a comment in the database

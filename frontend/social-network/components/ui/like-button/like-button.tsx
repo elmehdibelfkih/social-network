@@ -1,8 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { postsService } from '@/features/posts/postsService';
 import styles from './like-button.module.css';
+import { postsService } from '@/features/posts/postsService';
 
 interface LikeButtonProps {
   postId: number;

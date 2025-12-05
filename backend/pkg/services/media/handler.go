@@ -48,7 +48,6 @@ func HandleUploadMedia(w http.ResponseWriter, r *http.Request) {
 
 	detectedMediaType := http.DetectContentType(data)
 	if !AllowedMimeTypes[detectedMediaType] {
-		println("2")
 		utils.UnsupportedMediaType(w)
 		return
 	}
@@ -80,6 +79,8 @@ func HandleUploadMedia(w http.ResponseWriter, r *http.Request) {
 		CreatedAt: time.Now().String(),
 	}
 
+	fmt.Println(media)
+
 	if err := CreateMedia(media); err != nil {
 		os.Remove(filePath)
 		utils.SQLiteErrorTarget(err, "handleUploadMedia (CreateMedia)")
@@ -95,51 +96,31 @@ func HandleUploadMedia(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-// func HandleGetMedia(w http.ResponseWriter, r *http.Request) {
-// 	mediaID := utils.GetWildCardValue(w, r, "media_id")
-
-// 	media, err := GetMediaByID(mediaID)
-// 	if err != nil {
-// 		if err == sql.ErrNoRows {
-// 			utils.NotFoundError(w, "No media file found with the specified ID.")
-// 			return
-// 		}
-// 		utils.SQLiteErrorTarget(err, "handleGetMedia (GetMediaByID)")
-// 		utils.InternalServerError(w)
-// 		return
-// 	}
-
-// 	fileData, err := os.ReadFile(media.Path)
-// 	if err != nil {
-// 		utils.BackendErrorTarget(err, "handleGetMedia (ReadFile)")
-// 		utils.InternalServerError(w)
-// 		return
-// 	}
-
-// 	encoded := base64.StdEncoding.EncodeToString(fileData)
-// 	utils.WriteSuccess(w, http.StatusOK, map[string]string{
-// 		"mediaEncoded": encoded,
-// 	})
-// }
-
 func HandleGetMedia(w http.ResponseWriter, r *http.Request) {
-    mediaID := utils.GetWildCardValue(w, r, "media_id")
+	mediaID := utils.GetWildCardValue(w, r, "media_id")
 
-    media, err := GetMediaByID(mediaID)
-    if err != nil {
-        utils.NotFoundError(w, "Media not found")
-        return
-    }
+	media, err := GetMediaByID(mediaID)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			utils.NotFoundError(w, "No media file found with the specified ID.")
+			return
+		}
+		utils.SQLiteErrorTarget(err, "handleGetMedia (GetMediaByID)")
+		utils.InternalServerError(w)
+		return
+	}
 
-    fileData, err := os.ReadFile(media.Path)
-    if err != nil {
-        utils.InternalServerError(w)
-        return
-    }
+	fileData, err := os.ReadFile(media.Path)
+	if err != nil {
+		utils.BackendErrorTarget(err, "handleGetMedia (ReadFile)")
+		utils.InternalServerError(w)
+		return
+	}
 
-    w.Header().Set("Content-Type", media.Mime)
-    w.WriteHeader(http.StatusOK)
-    w.Write(fileData)
+	encoded := base64.StdEncoding.EncodeToString(fileData)
+	utils.WriteSuccess(w, http.StatusOK, map[string]string{
+		"mediaEncoded": encoded,
+	})
 }
 
 func HandleDeleteMedia(w http.ResponseWriter, r *http.Request) {

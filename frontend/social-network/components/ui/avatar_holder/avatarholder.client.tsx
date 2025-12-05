@@ -21,7 +21,6 @@ export function AvatarHolder({
 }: AvatarHolderProps) {
   const [url, setUrl] = useState<string | null>(null);
   const cancelledRef = useRef(false);
-  const currentObjectUrlRef = useRef<string | null>(null);
 
   useEffect(() => {
     cancelledRef.current = false;
@@ -37,18 +36,9 @@ export function AvatarHolder({
       const media = await fetchMediaClient(String(avatarId));
       if (cancelledRef.current) return;
       if (media?.mediaEncoded) {
-        // legacy: server may return base64-encoded payload
-        // prefer explicit mime if available; default to png
         setUrl(`data:image/png;base64,${media.mediaEncoded}`);
-      } else if (media?.url) {
-        // revoke previous object URL if any
-        if (currentObjectUrlRef.current) {
-          try {
-            URL.revokeObjectURL(currentObjectUrlRef.current);
-          } catch {}
-        }
-        currentObjectUrlRef.current = media.url;
-        setUrl(media.url);
+      } else if ((media as any)?.url) {
+        setUrl((media as any).url);
       } else {
         setUrl(null);
       }
@@ -56,13 +46,6 @@ export function AvatarHolder({
 
     return () => {
       cancelledRef.current = true;
-      // cleanup object URL when unmounting
-      if (currentObjectUrlRef.current) {
-        try {
-          URL.revokeObjectURL(currentObjectUrlRef.current);
-        } catch {}
-        currentObjectUrlRef.current = null;
-      }
     };
   }, [avatarId]);
 

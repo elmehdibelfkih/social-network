@@ -1,6 +1,6 @@
 .profileContainer {
     max-width: 900px;
-    margin: 0 auto;
+    margin: 14px auto 0;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     border-radius: 12px;
     overflow: hidden;

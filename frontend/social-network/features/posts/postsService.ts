@@ -1,110 +1,103 @@
-import { Post } from './types';
-import { http } from '@/libs/apiFetch';
-
-interface GetPostsParams {
-  userId?: number;
-  groupId?: number;
-  following?: boolean;
-  page?: number;
-  limit?: number;
-}
+import { http } from '@/libs/apiFetch'
+import type { Post, PaginationParams } from '@/libs/globalTypes'
 
 export const postsService = {
-  async getPosts(params?: GetPostsParams): Promise<Post[]> {
+  // Get feed posts
+  async getFeed(params?: PaginationParams): Promise<Post[]> {
     try {
-      const queryParams = new URLSearchParams();
+      const queryParams = new URLSearchParams()
+      if (params?.page) queryParams.set('page', params.page.toString())
+      if (params?.limit) queryParams.set('limit', params.limit.toString())
       
-      if (params?.userId) queryParams.set('userId', params.userId.toString());
-      if (params?.groupId) queryParams.set('groupId', params.groupId.toString());
-      if (params?.following) queryParams.set('following', 'true');
-      if (params?.page) queryParams.set('page', params.page.toString());
-      if (params?.limit) queryParams.set('limit', params.limit.toString());
+      const query = queryParams.toString()
+      const url = `/api/v1/feed${query ? `?${query}` : ''}`
       
-      const query = queryParams.toString();
-      const endpoint = query ? `/api/v1/posts?${query}` : '/api/v1/posts';
-      
-      const response = await http.get(endpoint) as any;
-      return response || [];
+      return await http.get<Post[]>(url) || []
     } catch (error) {
-      console.error('Error fetching posts:', error);
-      return [];
+      console.error('Failed to fetch feed:', error)
+      return []
     }
   },
 
-  async getPost(postId: number): Promise<Post | null> {
+  // Get user posts
+  async getUserPosts(userId: string | number, params?: PaginationParams): Promise<Post[]> {
     try {
-      const response = await http.get(`/api/v1/posts/${postId}`) as any;
-      return response || null;
+      const queryParams = new URLSearchParams()
+      if (params?.page) queryParams.set('page', params.page.toString())
+      if (params?.limit) queryParams.set('limit', params.limit.toString())
+      
+      const query = queryParams.toString()
+      const url = `/api/v1/users/${userId}/posts${query ? `?${query}` : ''}`
+      
+      return await http.get<Post[]>(url) || []
     } catch (error) {
-      return null;
+      console.error('Failed to fetch user posts:', error)
+      return []
     }
   },
 
-  async createPost(data: { 
-    content: string; 
-    privacy: 'public' | 'private' | 'followers'; 
-    mediaIds?: number[];
-    groupId?: number;
-    allowedList?: number[];
-  }): Promise<any> {
-    const payload: any = { content: data.content, privacy: data.privacy };
-    if (data.mediaIds && data.mediaIds.length > 0) payload.mediaIds = data.mediaIds;
-    if (data.groupId) payload.groupId = data.groupId;
-    if (data.allowedList && data.allowedList.length > 0) payload.allowedList = data.allowedList;
-
-    const response = await http.post('/api/v1/posts', payload) as any;
-    return response;
-  },
-  async uploadMedia(file: File): Promise<{ mediaId: number }> {
-    const reader = new FileReader();
-    const toBase64 = () => new Promise<string>((resolve, reject) => {
-      reader.onload = () => resolve(String(reader.result));
-      reader.onerror = reject;
-      reader.readAsDataURL(file);
-    });
-
+  // Get single post
+  async getPost(postId: string | number): Promise<Post | null> {
     try {
-      const dataUrl = await toBase64();
-      const base64Data = dataUrl.split(',')[1];
-      const payload = {
-        fileName: file.name,
-        fileType: file.type,
-        fileData: base64Data,
-        purpose: 'post'
-      };
-      const res = await http.post('/api/v1/media/upload', payload) as any;
-      if (!res || !res.mediaId) throw new Error('Invalid upload response');
-      return { mediaId: res.mediaId };
-    } catch (err) {
-      console.error('uploadMedia error', err);
-      throw err;
+      return await http.get<Post>(`/api/v1/posts/${postId}`)
+    } catch (error) {
+      console.error('Failed to fetch post:', error)
+      return null
     }
   },
 
-  async toggleLike(postId: number, isLiked: boolean): Promise<boolean> {
+  // Like post
+  async likePost(postId: string | number): Promise<boolean> {
     try {
-      if (isLiked) {
-        const res = await http.delete(`/api/v1/posts/${postId}/like`);
-        return !!res;
-      } else {
-        const res = await http.post(`/api/v1/posts/${postId}/like`);
-        return !!res;
+      await http.post(`/api/v1/posts/${postId}/like`)
+      return true
+    } catch (error) {
+      console.error('Failed to like post:', error)
+      return false
+    }
+  },
+
+  // Unlike post
+  async unlikePost(postId: string | number): Promise<boolean> {
+    try {
+      await http.delete(`/api/v1/posts/${postId}/like`)
+      return true
+    } catch (error) {
+      console.error('Failed to unlike post:', error)
+      return false
+    }
+  },
+
+  // Delete post
+  async deletePost(postId: string | number): Promise<boolean> {
+    try {
+      await http.delete(`/api/v1/posts/${postId}`)
+      return true
+    } catch (error) {
+      console.error('Failed to delete post:', error)
+      return false
+    }
+  },
+
+  // Get author avatar ID
+  async getAuthorAvatar(authorId: string | number): Promise<number | null> {
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_GO_API_URL}/api/v1/users/${authorId}/profile`, {
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+      
+      if (!response.ok) {
+        return null
       }
+      
+      const profile = await response.json()
+      return profile?.avatarId || null
     } catch (error) {
-      console.error('Error toggling like:', error);
-      return false;
-    }
-  },
-
-  async deletePost(postId: number): Promise<boolean> {
-    try {
-      const response = await http.delete(`/api/v1/posts/${postId}`);
-      return !!response;
-    } catch (error) {
-      console.error('Error deleting post:', error);
-      return false;
+      console.error('Failed to fetch author avatar:', error)
+      return null
     }
   }
-};
-
-export const createPost = postsService.createPost;
+}

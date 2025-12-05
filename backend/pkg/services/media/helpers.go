@@ -1,10 +1,10 @@
 package media
 
 import (
+	"net/http"
 	"os"
 	"path/filepath"
 
-	"net/http"
 	"social/pkg/config"
 	"social/pkg/utils"
 )
@@ -12,7 +12,7 @@ import (
 func getStoragePathForPurpose(purpose string) string {
 	baseDir := "../data/uploads"
 	dir := filepath.Join(baseDir, purpose+"s")
-	os.MkdirAll(dir, 0755)
+	os.MkdirAll(dir, 0o755)
 	return dir
 }
 
