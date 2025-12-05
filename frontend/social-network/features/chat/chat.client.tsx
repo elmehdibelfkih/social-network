@@ -9,13 +9,19 @@ import FloatingChat from './chat.popup.client';
 export function ChatSection() {
     const [openChats, setOpenChats] = useState<number[]>([]);
     const handleOpenChat = (chatId: number) => {
-        setOpenChats(prev =>
-            prev.includes(chatId) ? prev : [...prev, chatId]
-        );
+        setOpenChats(prev => {
+            if (prev.includes(chatId)) return prev;
+            if (prev.length < 3) return [...prev, chatId];
+            return [...prev.slice(1), chatId];
+        });
     };
     const handleCloseChat = (chatId: number) => {
         setOpenChats(prev => prev.filter(id => id !== chatId));
     };
+
+    const handleCloseAll = () => {
+        setOpenChats([]);
+    }
 
 
     const [users, setUsers] = useState<User[]>([]);
@@ -72,6 +78,9 @@ export function ChatSection() {
                         onClick={handleOpenChat}
                     />
                 ))}
+                <button onClick={handleCloseAll}>
+                    <img src="/svg/x.svg" alt="" />
+                </button>
                 {openChats.map(chatId => (
                     <FloatingChat
                         key={chatId}

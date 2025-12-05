@@ -7,13 +7,13 @@ import (
 
 // "POST", "/api/v1/chats/{chat_id}/messages"
 type ChatMessage struct {
-	MessageId     int64  `json:"messageId"`
-	ChatId        int64  `json:"chatId"`
-	SenderId      int64  `json:"SenderId"`
-	Content       string `json:"content"`
-	SeenState     string `json:"seenState"`
-	CreatedAt     string `json:"createdAt"`
-	UpdatedAt     string `json:"updatedAt"`
+	MessageId int64  `json:"messageId"`
+	ChatId    int64  `json:"chatId"`
+	SenderId  int64  `json:"senderId"`
+	Content   string `json:"content"`
+	SeenState string `json:"seenState"`
+	CreatedAt string `json:"createdAt"`
+	UpdatedAt string `json:"updatedAt"`
 }
 
 // "PUT", "/api/v1/chats/{chat_id}/messages/{message_id}"
@@ -21,7 +21,7 @@ type ChatMessage struct {
 type MarkSeen struct {
 	MessageId int64  `json:"messageId"`
 	ChatId    int64  `json:"chatId"`
-	SenderId  int64  `json:"SenderId"`
+	SenderId  int64  `json:"senderId"`
 	Content   string `json:"content"`
 	SeenState string `json:"seenState"`
 	CreatedAt string `json:"createdAt"`
@@ -31,7 +31,7 @@ type MarkSeen struct {
 // "GET", "/api/v1/chats/{chat_id}/messages"
 
 type MessagesList struct {
-	Messages []ChatMessage
+	Messages []ChatMessage `json:"messagesList"`
 }
 
 // "DELETE", "/api/v1/chats/{chat_id}/messages/{msg_id}"
@@ -39,7 +39,7 @@ type MessagesList struct {
 type DeleteMessageRequest struct {
 	MessageId int64  `json:"messageId"`
 	ChatId    int64  `json:"chatId"`
-	SenderId  int64  `json:"SenderId"`
+	SenderId  int64  `json:"senderId"`
 	Content   string `json:"content"`
 	SeenState string `json:"seenState"`
 	CreatedAt string `json:"createdAt"`
@@ -50,9 +50,6 @@ type DeleteMessageRequest struct {
 // "GET", "/api/v1/chats/{chat_id}/participants"
 
 func (v *ChatMessage) Validate() (bool, string) {
-	if v.MessageId <= 0 {
-		return false, "invalid messageId"
-	}
 	if v.ChatId <= 0 {
 		return false, "invalid chatId"
 	}
@@ -69,13 +66,6 @@ func (v *ChatMessage) Validate() (bool, string) {
 	}
 	if !validSeen[strings.ToLower(v.SeenState)] {
 		return false, "invalid seenState"
-	}
-
-	if !utils.DateValidation(v.CreatedAt) {
-		return false, "invalid createdAt"
-	}
-	if !utils.DateValidation(v.UpdatedAt) {
-		return false, "invalid updatedAt"
 	}
 
 	return true, "OK"
@@ -99,14 +89,6 @@ func (v *MarkSeen) Validate() (bool, string) {
 	if !validSeen[strings.ToLower(v.SeenState)] {
 		return false, "invalid seenState"
 	}
-
-	if !utils.DateValidation(v.CreatedAt) {
-		return false, "invalid createdAt"
-	}
-	if !utils.DateValidation(v.UpdatedAt) {
-		return false, "invalid updatedAt"
-	}
-
 	return true, "OK"
 }
 
@@ -118,7 +100,6 @@ func (v *MessagesList) Validate() (bool, string) {
 	}
 	return true, "OK"
 }
-
 
 func (v *DeleteMessageRequest) Validate() (bool, string) {
 	if v.MessageId <= 0 {
@@ -140,13 +121,6 @@ func (v *DeleteMessageRequest) Validate() (bool, string) {
 	}
 	if !validSeen[strings.ToLower(v.SeenState)] {
 		return false, "invalid seenState"
-	}
-
-	if !utils.DateValidation(v.CreatedAt) {
-		return false, "invalid createdAt"
-	}
-	if !utils.DateValidation(v.UpdatedAt) {
-		return false, "invalid updatedAt"
 	}
 
 	return true, "OK"

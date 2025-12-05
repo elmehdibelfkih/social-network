@@ -8,10 +8,6 @@ import (
 // POST /api/v1/chats/{chat_id}/messages
 func SendMessageHandler(w http.ResponseWriter, r *http.Request) {
 	userId := utils.GetUserIdFromContext(r)
-	chatId := utils.GetWildCardValue(w, r, "chat_id")
-	if chatId == 0 {
-		return
-	}
 	var body ChatMessage
 	if !utils.ValidateJsonRequest(w, r, &body, "SendMessageHandler") {
 		return
@@ -70,8 +66,7 @@ func GetChatByPagination(w http.ResponseWriter, r *http.Request) {
 		utils.IdentifySqlError(w, err)
 		return
 	}
-
-	utils.JsonResponseEncode(w, http.StatusOK, response)
+	utils.WriteSuccess(w, http.StatusOK, response)
 }
 
 // DELETE /api/v1/chats/{chat_id}/messages/{msg_id}
@@ -88,7 +83,7 @@ func DeleteMessageHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// todo: use utils.JsonResponseEncode()
-	utils.JsonResponseEncode(w, http.StatusOK, map[string]string{
+	utils.WriteSuccess(w, http.StatusOK, map[string]string{
 		"message": "Message deleted successfully.",
 	})
 }

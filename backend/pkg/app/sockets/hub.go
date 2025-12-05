@@ -56,7 +56,11 @@ func (h *Hub) AddChatUser(chatId, userId int64) {
 func (h *Hub) addClient(c *Client) {
 	h.mu.Lock()
 	defer h.mu.Unlock()
+
 	for chatId := range c.userChats {
+		if h.chatUsers[chatId] == nil {
+			h.chatUsers[chatId] = make(map[int64][]*Client)
+		}
 		h.chatUsers[chatId][c.userId] = append(h.chatUsers[chatId][c.userId], c)
 	}
 	firstConnection := len(h.clients[c.userId]) == 0

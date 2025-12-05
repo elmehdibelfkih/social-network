@@ -3,7 +3,11 @@ package socket
 // select
 const (
 	SELECT_USER_CHATS = `
-		SELECT chat_id FROM chat_participants WHERE user_id = ? AND status = 'active'
+		SELECT cp.chat_id
+		FROM chat_participants AS cp
+		JOIN chats AS c ON c.id = cp.chat_id
+		WHERE cp.user_id = ?
+		AND c.status = 'active';
 	`
 	SELECT_USER_BY_ID = `
 		SELECT first_name, last_name ,nickname, date_of_birth, avatar_id, about_me, privacy FROM users WHERE id = ?

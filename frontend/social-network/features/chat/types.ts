@@ -23,3 +23,26 @@ export interface SocketMessage {
     payload?: any;
 }
 
+export interface ChatMessage {
+    messageId: number
+    chatId: number
+    senderId: number
+    content: string
+    seenState: string
+    createdAt: string
+    updatedAt: string
+}
+
+export interface MarkSeen {
+    messageId: number
+    chatId: number
+    senderId: number
+    content: string
+    seenState: string
+    createdAt: string
+    updatedAt: string
+}
+
+export interface messagesList {
+    messagesList: ChatMessage[] | null
+}

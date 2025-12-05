@@ -32,6 +32,15 @@ func InsertMessage(c *ChatMessage) error {
 			utils.SQLiteErrorTarget(err, INSERT_MESSAGE)
 			return err
 		}
+		_, err = tx.Exec(
+			UPDATE_UNREAD_COUNT,
+			c.ChatId,
+			c.SenderId,
+		)
+		if err != nil {
+			utils.SQLiteErrorTarget(err, UPDATE_UNREAD_COUNT)
+			return err
+		}
 		return nil
 	})
 }
@@ -83,9 +92,14 @@ func SelectChatMessages(userId, chatId, messageId int64, l *MessagesList) error 
 		if count > limit {
 			limit = count
 		}
-		rows, err := tx.Query(UPDATE_MESSAGE_READ, chatId, userId, messageId, limit)
+		_, err = tx.Exec(UPDATE_MESSAGE_READ, chatId, userId, messageId, limit)
 		if err != nil {
 			utils.SQLiteErrorTarget(err, UPDATE_MESSAGE_READ)
+			return err
+		}
+		rows, err := tx.Query(SELECT_CHAT_HISTORY, chatId, messageId, limit)
+		if err != nil {
+			utils.SQLiteErrorTarget(err, SELECT_CHAT_HISTORY)
 			return err
 		}
 		defer rows.Close()
@@ -101,7 +115,7 @@ func SelectChatMessages(userId, chatId, messageId int64, l *MessagesList) error 
 				&msg.UpdatedAt,
 			)
 			if err != nil {
-				utils.SQLiteErrorTarget(err, UPDATE_MESSAGE_READ)
+				utils.SQLiteErrorTarget(err, SELECT_CHAT_HISTORY)
 				return err
 			}
 			l.Messages = append(l.Messages, msg)

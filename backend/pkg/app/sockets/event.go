@@ -30,9 +30,9 @@ type TypingIndicator struct {
 }
 
 type ChatMessage struct {
-	MessageId int64  `json:"id"`
+	MessageId int64  `json:"messageId"`
 	ChatId    int64  `json:"chatId"`
-	SenderId  int64  `json:"SenderId"`
+	SenderId  int64  `json:"senderId"`
 	Content   string `json:"content"`
 	SeenState string `json:"seenState"`
 	CreatedAt string `json:"createdAt"`
@@ -40,9 +40,9 @@ type ChatMessage struct {
 }
 
 type MarkSeen struct {
-	MessageId int64  `json:"id"`
+	MessageId int64  `json:"messageId"`
 	ChatId    int64  `json:"chatId"`
-	SenderId  int64  `json:"SenderId"`
+	SenderId  int64  `json:"senderId"`
 	Content   string `json:"content"`
 	SeenState string `json:"seenState"`
 	CreatedAt string `json:"createdAt"`
@@ -50,15 +50,15 @@ type MarkSeen struct {
 }
 
 type Notification struct {
-	Id           int64  `json:"id"`
-	UserId       int64  `json:"userId"`
-	Type         string `json:"type"`
-	RefrenceId   int64  `json:"refrenceId"`
-	RefrenceType int64  `json:"refrenceType"`
-	Content      string `json:"content"`
-	IsRead       string `json:"isRead"`
-	CreatedAt    string `json:"createdAt"`
-	ReadAt       string `json:"ReadAt"`
+	NotificationId int64  `json:"notificationId"`
+	UserId         int64  `json:"userId"`
+	Type           string `json:"type"`
+	RefrenceId     int64  `json:"refrenceId"`
+	RefrenceType   int64  `json:"refrenceType"`
+	Content        string `json:"content"`
+	IsRead         string `json:"isRead"`
+	CreatedAt      string `json:"createdAt"`
+	ReadAt         string `json:"readAt"`
 }
 
 type OnlineStatus struct {
