@@ -16,7 +16,7 @@ export default async function ProfilePage({ params, searchParams }: PageProps) {
   return (
     <>
       <Profile profile={profile} />
-      <ProfileFeed profile={profile} tab={tab || 'posts'} />
+      <ProfileFeed profile={profile} tab={tab || 'about'} />
     </>
   );
 }

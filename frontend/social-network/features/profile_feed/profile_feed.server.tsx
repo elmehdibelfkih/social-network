@@ -10,9 +10,6 @@ import { ProfileData } from '../profile/types'
 export default function ProfileFeed({ profile, tab: initialTab }: { profile: ProfileData, tab: string }) {
   const [activeTab, setActiveTab] = useState(initialTab || 'posts')
 
-  console.log(profile.aboutMe);
-
-
   return (
     <div className={styles.feedContainer}>
       <div className={styles.tabs}>

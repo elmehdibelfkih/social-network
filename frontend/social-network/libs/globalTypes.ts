@@ -67,7 +67,13 @@ export interface Follower {
     avatarId: number | null;
     followedAt?: string;
     status: FollowStatus;
+    privacy: 'public' | 'private';
     chatId: number | null;
+    stats: {
+        postsCount: number;
+        followersCount: number;
+        followingCount: number;
+    };
 }
 
 export interface PostStats {

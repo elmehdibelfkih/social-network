@@ -18,13 +18,21 @@ type UnfollowResponseJson struct {
 }
 
 type UserFollowItem struct {
-	UserId     int64  `json:"userId"`
-	Nickname   string `json:"nickname"`
-	FirstName  string `json:"firstName"`
-	LastName   string `json:"lastName"`
-	AvatarId   int64  `json:"avatarId"`
-	FollowedAt string `json:"followedAt"`
-	Status     string `json:"status"` // pending/accepted/declined
+	UserId    int64                `json:"userId"`
+	Status    *string              `json:"status"` // pending/accepted/declined or NULL
+	Nickname  *string              `json:"nickname"`
+	FirstName string               `json:"firstName"`
+	LastName  string               `json:"lastName"`
+	AvatarId  *int64               `json:"avatarId"`
+	Privacy   string               `json:"privacy"`
+	ChatId    *int64               `json:"chatId"`
+	Stats     UserProfileStatsJson `json:"stats"`
+}
+
+type UserProfileStatsJson struct {
+	PostsCount     int64 `json:"postsCount"`
+	FollowersCount int64 `json:"followersCount"`
+	FollowingCount int64 `json:"followingCount"`
 }
 
 // GET /api/v1/users/:user_id/followers

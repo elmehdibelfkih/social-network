@@ -25,7 +25,7 @@ export function MiniProfileActions({ userId, initialStatus, initialChatId }: Pro
     setBusy(true)
     try {
       const res = await http.post<FollowApiResponse>(`/api/v1/users/${encodeURIComponent(String(userId))}/follow`)
-      const payload =  res
+      const payload = res
       const newStatus = payload?.status ?? null
       const newChatId = payload?.chatId ?? null
       setStatus(newStatus)
@@ -68,7 +68,7 @@ export function MiniProfileActions({ userId, initialStatus, initialChatId }: Pro
           disabled={!chatId}
         >
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden>
-            <path d="M21 15a2 2 0 01-2 2H8l-5 4V5a2 2 0 012-2h14a2 2 0 012 2v10z" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
+            <path d="M21 15a2 2 0 01-2 2H8l-5 4V5a2 2 0 012-2h14a2 2 0 012 2v10z" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         </button>
       ) : null}
@@ -86,9 +86,10 @@ export function MiniProfileActions({ userId, initialStatus, initialChatId }: Pro
       ) : status === 'pending' ? (
         <button
           type="button"
-          className={`${styles.followBtn} ${styles.followDisabled}`}
-          disabled
-          title="Request pending"
+          className={`${styles.followBtn}`}
+          onClick={doUnfollow}
+          disabled={busy}
+          title="Request pending - — click to unfollow"
         >
           …
         </button>

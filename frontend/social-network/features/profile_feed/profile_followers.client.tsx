@@ -23,12 +23,8 @@ function followerToProfile(follower: Follower): ProfileAPIResponse {
         avatarId: follower.avatarId,
         aboutMe: null,
         dateOfBirth: null,
-        privacy: 'public',
-        stats: {
-            postsCount: 0,
-            followersCount: 0,
-            followingCount: 0
-        },
+        privacy: follower.privacy,
+        stats: follower.stats,
         joinedAt: follower.followedAt ?? null,
         chatId: follower.chatId
     }
@@ -52,7 +48,9 @@ export function FollowersList({ userId, type }: FollowersListProps) {
         } finally {
             setIsLoading(false)
         }
+        
     }
+    console.log("===???>",followers);
 
     useEffect(() => {
         loadFollowers()
@@ -62,19 +60,32 @@ export function FollowersList({ userId, type }: FollowersListProps) {
         return <div>Loading...</div>
     }
 
-    if (followers.length === 0 && !isLoading) {
-        return (
-            <div>
-                {type === 'followers' ? 'No followers yet' : 'Not following anyone yet'}
-            </div>
-        )
-    }
-
     return (
         <div className={styles.followersGrid}>
-            {followers.map((follower) => (
-                <MiniProfile key={follower.userId} data={followerToProfile(follower)} isMyprofile={String(follower.userId) !== user.userId} />
-            ))}
+            {followers.length === 0 && !isLoading ?
+                <EmptyContent type={type} />
+                : followers.map((follower) => (
+                    
+                    <MiniProfile key={follower.userId} data={followerToProfile(follower)} isMyprofile={String(follower.userId) !== user.userId} />
+                ))}
+        </div>
+    )
+}
+
+function EmptyContent({ type }: { type: 'followers' | 'following' }) {
+    return (
+        <div className={styles.emptyContent}>
+            {type === 'followers' ? (
+                <>
+                    <h3>No followers</h3>
+                    <p>You'll see your followers here</p>
+                </>
+            ) : (
+                <>
+                    <h3>No following</h3>
+                    <p>You'll see your following here</p>
+                </>
+            )}
         </div>
     )
 }

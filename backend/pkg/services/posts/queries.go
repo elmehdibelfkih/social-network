@@ -4,7 +4,7 @@ const (
 	// Post queries
 	QUERY_CREATE_POST = `
 		INSERT INTO posts (id, author_id, group_id, content, privacy, created_at, updated_at)
-		VALUES (?, ?, ?, ?, ?, ?, ?, ?);
+		VALUES (?, ?, ?, ?, ?, ?, ?);
 	`
 
 	QUERY_GET_POST_BY_ID = `
@@ -172,5 +172,4 @@ const (
 		INSERT INTO counters (entity_type, entity_id, reaction, created_at, updated_at)
 		VALUES (?, ?, ?, ?, ?);
 	`
-
 )

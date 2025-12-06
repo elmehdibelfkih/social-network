@@ -12,11 +12,11 @@ export default async function ProfilePage({ searchParams }: PageProps) {
   const { tab } = await searchParams;
 
   const profile = await getProfileData(String(userId))
-
+  
   return (
     <>
       <Profile profile={profile} />
-      <ProfileFeed profile={profile} tab={tab || 'posts'} />
+      <ProfileFeed profile={profile} tab={tab || 'about'} />
     </>
   );
 }
