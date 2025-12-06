@@ -41,11 +41,6 @@ export function PostsClient({ postId, isLiked, authorId, initialCommentCount }: 
     setCommentCount(prev => prev + 1)
   }
 
-  const handleShare = () => {
-    // TODO: Open share modal
-    console.log('Share post:', postId)
-  }
-
   return (
     <div className={styles.actions}>
       <button 
@@ -64,15 +59,6 @@ export function PostsClient({ postId, isLiked, authorId, initialCommentCount }: 
           <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
         </svg>
         Comment
-      </button>
-
-      <button className={styles.actionButton} onClick={handleShare}>
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-          <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
-          <polyline points="16,6 12,2 8,6"/>
-          <line x1="12" y1="2" x2="12" y2="15"/>
-        </svg>
-        Share
       </button>
 
       <Comments

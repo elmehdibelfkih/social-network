@@ -16,23 +16,23 @@ export default async function HomePage(): Promise<JSX.Element> {
   // Mock post data for testing
   const mockPosts = [
     {
-      postId: 2222451312431104,
-      authorId: 2217444638855168,
-      authorNickname: "Camille Weeks",
-      authorLastName: "Frost",
-      authorFirstName: "Bryar",
-      content: "hi this is a test.",
-      mediaIds: [2222451232739328],
-      privacy: "public" as const,
+      postId: 2520151354380288,
+      authorId: 2513730537656320,
+      authorNickname: " Dorothy Cohen",
+      authorLastName: "Mccoy",
+      authorFirstName: "Keane",
+      content: "this is the segand post",
+      mediaIds: [2520151270494208],
+      privacy: "private" as const,
       groupId: null,
       allowedList: null,
-      isLikedByUser: false,
+      isLikedByUser: true,
       stats: {
         reactionCount: 0,
         commentCount: 0,
       },
-      createdAt: "2024-01-15T14:30:00Z",
-      updatedAt: "2024-01-15T14:30:00Z"
+      createdAt: "2025-12-06T13:49:20Z",
+      updatedAt: "2025-12-06T13:49:20Z"
     },
     {
       postId: 128984387246926,
