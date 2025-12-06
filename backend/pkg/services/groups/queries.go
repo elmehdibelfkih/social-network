@@ -98,7 +98,7 @@ const (
 	`
 
 	INSERT_GROUP_EVENT = `
-		INSERT INTO group_events (id, group_id, creator_id, title, description, location, event_start_date, event_end_date )
+		INSERT INTO group_events (id, group_id, creator_id, title, description, location, start_at, end_at )
 		VALUES (?, ?, ?, ?, ?, ?, ?, ?)
 		RETURNING id, group_id, title, description, start_at, end_at, location, creator_id, created_at;
 	`
