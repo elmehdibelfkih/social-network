@@ -12,6 +12,17 @@ func InsertMessage(c *ChatMessage) error {
 		c.SeenState = "sent"
 		if socket.WSManger.ChatOnlineUsers(c.ChatId) > 1 {
 			c.SeenState = "delivered"
+			_, err := tx.Exec(
+				UPDATE_MESSAGE_STATUS,
+				c.SeenState,
+				c.MessageId,
+				c.ChatId,
+				c.SenderId,
+			)
+			if err != nil {
+				utils.SQLiteErrorTarget(err, UPDATE_MESSAGE_STATUS)
+				return err
+			}
 		}
 		err := tx.QueryRow(INSERT_MESSAGE,
 			utils.GenerateID(),
@@ -97,10 +108,19 @@ func SelectChatMessages(userId, chatId, messageId int64, l *MessagesList) error 
 			utils.SQLiteErrorTarget(err, UPDATE_MESSAGE_READ)
 			return err
 		}
-		rows, err := tx.Query(SELECT_CHAT_HISTORY, chatId, messageId, limit)
-		if err != nil {
-			utils.SQLiteErrorTarget(err, SELECT_CHAT_HISTORY)
-			return err
+		var rows *sql.Rows
+		if messageId > 0 {
+			rows, err = tx.Query(SELECT_CHAT_HISTORY_BEFORE, chatId, messageId, limit)
+			if err != nil {
+				utils.SQLiteErrorTarget(err, SELECT_CHAT_HISTORY_BEFORE)
+				return err
+			}
+		} else {
+			rows, err = tx.Query(SELECT_CHAT_HISTORY, chatId, limit)
+			if err != nil {
+				utils.SQLiteErrorTarget(err, SELECT_CHAT_HISTORY)
+				return err
+			}
 		}
 		defer rows.Close()
 		for rows.Next() {

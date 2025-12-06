@@ -2,6 +2,7 @@ package chat
 
 import (
 	"net/http"
+	socket "social/pkg/app/sockets"
 	"social/pkg/utils"
 )
 
@@ -25,6 +26,21 @@ func SendMessageHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// ws braodcast here
+	socket.WSManger.BroadcastToChat(userId,body.ChatId, socket.Event{
+		Source: "server",
+		Type:   "chat_message",
+		Payload: &socket.ClientMessage{
+			ChatMessage: &socket.ChatMessage{
+				MessageId: body.MessageId,
+				ChatId:    body.ChatId,
+				SenderId:  body.SenderId,
+				Content:   body.Content,
+				SeenState: body.SeenState,
+				CreatedAt: body.CreatedAt,
+				UpdatedAt: body.UpdatedAt,
+			},
+		},
+	})
 
 	utils.WriteSuccess(w, http.StatusOK, body)
 

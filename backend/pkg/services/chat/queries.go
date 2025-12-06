@@ -13,8 +13,13 @@ const (
 	SELECT_UNREAD_COUNT = `
 		SELECT unread_count FROM chat_participants WHERE user_id = ?
 	`
+	SELECT_CHAT_HISTORY_BEFORE = `
+		SELECT id, chat_id, sender_id, content, seen_status, created_at, updated_at FROM messages WHERE chat_id = ? AND id < ?
+		ORDER BY id DESC
+		LIMIT ?
+	`
 	SELECT_CHAT_HISTORY = `
-		SELECT id, chat_id, sender_id, content, seen_status, created_at, updated_at FROM messages WHERE chat_id = ? AND id > ?
+		SELECT id, chat_id, sender_id, content, seen_status, created_at, updated_at FROM messages WHERE chat_id = ?
 		ORDER BY id DESC
 		LIMIT ?
 	`
@@ -26,7 +31,7 @@ const (
 	`
 	//update
 	UPDATE_MESSAGE_STATUS = `
-		UPDATE messages SET seen_status = ? WHERE id = ? AND chat_id = ? AND sender_id <> ? 
+		UPDATE messages SET seen_status = ? WHERE id <= ? AND chat_id = ? AND sender_id <> ? 
 	`
 	UPDATE_MESSAGE_READ = `
 	UPDATE messages

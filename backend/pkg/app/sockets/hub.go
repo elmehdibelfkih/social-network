@@ -101,3 +101,14 @@ func (h *Hub) removeClient(c *Client) {
 func (h *Hub) ChatOnlineUsers(chatId int64) int {
 	return len(h.chatUsers[chatId])
 }
+
+func (h *Hub) BroadcastToChat(userId, chatId int64, event Event) {
+	for id, clients := range h.chatUsers[chatId] {
+		if id == userId {
+			continue
+		}
+		for _, c := range clients {
+			c.events <- event
+		}
+	}
+}
