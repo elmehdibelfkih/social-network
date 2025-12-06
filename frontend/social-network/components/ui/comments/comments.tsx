@@ -122,7 +122,7 @@ export function Comments({ postId, isOpen, onClose, commentCount, onCommentAdded
           {Array.isArray(comments) && comments.map((comment) => (
             <div key={comment.commentId} className={styles.comment}>
               <div className={styles.commentAvatar}>
-        <AvatarHolder avatarId={userProfiles[comment.authorId]?.avatarId ?? null} size={40} />
+        <AvatarHolder avatarId={userProfiles[comment.authorId]?.avatarId ?? null} size={25} />
               </div>
               <div className={styles.commentContent}>
                 <div className={styles.commentHeader}>

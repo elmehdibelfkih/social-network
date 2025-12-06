@@ -12,7 +12,8 @@ import AvatarHolder from '@/components/ui/avatar_holder/avatarholder.client';
 export const privacyOptions = [
   { value: 'public', label: 'Public', description: 'Anyone can see this post', icon: 'globe' },
   { value: 'followers', label: 'Followers', description: 'Only your followers can see', icon: 'users' },
-  { value: 'private', label: 'Private', description: 'Only share with...', icon: 'users' }
+  { value: 'private', label: 'Private', description: 'Only you can see', icon: 'lock' },
+  { value: 'restricted', label: 'Restricted', description: 'Only share with...', icon: 'users' }
 ] as const;
 
 export function NewPostClient() {
@@ -53,7 +54,7 @@ export function NewPostClient() {
         privacy,
         mediaIds: mediaIds.length ? mediaIds : undefined,
         allowedList:
-          privacy === 'private' && selectedFollowers.length ? selectedFollowers : undefined
+          privacy === 'restricted' && selectedFollowers.length ? selectedFollowers : undefined
       });
 
       setContent('');
@@ -168,7 +169,7 @@ export function NewPostClient() {
                       onClick={() => {
                         setPrivacy(opt.value);
                         setShowPrivacyDropdown(false);
-                        if (opt.value === 'private') setShowAddFriends(true);
+                        if (opt.value === 'restricted') setShowAddFriends(true);
                       }}
                     >
                       <div className={styles.privacyOptionIcon}>
