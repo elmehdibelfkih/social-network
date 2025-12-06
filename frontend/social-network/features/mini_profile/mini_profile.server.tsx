@@ -70,9 +70,6 @@ export default function MiniProfile({ userId, data, isMyprofile }: Props) {
           </div>
 
           <div className={styles.statusBadges}>
-            <span className={isOnline ? styles.badgeOnline : styles.badgeOffline}>
-              {isOnline ? 'Online' : 'Offline'}
-            </span>
             <span className={styles.badgePrivacy}>
               {profile.privacy === 'public' ? 'Public' : 'Private'}
             </span>

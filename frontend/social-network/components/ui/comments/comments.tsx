@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import styles from './comments.module.css';
 import AvatarHolder from '@/components/ui/avatar_holder/avatarholder.client';
+import { http } from '@/libs/apiFetch';
 
 
 interface Comment {
@@ -11,6 +12,8 @@ interface Comment {
   authorNickname: string;
   content: string;
   createdAt: string;
+  isLikedByUser: boolean;
+  likeCount: number;
 }
 
 interface CommentsProps {
@@ -26,6 +29,7 @@ export function Comments({ postId, isOpen, onClose, commentCount, onCommentAdded
   const [newComment, setNewComment] = useState('');
   const [loading, setLoading] = useState(false);
   const [userProfiles, setUserProfiles] = useState<{[key: number]: {avatarId: number | null}}>({});
+  const [likingComments, setLikingComments] = useState<Set<number>>(new Set());
 
   useEffect(() => {
     if (isOpen) {
@@ -65,6 +69,34 @@ export function Comments({ postId, isOpen, onClose, commentCount, onCommentAdded
       }
     } catch (error) {
       console.error('Failed to fetch comments:', error);
+    }
+  };
+
+  const handleCommentLike = async (commentId: number, isLiked: boolean) => {
+    setLikingComments(prev => new Set(prev).add(commentId));
+    
+    try {
+      const success = await http.post(`/api/v1/comments/${commentId}/like`);
+
+      if (success !== null) {
+        setComments(prev => prev.map(comment => 
+          comment.commentId === commentId
+            ? {
+                ...comment,
+                isLikedByUser: !isLiked,
+                likeCount: comment.likeCount + (isLiked ? -1 : 1)
+              }
+            : comment
+        ));
+      }
+    } catch (error) {
+      console.error('Failed to like comment:', error);
+    } finally {
+      setLikingComments(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(commentId);
+        return newSet;
+      });
     }
   };
 
@@ -134,6 +166,16 @@ export function Comments({ postId, isOpen, onClose, commentCount, onCommentAdded
                   </span>
                 </div>
                 <p className={styles.commentText}>{comment.content}</p>
+                <button
+                  className={`${styles.likeButton} ${comment.isLikedByUser ? styles.liked : ''}`}
+                  onClick={() => handleCommentLike(comment.commentId, comment.isLikedByUser)}
+                  disabled={likingComments.has(comment.commentId)}
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill={comment.isLikedByUser ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2">
+                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                  </svg>
+                  {comment.likeCount > 0 && <span>{comment.likeCount}</span>}
+                </button>
               </div>
             </div>
           ))}

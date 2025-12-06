@@ -172,4 +172,22 @@ const (
 		INSERT INTO counters (entity_type, entity_id, reaction, created_at, updated_at)
 		VALUES (?, ?, ?, ?, ?);
 	`
+
+	// Comment reaction queries
+	QUERY_CREATE_COMMENT_REACTION = `
+		INSERT INTO comment_reactions (comment_id, user_id, reaction_type, reacted_at)
+		VALUES (?, ?, ?, ?);
+	`
+
+	QUERY_DELETE_COMMENT_REACTION = `
+		DELETE FROM comment_reactions
+		WHERE comment_id = ? AND user_id = ?;
+	`
+
+	QUERY_CHECK_COMMENT_REACTION_EXISTS = `
+		SELECT 1
+		FROM comment_reactions
+		WHERE comment_id = ? AND user_id = ?
+		LIMIT 1;
+	`
 )

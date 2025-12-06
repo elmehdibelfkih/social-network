@@ -529,3 +529,44 @@ func GetAuthorNickname(authorID int64) (string, error) {
 	}
 	return "", nil
 }
+
+// CreateCommentReaction creates a like reaction on a comment
+func CreateCommentReaction(commentID, userID int64, reaction string) error {
+	now := time.Now().Format(time.RFC3339)
+	_, err := config.DB.Exec(QUERY_CREATE_COMMENT_REACTION, commentID, userID, reaction, now)
+	if err != nil {
+		if e, ok := err.(sqlite3.Error); ok && e.Code == sqlite3.ErrConstraint {
+			return fmt.Errorf("reaction already exists")
+		}
+		utils.SQLiteErrorTarget(err, "CreateCommentReaction")
+		return fmt.Errorf("failed to create comment reaction: %w", err)
+	}
+	return nil
+}
+
+// DeleteCommentReaction removes a reaction from a comment
+func DeleteCommentReaction(commentID, userID int64) error {
+	result, err := config.DB.Exec(QUERY_DELETE_COMMENT_REACTION, commentID, userID)
+	if err != nil {
+		utils.SQLiteErrorTarget(err, "DeleteCommentReaction")
+		return fmt.Errorf("failed to delete comment reaction: %w", err)
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	if rowsAffected == 0 {
+		return sql.ErrNoRows
+	}
+
+	return nil
+}
+
+// CheckCommentReactionExists checks if a reaction already exists on a comment
+func CheckCommentReactionExists(commentID, userID int64) bool {
+	var exists int
+	err := config.DB.QueryRow(QUERY_CHECK_COMMENT_REACTION_EXISTS, commentID, userID).Scan(&exists)
+	return err == nil
+}

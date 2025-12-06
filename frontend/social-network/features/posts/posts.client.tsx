@@ -22,9 +22,7 @@ export function PostsClient({ postId, isLiked, authorId, initialCommentCount }: 
     
     setIsLoading(true)
     
-    const success = liked 
-      ? await postsService.unlikePost(postId)
-      : await postsService.likePost(postId)
+    const success = await postsService.likePost(postId)
     
     if (success) {
       setLiked(!liked)

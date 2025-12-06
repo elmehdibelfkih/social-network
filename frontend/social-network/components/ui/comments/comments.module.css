@@ -104,10 +104,41 @@
 }
 
 .commentText {
-  margin: 0;
+  margin: 0 0 8px 0;
   font-size: 14px;
   line-height: 1.4;
   color: #050505;
+}
+
+.likeButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  border: none;
+  color: #65676b;
+  font-size: 12px;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.likeButton:hover:not(:disabled) {
+  background: #f2f3f4;
+}
+
+.likeButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.likeButton.liked {
+  color: #8a63d2;
+}
+
+.likeButton svg {
+  flex-shrink: 0;
 }
 
 .noComments {
