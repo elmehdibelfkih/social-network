@@ -113,10 +113,10 @@ func SelectGroupById(groupId int64, g *GetGroupResponseJson) error {
 
 func SelectGroupMember(groupId, userId int64) (bool, error) {
 	var exist bool
-	_, err := config.DB.Query(SELECT_GROUP_MEMBER_BY_ID,
+	err := config.DB.QueryRow(SELECT_GROUP_MEMBER_BY_ID,
 		groupId,
 		userId,
-	)
+	).Scan(&exist)
 	if err != nil {
 		utils.SQLiteErrorTarget(err, SELECT_GROUP_MEMBER_BY_ID)
 	}

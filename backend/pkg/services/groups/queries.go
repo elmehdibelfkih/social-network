@@ -65,7 +65,7 @@ const (
 
 	SELECT_EVENT_BY_ID = `
 		SELECT 
-		ge.id, ge.group_id, ge.creator_id, ge.title, ge.description, ge.location, ge.event_start_date, ge.event_end_date, ge.created_at,
+		ge.id, ge.group_id, ge.creator_id, ge.title, ge.description, ge.location, ge.start_at, ge.end_at, ge.created_at,
 		u.first_name, u.last_name
 		FROM group_events AS ge
 		JOIN users AS u
@@ -74,7 +74,7 @@ const (
 	`
 
 	SELECT_EVENTS_BY_GROUP_ID = `
-		SELECT id, creator_id, title, description, location, event_start_date, event_end_date, created_at,
+		SELECT id, creator_id, title, description, location, start_at, end_at, created_at
 		FROM group_events
 		WHERE group_id = ?
 		ORDER BY created_at ASC;

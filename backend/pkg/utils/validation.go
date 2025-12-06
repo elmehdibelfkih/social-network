@@ -56,7 +56,7 @@ func FirstNameLastName(name string) (bool, string) {
 
 // DateValidation validates date in "yyyy-mm-dd" format
 func DateValidation(dateStr string) bool {
-	_, err := time.Parse("2006-01-02", dateStr)
+	_, err := time.Parse(time.RFC3339, dateStr) // time.RFC3339 is the format for "2025-11-02T20:00:00Z"
 	return err == nil
 }
 
