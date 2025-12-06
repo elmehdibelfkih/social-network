@@ -4,6 +4,7 @@ import styles from "./styles/chat.conversation.module.css";
 import { chatService } from "@/features/chat/services/chat";
 import { ChatMessage } from "./types";
 import { formatMessageDate } from "@/libs/helpers";
+import { SeenStatus } from "@/components/ui/chats/seen"
 
 interface ChatConversationProps {
     chatId: number;
@@ -12,29 +13,106 @@ interface ChatConversationProps {
 
 export default function ChatConversation({ chatId, onClose }: ChatConversationProps) {
     const [messages, setMessages] = useState<ChatMessage[]>([]);
+    const [loadingOld, setLoadingOld] = useState(false);
+    const [hasMore, setHasMore] = useState(true);
     const [isLoading, setIsLoading] = useState(false)
     const [input, setInput] = useState("");
     const [userData, setUserData] = useState(JSON.parse(localStorage.getItem("social_network-user")))
+    const [isTyping, setIsTyping] = useState(false)
+    const [isAfk, setIsAfk] = useState(true)
     const scrollRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        if (scrollRef.current) {
-            scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+        const port = chatService.getGlobalPort()
+
+        port.onmessage = (e) => {
+            const data = e.data;
+            console.log("received from sharedworker:", data);
+            if (!data.payload) return
+            switch (data.type) {
+                case 'chat_message':
+                    setMessages(prev => [...prev, data.payload.chatMessage])
+                    break;
+                case 'chat_seen':
+                    setMessages(messages.map(msg => {
+                        if (msg.messageId === data.payload.markSeen.messageId) {
+                            msg.seenState = data.payload.markSeen.seenState
+                        }
+                        return msg
+                    }))
+                    break;
+                case 'chat_typing':
+                    setIsTyping(true)
+                    break;
+                case 'chat_afk':
+                    setIsAfk(true)
+                    break;
+                default:
+                    break;
+            }
+        };
+    }, [])
+
+    async function loadOlderMessages() {
+        if (loadingOld || !hasMore) return;
+        const div = scrollRef.current;
+        if (!div) return;
+        setLoadingOld(true);
+
+        const prevScrollHeight = div.scrollHeight;
+        const oldest = messages[0];
+        const beforeId = oldest?.messageId;
+
+        const resp = await chatService.chatHistory(chatId, beforeId);
+        if (!resp.messagesList) {
+            setHasMore(false);
+            setLoadingOld(false);
+            return;
         }
-    }, [messages]);
+        const reversed = resp.messagesList.reverse()
+
+        setMessages(prev => [...reversed, ...prev]);
+
+        requestAnimationFrame(() => {
+            const newScrollHeight = div.scrollHeight;
+            div.scrollTop = newScrollHeight - prevScrollHeight;
+        });
+
+
+        setLoadingOld(false);
+    }
 
     useEffect(() => {
-        async function loadMessages() {
-            try {
-                const resp = await chatService.chatHistory(chatId)
-                console.log(resp.messagesList)
-                setMessages(resp.messagesList)
-            } catch (error) {
-                console.error("Failed to send message:", error);
+        const div = scrollRef.current;
+        if (!div) return;
+
+        function onScroll() {
+            if (div.scrollTop <= 0) {
+                loadOlderMessages();
             }
         }
+
+        div.addEventListener("scroll", onScroll);
+        return () => div.removeEventListener("scroll", onScroll);
+    }, [messages, hasMore, loadingOld]);
+
+    useEffect(() => {
         loadMessages();
     }, [chatId])
+
+    async function loadMessages() {
+        try {
+            const resp = await chatService.chatHistory(chatId);
+            if (!resp.messagesList) return
+            setMessages(resp.messagesList.reverse() || [])
+            setTimeout(() => {
+                const div = scrollRef.current;
+                if (div) div.scrollTop = div.scrollHeight;
+            }, 0);
+        } catch (error) {
+            console.error("Failed to send message:", error);
+        }
+    }
 
 
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
@@ -64,6 +142,11 @@ export default function ChatConversation({ chatId, onClose }: ChatConversationPr
             };
             setMessages(prev => [...prev, chatMessageResponse]);
             setInput("");
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    scrollRef.current.scrollTop = scrollRef.current.scrollHeight; // scoll down after submiting a msg
+                })
+            })
         } catch (error) {
             console.error("Failed to send message:", error);
         } finally {
@@ -77,7 +160,9 @@ export default function ChatConversation({ chatId, onClose }: ChatConversationPr
 
             <div className={styles.chatHeader}>
                 <span>Chat {chatId}</span>
-                <button className={styles.closeBtn} onClick={onClose}>X</button>
+                <button className={styles.closeBtn} onClick={onClose}>
+                    <img src="/svg/x.svg" alt="" />
+                </button>
             </div>
 
             <div className={styles.chatMessages} ref={scrollRef}>
@@ -87,10 +172,10 @@ export default function ChatConversation({ chatId, onClose }: ChatConversationPr
                             key={msg.messageId}
                             className={`${styles.message} ${msg.senderId == userData.userId ? styles.myMessage : styles.otherMessage}`}
                         >
-
                             {msg.content}
                             <div className={styles.timestamp}>
                                 {formatMessageDate(msg.updatedAt)}
+                                <SeenStatus state={msg.seenState}></SeenStatus>
                             </div>
                         </div>
                     );
