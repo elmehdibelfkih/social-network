@@ -267,8 +267,8 @@ func buildPostResponse(post *Post) (*GetPostResponse, error) {
 	}, nil
 }
 
-// buildCommentResponse builds a complete comment response with media
-func buildCommentResponse(comment *Comment) (*CommentResponse, error) {
+// buildCommentResponse builds a complete comment response with media, like status and count
+func buildCommentResponse(comment *Comment, viewerID int64) (*CommentResponse, error) {
 	// Get author nickname
 	author, err := GetAuthorDetails(comment.AuthorID)
 	if err != nil && err != sql.ErrNoRows {
@@ -292,6 +292,8 @@ func buildCommentResponse(comment *Comment) (*CommentResponse, error) {
 		AuthorNickname:  author.Nickname,
 		Content:         comment.Content,
 		MediaIDs:        mediaIDs,
+		IsLikedByUser:   CheckCommentReactionExists(comment.ID, viewerID),
+		LikeCount:       GetCommentLikeCount(comment.ID),
 		CreatedAt:       comment.CreatedAt,
 		UpdatedAt:       comment.UpdatedAt,
 	}, nil

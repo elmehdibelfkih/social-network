@@ -24,6 +24,12 @@
   font-weight: 600;
   color: #1f2937;
   margin: 0 0 2px 0;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.authorName:hover {
+  color: #8a63d2;
 }
 
 .postMeta {
@@ -44,6 +50,10 @@
   gap: 4px;
 }
 
+.menuContainer {
+  position: relative;
+}
+
 .menuButton {
   background: none;
   border: none;
@@ -57,6 +67,54 @@
 
 .menuButton:hover {
   background-color: #f3f4f6;
+}
+
+.menuBackdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 9;
+}
+
+.menuDropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 4px;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+  min-width: 150px;
+  overflow: hidden;
+}
+
+.menuDropdown button {
+  display: block;
+  width: 100%;
+  padding: 12px 16px;
+  border: none;
+  background: white;
+  text-align: left;
+  cursor: pointer;
+  font-size: 14px;
+  color: #374151;
+  transition: background-color 0.2s;
+}
+
+.menuDropdown button:hover {
+  background-color: #f9fafb;
+}
+
+.menuDropdown button:last-child {
+  color: #ef4444;
+}
+
+.menuDropdown button:last-child:hover {
+  background-color: #fef2f2;
 }
 
 .content {
@@ -76,12 +134,80 @@
   gap: 8px;
 }
 
+.mediaCarousel {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+}
+
 .mediaImage {
   width: 100%;
   height: auto;
-  max-height: 400px;
+  max-height: 500px;
   object-fit: cover;
   display: block;
+}
+
+.carouselBtnPrev,
+.carouselBtnNext {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0, 0, 0, 0.5);
+  color: white;
+  border: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  font-size: 24px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+  z-index: 2;
+}
+
+.carouselBtnPrev:hover,
+.carouselBtnNext:hover {
+  background: rgba(0, 0, 0, 0.7);
+}
+
+.carouselBtnPrev {
+  left: 10px;
+}
+
+.carouselBtnNext {
+  right: 10px;
+}
+
+.carouselDots {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 8px;
+  z-index: 2;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.dot:hover {
+  background: rgba(255, 255, 255, 0.8);
+}
+
+.dotActive {
+  background: white;
+  width: 10px;
+  height: 10px;
 }
 
 .stats {

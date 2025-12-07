@@ -4,8 +4,53 @@ import type { Post } from '@/libs/globalTypes'
 import { PostsClient } from './posts.client'
 import { AvatarHolder } from '@/components/ui/avatar_holder/avatarholder.client'
 import styles from './styles.module.css'
-import { fetchMediaClient } from '@/libs/apiFetch'
+import { fetchMediaClient, http } from '@/libs/apiFetch'
+import { UpdatePost } from '@/components/ui/UpdatePost/UpdatePost'
+import { ConfirmDelete } from '@/components/ui/ConfirmDelete/ConfirmDelete'
 import { useAuth } from '@/providers/authProvider'
+
+function MediaCarousel({ mediaDataList }: { mediaDataList: string[] }) {
+  const [currentIndex, setCurrentIndex] = useState(0)
+
+  if (mediaDataList.length === 0) return null
+
+  const goToNext = () => {
+    setCurrentIndex((prev) => (prev + 1) % mediaDataList.length)
+  }
+
+  const goToPrev = () => {
+    setCurrentIndex((prev) => (prev - 1 + mediaDataList.length) % mediaDataList.length)
+  }
+
+  return (
+    <div className={styles.mediaCarousel}>
+      <img
+        src={mediaDataList[currentIndex]}
+        alt="Post media"
+        className={styles.mediaImage}
+      />
+      {mediaDataList.length > 1 && (
+        <>
+          <button className={styles.carouselBtnPrev} onClick={goToPrev}>
+            ‹
+          </button>
+          <button className={styles.carouselBtnNext} onClick={goToNext}>
+            ›
+          </button>
+          <div className={styles.carouselDots}>
+            {mediaDataList.map((_, index) => (
+              <span
+                key={index}
+                className={`${styles.dot} ${index === currentIndex ? styles.dotActive : ''}`}
+                onClick={() => setCurrentIndex(index)}
+              />
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  )
+}
 
 async function getMediaData(mediaId: number): Promise<string | null> {
   try {
@@ -20,8 +65,15 @@ async function getMediaData(mediaId: number): Promise<string | null> {
 }
 
 export function PostCard({ post, avatarId }: { post: Post, avatarId: number}) {
+  const { user } = useAuth()
   const [mediaDataList, setMediaDataList] = useState<(string | null)[]>([])
   const [isLoadingMedia, setIsLoadingMedia] = useState(true)
+  const [showMenu, setShowMenu] = useState(false)
+  const [showUpdateModal, setShowUpdateModal] = useState(false)
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => setMounted(true), [])
 
   useEffect(() => {
     const loadData = async () => {
@@ -49,13 +101,30 @@ export function PostCard({ post, avatarId }: { post: Post, avatarId: number}) {
       <div className={styles.header}>
         <AvatarHolder avatarId={avatarId} size={40} />
         <div className={styles.authorInfo}>
-          <h3 className={styles.authorName}>{authorName}</h3>
+          <h3 className={styles.authorName} onClick={() => window.location.href = `/profile/${post.authorId}`}>{authorName}</h3>
           <div className={styles.postMeta}>
             <span className={styles.timeAgo}>{timeAgo}</span>
             <span className={styles.privacy}>🌐 {post.privacy}</span>
           </div>
         </div>
-        <button className={styles.menuButton}>⋮</button>
+        {mounted && user && (
+          <div className={styles.menuContainer}>
+            <button className={styles.menuButton} onClick={() => setShowMenu(!showMenu)}>⋮</button>
+            {showMenu && (
+              <>
+                <div className={styles.menuBackdrop} onClick={() => setShowMenu(false)} />
+                <div className={styles.menuDropdown}>
+                  <button onClick={() => { setShowUpdateModal(true); setShowMenu(false); }}>
+                    Edit Post
+                  </button>
+                  <button onClick={() => { setShowDeleteConfirm(true); setShowMenu(false); }}>
+                    Delete Post
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        )}
       </div>
 
       <div className={styles.content}>
@@ -63,24 +132,13 @@ export function PostCard({ post, avatarId }: { post: Post, avatarId: number}) {
       </div>
 
       {post?.mediaIds && post.mediaIds.length > 0 && (
-        <div className={styles.media}>
-          {isLoadingMedia ? (
-            <div style={{ padding: '40px', textAlign: 'center', color: '#6b7280' }}>
-              Loading media...
-            </div>
-          ) : (
-            mediaDataList.map((mediaData, index) =>
-              mediaData ? (
-                <img
-                  key={post.mediaIds![index]}
-                  src={mediaData}
-                  alt="Post media"
-                  className={styles.mediaImage}
-                />
-              ) : null
-            )
-          )}
-        </div>
+        isLoadingMedia ? (
+          <div style={{ padding: '40px', textAlign: 'center', color: '#6b7280' }}>
+            Loading media...
+          </div>
+        ) : (
+          <MediaCarousel mediaDataList={mediaDataList.filter(Boolean) as string[]} />
+        )
       )}
 
       <div className={styles.stats}>
@@ -89,6 +147,27 @@ export function PostCard({ post, avatarId }: { post: Post, avatarId: number}) {
       </div>
 
       <PostsClient post={post} />
+
+      {showUpdateModal && (
+        <UpdatePost
+          postId={post.postId}
+          initialContent={post.content}
+          initialPrivacy={post.privacy}
+          initialMediaIds={post.mediaIds || []}
+          onClose={() => setShowUpdateModal(false)}
+          onUpdate={() => window.location.reload()}
+        />
+      )}
+
+      {showDeleteConfirm && (
+        <ConfirmDelete
+          onConfirm={async () => {
+            await http.delete(`/api/v1/posts/${post.postId}`);
+            window.location.reload();
+          }}
+          onCancel={() => setShowDeleteConfirm(false)}
+        />
+      )}
     </article>
   )
 }

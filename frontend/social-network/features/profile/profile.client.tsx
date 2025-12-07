@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import styles from './styles.module.css'
 import { unfollowPerson, followPerson } from './profileSrevice'
 import { FollowIcon, MessageIcon } from '@/components/ui/icons'
@@ -61,9 +61,12 @@ export function MessageButton() {
 
 export function ProfileTopActions({ userId, profile }: { userId: string, profile: ProfileData }) {
     const { user } = useAuth()
+    const [mounted, setMounted] = useState(false)
 
-    if (!user) {
-        return null
+    useEffect(() => setMounted(true), [])
+
+    if (!mounted || !user) {
+        return <div className={styles.topPart}></div>
     }
     const isOwnProfile = user.userId == userId
 

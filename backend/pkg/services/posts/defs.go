@@ -129,6 +129,8 @@ type CommentResponse struct {
 	AuthorNickname  string  `json:"authorNickname"`
 	Content         string  `json:"content"`
 	MediaIDs        []int64 `json:"mediaIds"`
+	IsLikedByUser   bool    `json:"isLikedByUser"`
+	LikeCount       int     `json:"likeCount"`
 	CreatedAt       string  `json:"createdAt"`
 	UpdatedAt       string  `json:"updatedAt"`
 }
