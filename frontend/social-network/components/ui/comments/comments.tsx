@@ -30,16 +30,24 @@ export function Comments({ postId, isOpen, onClose, commentCount, onCommentAdded
   const [loading, setLoading] = useState(false);
   const [userProfiles, setUserProfiles] = useState<{[key: number]: {avatarId: number | null}}>({});
   const [likingComments, setLikingComments] = useState<Set<number>>(new Set());
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
-      fetchComments();
+      setPage(1);
+      setComments([]);
+      setHasMore(true);
+      fetchComments(1);
     }
   }, [isOpen, postId]);
 
-  const fetchComments = async () => {
+  const fetchComments = async (pageNum: number) => {
+    if (loadingMore || !hasMore) return;
+    setLoadingMore(true);
     try {
-      const data = await http.get<any>(`/api/v1/posts/${postId}/comments`);
+      const data = await http.get<any>(`/api/v1/posts/${postId}/comments?page=${pageNum}&limit=10`);
       const commentsData = (data?.comments || []).map((c: any) => ({
         commentId: c.commentId,
         authorId: c.authorId,
@@ -49,7 +57,9 @@ export function Comments({ postId, isOpen, onClose, commentCount, onCommentAdded
         isLikedByUser: Boolean(c.isLikedByUser),
         likeCount: Number(c.likeCount) || 0
       }));
-      setComments(commentsData);
+      
+      if (commentsData.length < 10) setHasMore(false);
+      setComments(prev => pageNum === 1 ? commentsData : [...prev, ...commentsData]);
       
       // Fetch user profiles for avatars
       const uniqueUserIds = [...new Set(commentsData.map((c: Comment) => c.authorId))];
@@ -67,8 +77,35 @@ export function Comments({ postId, isOpen, onClose, commentCount, onCommentAdded
       setUserProfiles(profiles);
     } catch (error) {
       console.error('Failed to fetch comments:', error);
+    } finally {
+      setLoadingMore(false);
     }
   };
+
+  useEffect(() => {
+    const commentsList = document.querySelector(`.${styles.commentsList}`);
+    if (!commentsList || !isOpen) return;
+
+    let scrollTimeout: NodeJS.Timeout;
+    const handleScroll = () => {
+      clearTimeout(scrollTimeout);
+      scrollTimeout = setTimeout(() => {
+        if (commentsList.scrollHeight - commentsList.scrollTop <= commentsList.clientHeight + 50) {
+          if (hasMore && !loadingMore) {
+            const nextPage = page + 1;
+            setPage(nextPage);
+            fetchComments(nextPage);
+          }
+        }
+      }, 200);
+    };
+
+    commentsList.addEventListener('scroll', handleScroll);
+    return () => {
+      clearTimeout(scrollTimeout);
+      commentsList.removeEventListener('scroll', handleScroll);
+    };
+  }, [isOpen, hasMore, loadingMore, page]);
 
   const handleCommentLike = async (commentId: number, isLiked: boolean) => {
     setLikingComments(prev => new Set(prev).add(commentId));
@@ -115,7 +152,10 @@ export function Comments({ postId, isOpen, onClose, commentCount, onCommentAdded
 
       if (response.ok) {
         setNewComment('');
-        fetchComments();
+        setPage(1);
+        setComments([]);
+        setHasMore(true);
+        fetchComments(1);
         onCommentAdded();
       }
     } catch (error) {
@@ -149,10 +189,10 @@ export function Comments({ postId, isOpen, onClose, commentCount, onCommentAdded
         </div>
         
         <div className={styles.commentsList}>
-          {Array.isArray(comments) && comments.map((comment) => {
+          {Array.isArray(comments) && comments.map((comment, index) => {
             const isLiked = comment.isLikedByUser === true;
             return (
-            <div key={comment.commentId} className={styles.comment}>
+            <div key={`${comment.commentId}-${index}`} className={styles.comment}>
               <div className={styles.commentAvatar}>
         <AvatarHolder avatarId={userProfiles[comment.authorId]?.avatarId ?? null} size={25} />
               </div>
@@ -181,6 +221,9 @@ export function Comments({ postId, isOpen, onClose, commentCount, onCommentAdded
           );})}
           {(!Array.isArray(comments) || comments.length === 0) && (
             <div className={styles.noComments}>No comments yet. Be the first to comment!</div>
+          )}
+          {loadingMore && comments.length > 0 && (
+            <div className={styles.loadingMore}>Loading more...</div>
           )}
         </div>
 

@@ -194,3 +194,10 @@
 .submitButton:not(:disabled):hover {
   background: #8a63d2;
 }
+
+.loadingMore {
+  text-align: center;
+  padding: 12px;
+  color: #65676b;
+  font-size: 13px;
+}
