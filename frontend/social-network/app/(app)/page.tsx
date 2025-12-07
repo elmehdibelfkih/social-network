@@ -4,7 +4,7 @@ import { ProfileSummaryServer } from "@/features/profile_summary";
 import { http } from "@/libs/apiFetch";
 import { JSX } from "react";
 import { getUserId } from "@/libs/helpers";
-import { ProfileAPIResponse } from "@/libs/globalTypes";
+import { Post, ProfileAPIResponse } from "@/libs/globalTypes";
 import { NewPost } from "@/features/newPost";
 import { postsService } from "@/features/posts";
 import PostServer from "@/features/posts/posts.server";
@@ -12,59 +12,25 @@ import PostServer from "@/features/posts/posts.server";
 export default async function HomePage(): Promise<JSX.Element> {
   const userId = await getUserId();
   const res2 = await http.get<ProfileAPIResponse>(`/api/v1/users/${userId}/profile`);
-  
-  // Mock post data for testing
-  const mockPosts = [
-    {
-      postId: 2520151354380288,
-      authorId: 2513730537656320,
-      authorNickname: " Dorothy Cohen",
-      authorLastName: "Mccoy",
-      authorFirstName: "Keane",
-      content: "this is the segand post",
-      mediaIds: [2520151270494208],
-      privacy: "private" as const,
-      groupId: null,
-      allowedList: null,
-      isLikedByUser: true,
-      stats: {
-        reactionCount: 0,
-        commentCount: 0,
-      },
-      createdAt: "2025-12-06T13:49:20Z",
-      updatedAt: "2025-12-06T13:49:20Z"
-    },
-    {
-      postId: 128984387246926,
-      authorId: 128984387246930,
-      authorNickname: "devops_mehdi",
-      authorLastName: "Khalifa",
-      authorFirstName: "Mehdi",
-      content: "Hello world — launching my new service today! 🚀 Excited to share this journey with everyone.",
-      mediaIds: null,
-      privacy: "public" as const,
-      groupId: null,
-      allowedList: null,
-      isLikedByUser: true,
-      stats: {
-        reactionCount: 15,
-        commentCount: 3,
-      },
-      createdAt: "2024-01-15T12:00:00Z",
-      updatedAt: "2024-01-15T12:00:00Z"
-    }
-  ];
+
+  const posts = await postsService.getFeed({ page: 1, limit: 20 })
 
   return (
     <>
       <ProfileSummaryServer userId={userId} />
       <div>
-          <NewPost  data={res2} isMyprofile={false}  />
+        <NewPost data={res2} isMyprofile={false} />
       </div>
       <div>
-        {mockPosts.map((post) => (
-          <PostServer key={post.postId} post={post} />
-        ))}
+        {posts.length === 0 ? (
+          <p>
+            No posts yet. Be the first to create one!
+          </p>
+        ) : (
+          posts.map((post) => (
+            <PostServer key={post.postId} post={post} />
+          ))
+        )}
       </div>
       <MiniProfile data={res2} isMyprofile={false} />
     </>

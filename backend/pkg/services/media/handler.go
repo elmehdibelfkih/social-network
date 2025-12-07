@@ -15,6 +15,7 @@ import (
 )
 
 func HandleUploadMedia(w http.ResponseWriter, r *http.Request) {
+	userId := utils.GetUserIdFromContext(r)
 	var req UploadMediaRequest
 	r.Body = http.MaxBytesReader(w, r.Body, MaxRequestSize)
 	defer r.Body.Close()
@@ -39,7 +40,6 @@ func HandleUploadMedia(w http.ResponseWriter, r *http.Request) {
 		utils.BadRequest(w, "The provided file data is not valid base64.", utils.ErrorTypeAlert)
 		return
 	}
-	fmt.Println(len(data))
 
 	if len(data) > MaxMediaSize {
 		utils.MediaTooLargeError(w, fmt.Sprintf("File size cannot exceed %d MB.", MaxMediaSize/1024/1024))
@@ -69,17 +69,22 @@ func HandleUploadMedia(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	var ownerId *int64
+	if req.Purpose == "avatar" {
+		ownerId = nil
+	} else {
+		ownerId = &userId
+	}
+
 	media := &Media{
 		ID:        mediaID,
 		Path:      filePath,
-		OwnerId:   nil,
+		OwnerId:   ownerId,
 		Mime:      detectedMediaType,
 		Size:      len(data),
 		Purpose:   req.Purpose,
 		CreatedAt: time.Now().String(),
 	}
-
-	fmt.Println(media)
 
 	if err := CreateMedia(media); err != nil {
 		os.Remove(filePath)

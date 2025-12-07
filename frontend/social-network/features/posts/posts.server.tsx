@@ -3,7 +3,7 @@ import type { Post } from '@/libs/globalTypes'
 import { PostsClient } from './posts.client'
 import { AvatarHolder } from '@/components/ui/avatar_holder/avatarholder.client'
 import styles from './styles.module.css'
-import { http } from '@/libs/apiFetch'
+import { http, fetchMediaClient } from '@/libs/apiFetch'
 
 async function getAvatarId(userId: number): Promise<number | null> {
   try {
@@ -14,14 +14,29 @@ async function getAvatarId(userId: number): Promise<number | null> {
   }
 }
 
+async function getMediaData(mediaId: number): Promise<string | null> {
+  try {
+    const media = await fetchMediaClient(String(mediaId))
+    if (media?.mediaEncoded) {
+      return `data:image/jpeg;base64,${media.mediaEncoded}`
+    }
+    return null
+  } catch {
+    return null
+  }
+}
+
 type Props = {
   post: Post
 }
 
 export default async function PostServer({ post }: Props) {
-  const authorName =  `${post.authorFirstName} ${post.authorLastName}`
+  const authorName = `${post.authorFirstName} ${post.authorLastName}`
   const timeAgo = new Date(post.createdAt).toLocaleDateString()
   const avatarId = await getAvatarId(post.authorId)
+
+  const mediaDataPromises = post.mediaIds?.map(mediaId => getMediaData(mediaId)) || []
+  const mediaDataList = await Promise.all(mediaDataPromises)
 
   return (
     <article className={styles.post}>
@@ -43,14 +58,16 @@ export default async function PostServer({ post }: Props) {
 
       {post.mediaIds && post.mediaIds.length > 0 && (
         <div className={styles.media}>
-          {post.mediaIds.map((mediaId) => (
-            <img
-              key={mediaId}
-              src={`/api/v1/media/${mediaId}`}
-              alt="Post media"
-              className={styles.mediaImage}
-            />
-          ))}
+          {mediaDataList.map((mediaData, index) =>
+            mediaData ? (
+              <img
+                key={post.mediaIds![index]}
+                src={mediaData}
+                alt="Post media"
+                className={styles.mediaImage}
+              />
+            ) : null
+          )}
         </div>
       )}
 
@@ -60,7 +77,7 @@ export default async function PostServer({ post }: Props) {
       </div>
 
       <Suspense fallback={<div className={styles.actionsLoading}>Loading...</div>}>
-        <PostsClient 
+        <PostsClient
           postId={post.postId}
           isLiked={post.isLikedByUser}
           authorId={post.authorId}
