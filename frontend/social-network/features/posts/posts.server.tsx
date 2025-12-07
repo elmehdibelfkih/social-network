@@ -81,6 +81,7 @@ export default function PostServer({ post }: { post: Post }) {
   const [showUpdateModal, setShowUpdateModal] = useState(false)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const [mounted, setMounted] = useState(false)
+  const isAuthor = mounted && user && Number(user.userId) === post.authorId
 
   useEffect(() => setMounted(true), [])
 
@@ -106,7 +107,7 @@ export default function PostServer({ post }: { post: Post }) {
             <span className={styles.privacy}>🌐 {post.privacy}</span>
           </div>
         </div>
-        {mounted && user && (
+        {isAuthor && (
           <div className={styles.menuContainer}>
             <button className={styles.menuButton} onClick={() => setShowMenu(!showMenu)}>⋮</button>
             {showMenu && (
