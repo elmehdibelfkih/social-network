@@ -26,7 +26,7 @@ func SendMessageHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// ws braodcast here
-	socket.WSManger.BroadcastToChat(userId,body.ChatId, socket.Event{
+	socket.WSManger.BroadcastToChat(userId, body.ChatId, socket.Event{
 		Source: "server",
 		Type:   "chat_message",
 		Payload: &socket.ClientMessage{
@@ -48,6 +48,7 @@ func SendMessageHandler(w http.ResponseWriter, r *http.Request) {
 
 // PUT /api/v1/chats/{chat_id}/messages/{message_id}
 func SeenMessageHandler(w http.ResponseWriter, r *http.Request) {
+	userId := utils.GetUserIdFromContext(r)
 	var body MarkSeen
 	if !utils.ValidateJsonRequest(w, r, &body, "SendMessageHandler") {
 		return
@@ -56,7 +57,7 @@ func SeenMessageHandler(w http.ResponseWriter, r *http.Request) {
 		utils.BadRequest(w, str, "alert")
 		return
 	}
-
+	body.SenderId = userId
 	err := UpdateMessageStatus(&body)
 	if err != nil {
 		utils.BackendErrorTarget(err, "SendMessageHandler")
@@ -65,6 +66,21 @@ func SeenMessageHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// ws braodcast here
+	socket.WSManger.BroadcastToChat(userId, body.ChatId, socket.Event{
+		Source: "server",
+		Type:   "chat_seen",
+		Payload: &socket.ClientMessage{
+			MarkSeen: &socket.MarkSeen{
+				MessageId: body.MessageId,
+				ChatId:    body.ChatId,
+				SenderId:  body.SenderId,
+				Content:   body.Content,
+				SeenState: body.SeenState,
+				CreatedAt: body.CreatedAt,
+				UpdatedAt: body.UpdatedAt,
+			},
+		},
+	})
 
 	utils.WriteSuccess(w, http.StatusOK, body)
 }

@@ -34,12 +34,17 @@ export default function ChatConversation({ chatId, onClose }: ChatConversationPr
                     setMessages(prev => [...prev, data.payload.chatMessage])
                     break;
                 case 'chat_seen':
-                    setMessages(messages.map(msg => {
-                        if (msg.messageId === data.payload.markSeen.messageId) {
-                            msg.seenState = data.payload.markSeen.seenState
-                        }
-                        return msg
-                    }))
+                    setMessages(prev =>
+                        prev.map(msg => {
+                            if (msg.messageId === data.payload.markSeen.messageId) {
+                                return {
+                                    ...msg,
+                                    seenState: data.payload.markSeen.seenState,
+                                };
+                            }
+                            return msg; 
+                        })
+                    );
                     break;
                 case 'chat_typing':
                     setIsTyping(true)
@@ -92,9 +97,38 @@ export default function ChatConversation({ chatId, onClose }: ChatConversationPr
             }
         }
 
+        if (messages.length !== 0) {
+            const last = messages[messages.length - 1];
+            if (last.senderId != userData.userId && last.seenState !== "read") {
+                updateSeen(last);
+            }
+        }
+
         div.addEventListener("scroll", onScroll);
         return () => div.removeEventListener("scroll", onScroll);
     }, [messages, hasMore, loadingOld]);
+
+    async function updateSeen(last: ChatMessage) {
+        last.seenState = "read"
+        const resp = await chatService.sendChatSeen(last, chatId);
+        const chatSeenResponse = {
+            messageId: resp.messageId,
+            chatId: resp.chatId,
+            senderId: resp.senderId,
+            content: resp.content,
+            seenState: resp.seenState,
+            createdAt: resp.createdAt,
+            updatedAt: resp.updatedAt,
+        };
+        setMessages(() => {
+            if (chatSeenResponse.seenState === "read") return messages.map(msg => {
+                if (msg.senderId != userData.userId) msg.seenState = "read"
+                return msg
+            })
+            return messages
+        })
+
+    }
 
     useEffect(() => {
         loadMessages();

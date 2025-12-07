@@ -62,7 +62,7 @@ func (v *ChatMessage) Validate() (bool, string) {
 
 	// seen state validation
 	validSeen := map[string]bool{
-		"sent": true, "delivered": true, "seen": true,
+		"sent": true, "delivered": true, "read": true,
 	}
 	if !validSeen[strings.ToLower(v.SeenState)] {
 		return false, "invalid seenState"
@@ -84,7 +84,7 @@ func (v *MarkSeen) Validate() (bool, string) {
 
 	// SeenState must be correct
 	validSeen := map[string]bool{
-		"sent": true, "delivered": true, "seen": true,
+		"sent": true, "delivered": true, "read": true,
 	}
 	if !validSeen[strings.ToLower(v.SeenState)] {
 		return false, "invalid seenState"
@@ -117,7 +117,7 @@ func (v *DeleteMessageRequest) Validate() (bool, string) {
 	}
 
 	validSeen := map[string]bool{
-		"sent": true, "delivered": true, "seen": true,
+		"sent": true, "delivered": true, "read": true,
 	}
 	if !validSeen[strings.ToLower(v.SeenState)] {
 		return false, "invalid seenState"

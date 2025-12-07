@@ -52,13 +52,13 @@
 .myMessage {
     background: var(--primary-purple-light);
     color: white;
-    align-self: flex-start;
+    align-self: flex-end;
 }
 
 .otherMessage {
     background: #e0e0e0;
     color: black;
-    align-self: flex-end;
+    align-self: flex-start;
 }
 
 .timestamp {
