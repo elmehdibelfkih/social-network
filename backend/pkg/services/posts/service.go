@@ -4,9 +4,10 @@ import (
 	"database/sql"
 	"fmt"
 	"net/http"
+	"strconv"
+
 	"social/pkg/config"
 	"social/pkg/utils"
-	"strconv"
 )
 
 // getPostID extracts and validates post_id from URL path
@@ -227,7 +228,7 @@ func validateReaction(reaction string) bool {
 // buildPostResponse builds a complete post response with media and allowed list
 func buildPostResponse(post *Post) (*GetPostResponse, error) {
 	// Get author nickname
-	nickname, err := GetAuthorNickname(post.AuthorID)
+	authorDetails, err := GetAuthorDetails(post.AuthorID)
 	if err != nil && err != sql.ErrNoRows {
 		return nil, err
 	}
@@ -251,23 +252,25 @@ func buildPostResponse(post *Post) (*GetPostResponse, error) {
 	}
 
 	return &GetPostResponse{
-		PostID:         post.ID,
-		AuthorID:       post.AuthorID,
-		AuthorNickname: nickname,
-		Content:        post.Content,
-		MediaIDs:       mediaIDs,
-		Privacy:        post.Privacy,
-		GroupID:        post.GroupID,
-		AllowedList:    allowedList,
-		CreatedAt:      post.CreatedAt,
-		UpdatedAt:      post.UpdatedAt,
+		PostID:          post.ID,
+		AuthorID:        post.AuthorID,
+		AuthorFirstName: authorDetails.FirstName,
+		AuthorLastName:  authorDetails.LastName,
+		AuthorNickname:  authorDetails.Nickname,
+		Content:         post.Content,
+		MediaIDs:        mediaIDs,
+		Privacy:         post.Privacy,
+		GroupID:         post.GroupID,
+		AllowedList:     allowedList,
+		CreatedAt:       post.CreatedAt,
+		UpdatedAt:       post.UpdatedAt,
 	}, nil
 }
 
 // buildCommentResponse builds a complete comment response with media
 func buildCommentResponse(comment *Comment) (*CommentResponse, error) {
 	// Get author nickname
-	nickname, err := GetAuthorNickname(comment.AuthorID)
+	author, err := GetAuthorDetails(comment.AuthorID)
 	if err != nil && err != sql.ErrNoRows {
 		return nil, err
 	}
@@ -282,13 +285,15 @@ func buildCommentResponse(comment *Comment) (*CommentResponse, error) {
 	}
 
 	return &CommentResponse{
-		CommentID:      comment.ID,
-		AuthorID:       comment.AuthorID,
-		AuthorNickname: nickname,
-		Content:        comment.Content,
-		MediaIDs:       mediaIDs,
-		CreatedAt:      comment.CreatedAt,
-		UpdatedAt:      comment.UpdatedAt,
+		CommentID:       comment.ID,
+		AuthorID:        comment.AuthorID,
+		AuthorFirstName: author.FirstName,
+		AuthorLastName:  author.LastName,
+		AuthorNickname:  author.Nickname,
+		Content:         comment.Content,
+		MediaIDs:        mediaIDs,
+		CreatedAt:       comment.CreatedAt,
+		UpdatedAt:       comment.UpdatedAt,
 	}, nil
 }
 

@@ -40,7 +40,7 @@ export default function ProfileFeed({ profile, tab: initialTab }: { profile: Pro
       </div>
 
       <div className={styles.tabContent}>
-        {activeTab === 'posts' && <PostsSection userId={String(profile.userId)} />}
+        {activeTab === 'posts' && <PostsSection userId={String(profile.userId)} avatarId={profile.avatarId} />}
         {activeTab === 'about' && <AboutSection profile={profile} />}
         {activeTab === 'followers' && <FollowersList userId={String(profile.userId)} type="followers" />}
         {activeTab === 'following' && <FollowersList userId={String(profile.userId)} type="following" />}

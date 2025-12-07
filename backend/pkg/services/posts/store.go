@@ -512,22 +512,31 @@ func CheckPostReactionExists(postID, userID int64) bool {
 	return err == nil
 }
 
-// GetAuthorNickname retrieves the author's nickname
-func GetAuthorNickname(authorID int64) (string, error) {
+func GetAuthorDetails(authorID int64) (*AuthorDetails, error) {
+	var firstName, lastName sql.NullString
 	var nickname sql.NullString
-	err := config.DB.QueryRow(QUERY_GET_AUTHOR_NICKNAME, authorID).Scan(&nickname)
+
+	err := config.DB.QueryRow(QUERY_GET_AUTHOR_DETAILS, authorID).Scan(&firstName, &lastName, &nickname)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return "", err
+			return nil, err
 		}
-		utils.SQLiteErrorTarget(err, "GetAuthorNickname")
-		return "", err
+		utils.SQLiteErrorTarget(err, "GetAuthorDetails")
+		return nil, fmt.Errorf("failed to get author details: %w", err)
 	}
 
-	if nickname.Valid {
-		return nickname.String, nil
+	details := &AuthorDetails{}
+	if firstName.Valid {
+		details.FirstName = firstName.String
 	}
-	return "", nil
+	if lastName.Valid {
+		details.LastName = lastName.String
+	}
+	if nickname.Valid {
+		details.Nickname = nickname.String
+	}
+
+	return details, nil
 }
 
 // CreateCommentReaction creates a like reaction on a comment

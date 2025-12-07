@@ -44,6 +44,12 @@ const (
 		WHERE id = ?;
 	`
 
+	QUERY_GET_AUTHOR_DETAILS = `
+		SELECT first_name, last_name, nickname
+		FROM users
+		WHERE id = ?;
+	`
+
 	// Post media queries
 	QUERY_INSERT_POST_MEDIA = `
 		INSERT INTO post_media (post_id, media_id, ordinal)

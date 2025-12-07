@@ -26,11 +26,7 @@ async function getMediaData(mediaId: number): Promise<string | null> {
   }
 }
 
-type Props = {
-  post: Post
-}
-
-export default async function PostServer({ post }: Props) {
+export default async function PostServer({ post }: { post: Post }) {
   const authorName = `${post.authorFirstName} ${post.authorLastName}`
   const timeAgo = new Date(post.createdAt).toLocaleDateString()
   const avatarId = await getAvatarId(post.authorId)
@@ -77,12 +73,7 @@ export default async function PostServer({ post }: Props) {
       </div>
 
       <Suspense fallback={<div className={styles.actionsLoading}>Loading...</div>}>
-        <PostsClient
-          postId={post.postId}
-          isLiked={post.isLikedByUser}
-          authorId={post.authorId}
-          initialCommentCount={post.stats.commentCount}
-        />
+        <PostsClient post={post} />
       </Suspense>
     </article>
   )
