@@ -10,7 +10,7 @@ export interface ChatContactProps {
   lastName: string;
   nickname?: string;
   isOnline: boolean;
-  onClick?: (chatId: number) => void;
+  onClick: (chatId: number) => void;
 }
 
 export const ChatCard: React.FC<ChatContactProps> = ({
@@ -25,7 +25,7 @@ export const ChatCard: React.FC<ChatContactProps> = ({
 }) => {
   return (
     <div
-      className={`${styles.contactItem} ${isOnline ? styles.online : styles.offline}`} onClick={() => onClick?.(chatId)} >
+      className={`${styles.contactItem} ${isOnline ? styles.online : styles.offline}`} onClick={() => onClick(chatId)} >
       <img
         src={profileImage}
         alt={`${firstName} ${lastName}`}

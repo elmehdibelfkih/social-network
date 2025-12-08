@@ -23,10 +23,7 @@ export default function ChatConversation({ chatId, onClose }: ChatConversationPr
     const scrollRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        const port = chatService.getGlobalPort()
-
-        port.onmessage = (e) => {
-            const data = e.data;
+        const onUnMount = chatService.addListener((data) => {
             console.log("received from sharedworker:", data);
             if (!data.payload) return
             switch (data.type) {
@@ -42,7 +39,7 @@ export default function ChatConversation({ chatId, onClose }: ChatConversationPr
                                     seenState: data.payload.markSeen.seenState,
                                 };
                             }
-                            return msg; 
+                            return msg;
                         })
                     );
                     break;
@@ -55,7 +52,9 @@ export default function ChatConversation({ chatId, onClose }: ChatConversationPr
                 default:
                     break;
             }
-        };
+        })
+
+        return onUnMount;
     }, [])
 
     async function loadOlderMessages() {

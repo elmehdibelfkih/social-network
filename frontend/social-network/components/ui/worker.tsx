@@ -5,8 +5,8 @@ import { chatService } from "@/features/chat/services/chat";
 
 export default function SharedWorekerClient() {
     useEffect(() => {
-        chatService.initSharedWorker();
-        chatService.getGlobalPort().postMessage({ type: 'init_ws'});
+        chatService.initPort();
+        chatService.sendToWorker({ source: 'client', type: 'init_ws' });
     }, []);
     return null
 }

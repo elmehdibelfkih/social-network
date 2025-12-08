@@ -11,7 +11,6 @@ interface FloatingChatProps {
 
 export default function FloatingChat({ chatId, onClose }: FloatingChatProps) {
     const [portalNode, setPortalNode] = useState<HTMLElement | null>(null);
-
     useEffect(() => {
         setPortalNode(document.getElementById("chat-portals"));
     }, []);

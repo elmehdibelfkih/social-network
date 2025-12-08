@@ -15,12 +15,12 @@ export interface User {
     online: boolean
 }
 
-
-
-
 export interface SocketMessage {
+    source: string;
     type: string;
     payload?: any;
+    error?: any
+
 }
 
 export interface ChatMessage {

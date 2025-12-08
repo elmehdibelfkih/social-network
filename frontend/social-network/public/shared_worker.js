@@ -52,7 +52,7 @@ class WebSocketManger {
         if (this.reconnectTimer) return // we are already trying o reconnect 
         this.reconnectTimer = setTimeout(() => {
             this.#initWebsocket()
-            if (this.ws && this.ws.readyState == WebSocket.OPEN) this.#sendOrQueue(JSON.stringify({source: "shared_worker", type: "reconnect"}))
+            if (this.ws && this.ws.readyState == WebSocket.OPEN) this.#sendOrQueue(JSON.stringify({ source: "shared_worker", type: "reconnect" }))
         }, this.reconnectDelay)
     }
 
@@ -86,7 +86,7 @@ class WebSocketManger {
             this.messagesQueue.push(data)
             return
         }
-        this.ws.send(data)
+        this.ws.send(JSON.stringify(data))
     }
 
     #burstQueue() {
