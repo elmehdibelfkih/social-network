@@ -47,9 +47,9 @@ func FollowersListHandler(w http.ResponseWriter, r *http.Request) {
 // GET /api/v1/users/:user_id/following  => list followees
 func FolloweesListHandler(w http.ResponseWriter, r *http.Request) {
 	targetUserId := utils.GetWildCardValue(w, r, "user_id")
-	// userId := utils.GetUserIdFromContext(r)
+	userId := utils.GetUserIdFromContext(r)
 
-	res, err := GetFolloweesByUserID(targetUserId)
+	res, err := GetFolloweesByUserID(targetUserId, userId)
 	if err != nil {
 		utils.InternalServerError(w)
 		return
