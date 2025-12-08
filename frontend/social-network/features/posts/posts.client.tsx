@@ -5,11 +5,12 @@ import { Comments } from '@/components/ui/comments/comments'
 import styles from './styles.module.css'
 import { Post } from '@/libs/globalTypes'
 
-export function PostsClient({ post }: { post: Post }) {
+export function PostsClient({ post, onStatsUpdate }: { post: Post, onStatsUpdate?: (stats: { reactionCount: number, commentCount: number }) => void }) {
   const [liked, setLiked] = useState(post?.isLikedByUser)
   const [isLoading, setIsLoading] = useState(false)
   const [showComments, setShowComments] = useState(false)
   const [commentCount, setCommentCount] = useState(post?.stats?.commentCount)
+  const [likeCount, setLikeCount] = useState(post?.stats?.reactionCount || 0)
 
   const handleLike = async () => {
     if (isLoading) return
@@ -19,7 +20,13 @@ export function PostsClient({ post }: { post: Post }) {
     const success = await postsService.likePost(post.postId)
 
     if (success) {
-      setLiked(!liked)
+      const newLiked = !liked
+      setLiked(newLiked)
+      const newCount = newLiked ? likeCount + 1 : likeCount - 1
+      setLikeCount(newCount)
+      if (onStatsUpdate) {
+        onStatsUpdate({ reactionCount: newCount, commentCount })
+      }
     }
 
     setIsLoading(false)

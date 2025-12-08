@@ -72,6 +72,10 @@ export function PostCard({ post, avatarId }: { post: Post, avatarId: number}) {
   const [showUpdateModal, setShowUpdateModal] = useState(false)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const [mounted, setMounted] = useState(false)
+  const [stats, setStats] = useState({ 
+    reactionCount: post.stats?.reactionCount || 0, 
+    commentCount: post.stats?.commentCount || 0 
+  })
   const isAuthor = mounted && user && Number(user.userId) === post.authorId
 
   useEffect(() => setMounted(true), [])
@@ -92,12 +96,26 @@ export function PostCard({ post, avatarId }: { post: Post, avatarId: number}) {
     loadData()
   }, [post.mediaIds])
 
-
-
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const commentsData = await http.get<any>(`/api/v1/posts/${post.postId}/comments?page=1&limit=1`)
+        setStats(prev => ({
+          ...prev,
+          commentCount: commentsData?.totalComments || 0
+        }))
+      } catch (error) {
+        console.error('Failed to fetch stats:', error)
+      }
+    }
+    fetchStats()
+  }, [post.postId])
   const authorName = `${post.authorFirstName} ${post.authorLastName}`
   const timeAgo = new Date(post.createdAt).toLocaleDateString()
+  
 
   return (
+    
     <article className={styles.post}>
       <div className={styles.header}>
         <AvatarHolder avatarId={avatarId} size={40} />
@@ -143,11 +161,10 @@ export function PostCard({ post, avatarId }: { post: Post, avatarId: number}) {
       )}
 
       <div className={styles.stats}>
-        <span>{post.stats?.reactionCount} likes</span>
-        <span>{post.stats?.commentCount} comment{post.stats?.commentCount !== 1 ? 's' : ''}</span>
+        <span>{stats.reactionCount} likes</span>
+        <span>{stats.commentCount} comment{stats.commentCount !== 1 ? 's' : ''}</span>
       </div>
-
-      <PostsClient post={post} />
+      <PostsClient post={{ ...post, stats }} onStatsUpdate={setStats} />
 
       {showUpdateModal && (
         <UpdatePost
@@ -170,5 +187,7 @@ export function PostCard({ post, avatarId }: { post: Post, avatarId: number}) {
         />
       )}
     </article>
+    
   )
+
 }

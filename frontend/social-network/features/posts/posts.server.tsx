@@ -81,6 +81,10 @@ export default function PostServer({ post }: { post: Post }) {
   const [showUpdateModal, setShowUpdateModal] = useState(false)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const [mounted, setMounted] = useState(false)
+  const [stats, setStats] = useState({ 
+    reactionCount: post.stats?.reactionCount || 0, 
+    commentCount: post.stats?.commentCount || 0 
+  })
   const isAuthor = mounted && user && Number(user.userId) === post.authorId
 
   useEffect(() => setMounted(true), [])
@@ -92,6 +96,14 @@ export default function PostServer({ post }: { post: Post }) {
       Promise.all(post.mediaIds.map(getMediaData)).then(setMediaDataList)
     }
   }, [post.authorId, post.mediaIds])
+
+  useEffect(() => {
+    if (!post.stats) {
+      http.get<any>(`/api/v1/posts/${post.postId}/comments?page=1&limit=1`)
+        .then(data => setStats(prev => ({ ...prev, commentCount: data?.totalComments || 0 })))
+        .catch(() => {})
+    }
+  }, [post.postId, post.stats])
 
   const authorName = `${post.authorFirstName} ${post.authorLastName}`
   const timeAgo = new Date(post.createdAt).toLocaleDateString()
@@ -136,12 +148,12 @@ export default function PostServer({ post }: { post: Post }) {
       )}
 
       <div className={styles.stats}>
-        <span>{post.stats.reactionCount} likes</span>
-        <span>{post.stats.commentCount} comment{post.stats.commentCount !== 1 ? 's' : ''}</span>
+        <span>{stats.reactionCount} like{stats.reactionCount !== 1 ? 's' : ''}</span>
+        <span>{stats.commentCount} comment{stats.commentCount !== 1 ? 's' : ''}</span>
       </div>
 
       <Suspense fallback={<div className={styles.actionsLoading}>Loading...</div>}>
-        <PostsClient post={post} />
+        <PostsClient post={{ ...post, stats }} onStatsUpdate={setStats} />
       </Suspense>
 
       {showUpdateModal && (
