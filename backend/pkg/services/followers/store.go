@@ -164,7 +164,8 @@ func unfollowUser(followerId, followedId int64) error {
 		return nil
 	})
 }
-func GetFollowersByUserID(userID int64) ([]UserFollowItem, error) {
+func GetFollowersByUserID(targetUser int64, userID int64) ([]UserFollowItem, error) {
+
 	rows, err := config.DB.Query(GET_FOLLOWERS_QUERY, userID, userID, userID)
 	if err != nil {
 		utils.SQLiteErrorTarget(err, GET_FOLLOWERS_QUERY)

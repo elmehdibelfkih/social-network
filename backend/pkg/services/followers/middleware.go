@@ -1,6 +1,7 @@
 package follow
 
 import (
+	"fmt"
 	"net/http"
 	"social/pkg/utils"
 )
@@ -8,6 +9,7 @@ import (
 // POST /api/v1/users/:user_id/follow => send follow request or follow immediately if target is public
 func FollowRequestMiddleWare(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+
 		userId := utils.GetUserIdFromContext(r)
 		targetUserId := utils.GetWildCardValue(w, r, "user_id")
 
@@ -31,7 +33,7 @@ func FollowRequestMiddleWare(next http.HandlerFunc) http.HandlerFunc {
 			utils.InternalServerError(w)
 			return
 		}
-
+		println(status, userId, targetUserId)
 		switch status {
 		case "pending":
 			utils.BadRequest(w, "Follow request already sent.", "alert")
@@ -88,6 +90,7 @@ func FollowersFolloweesListMiddleWare(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		userId := utils.GetUserIdFromContext(r)
 		targetUserId := utils.GetWildCardValue(w, r, "user_id")
+		fmt.Println(userId, targetUserId)
 
 		isExist, err := userExists(targetUserId)
 		if err != nil {

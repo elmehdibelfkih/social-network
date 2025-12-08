@@ -14,7 +14,8 @@ type Props = {
 
 export default function MiniProfile({ userId, data, isMyprofile }: Props) {
   let profile: ProfileAPIResponse | null = data ?? null
-
+  console.log("=>",profile);
+  
   if (!profile && userId != null) {
     const fetchProfile = async () => {
       profile = await getProfileServer(userId)
@@ -46,8 +47,6 @@ export default function MiniProfile({ userId, data, isMyprofile }: Props) {
     : ''
 
   // todo
-  let isOnline = false;
-
   return (
     <aside className={styles.miniCardLarge} aria-label={`Mini profile for ${name}`}>
       <div className={styles.miniHeaderLarge}>

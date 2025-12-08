@@ -11,26 +11,25 @@ class WebSocketManger {
     }
 
     #initWebsocket() {
-        console.log("this.initWebsocket")
-        console.log("-")
+
         if (this.ws) return // already has websocket
         this.ws = new WebSocket(this.url);
 
         this.ws.onopen = () => {
-            console.log("ws connection opened")
+            // console.log("ws connection opened")
             this.#burstQueue();
             this.reconnectTimer = null;
         }
         this.ws.onmessage = (e) => {
-            console.log(e.data)
+            // console.log(e.data)
             this.#broadcast(e.data)
         }
         this.ws.onerror = (err) => {
-            console.log("ws error", err)
+            // console.log("ws error", err)
             this.ws?.close()
         }
         this.ws.onclose = () => {
-            console.log("closing websocket")
+            // console.log("closing websocket")
             this.ws = null;
             this.#tryReconnect();
         }
@@ -75,7 +74,7 @@ class WebSocketManger {
                 return;
             }
             e.data.origin = this.ports.indexOf(port)
-            console.log(e.data)
+            // console.log(e.data)
             this.#sendOrQueue(e.data);
         };
     }
