@@ -27,7 +27,8 @@ export default function ChatConversation({ chatId, onClose }: ChatConversationPr
             console.log("received from sharedworker:", data);
             if (!data.payload) return
             switch (data.type) {
-                case 'chat_message':
+                case 'chat_message': 
+                    if (chatId !== data.payload.chatMessage.chatId) return
                     setMessages(prev => [...prev, data.payload.chatMessage])
                     break;
                 case 'chat_seen':
