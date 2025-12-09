@@ -138,6 +138,21 @@ func SelectChatMessages(userId, chatId, messageId int64, l *MessagesList) error 
 				utils.SQLiteErrorTarget(err, SELECT_CHAT_HISTORY)
 				return err
 			}
+			socket.WSManger.BroadcastToChat(userId, chatId, socket.Event{
+				Source: "server",
+				Type:   "chat_seen",
+				Payload: &socket.ClientMessage{
+					MarkSeen: &socket.MarkSeen{
+						MessageId: msg.MessageId,
+						ChatId:    msg.ChatId,
+						SenderId:  msg.SenderId,
+						Content:   msg.Content,
+						SeenState: msg.SeenState,
+						CreatedAt: msg.CreatedAt,
+						UpdatedAt: msg.UpdatedAt,
+					},
+				},
+			})
 			l.Messages = append(l.Messages, msg)
 		}
 		return nil

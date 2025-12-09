@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"social/pkg/utils"
 	"time"
 
 	"github.com/gorilla/websocket"
@@ -56,8 +57,18 @@ func (c *Client) getClientChats() {
 	}
 }
 
+func (c *Client) updateSentMessages() {
+	for chatId := range c.userChats {
+		err := UpdateMessagesStatus(chatId, c.userId, "delivered")
+		if err != nil {
+			utils.BackendErrorTarget(err, "updating seen Message")
+			return
+		}
+	}
+}
+
 func (c *Client) pongHandler(pongMsg string) error {
-	log.Println("pong")
+	// log.Println("pong")
 	return c.connection.SetReadDeadline(time.Now().Add(pongWait))
 }
 
@@ -117,7 +128,7 @@ func (c *Client) writeMessages() {
 				return
 			}
 		case <-ticker.C:
-			log.Println("ping")
+			// log.Println("ping")
 			c.connection.SetWriteDeadline(time.Now().Add(10 * time.Second))
 			if err = c.connection.WriteMessage(websocket.PingMessage, []byte{}); err != nil {
 				log.Println("write msg: ", err)

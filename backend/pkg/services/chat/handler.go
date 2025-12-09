@@ -94,10 +94,12 @@ func GetChatByPagination(w http.ResponseWriter, r *http.Request) {
 
 	err := SelectChatMessages(userId, chatId, messageId, &response)
 	if err != nil {
-		utils.BackendErrorTarget(err, "SendMessageHandler")
+		utils.BackendErrorTarget(err, "GetChatByPagination")
 		utils.IdentifySqlError(w, err)
 		return
 	}
+
+
 	utils.WriteSuccess(w, http.StatusOK, response)
 }
 
@@ -120,39 +122,3 @@ func DeleteMessageHandler(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-// // GET /api/v1/chats
-// func GetUserChats(w http.ResponseWriter, r *http.Request) {
-// 	userId := utils.GetUserIdFromContext(r)
-
-// 	lastConversationId := utils.GetQuerryPramInt(r, "last-conversation-id")
-// 	limit := int(utils.GetQuerryPramInt(r, "limit"))
-// 	if limit == 0 {
-// 		limit = 20
-// 	}
-// 	if limit > 100 {
-// 		limit = 100
-// 	}
-
-// 	chats, err := GetUserChatsFromDB(config.DB, userId, lastConversationId, limit)
-// 	if err != nil {
-// 		utils.BackendErrorTarget(err, "GetUserChats")
-// 		utils.InternalServerError(w)
-// 		return
-// 	}
-
-// 	utils.JsonResponseEncode(w, http.StatusOK, chats)
-// }
-
-// GET /api/v1/chats/{chat_id}/participants
-// func GetParticipantsHandler(w http.ResponseWriter, r *http.Request) {
-// 	userId := utils.GetUserIdFromContext(r)
-// 	chatId := utils.GetWildCardValue(w, r, "chat_id")
-
-// 	participants, err := GetChatParticipants(config.DB, chatId, userId)
-// 	if err != nil {
-// 		utils.BackendErrorTarget(err, "GetParticipantsHandler")
-// 		utils.InternalServerError(w)
-// 		return
-// 	}
-// 	utils.JsonResponseEncode(w, http.StatusOK, participants)
-// }

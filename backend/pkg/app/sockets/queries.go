@@ -1,7 +1,7 @@
 package socket
 
-// select
 const (
+	// select
 	SELECT_USER_CHATS = `
 		SELECT cp.chat_id
 		FROM chat_participants AS cp
@@ -33,5 +33,14 @@ const (
 		JOIN chat_participants b
     	ON a.chat_id = b.chat_id
 		WHERE a.user_id = ? AND b.user_id = ?
+	`
+	SELECT_MESSAGES_BY_STATUS = `
+		SELECT id, chat_id, sender_id, content, seen_status, created_at, updated_at FROM messages WHERE chat_id = ? AND sender_id <> ? AND seen_status = ?
+	`
+
+	// update
+	UPDATE_MESSAGE_STATUS = `
+		UPDATE messages SET seen_status = ? WHERE chat_id = ? AND sender_id <> ? AND seen_status = 'sent'
+		RETURNING id, chat_id, sender_id, content, seen_status, created_at, updated_at
 	`
 )

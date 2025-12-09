@@ -28,7 +28,6 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     <html lang="en">
       <head />
       <body className="app-root">
-        <SharedWorekerClient />
         {children}
         <div id="chat-portals"></div>
         <Snackbar />

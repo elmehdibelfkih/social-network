@@ -83,7 +83,7 @@ class WebSocketManger {
 
     #sendOrQueue(data) {
         if (!this.ws || this.ws.readyState !== WebSocket.OPEN) {
-            this.messagesQueue.push(data)
+            this.messagesQueue.push(JSON.stringify(data))
             return
         }
         this.ws.send(JSON.stringify(data))

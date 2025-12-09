@@ -12,7 +12,9 @@ interface ChatConversationProps {
 }
 
 export default function ChatConversation({ chatId, onClose }: ChatConversationProps) {
-    const [messages, setMessages] = useState<ChatMessage[]>([]);
+    const [messages, setMessages] = useState<Map<number, ChatMessage>>(new Map());
+    const [oldestMessage, setOldestMessage] = useState<ChatMessage>(null);
+    const [lastMessage, setLastMessage] = useState<ChatMessage>(null);
     const [loadingOld, setLoadingOld] = useState(false);
     const [hasMore, setHasMore] = useState(true);
     const [isLoading, setIsLoading] = useState(false)
@@ -27,22 +29,21 @@ export default function ChatConversation({ chatId, onClose }: ChatConversationPr
             console.log("received from sharedworker:", data);
             if (!data.payload) return
             switch (data.type) {
-                case 'chat_message': 
+                case 'chat_message':
                     if (chatId !== data.payload.chatMessage.chatId) return
-                    setMessages(prev => [...prev, data.payload.chatMessage])
+                    setLastMessage(data.payload.chatMessage)
+                    setMessages(prev => {
+                        const next = new Map(prev);
+                        next.set(data.payload.chatMessage.messageId, data.payload.chatMessage);
+                        return next;
+                    })
                     break;
                 case 'chat_seen':
-                    setMessages(prev =>
-                        prev.map(msg => {
-                            if (msg.messageId === data.payload.markSeen.messageId) {
-                                return {
-                                    ...msg,
-                                    seenState: data.payload.markSeen.seenState,
-                                };
-                            }
-                            return msg;
-                        })
-                    );
+                    setMessages(prev => {
+                        const next = new Map(prev);
+                        next.set(data.payload.markSeen.messageId, data.payload.markSeen);
+                        return next;
+                    });
                     break;
                 case 'chat_typing':
                     setIsTyping(true)
@@ -59,24 +60,35 @@ export default function ChatConversation({ chatId, onClose }: ChatConversationPr
     }, [])
 
     async function loadOlderMessages() {
+        console.log(oldestMessage)
+        console.log(lastMessage)
         if (loadingOld || !hasMore) return;
         const div = scrollRef.current;
         if (!div) return;
         setLoadingOld(true);
-
         const prevScrollHeight = div.scrollHeight;
-        const oldest = messages[0];
-        const beforeId = oldest?.messageId;
 
-        const resp = await chatService.chatHistory(chatId, beforeId);
+        const resp = await chatService.chatHistory(chatId, oldestMessage.messageId);
         if (!resp.messagesList) {
             setHasMore(false);
             setLoadingOld(false);
             return;
         }
-        const reversed = resp.messagesList.reverse()
-
-        setMessages(prev => [...reversed, ...prev]);
+        const list = resp.messagesList
+        setOldestMessage(list[list.length - 1])
+        setMessages(prev => {
+            const next = new Map(prev);
+            for (const msg of list) {
+                if (!next.has(msg.messageId)) {
+                    const temp = new Map<number, ChatMessage>();
+                    temp.set(msg.messageId, msg);
+                    next.forEach((v, k) => temp.set(k, v));
+                    next.clear();
+                    temp.forEach((v, k) => next.set(k, v));
+                }
+            }
+            return next;
+        });
 
         requestAnimationFrame(() => {
             const newScrollHeight = div.scrollHeight;
@@ -97,12 +109,12 @@ export default function ChatConversation({ chatId, onClose }: ChatConversationPr
             }
         }
 
-        if (messages.length !== 0) {
-            const last = messages[messages.length - 1];
-            if (last.senderId != userData.userId && last.seenState !== "read") {
-                updateSeen(last);
-            }
-        }
+        // if (messages.size !== 0) {
+        //     console.log(lastMessage)
+        //     if (lastMessage.senderId != userData.userId && lastMessage.seenState !== "read") {
+        //         updateSeen(lastMessage);
+        //     }
+        // }
 
         div.addEventListener("scroll", onScroll);
         return () => div.removeEventListener("scroll", onScroll);
@@ -121,10 +133,7 @@ export default function ChatConversation({ chatId, onClose }: ChatConversationPr
             updatedAt: resp.updatedAt,
         };
         setMessages(() => {
-            if (chatSeenResponse.seenState === "read") return messages.map(msg => {
-                if (msg.senderId != userData.userId) msg.seenState = "read"
-                return msg
-            })
+            if (chatSeenResponse.seenState === "read") messages.set(chatSeenResponse.messageId, chatSeenResponse)
             return messages
         })
 
@@ -138,7 +147,13 @@ export default function ChatConversation({ chatId, onClose }: ChatConversationPr
         try {
             const resp = await chatService.chatHistory(chatId);
             if (!resp.messagesList) return
-            setMessages(resp.messagesList.reverse() || [])
+            console.log(resp.messagesList)
+            const corrected = resp.messagesList.reverse()
+            const keyValuePairs: [number, ChatMessage][] = corrected.map(obj => [obj.messageId, obj]);
+            const history: Map<number, ChatMessage> = new Map<number, ChatMessage>(keyValuePairs);
+            setMessages(history);
+            setOldestMessage(corrected[0])
+            setLastMessage(corrected[corrected.length - 1])
             setTimeout(() => {
                 const div = scrollRef.current;
                 if (div) div.scrollTop = div.scrollHeight;
@@ -174,7 +189,12 @@ export default function ChatConversation({ chatId, onClose }: ChatConversationPr
                 createdAt: resp.createdAt,
                 updatedAt: resp.updatedAt,
             };
-            setMessages(prev => [...prev, chatMessageResponse]);
+            setLastMessage(chatMessageResponse)
+            setMessages(prev => {
+                const next = new Map(prev);
+                next.set(chatMessageResponse.messageId, chatMessageResponse);
+                return next;
+            })
             setInput("");
             requestAnimationFrame(() => {
                 requestAnimationFrame(() => {
@@ -200,7 +220,7 @@ export default function ChatConversation({ chatId, onClose }: ChatConversationPr
             </div>
 
             <div className={styles.chatMessages} ref={scrollRef}>
-                {messages?.map(msg => {
+                {Array.from(messages.values())?.map(msg => {
                     return (
                         <div
                             key={msg.messageId}

@@ -6,6 +6,7 @@ import { NewPost } from '../features/newPost/newPost.client';
 // import { PostsClient } from "../features/posts";
 import { http } from '@/libs/apiFetch';
 import { ChatSection } from '../features/chat/chat.client';
+import SharedWorekerClient from "@/components/ui/worker";
 
 type AuthResponse = {
   sessionId: number;
@@ -64,6 +65,7 @@ export default function HomePage(): JSX.Element {
   return (
     <main>
       <Navbar />
+      <SharedWorekerClient />
       <ChatSection />
       <NewPost userAvatar="/svg/pic.png" />
       {/* <PostsClient /> */}

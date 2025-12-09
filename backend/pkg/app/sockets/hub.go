@@ -40,6 +40,9 @@ func (h *Hub) Run() {
 }
 
 func (h *Hub) AddChatUser(chatId, userId int64) {
+	h.mu.Lock()
+	defer h.mu.Unlock()
+
 	if len(h.clients[userId]) > 0 {
 		src := h.clients[userId]
 		if src == nil {
@@ -73,6 +76,7 @@ func (h *Hub) addClient(c *Client) {
 func (h *Hub) removeClient(c *Client) {
 	h.mu.Lock()
 	defer h.mu.Unlock()
+
 	clients, ok := h.clients[c.userId]
 	if !ok {
 		return
@@ -99,10 +103,16 @@ func (h *Hub) removeClient(c *Client) {
 }
 
 func (h *Hub) ChatOnlineUsers(chatId int64) int {
+	h.mu.Lock()
+	defer h.mu.Unlock()
+
 	return len(h.chatUsers[chatId])
 }
 
 func (h *Hub) BroadcastToChat(userId, chatId int64, event Event) {
+	h.mu.Lock()
+	defer h.mu.Unlock()
+
 	for id, clients := range h.chatUsers[chatId] {
 		if id == userId {
 			continue

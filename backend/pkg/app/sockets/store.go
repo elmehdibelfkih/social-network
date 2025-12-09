@@ -126,3 +126,51 @@ func SelectUserFollowers(userId int64) (*OnlineStatus, error) {
 	})
 	return &users, err
 }
+
+func UpdateMessagesStatus(chatId, senderId int64, status string) error {
+	return database.WrapWithTransaction(func(tx *sql.Tx) error {
+		rows, err := tx.Query(UPDATE_MESSAGE_STATUS,
+			status,
+			chatId,
+			senderId,
+		)
+		if err != nil {
+			utils.SQLiteErrorTarget(err, UPDATE_MESSAGE_STATUS)
+			return err
+		}
+		defer rows.Close()
+
+		for rows.Next() {
+			var msg ChatMessage
+			err = rows.Scan(
+				&msg.MessageId,
+				&msg.ChatId,
+				&msg.SenderId,
+				&msg.Content,
+				&msg.SeenState,
+				&msg.CreatedAt,
+				&msg.UpdatedAt,
+			)
+			if err != nil {
+				utils.SQLiteErrorTarget(err, UPDATE_MESSAGE_STATUS)
+				return err
+			}
+			WSManger.BroadcastToChat(senderId, chatId, Event{
+				Source: "server",
+				Type:   "chat_seen",
+				Payload: &ClientMessage{
+					MarkSeen: &MarkSeen{
+						MessageId: msg.MessageId,
+						ChatId:    msg.ChatId,
+						SenderId:  msg.SenderId,
+						Content:   msg.Content,
+						SeenState: msg.SeenState,
+						CreatedAt: msg.CreatedAt,
+						UpdatedAt: msg.UpdatedAt,
+					},
+				},
+			})
+		}
+		return nil
+	})
+}
