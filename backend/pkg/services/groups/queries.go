@@ -39,7 +39,7 @@ const (
 	SELECT_GROUP_MEMBERS_COUNT = `
 		SELECT followers_count FROM counters WHERE entity_type = ? AND entity_id = ?
 	`
-
+	
 	SELECT_BROWSE_GROUPS = `
 		SELECT id, title, description, avatar_id, creator_id, created_at
 		FROM groups

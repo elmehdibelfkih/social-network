@@ -124,7 +124,7 @@ export function RegisterForm({ onAuthSuccess }: { onAuthSuccess?: () => void }) 
                     id="dob"
                     className={styles.input}
                     required
-                    onChange={(e) => setFormData({ ...formData, dateOfBirth: e.target.value })}
+                    onChange={(e) => setFormData({ ...formData, dateOfBirth: new Date(e.target.value).toISOString() })}
                 />
             </div>
 

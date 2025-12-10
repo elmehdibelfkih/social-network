@@ -2,6 +2,7 @@ package groups
 
 import (
 	"database/sql"
+	"math"
 	"social/pkg/config"
 	"social/pkg/db/database"
 	"social/pkg/utils"
@@ -42,6 +43,9 @@ func SelectGroupMembers(groupId, limit, lastItemId int64, l *ListGroupMembersRes
 }
 
 func SelectGroupsById(limit, lastItemId int64, l *BrowseGroupsResponseJson) error {
+	if lastItemId == 0 {
+		lastItemId = math.MaxInt64
+	}
 	rows, err := config.DB.Query(SELECT_BROWSE_GROUPS,
 		lastItemId,
 		limit,

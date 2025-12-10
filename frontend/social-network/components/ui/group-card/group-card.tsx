@@ -1,6 +1,7 @@
 import React from 'react';
 import { Users, Calendar, UserPlus } from 'lucide-react';
 import styles from '@/components/ui/group-card/group-card.module.css'
+import { CalendarIcon, ProfileIcon, GroupsIcon } from '@/components/ui/icons';
 
 // Types
 interface Group {
@@ -68,7 +69,7 @@ const GroupCard: React.FC<GroupCardProps> = ({
 
         {/* Member Count */}
         <div className="group-card-members">
-          <Users className="group-card-members-icon" />
+          <GroupsIcon />
           <span className="group-card-members-text">
             {group.memberCount}{' '}
             {group.memberCount === 1 ? 'member' : 'members'}
@@ -79,7 +80,8 @@ const GroupCard: React.FC<GroupCardProps> = ({
         {group.upcomingEvent && (
           <div className="group-card-event">
             <div className="group-card-event-content">
-              <Calendar className="group-card-event-icon" />
+              {/* <Calendar className="group-card-event-icon" /> */}
+              <CalendarIcon />
               <div>
                 <h4 className="group-card-event-title">
                   {group.upcomingEvent.title}
