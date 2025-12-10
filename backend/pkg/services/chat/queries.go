@@ -30,6 +30,9 @@ const (
     RETURNING id, chat_id, sender_id, content, seen_status, created_at, updated_at
 	`
 	//update
+	UPDATE_RESET_UNREAD_COUNT = `
+		UPDATE chat_participants SET unread_count = 0 WHERE user_id = ?
+	`
 	UPDATE_MESSAGE_STATUS = `
 		UPDATE messages SET seen_status = ? WHERE id <= ? AND chat_id = ? AND sender_id <> ? 
 	`

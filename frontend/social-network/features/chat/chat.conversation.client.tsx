@@ -39,9 +39,18 @@ export default function ChatConversation({ chatId, onClose }: ChatConversationPr
                     })
                     break;
                 case 'chat_seen':
+                    if (chatId !== data.payload.markSeen.chatId) return
                     setMessages(prev => {
                         const next = new Map(prev);
-                        next.set(data.payload.markSeen.messageId, data.payload.markSeen);
+                        const msgId = data.payload.markSeen.messageId;
+                        const oldMsg = next.get(msgId);
+                        if (!oldMsg) return prev;
+
+                        const updated = {
+                            ...oldMsg,
+                            seenState: data.payload.markSeen.seenState
+                        };
+                        next.set(msgId, updated);
                         return next;
                     });
                     break;
@@ -109,13 +118,6 @@ export default function ChatConversation({ chatId, onClose }: ChatConversationPr
             }
         }
 
-        // if (messages.size !== 0) {
-        //     console.log(lastMessage)
-        //     if (lastMessage.senderId != userData.userId && lastMessage.seenState !== "read") {
-        //         updateSeen(lastMessage);
-        //     }
-        // }
-
         div.addEventListener("scroll", onScroll);
         return () => div.removeEventListener("scroll", onScroll);
     }, [messages, hasMore, loadingOld]);
@@ -123,21 +125,31 @@ export default function ChatConversation({ chatId, onClose }: ChatConversationPr
     async function updateSeen(last: ChatMessage) {
         last.seenState = "read"
         const resp = await chatService.sendChatSeen(last, chatId);
+        console.log("from backend", resp)
         const chatSeenResponse = {
             messageId: resp.messageId,
             chatId: resp.chatId,
-            senderId: resp.senderId,
+            senderId: last.senderId,
             content: resp.content,
             seenState: resp.seenState,
             createdAt: resp.createdAt,
             updatedAt: resp.updatedAt,
         };
-        setMessages(() => {
-            if (chatSeenResponse.seenState === "read") messages.set(chatSeenResponse.messageId, chatSeenResponse)
-            return messages
+        setMessages(prev => {
+            const next = new Map(prev);
+            next.set(chatSeenResponse.messageId, chatSeenResponse);
+            return next;
         })
-
     }
+
+    useEffect(() => {
+        console.log("last message", lastMessage)
+        if (!lastMessage) return
+        console.log(lastMessage.senderId != userData.userId)
+        if (lastMessage.senderId != userData.userId) {
+            updateSeen(lastMessage)
+        }
+    }, [lastMessage])
 
     useEffect(() => {
         loadMessages();

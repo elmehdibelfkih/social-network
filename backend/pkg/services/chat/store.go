@@ -100,6 +100,11 @@ func SelectChatMessages(userId, chatId, messageId int64, l *MessagesList) error 
 			utils.SQLiteErrorTarget(err, SELECT_UNREAD_COUNT)
 			return err
 		}
+		_, err = tx.Exec(UPDATE_RESET_UNREAD_COUNT, userId)
+		if err != nil {
+			utils.SQLiteErrorTarget(err, UPDATE_RESET_UNREAD_COUNT)
+			return err
+		}
 		if count > limit {
 			limit = count
 		}
