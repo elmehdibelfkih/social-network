@@ -47,11 +47,16 @@ SELECT
     u.last_name,
     u.avatar_id,
     u.privacy,
-    c.id
-FROM followers f
+    (
+		SELECT ch.id
+		FROM chats ch
+		JOIN chat_participants cp1 ON cp1.chat_id = ch.id AND cp1.user_id = ?
+		JOIN chat_participants cp2 ON cp2.chat_id = ch.id AND cp2.user_id = u.id
+		LIMIT 1
+	) as chatId
+FROM follows f
 JOIN users u ON u.id = f.follower_id
-LEFT JOIN followers f_status ON f_status.follower_id = ? AND f_status.followed_id = u.id
-LEFT JOIN chats c ON (c.user1_id = f_status.follower_id AND c.user2_id = u.id) OR (c.user1_id = u.id AND c.user2_id = f_status.follower_id)
+LEFT JOIN follows f_status ON f_status.follower_id = ? AND f_status.followed_id = u.id
 WHERE f.followed_id = ? AND f.status = 'accepted'
 `
 
@@ -64,11 +69,16 @@ SELECT
     u.last_name,
     u.avatar_id,
     u.privacy,
-    c.id
-FROM followers f
+    (
+		SELECT ch.id
+		FROM chats ch
+		JOIN chat_participants cp1 ON cp1.chat_id = ch.id AND cp1.user_id = ?
+		JOIN chat_participants cp2 ON cp2.chat_id = ch.id AND cp2.user_id = u.id
+		LIMIT 1
+	) as chatId
+FROM follows f
 JOIN users u ON u.id = f.followed_id
-LEFT JOIN followers f_status ON f_status.follower_id = ? AND f_status.followed_id = u.id
-LEFT JOIN chats c ON (c.user1_id = f_status.follower_id AND c.user2_id = u.id) OR (c.user1_id = u.id AND c.user2_id = f_status.follower_id)
+LEFT JOIN follows f_status ON f_status.follower_id = ? AND f_status.followed_id = u.id
 WHERE f.follower_id = ? AND f.status = 'accepted'
 `
 

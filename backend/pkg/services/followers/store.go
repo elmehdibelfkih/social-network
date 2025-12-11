@@ -165,7 +165,7 @@ func unfollowUser(followerId, followedId int64) error {
 	})
 }
 
-func getFollowList(query string, args ...interface{}) ([]UserFollowItem, error) {
+func getFollowList(query string, args ...any) ([]UserFollowItem, error) {
 	rows, err := config.DB.Query(query, args...)
 	if err != nil {
 		utils.SQLiteErrorTarget(err, query)
@@ -231,13 +231,11 @@ func getFollowList(query string, args ...interface{}) ([]UserFollowItem, error) 
 }
 
 func GetFollowersByUserID(targetUser int64, userID int64) ([]UserFollowItem, error) {
-	// The userID is the user making the request, and the targetUser is the user whose followers are being requested.
-	return getFollowList(GET_FOLLOWERS_QUERY, userID, targetUser)
+	return getFollowList(GET_FOLLOWERS_QUERY, userID, userID, targetUser)
 }
 
 func GetFolloweesByUserID(targetUser int64, userID int64) ([]UserFollowItem, error) {
-	// The userID is the user making the request, and the targetUser is the user whose followees are being requested.
-	return getFollowList(GET_FOLLOWEES_QUERY, userID, targetUser)
+	return getFollowList(GET_FOLLOWEES_QUERY, userID, userID, targetUser)
 }
 
 func GetFollowRequestByUserID(userID int64) ([]UserFollowItem, error) {
