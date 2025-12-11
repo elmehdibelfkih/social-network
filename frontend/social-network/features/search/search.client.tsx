@@ -5,14 +5,14 @@ import styles from './styles.module.css'
 import MiniProfile from '../mini_profile'
 import { useDebounce } from '@/libs/debounce'
 import { http } from '@/libs/apiFetch'
-import { User } from './types'
+import * as types from './types'
 import { useAuth } from '@/providers/authProvider'
 import type { ProfileAPIResponse } from '@/libs/globalTypes'
 
 export function Search() {
-  const [searchResults, setSearchResults] = useState<User[]>([])
+  const [searchResults, setSearchResults] = useState<types.User[] | types.Group[] | types.Post[] >([])
 
-  const handleSearchComplete = (results: User[]) => {
+  const handleSearchComplete = (results: types.User[] | types.Group[] | types.Post[]) => {
     setSearchResults(results)
   }
 
@@ -24,16 +24,28 @@ export function Search() {
         <div className={styles.resultsContainer}>
           <h3 className={styles.resultsTitle}>Search Results ({searchResults.length})</h3>
           <div className={styles.resultsGrid}>
-            {searchResults.map((user) => (
-              <SearchedCard key={user.userId} searchUser={user} />
-            ))}
+            {searchResults.map((item) => {
+              // Type guard to check if the item is a User
+              if ('userId' in item && 'nickname' in item) {
+                return <SearchedCard key={`user-${item.userId}`} searchUser={item} />
+              }
+              // Placeholder for Post results - assuming 'postId'
+              if ('postId' in item) {
+                return <div key={`post-${item.postId}`}>Post Result (ID: {item.postId})</div>
+              }
+              // Placeholder for Group results - assuming 'groupId'
+              if ('groupId' in item) {
+                return <div key={`group-${item.groupId}`}>Group Result (ID: {item.groupId})</div>
+              }
+              return null
+            })}
           </div>
         </div>
       )}
 
       {searchResults.length === 0 && (
         <div className={styles.emptyContainer}>
-          <p className={styles.emptyText}>No users found. Try a different search term.</p>
+          <p className={styles.emptyText}>No results found. Try a different search term.</p>
         </div>
       )}
     </div>
@@ -41,10 +53,16 @@ export function Search() {
 }
 
 
+type SearchType = 'users' | 'posts' | 'groups'
+const SEARCH_FILTERS: { label: string; value: SearchType }[] = [
+  { label: 'Users', value: 'users' },
+  { label: 'Posts', value: 'posts' },
+  { label: 'Groups', value: 'groups' },
+]
 
-function SearchCard({ onSearched }: { onSearched: (results: User[]) => void }) {
+function SearchCard({ onSearched }: { onSearched: (results: types.User[] | types.Group[] | types.Post[]) => void }) {
   const [searchQuery, setSearchQuery] = useState<string>('')
-  const [searchFilter, setSearchFilter] = useState<string>('All Users')
+  const [searchFilter, setSearchFilter] = useState<SearchType>('users')
   const debouncedValue = useDebounce(searchQuery, 350)
 
   useEffect(() => {
@@ -56,19 +74,11 @@ function SearchCard({ onSearched }: { onSearched: (results: User[]) => void }) {
       onSearched([])
 
       try {
-        const endpoint = `/api/v1/search?q=${debouncedValue}&type=users`
-        const resp = await http.get<User[]>(endpoint)
-
-        let filteredResults = resp
-        if (searchFilter === 'Public Profiles') {
-          filteredResults = resp.filter(user => user.privacy === 'public')
-        } else if (searchFilter === 'Private Profiles') {
-          filteredResults = resp.filter(user => user.privacy === 'private')
-        }
-
-        onSearched(filteredResults)
+        const endpoint = `/api/v1/search?q=${debouncedValue}&type=${searchFilter}`
+        const resp = await http.get<types.User[] | types.Group[] | types.Post[]>(endpoint)
+        onSearched(resp)
       } catch (error) {
-        console.error('Failed to fetch users:', error)
+        console.error('Failed to fetch search results:', error)
         onSearched([])
       }
     }
@@ -77,7 +87,7 @@ function SearchCard({ onSearched }: { onSearched: (results: User[]) => void }) {
 
   return (
     <div className={styles.searchCard}>
-      <h2 className={styles.title}>Search Users</h2>
+      <h2 className={styles.title}>Search</h2>
       <div className={styles.searchContainer}>
         <input
           type="text"
@@ -88,27 +98,20 @@ function SearchCard({ onSearched }: { onSearched: (results: User[]) => void }) {
         />
       </div>
       <div className={styles.buttonsContainer}>
-        <button
-          className={`${styles.filterButton} ${searchFilter === 'All Users' ? styles.active : ''}`}
-          onClick={() => setSearchFilter('All Users')}>
-          All Users
-        </button>
-        <button
-          className={`${styles.filterButton} ${searchFilter === 'Public Profiles' ? styles.active : ''}`}
-          onClick={() => setSearchFilter('Public Profiles')}>
-          Public Profiles
-        </button>
-        <button
-          className={`${styles.filterButton} ${searchFilter === 'Private Profiles' ? styles.active : ''}`}
-          onClick={() => setSearchFilter('Private Profiles')}>
-          Private Profiles
-        </button>
+        {SEARCH_FILTERS.map((filter) => (
+          <button
+            key={filter.value}
+            className={`${styles.filterButton} ${searchFilter === filter.value ? styles.active : ''}`}
+            onClick={() => setSearchFilter(filter.value)}>
+            {filter.label}
+          </button>
+        ))}
       </div>
     </div>
   )
 }
 
-function SearchedCard({ searchUser }: { searchUser: User }) {
+function SearchedCard({ searchUser }: { searchUser: types.User }) {
   const { user } = useAuth()
   const isMyPorfile = user.userId == String(searchUser.userId)
 
