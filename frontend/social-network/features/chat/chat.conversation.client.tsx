@@ -5,6 +5,7 @@ import { chatService } from "@/features/chat/services/chat";
 import { ChatMessage } from "./types";
 import { formatMessageDate } from "@/libs/helpers";
 import { SeenStatus } from "@/components/ui/chats/seen"
+import { useDebounce, useDebounceCbf } from "@/libs/debounce";
 
 interface ChatConversationProps {
     chatId: number;
@@ -176,8 +177,8 @@ export default function ChatConversation({ chatId, onClose }: ChatConversationPr
     }
 
 
-    const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
+    const handleSubmitMessage = async (e: FormEvent<HTMLFormElement>) => {
+
         setIsLoading(true);
 
         try {
@@ -220,6 +221,16 @@ export default function ChatConversation({ chatId, onClose }: ChatConversationPr
         }
     };
 
+    const handleSubmitDebounced = useDebounceCbf(handleSubmitMessage, 200)
+
+    const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setInput(e.target.value);
+    };
+
+    const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        handleSubmitDebounced(e);
+    }
 
     return (
         <div className={styles.chatContainer}>
@@ -240,8 +251,7 @@ export default function ChatConversation({ chatId, onClose }: ChatConversationPr
                         >
                             {msg.content}
                             <div className={styles.timestamp}>
-                                {formatMessageDate(msg.updatedAt)}
-                                <SeenStatus state={msg.seenState}></SeenStatus>
+                                <SeenStatus state={msg.seenState} time={formatMessageDate(msg.updatedAt)}></SeenStatus>
                             </div>
                         </div>
                     );
@@ -253,7 +263,7 @@ export default function ChatConversation({ chatId, onClose }: ChatConversationPr
                     type="text"
                     value={input}
                     placeholder="Type a message..."
-                    onChange={(e) => setInput(e.target.value)}
+                    onChange={handleInput}
                     className={styles.chatInput}
                 />
                 <button type="submit"

@@ -1,8 +1,13 @@
 import styles from "./seen.module.css";
 
-export function SeenStatus({ state }: { state: string }) {
-    if (state === "sent") return <span className={styles.seenIcon}><img src="svg/check.svg" alt="" /></span>;
-    if (state === "delivered") return <span className={styles.seenIcon}><img src="svg/check-check.svg" alt="" /></span>;
-    if (state === "read") return <span className={styles.seenIcon}><img src="svg/check-check-read.svg" alt="" /></span>;
+export interface SeenStatusProps {
+    time: string;
+    state: string;
+}
+
+export function SeenStatus({ state, time }: SeenStatusProps) {
+    if (state === "sent") return <div className={styles.seenIcon}><div>{time}</div><img src="svg/check.svg" alt="" /></div>;
+    if (state === "delivered") return <div className={styles.seenIcon}><div>{time}</div><img src="svg/check-check.svg" alt="" /></div>;
+    if (state === "read") return <div className={styles.seenIcon}><div>{time}</div><img src="svg/check-check-read.svg" alt="" /></div>;
     return null;
 }
