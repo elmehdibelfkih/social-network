@@ -145,6 +145,15 @@ func unfollowUser(followerId, followedId int64) error {
 			return err
 		}
 
+		status, err := selectFollowStatus(followerId, followedId)
+		if err != nil {
+			return err
+		}
+
+		if status != "accepted" {
+			return nil
+		}
+
 		// Update followers count for the followed user
 		counter := followUnfollowUpdateCounterStruct(database.USER_ENTITY_TYPE, followedId, database.FOLLOWERS_ENTITY_NAME, "decrement")
 		err = database.UpdateCounter(tx, counter)
