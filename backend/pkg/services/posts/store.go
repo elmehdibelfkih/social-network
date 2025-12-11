@@ -579,3 +579,13 @@ func CheckCommentReactionExists(commentID, userID int64) bool {
 	err := config.DB.QueryRow(QUERY_CHECK_COMMENT_REACTION_EXISTS, commentID, userID).Scan(&exists)
 	return err == nil
 }
+
+// GetCommentLikeCount returns the number of likes on a comment
+func GetCommentLikeCount(commentID int64) int {
+	var count int
+	err := config.DB.QueryRow(QUERY_COUNT_COMMENT_LIKES, commentID).Scan(&count)
+	if err != nil {
+		return 0
+	}
+	return count
+}

@@ -4,7 +4,8 @@ import { useRouter, useSearchParams } from "next/navigation"
 import { getPosts } from "./profile_feed.services"
 import { useEffect, useState } from "react"
 import { Post } from "@/libs/globalTypes"
-import { PostCard } from "../posts"
+import PostServer from "../posts/posts.server"
+
 import styles from "./styles.module.css"
 
 export function PostsSection({ userId, avatarId }: { userId: string, avatarId: number }) {
@@ -62,7 +63,7 @@ export function PostsSection({ userId, avatarId }: { userId: string, avatarId: n
                     <EmptyContent />
                     :
                     posts.map((post) => (
-                        <PostCard key={post.postId} post={post} avatarId={avatarId} />
+                        <PostServer key={post.postId} post={post} />
                     ))
             }
             {isLoading && <div>Loading...</div>}

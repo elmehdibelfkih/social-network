@@ -4,7 +4,7 @@ import { ProfileSummaryServer } from "@/features/profile_summary";
 import { http } from "@/libs/apiFetch";
 import { JSX } from "react";
 import { getUserId } from "@/libs/helpers";
-import { Post, ProfileAPIResponse } from "@/libs/globalTypes";
+import { ProfileAPIResponse } from "@/libs/globalTypes";
 import { NewPost } from "@/features/newPost";
 import { postsService } from "@/features/posts";
 import PostServer from "@/features/posts/posts.server";
@@ -36,3 +36,5 @@ export default async function HomePage(): Promise<JSX.Element> {
     </>
   );
 }
+
+

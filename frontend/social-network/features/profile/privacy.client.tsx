@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import styles from './styles.module.css'
 import { togglePrivacy } from './profileSrevice'
 import { useAuth } from '@/providers/authProvider'
@@ -55,7 +55,11 @@ export default function PrivacyToggle({ privacy }: { privacy: string }) {
 
 export function ProfileSettings({ privacy, userId }: { privacy: string, userId: string }) {
     const { user } = useAuth()
-    if (!user) return null
+    const [mounted, setMounted] = useState(false)
+
+    useEffect(() => setMounted(true), [])
+
+    if (!mounted || !user) return null
     const isOwnProfile = user.userId == userId
     if (!isOwnProfile) return null
     return (

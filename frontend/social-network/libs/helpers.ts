@@ -9,7 +9,7 @@ import type {
 export async function getUserId() {
     const res = await http.get<UserId>('/api/v1/users/id');
     if (!res) {
-        throw new Error('Failed to fetch user ID');
+        return null;
     }
     return res.Id
 }

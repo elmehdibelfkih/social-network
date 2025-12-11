@@ -314,6 +314,7 @@ func HandleCreateComment(w http.ResponseWriter, r *http.Request) {
 
 // HandleGetComments handles GET /api/v1/posts/{post_id}/comments
 func HandleGetComments(w http.ResponseWriter, r *http.Request) {
+	viewerID := utils.GetUserIdFromContext(r)
 	postID, err := getPostID(r)
 	if err != nil {
 		utils.BadRequest(w, "Invalid post ID", utils.ErrorTypeAlert)
@@ -331,7 +332,7 @@ func HandleGetComments(w http.ResponseWriter, r *http.Request) {
 
 	var commentResponses []CommentResponse
 	for _, comment := range comments {
-		commentResponse, err := buildCommentResponse(&comment)
+		commentResponse, err := buildCommentResponse(&comment, viewerID)
 		if err != nil {
 			utils.SQLiteErrorTarget(err, "HandleGetComments (buildCommentResponse)")
 			continue

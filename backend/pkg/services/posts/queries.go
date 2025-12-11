@@ -196,4 +196,10 @@ const (
 		WHERE comment_id = ? AND user_id = ?
 		LIMIT 1;
 	`
+
+	QUERY_COUNT_COMMENT_LIKES = `
+		SELECT COUNT(*)
+		FROM comment_reactions
+		WHERE comment_id = ?;
+	`
 )
