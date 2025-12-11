@@ -67,7 +67,7 @@ export function FollowersList({ userId, type }: FollowersListProps) {
                 <EmptyContent type={type} />
                 : followers.map((follower) => (
 
-                    <MiniProfile key={follower.userId} data={followerToProfile(follower)} isMyprofile={String(follower.userId) !== user.userId}  />
+                    <MiniProfile key={follower.userId} data={followerToProfile(follower)} isMyprofile={String(follower.userId) !== user?.userId}  />
                 ))}
         </div>
     )
