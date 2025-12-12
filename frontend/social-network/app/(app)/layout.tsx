@@ -8,7 +8,6 @@ import { NotificationCount } from "@/libs/globalTypes";
 import { ProfileAPIResponse } from "@/libs/globalTypes";
 import { UserStatsState } from "@/libs/globalTypes";
 import { Counts } from "@/libs/globalTypes";
-// import { AuthProvider } from "@/providers/authProvider";
 
 
 export default async function AppLayout({ children }: { children: ReactNode }) {
