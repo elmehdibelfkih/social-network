@@ -1,5 +1,4 @@
 
-import MiniProfile from "@/features/mini_profile";
 import { ProfileSummaryServer } from "@/features/profile_summary";
 import { http } from "@/libs/apiFetch";
 import { JSX } from "react";
@@ -8,7 +7,6 @@ import { ProfileAPIResponse } from "@/libs/globalTypes";
 import { NewPost } from "@/features/newPost";
 import { postsService } from "@/features/posts";
 import PostServer from "@/features/posts/posts.server";
-import { useUserStats } from "@/providers/userStatsContext";
 
 export default async function HomePage(): Promise<JSX.Element> {
   const userId = await getUserId();
@@ -33,7 +31,6 @@ export default async function HomePage(): Promise<JSX.Element> {
           ))
         )}
       </div>
-      <MiniProfile data={res2} isMyprofile={false} />
     </>
   );
 }

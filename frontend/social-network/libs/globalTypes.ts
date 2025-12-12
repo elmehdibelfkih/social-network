@@ -4,8 +4,8 @@
 //     limit?: number;
 // }
 
-// export type PrivacyLevel = 'public' | 'followers' | 'private' | 'group' | 'restricted';
-// export type FollowStatus = 'none' | 'follow' | 'accepted' | 'pending' | 'declined';
+export type PrivacyLevel = 'public' | 'followers' | 'private' | 'group' | 'restricted';
+export type FollowStatus = 'none' | 'follow' | 'accepted' | 'pending' | 'declined';
 // export type ReactionType = 'like';
 // export type MediaType = 'image/png' | 'image/jpeg' | 'image/gif';
 
@@ -59,44 +59,44 @@
 //     commentsReceived: number;
 // }
 
-// export interface Follower {
-//     userId: number;
-//     nickname: string | null;
-//     firstName: string;
-//     lastName: string;
-//     avatarId: number | null;
-//     followedAt?: string;
-//     status: FollowStatus;
-//     privacy: 'public' | 'private';
-//     chatId: number | null;
-//     stats: {
-//         postsCount: number;
-//         followersCount: number;
-//         followingCount: number;
-//     };
-// }
+export interface Follower {
+    userId: number;
+    nickname: string | null;
+    firstName: string;
+    lastName: string;
+    avatarId: number | null;
+    followedAt?: string;
+    status: FollowStatus;
+    privacy: 'public' | 'private';
+    chatId: number | null;
+    stats: {
+        postsCount: number;
+        followersCount: number;
+        followingCount: number;
+    };
+}
 
-// export interface PostStats {
-//     reactionCount: number;
-//     commentCount: number;
-// }
+export interface PostStats {
+    reactionCount: number;
+    commentCount: number;
+}
 
-// export interface Post {
-//     postId: number;
-//     authorId: number;
-//     authorNickname: string | null;
-//     authorLastName: string;
-//     authorFirstName: string;
-//     content: string;
-//     mediaIds?: number[] | null;
-//     privacy: PrivacyLevel;
-//     isLikedByUser: boolean;
-//     stats: PostStats;
-//     groupId: number | null;
-//     allowedList?: number[] | null;
-//     createdAt: string;
-//     updatedAt: string;
-// }
+export interface Post {
+    postId: number;
+    authorId: number;
+    authorNickname: string | null;
+    authorLastName: string;
+    authorFirstName: string;
+    content: string;
+    mediaIds?: number[] | null;
+    privacy: PrivacyLevel;
+    isLikedByUser: boolean;
+    stats: PostStats;
+    groupId: number | null;
+    allowedList?: number[] | null;
+    createdAt: string;
+    updatedAt: string;
+}
 
 
 
