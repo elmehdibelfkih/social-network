@@ -39,48 +39,48 @@ const (
 	IS_USER_PROFILE_PUBLIC_QUERY = `SELECT EXISTS(SELECT 1 FROM users WHERE privacy = "public" AND id = ?)`
 
 	GET_FOLLOWERS_QUERY = `
-SELECT
-    u.id,
-    f_status.status,
-    u.nickname,
-    u.first_name,
-    u.last_name,
-    u.avatar_id,
-    u.privacy,
-    (
-		SELECT ch.id
-		FROM chats ch
-		JOIN chat_participants cp1 ON cp1.chat_id = ch.id AND cp1.user_id = ?
-		JOIN chat_participants cp2 ON cp2.chat_id = ch.id AND cp2.user_id = u.id
-		LIMIT 1
-	) as chatId
-FROM follows f
-JOIN users u ON u.id = f.follower_id
-LEFT JOIN follows f_status ON f_status.follower_id = ? AND f_status.followed_id = u.id
-WHERE f.followed_id = ? AND f.status = 'accepted'
-`
+	SELECT
+		u.id,
+		f_status.status,
+		u.nickname,
+		u.first_name,
+		u.last_name,
+		u.avatar_id,
+		u.privacy,
+		(
+			SELECT ch.id
+			FROM chats ch
+			JOIN chat_participants cp1 ON cp1.chat_id = ch.id AND cp1.user_id = ?
+			JOIN chat_participants cp2 ON cp2.chat_id = ch.id AND cp2.user_id = u.id
+			LIMIT 1
+		) as chatId
+	FROM follows f
+	JOIN users u ON u.id = f.follower_id
+	LEFT JOIN follows f_status ON f_status.follower_id = ? AND f_status.followed_id = u.id
+	WHERE f.followed_id = ? AND f.status = 'accepted'
+	`
 
 	GET_FOLLOWEES_QUERY = `
-SELECT
-    u.id,
-    f_status.status,
-    u.nickname,
-    u.first_name,
-    u.last_name,
-    u.avatar_id,
-    u.privacy,
-    (
-		SELECT ch.id
-		FROM chats ch
-		JOIN chat_participants cp1 ON cp1.chat_id = ch.id AND cp1.user_id = ?
-		JOIN chat_participants cp2 ON cp2.chat_id = ch.id AND cp2.user_id = u.id
-		LIMIT 1
-	) as chatId
-FROM follows f
-JOIN users u ON u.id = f.followed_id
-LEFT JOIN follows f_status ON f_status.follower_id = ? AND f_status.followed_id = u.id
-WHERE f.follower_id = ? AND f.status = 'accepted'
-`
+	SELECT
+		u.id,
+		f_status.status,
+		u.nickname,
+		u.first_name,
+		u.last_name,
+		u.avatar_id,
+		u.privacy,
+		(
+			SELECT ch.id
+			FROM chats ch
+			JOIN chat_participants cp1 ON cp1.chat_id = ch.id AND cp1.user_id = ?
+			JOIN chat_participants cp2 ON cp2.chat_id = ch.id AND cp2.user_id = u.id
+			LIMIT 1
+		) as chatId
+	FROM follows f
+	JOIN users u ON u.id = f.followed_id
+	LEFT JOIN follows f_status ON f_status.follower_id = ? AND f_status.followed_id = u.id
+	WHERE f.follower_id = ? AND f.status = 'accepted'
+	`
 
 	GET_FOLLOW_REQUEST_QUERY = `
 	SELECT
