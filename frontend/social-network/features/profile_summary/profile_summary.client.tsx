@@ -1,31 +1,14 @@
-import { getProfileServer } from './profile_summary.services'
-import type { ProfileAPIResponse } from './types'
+"use client";
+
 import styles from './styles.module.css'
 import { AvatarHolder } from '@/components/ui/avatar_holder/avatarholder.client'
 import { displayName, handleName } from '@/libs/helpers'
+import { useUserStats } from '@/providers/userStatsContext';
 
-type Props = { userId: string | number }
+export default function ProfileSummary() {
+  const { state: profile } = useUserStats();
+  console.log(profile);
 
-
-export default async function ProfileSummaryServer({ userId }: Props) {
-  const api: ProfileAPIResponse | null = await getProfileServer(userId)
-
-  const profile: Partial<ProfileAPIResponse> = api ?? {
-    userId: Number(userId),
-    status: null,
-    nickname: null,
-    firstName: '',
-    lastName: '',
-    avatarId: null,
-    aboutMe: null,
-    dateOfBirth: null,
-    privacy: 'public',
-    stats: { postsCount: 0, followersCount: 0, followingCount: 0 },
-    joinedAt: null,
-  }
-
-  // const displayName = formatDisplayName(profile)
-  // const handle = formatHandle(profile)
   const name = displayName(profile)
   const handle = handleName(profile)
 
@@ -60,17 +43,17 @@ export default async function ProfileSummaryServer({ userId }: Props) {
       <div className={styles.statsContainer}>
         <div className={styles.statBlock}>
           <div className={styles.statLabel}>Posts</div>
-          <div className={styles.statValue}>{profile.stats?.postsCount ?? 0}</div>
+          <div className={styles.statValue}>{profile.postsCount ?? 0}</div>
         </div>
 
         <div className={styles.statBlock}>
           <div className={styles.statLabel}>Followers</div>
-          <div className={styles.statValue}>{profile.stats?.followersCount ?? 0}</div>
+          <div className={styles.statValue}>{profile.followersCount ?? 0}</div>
         </div>
 
         <div className={styles.statBlock}>
           <div className={styles.statLabel}>Following</div>
-          <div className={styles.statValue}>{profile.stats?.followingCount ?? 0}</div>
+          <div className={styles.statValue}>{profile.followingCount ?? 0}</div>
         </div>
       </div>
     </aside>

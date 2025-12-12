@@ -53,7 +53,8 @@ const (
 			JOIN chat_participants cp1 ON cp1.chat_id = ch.id AND cp1.user_id = ?
 			JOIN chat_participants cp2 ON cp2.chat_id = ch.id AND cp2.user_id = u.id
 			LIMIT 1
-		) as chatId
+		) as chatId,
+		u.created_at
 	FROM follows f
 	JOIN users u ON u.id = f.follower_id
 	LEFT JOIN follows f_status ON f_status.follower_id = ? AND f_status.followed_id = u.id
@@ -75,7 +76,8 @@ const (
 			JOIN chat_participants cp1 ON cp1.chat_id = ch.id AND cp1.user_id = ?
 			JOIN chat_participants cp2 ON cp2.chat_id = ch.id AND cp2.user_id = u.id
 			LIMIT 1
-		) as chatId
+		) as chatId,
+		u.created_at
 	FROM follows f
 	JOIN users u ON u.id = f.followed_id
 	LEFT JOIN follows f_status ON f_status.follower_id = ? AND f_status.followed_id = u.id
@@ -98,7 +100,8 @@ const (
 	    JOIN chat_participants cp2 ON cp2.chat_id = ch.id AND cp2.user_id = u.id
 	    ORDER BY ch.updated_at DESC
 	    LIMIT 1
-	  ) AS chatId
+	  ) AS chatId,
+	  u.created_at             AS joinedAt
 	FROM follows f
 	JOIN users u ON u.id = f.follower_id
 	WHERE f.followed_id = ? AND f.status = 'pending'

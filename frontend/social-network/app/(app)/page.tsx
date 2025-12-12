@@ -1,5 +1,5 @@
 
-import { ProfileSummaryServer } from "@/features/profile_summary";
+import { ProfileSummary } from "@/features/profile_summary";
 import { http } from "@/libs/apiFetch";
 import { JSX } from "react";
 import { getUserId } from "@/libs/helpers";
@@ -16,7 +16,7 @@ export default async function HomePage(): Promise<JSX.Element> {
 
   return (
     <>
-      <ProfileSummaryServer userId={userId} />
+      <ProfileSummary/>
       <div>
         <NewPost data={res2} isMyprofile={false} />
       </div>

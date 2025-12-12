@@ -194,6 +194,7 @@ func getFollowList(query string, args ...any) ([]UserFollowItem, error) {
 			avatarId  sql.NullInt64
 			privacy   string
 			chatId    sql.NullInt64
+			joinedAt  sql.NullString
 		)
 
 		if err := rows.Scan(
@@ -205,6 +206,7 @@ func getFollowList(query string, args ...any) ([]UserFollowItem, error) {
 			&avatarId,
 			&privacy,
 			&chatId,
+			&joinedAt,
 		); err != nil {
 			utils.SQLiteErrorTarget(err, query)
 			return nil, err
@@ -226,6 +228,7 @@ func getFollowList(query string, args ...any) ([]UserFollowItem, error) {
 			Privacy:   privacy,
 			ChatId:    toInt64Ptr(chatId),
 			Stats:     stats,
+			JoinedAt:  toStringPtr(joinedAt),
 		}
 
 		items = append(items, item)
@@ -267,9 +270,10 @@ func GetFollowRequestByUserID(userID int64) ([]UserFollowItem, error) {
 			avatarId  sql.NullInt64
 			privacy   string
 			chatId    sql.NullInt64
+			joinedAt  sql.NullString
 		)
 
-		err = rows.Scan(&userId, &status, &nickname, &firstName, &lastName, &avatarId, &privacy, &chatId)
+		err = rows.Scan(&userId, &status, &nickname, &firstName, &lastName, &avatarId, &privacy, &chatId, &joinedAt)
 		if err != nil {
 			utils.SQLiteErrorTarget(err, GET_FOLLOW_REQUEST_QUERY)
 			return nil, err
@@ -292,6 +296,7 @@ func GetFollowRequestByUserID(userID int64) ([]UserFollowItem, error) {
 			Privacy:   privacy,
 			ChatId:    toInt64Ptr(chatId),
 			Stats:     stats,
+			JoinedAt:  toStringPtr(joinedAt),
 		}
 
 		followRequests = append(followRequests, followRequest)

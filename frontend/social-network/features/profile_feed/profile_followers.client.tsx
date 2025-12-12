@@ -41,9 +41,7 @@ export function FollowersList({ userId, type }: FollowersListProps) {
         try {
             const data = type === 'followers'
                 ? await getFollowers(userId)
-                : await getFollowing(userId)
-                console.log("data +==>",data);
-                
+                : await getFollowing(userId)                
             setFollowers(data)
         } catch (err) {
             console.error("Error loading followers:", err)
@@ -60,7 +58,6 @@ export function FollowersList({ userId, type }: FollowersListProps) {
     if (isLoading) {
         return <div>Loading...</div>
     }
-    console.log(followers);
 
     return (
         <div className={styles.followersGrid}>

@@ -1,13 +1,14 @@
 'use client';
 import { useState, useRef, useEffect } from 'react';
 import styles from './styles.module.css';
-import {} from '../mini_profile/styles.module.css';
+import { } from '../mini_profile/styles.module.css';
 import { ImageIcon, GlobeIcon, DropdownIcon, LockIcon, UsersIcon } from '@/components/ui/icons';
 import AddFriends from '@/components/ui/AddFriends/addFriends';
 import { postsService } from './services/postsService';
 import type { PrivacyLevel } from './types';
 import { useAuth } from '@/providers/authProvider';
 import AvatarHolder from '@/components/ui/avatar_holder/avatarholder.client';
+import { useUserStats } from '@/providers/userStatsContext';
 
 export const privacyOptions = [
   { value: 'public', label: 'Public', description: 'Anyone can see this post', icon: 'globe' },
@@ -18,6 +19,7 @@ export const privacyOptions = [
 
 export function NewPostClient() {
   const { user } = useAuth();
+  const { dispatch } = useUserStats();
   const [content, setContent] = useState('');
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [privacy, setPrivacy] = useState<PrivacyLevel>('public');
@@ -26,7 +28,7 @@ export function NewPostClient() {
   const [showAddFriends, setShowAddFriends] = useState(false);
   const [selectedFollowers, setSelectedFollowers] = useState<number[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  
+
 
   const [isMounted, setIsMounted] = useState(false);
   useEffect(() => setIsMounted(true), []);
@@ -61,6 +63,7 @@ export function NewPostClient() {
       setSelectedFiles([]);
       setPrivacy('public');
       setSelectedFollowers([]);
+      dispatch({ type: 'INCREMENT_POSTS' })
     } finally {
       setIsSubmitting(false);
     }
@@ -68,8 +71,8 @@ export function NewPostClient() {
 
   const getPrivacyIcon = (icon: string) => {
     if (icon === 'globe') return <GlobeIcon fillColor="currentColor" />;
-    if (icon === 'users') return <UsersIcon  />;
-    if (icon === 'lock') return <LockIcon  />;
+    if (icon === 'users') return <UsersIcon />;
+    if (icon === 'lock') return <LockIcon />;
   };
 
   return (
@@ -77,13 +80,13 @@ export function NewPostClient() {
       <div className={styles.leftPart}>
         <AvatarHolder avatarId={user?.avatarId ?? null} size={60} />
       </div>
-      
+
       <div className={styles.rightPart}>
         <div className={styles.userInfo}>
           <div className={styles.miniHandle}>{user.firstName + ' ' + user.lastName}</div>
-          <h4 className={styles.miniName}>{'@'+user.nickname}</h4>
+          <h4 className={styles.miniName}>{'@' + user.nickname}</h4>
         </div>
-        
+
         {/* Textarea */}
         <div className={styles.topPart}>
           <textarea
@@ -99,8 +102,8 @@ export function NewPostClient() {
           <div className={styles.selectedFiles}>
             {selectedFiles.map((file, i) => (
               <div key={i} className={styles.fileItem}>
-                <img 
-                  src={URL.createObjectURL(file)} 
+                <img
+                  src={URL.createObjectURL(file)}
                   alt={file.name}
                   className={styles.previewImage}
                 />
@@ -220,4 +223,32 @@ export function NewPostClient() {
       </div>
     </form>
   );
+}
+
+export function TopPart() {
+  const { state } = useUserStats();
+
+  return (
+    <>
+      <div className={styles.leftPart}>
+        <AvatarHolder avatarId={state.avatarId ?? null} size={60} />
+
+        <div className={styles.userInfo}>
+          <div className={styles.miniHandle}>{state.nickname}</div>
+          <h4 className={styles.miniName}>{state.firstName + ' ' + state.lastName}</h4>
+        </div>
+
+        <div className={styles.topPart}>
+          <textarea
+            name="content"
+            placeholder="What's on your mind?"
+            className={styles.textArea}
+            required
+            minLength={1}
+          />
+        </div>
+      </div >
+    </>
+  )
+
 }

@@ -3,23 +3,17 @@
 import React, { createContext, useReducer, useContext, ReactNode } from 'react';
 import { UserStatsState } from "@/libs/globalTypes";
 
-
-// export type UserStatsState = {
-//   userId: number | null;
-//   postsCount: number;
-//   followersCount: number;
-//   followingCount: number;
-//   likesReceived: number;
-//   commentsReceived: number;
-//   unreadNotifications: number; 
-// };
-
-
 type Action =
   | { type: 'INCREMENT_FOLLOWERS' }
   | { type: 'DECREMENT_FOLLOWERS' }
+  | { type: 'INCREMENT_FOLLOWING' }
+  | { type: 'DECREMENT_FOLLOWING' }
   | { type: 'INCREMENT_POSTS' }
   | { type: 'DECREMENT_POSTS' }
+  | { type: 'INCREMENT_LIKES_RECEIVED' }
+  | { type: 'DECREMENT_LIKES_RECEIVED' }
+  | { type: 'INCREMENT_COMMENTS_RECEIVED' }
+  | { type: 'DECREMENT_COMMENTS_RECEIVED' }
   | { type: 'NEW_NOTIFICATION' }
   | { type: 'READ_ALL_NOTIFICATIONS' }
   | { type: 'SET_STATS'; payload: Partial<UserStatsState> }; // Use Partial for flexibility
@@ -30,10 +24,22 @@ const userStatsReducer = (state: UserStatsState, action: Action): UserStatsState
       return { ...state, followersCount: state.followersCount + 1 };
     case 'DECREMENT_FOLLOWERS':
       return { ...state, followersCount: Math.max(0, state.followersCount - 1) };
+    case 'INCREMENT_FOLLOWING':
+      return { ...state, followingCount: state.followingCount + 1 };
+    case 'DECREMENT_FOLLOWING':
+      return { ...state, followingCount: Math.max(0, state.followingCount - 1) };
     case 'INCREMENT_POSTS':
       return { ...state, postsCount: state.postsCount + 1 };
     case 'DECREMENT_POSTS':
       return { ...state, postsCount: Math.max(0, state.postsCount - 1) };
+    case 'INCREMENT_LIKES_RECEIVED':
+      return { ...state, likesReceived: state.likesReceived + 1 };
+    case 'DECREMENT_LIKES_RECEIVED':
+      return { ...state, likesReceived: Math.max(0, state.likesReceived - 1) };
+    case 'INCREMENT_COMMENTS_RECEIVED':
+        return { ...state, commentsReceived: state.commentsReceived + 1 };
+    case 'DECREMENT_COMMENTS_RECEIVED':
+        return { ...state, commentsReceived: Math.max(0, state.commentsReceived - 1) };
     case 'NEW_NOTIFICATION':
       return { ...state, unreadNotifications: state.unreadNotifications + 1 };
     case 'READ_ALL_NOTIFICATIONS':
