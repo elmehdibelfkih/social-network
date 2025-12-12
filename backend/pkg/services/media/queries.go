@@ -98,8 +98,13 @@ const (
 		LIMIT 1
 	`
 
-	
 	QUERY_CHECK_GROUP_MEMBERSHIP = `
 		SELECT 1 FROM group_members WHERE group_id = ? AND user_id = ? AND status = 'accepted' LIMIT 1
+	`
+
+	QUERY_CHECK_FOLLOW_RELATION = `
+		SELECT f.status
+		FROM follows
+		WHERE follower_id = ?
 	`
 )

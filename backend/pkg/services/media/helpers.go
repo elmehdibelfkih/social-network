@@ -46,9 +46,22 @@ func canGetMedia(userID, mediaID int64) bool {
 		var postID, authorID int64
 		var privacy string
 		err := config.DB.QueryRow(QUERY_GET_POST_VISIBILITY_FROM_POST_MEDIA, mediaID).Scan(&postID, &privacy, &authorID)
-		if err == nil && privacy == "public" {
+		if err != nil {
+		}
+		if privacy == "public" {
 			return true
 		}
+		if privacy == "followers" {
+			// Need to check if the user requesting the media is a follower to the owner
+			var status sql.NullString
+			err := config.DB.QueryRow(QUERY_CHECK_FOLLOW_RELATION, userID).Scan(&status)
+			if err != nil {
+			}
+			if status.Valid && status.String == "accepted" {
+				return true
+			}
+		}
+
 	}
 	println("5")
 

@@ -24,7 +24,7 @@ func MediaMiddleware(next http.HandlerFunc) http.HandlerFunc {
 		if r.Method == http.MethodGet {
 			if ok := canGetMedia(userID, mediaID); !ok {
 			println("3'")
-				utils.Unauthorized(w, "don't have the permission to get this media")
+				utils.MethodNotAllowed(w, "don't have the permission to get this media")
 				return
 			}
 		}
