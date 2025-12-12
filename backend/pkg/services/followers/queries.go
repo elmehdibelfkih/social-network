@@ -7,6 +7,12 @@ const (
     updated_at = CURRENT_TIMESTAMP
 	WHERE id = ? AND group_id IS NULL
 	`
+	UPDATE_CHAT_ACTIVE = `
+	UPDATE chats
+	SET status = 'active',
+    updated_at = CURRENT_TIMESTAMP
+	WHERE id = ?
+	`
 	SELECT_SHARED_CHATS = `
 	SELECT chat_id FROM chat_participants WHERE user_id = ?
 	INTERSECT

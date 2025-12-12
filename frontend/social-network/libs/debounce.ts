@@ -22,7 +22,7 @@ export function useDebounceCbf<T extends (...args: any[]) => any>(cbf: T, delay:
         cbfRef.current = cbf;
     }, [cbf]);
 
-    return useCallback((...args: Parameters<T>) => {
+    return (...args: Parameters<T>) => {
         if (canInvock.current) {
             cbfRef.current(...args);
             canInvock.current = false;
@@ -35,5 +35,5 @@ export function useDebounceCbf<T extends (...args: any[]) => any>(cbf: T, delay:
         timeoutRef.current = setTimeout(() => {
             canInvock.current = true;
         }, delay);
-    }, [delay]);
+    }
 }

@@ -178,9 +178,10 @@ export default function ChatConversation({ chatId, onClose }: ChatConversationPr
 
 
     const handleSubmitMessage = async (e: FormEvent<HTMLFormElement>) => {
-
+        e.preventDefault()
+        console.log("onsubmit")
+        if (!input) return
         setIsLoading(true);
-
         try {
             setUserData(JSON.parse(localStorage.getItem("social_network-user")))
             const chatMessage = {

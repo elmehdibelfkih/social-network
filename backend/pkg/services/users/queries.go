@@ -32,7 +32,7 @@ const (
 		FROM chats c
 		INNER JOIN chat_participants cp1 ON c.id = cp1.chat_id
 		INNER JOIN chat_participants cp2 ON c.id = cp2.chat_id
-		WHERE c.is_group = 0
+		WHERE c.group_id IS NULL
 		  AND cp1.user_id = ?
 		  AND cp2.user_id = ?
 		LIMIT 1`

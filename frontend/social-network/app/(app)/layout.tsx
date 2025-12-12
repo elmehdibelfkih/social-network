@@ -6,6 +6,7 @@ import { getUserId } from "@/libs/helpers";
 import { http } from "@/libs/apiFetch";
 import { ProfileAPIResponse } from "@/libs/globalTypes";
 import { AuthProvider } from "@/providers/authProvider";
+import SharedWorekerClient from "@/components/ui/worker";
 
 
 export default async function AppLayout({ children }: { children: ReactNode }) {
@@ -26,6 +27,7 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
   return (
     <AppProviders>
       <UserStatsProvider initialState={stats}>
+        <SharedWorekerClient />
         <Navbar />
         {children}
       </UserStatsProvider>

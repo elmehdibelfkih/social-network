@@ -49,6 +49,9 @@ func (h *Hub) AddChatUser(chatId, userId int64) {
 			return
 		}
 		dst := append([]*Client(nil), src...)
+		if h.chatUsers[chatId] == nil {
+			return
+		}
 		h.chatUsers[chatId][userId] = dst
 		for _, c := range h.chatUsers[chatId][userId] {
 			c.userChats[chatId] = struct{}{}

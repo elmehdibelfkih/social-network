@@ -143,7 +143,7 @@ func followBack(followerId, followedId int64) (bool, error) {
 		followedId,
 		followerId,
 	).Scan(
-		exist,
+		&exist,
 	)
 	if err != nil {
 		utils.SQLiteErrorTarget(err, FOLLOW_BACK)
@@ -154,8 +154,21 @@ func followBack(followerId, followedId int64) (bool, error) {
 func createConversation(followerId, followedId int64) error {
 	var chatId int64
 	return database.WrapWithTransaction(func(tx *sql.Tx) error {
+		err := tx.QueryRow(SELECT_SHARED_CHATS, followerId, followedId).Scan(&chatId)
+		if err != nil && err != sql.ErrNoRows {
+			utils.SQLiteErrorTarget(err, SELECT_SHARED_CHATS)
+			return err
+		}
+		if err != sql.ErrNoRows {
+			_, err = tx.Exec(UPDATE_CHAT_ACTIVE, chatId)
+			if err != nil {
+				utils.SQLiteErrorTarget(err, UPDATE_CHAT_ACTIVE)
+				return err
+			}
+			return nil
+		}
 		chatId = utils.GenerateID()
-		_, err := tx.Exec(
+		_, err = tx.Exec(
 			CREATE_CHAT_ROW,
 			chatId,
 		)

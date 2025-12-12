@@ -2,6 +2,7 @@ package socket
 
 import (
 	"database/sql"
+	"fmt"
 
 	"social/pkg/db/database"
 	"social/pkg/utils"
@@ -28,6 +29,7 @@ func SelectUserChats(c *Client) error {
 				utils.SQLiteErrorTarget(err, SELECT_USER_CHATS)
 				return err
 			}
+			fmt.Println("chatId",chatId)
 			c.userChats[chatId] = struct{}{}
 		}
 		return nil

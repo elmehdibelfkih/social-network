@@ -35,7 +35,6 @@ export function ChatSection() {
                     break;
                 case 'onlineUser': {
                     const updated = data?.payload?.onlineUser.user;
-                    console.log("howa")
                     setUsers(prev =>
                         prev.map(u =>
                             u.userId === updated.userId
@@ -74,7 +73,7 @@ export function ChatSection() {
     return (
         <div className={styles.wrapper}>
             <div className={styles.header}>
-                {/* <img src="/svg/users.svg" alt="" /> */}
+                <img src="/svg/message-square.svg" alt="" />
                 <h2>Contacts</h2>
             </div>
             <div className={styles.scrollArea}>

@@ -9,6 +9,8 @@ import { NewPost } from "@/features/newPost";
 import { postsService } from "@/features/posts";
 import PostServer from "@/features/posts/posts.server";
 import { useUserStats } from "@/providers/userStatsContext";
+import { ChatSection } from "@/features/chat";
+import styles from "@/styles/app.module.css"
 
 export default async function HomePage(): Promise<JSX.Element> {
   const userId = await getUserId();
@@ -18,22 +20,27 @@ export default async function HomePage(): Promise<JSX.Element> {
 
   return (
     <>
-      <ProfileSummaryServer userId={userId} />
-      <div>
-        <NewPost data={res2} isMyprofile={false} />
-      </div>
-      <div>
-        {posts.length === 0 ? (
-          <p>
-            No posts yet. Be the first to create one!
-          </p>
-        ) : (
-          posts.map((post) => (
-            <PostServer key={post.postId} post={post} />
-          ))
-        )}
-      </div>
-      <MiniProfile data={res2} isMyprofile={false} />
+      <main className={styles.main}>
+        <div className={styles.firstSection}>
+          <ProfileSummaryServer userId={userId} />
+        </div>
+        <div className={styles.secondSection}>
+          <NewPost data={res2} isMyprofile={false} />
+          {posts.length === 0 ? (
+            <p>
+              No posts yet. Be the first to create one!
+            </p>
+          ) : (
+            posts.map((post) => (
+              <PostServer key={post.postId} post={post} />
+            ))
+          )}
+        </div>
+        <div className={styles.thirdSection}>
+          <ChatSection></ChatSection>
+        </div>
+        {/* <MiniProfile data={res2} isMyprofile={false} /> */}
+      </main>
     </>
   );
 }
