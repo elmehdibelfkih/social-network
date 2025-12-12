@@ -4,7 +4,7 @@ import styles from './styles.module.css';
 import { } from '../mini_profile/styles.module.css';
 import { ImageIcon, GlobeIcon, DropdownIcon, LockIcon, UsersIcon } from '@/components/ui/icons';
 import AddFriends from '@/components/ui/AddFriends/addFriends';
-import { postsService } from './services/postsService';
+import { postsService } from './postsService';
 import type { PrivacyLevel } from './types';
 import { useAuth } from '@/providers/authProvider';
 import AvatarHolder from '@/components/ui/avatar_holder/avatarholder.client';

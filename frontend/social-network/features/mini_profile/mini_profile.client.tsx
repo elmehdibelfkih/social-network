@@ -7,11 +7,9 @@ import { FollowApiResponse } from './types'
 import { useUserStats } from '@/providers/userStatsContext'
 import { MiniProfile } from '@/libs/globalTypes'
 
-
 type Props = {
   data?: MiniProfile
 }
-
 
 export function MiniProfileActions({ data }: Props) {
   const { state, dispatch } = useUserStats();
@@ -78,7 +76,6 @@ export function MiniProfileActions({ data }: Props) {
     followersCount: isCurrentUser ? state.followersCount : followersCount,
     followingCount: isCurrentUser ? state.followingCount : data?.stats?.followingCount ?? 0,
   };
-
 
   return (
     <>

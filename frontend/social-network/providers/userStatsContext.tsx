@@ -16,7 +16,14 @@ type Action =
   | { type: 'DECREMENT_COMMENTS_RECEIVED' }
   | { type: 'NEW_NOTIFICATION' }
   | { type: 'READ_ALL_NOTIFICATIONS' }
-  | { type: 'SET_STATS'; payload: Partial<UserStatsState> }; // Use Partial for flexibility
+  | { type: 'SET_STATS'; payload: Partial<UserStatsState> }
+  | { type: 'SET_PRIVACY'; payload: 'public' | 'private' | string }
+  | { type: 'SET_NICKNAME'; payload: string | null }
+  | { type: 'SET_FIRST_NAME'; payload: string | null }
+  | { type: 'SET_LAST_NAME'; payload: string | null }
+  | { type: 'SET_AVATAR_ID'; payload: number | null }
+  | { type: 'SET_ABOUT_ME'; payload: string | null }
+  | { type: 'SET_DATE_OF_BIRTH'; payload: string | null };
 
 const userStatsReducer = (state: UserStatsState, action: Action): UserStatsState => {
   switch (action.type) {
@@ -46,6 +53,20 @@ const userStatsReducer = (state: UserStatsState, action: Action): UserStatsState
       return { ...state, unreadNotifications: 0 };
     case 'SET_STATS':
       return { ...state, ...action.payload };
+    case 'SET_PRIVACY':
+      return { ...state, privacy: action.payload };
+    case 'SET_NICKNAME':
+      return { ...state, nickname: action.payload };
+    case 'SET_FIRST_NAME':
+      return { ...state, firstName: action.payload };
+    case 'SET_LAST_NAME':
+      return { ...state, lastName: action.payload };
+    case 'SET_AVATAR_ID':
+      return { ...state, avatarId: action.payload };
+    case 'SET_ABOUT_ME':
+      return { ...state, aboutMe: action.payload };
+    case 'SET_DATE_OF_BIRTH':
+      return { ...state, dateOfBirth: action.payload };
     default:
       return state;
   }
@@ -58,7 +79,7 @@ const UserStatsContext = createContext<{
 
 type UserStatsProviderProps = {
   children: ReactNode;
-  initialState?: Partial<UserStatsState>; // Make initial state an optional prop
+  initialState?: Partial<UserStatsState>; 
 };
 
 export const UserStatsProvider = ({ children, initialState }: UserStatsProviderProps) => {

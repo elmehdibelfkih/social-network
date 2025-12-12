@@ -1,5 +1,5 @@
 import { http } from '@/libs/apiFetch';
-import type { CreatePostInput, MediaUploadResponse, Post } from '../types';
+import type { CreatePostInput, MediaUploadResponse, Post } from './types';
 import { PrivacyLevel } from '@/libs/globalTypes';
 
 export const postsService = {

@@ -7,9 +7,12 @@ import { FollowIcon, MessageIcon } from '@/components/ui/icons'
 import { ProfileData } from './types'
 import { FollowStatus } from '@/libs/globalTypes'
 import { useAuth } from '@/providers/authProvider'
+import { useUserStats } from '@/providers/userStatsContext'
 
 export function FollowButton({ targetUserId, initialStatus, isPrivate = false }: { targetUserId: string, initialStatus: FollowStatus, isPrivate?: boolean }) {
     const [status, setStatus] = useState<FollowStatus>(initialStatus);
+
+    const { state, dispatch } = useUserStats();
 
     const handleFollow = async () => {
         if (status == 'follow' || status == 'none') {
@@ -19,14 +22,18 @@ export function FollowButton({ targetUserId, initialStatus, isPrivate = false }:
 
             followPerson(targetUserId).catch(() => {
                 setStatus(previousStatus)
+                return
             })
+            dispatch({ type: 'INCREMENT_FOLLOWING' });
         } else {
             const previousStatus = status
             setStatus('follow');
 
             unfollowPerson(targetUserId).catch(() => {
                 setStatus(previousStatus)
+                return
             })
+            dispatch({ type: 'DECREMENT_FOLLOWING' });
         }
     }
 

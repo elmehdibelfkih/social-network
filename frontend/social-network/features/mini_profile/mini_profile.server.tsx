@@ -5,7 +5,6 @@ import type { MiniProfile } from '@/libs/globalTypes'
 import { MiniProfileActions } from './mini_profile.client'
 import { AvatarHolder } from '@/components/ui/avatar_holder/avatarholder.client'
 
-
 type Props = {
   userId?: string | number
   data?: MiniProfile
@@ -13,11 +12,11 @@ type Props = {
 
 export default function MiniProfile({ userId, data }: Props) {
   let profile: MiniProfile | null = data ?? null
-  
+
   if (!profile && userId != null) {
     const fetchProfile = async () => {
       profile = await getMiniProfileServer(userId)
-    }    
+    }
     fetchProfile()
   }
 
@@ -27,7 +26,6 @@ export default function MiniProfile({ userId, data }: Props) {
     ? new Date(profile.joinedAt).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })
     : ''
 
-  // todo
   return (
     <aside className={styles.miniCardLarge} aria-label={`Mini profile for ${name}`}>
       <div className={styles.miniHeaderLarge}>
@@ -59,7 +57,7 @@ export default function MiniProfile({ userId, data }: Props) {
       </div>
 
       <div className={styles.miniDivider} />
-        <MiniProfileActions data={profile}/>
+      <MiniProfileActions data={profile} />
     </aside>
   )
 }
