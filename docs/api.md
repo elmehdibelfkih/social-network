@@ -1794,12 +1794,12 @@ No need for a request body.
 
 ***pagination***
 
-> - example of use: GET /api/v1/notifications?page=2&limit=10&read=unread
+> - example of use: GET /api/v1/notifications?last_id=2&limit=10&read=unread
 
 |Parameter| Type| Description|
 |----------|-------|--------------|
-|page| integer| Page number (default = 1)|
-|limit| integer| Number of items per page (default = 20)|
+|last_id| integer| last_id number (default = 1)|
+|limit| integer| Number of items per last_id (default = 20)|
 |read| string| Optional filter: read / unread|
 |type| string| Optional filter: follow_request, post_liked, etc.|
 

@@ -11,6 +11,7 @@ import { SettingsIcon, ProfileIcon, LogoutIcon, HomeIcon, GroupsIcon, SearchIcon
 import { http } from '@/libs/apiFetch';
 import { useAuth } from '@/providers/authProvider';
 import Snackbar, { ShowSnackbar } from '@/components/ui/snackbar/snackbar';
+import { useUserStats } from '@/providers/userStatsContext';
 
 type Props = {
   userId?: string | number
@@ -22,6 +23,10 @@ export function NavProfile({ userId: initialUserId, data: initialData }: Props) 
   const [open, setOpen] = useState(false);
   const [profile, setProfile] = useState<ProfileAPIResponse | null>(initialData ?? null);
   const { setUser } = useAuth();
+
+  const { state } = useUserStats();
+  console.log(state);
+  
 
   useEffect(() => {
     let mounted = true;

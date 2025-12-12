@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation';
 import { authService } from './index';
 import styles from './styles.module.css';
 import { useAuth } from '@/providers/authProvider';
-import { User } from "@/features/navbar/types";
 import { ShowSnackbar } from '@/components/ui/snackbar/snackbar';
 
 
