@@ -10,7 +10,7 @@ export type UserStatsState = {
   followingCount: number;
   likesReceived: number;
   commentsReceived: number;
-  unreadNotifications: number; /
+  unreadNotifications: number; 
 };
 
 
