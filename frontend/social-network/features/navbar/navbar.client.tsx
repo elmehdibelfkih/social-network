@@ -24,8 +24,8 @@ export function NavProfile({ userId: initialUserId, data: initialData }: Props) 
   const [profile, setProfile] = useState<ProfileAPIResponse | null>(initialData ?? null);
   const { setUser } = useAuth();
 
-  const { state } = useUserStats();
-  console.log(state);
+  // const { state } = useUserStats();
+  // console.log(state);
   
 
   useEffect(() => {

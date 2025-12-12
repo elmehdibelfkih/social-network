@@ -59,14 +59,11 @@ export function FollowersList({ userId, type }: FollowersListProps) {
         return <div>Loading...</div>
     }
     
-    { followers.map((follower) => { console.log(follower) }) } // debaggin
-
     return (
         <div className={styles.followersGrid}>
-            {followers.length === 0 && !isLoading ?
+            {!followers && !isLoading ?
                 <EmptyContent type={type} />
                 : followers.map((follower) => (
-
                     <MiniProfile key={follower.userId} data={followerToProfile(follower)} isMyprofile={String(follower.userId) !== user?.userId}  />
                 ))}
         </div>

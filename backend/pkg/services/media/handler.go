@@ -25,7 +25,6 @@ func HandleUploadMedia(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if !AllowedMimeTypes[req.FileType] {
-		println(req.FileType)
 		utils.UnsupportedMediaType(w)
 		return
 	}

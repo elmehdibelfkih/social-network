@@ -1,17 +1,18 @@
 'use client';
 
 import React, { createContext, useReducer, useContext, ReactNode } from 'react';
+import { UserStatsState } from "@/libs/globalTypes";
 
 
-export type UserStatsState = {
-  userId: number | null;
-  postsCount: number;
-  followersCount: number;
-  followingCount: number;
-  likesReceived: number;
-  commentsReceived: number;
-  unreadNotifications: number; 
-};
+// export type UserStatsState = {
+//   userId: number | null;
+//   postsCount: number;
+//   followersCount: number;
+//   followingCount: number;
+//   likesReceived: number;
+//   commentsReceived: number;
+//   unreadNotifications: number; 
+// };
 
 
 type Action =
@@ -30,9 +31,9 @@ const userStatsReducer = (state: UserStatsState, action: Action): UserStatsState
     case 'DECREMENT_FOLLOWERS':
       return { ...state, followersCount: Math.max(0, state.followersCount - 1) };
     case 'INCREMENT_POSTS':
-        return { ...state, postsCount: state.postsCount + 1 };
+      return { ...state, postsCount: state.postsCount + 1 };
     case 'DECREMENT_POSTS':
-        return { ...state, postsCount: Math.max(0, state.postsCount - 1) };
+      return { ...state, postsCount: Math.max(0, state.postsCount - 1) };
     case 'NEW_NOTIFICATION':
       return { ...state, unreadNotifications: state.unreadNotifications + 1 };
     case 'READ_ALL_NOTIFICATIONS':
@@ -63,6 +64,14 @@ export const UserStatsProvider = ({ children, initialState }: UserStatsProviderP
     likesReceived: 0,
     commentsReceived: 0,
     unreadNotifications: 0,
+    privacy: 'public',
+    nickname: null,
+    firstName: "",
+    lastName: "",
+    avatarId:  null,
+    aboutMe:  null,
+    dateOfBirth: null,
+    joinedAt: null,
   };
 
   const [state, dispatch] = useReducer(userStatsReducer, {
