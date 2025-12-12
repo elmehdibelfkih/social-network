@@ -103,8 +103,18 @@ const (
 	`
 
 	QUERY_CHECK_FOLLOW_RELATION = `
-		SELECT f.status
+		SELECT status
 		FROM follows
-		WHERE follower_id = ?
+		WHERE follower_id = ? AND followed_id = ?
+	`
+
+	QUERY_CHECK_IS_USER_ALLOWED = `
+		SELECT pav.user_id
+		FROM post_allowed_viewers pav
+		JOIN follows f ON pav.user_id = f.follower_id
+		WHERE pav.post_id = ?
+		AND f.follower_id = ?
+		AND f.followed_id = ?
+		AND f.status = 'accepted'
 	`
 )
