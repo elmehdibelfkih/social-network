@@ -9,7 +9,6 @@ type Post struct {
 	Privacy   string `db:"privacy"`
 	CreatedAt string `db:"created_at"`
 	UpdatedAt string `db:"updated_at"`
-	Pinned    int    `db:"pinned"`
 }
 
 // Comment represents a comment in the database
@@ -20,6 +19,13 @@ type Comment struct {
 	Content   string `db:"content"`
 	CreatedAt string `db:"created_at"`
 	UpdatedAt string `db:"updated_at"`
+}
+
+// AuthorDetails represents author information
+type AuthorDetails struct {
+	FirstName string
+	LastName  string
+	Nickname  string
 }
 
 // PostReaction represents a reaction to a post
@@ -54,16 +60,18 @@ type CreatePostResponse struct {
 
 // GetPostResponse represents a single post response
 type GetPostResponse struct {
-	PostID         int64   `json:"postId"`
-	AuthorID       int64   `json:"authorId"`
-	AuthorNickname string  `json:"authorNickname"`
-	Content        string  `json:"content"`
-	MediaIDs       []int64 `json:"mediaIds"`
-	Privacy        string  `json:"privacy"`
-	GroupID        *int64  `json:"groupId"`
-	AllowedList    []int64 `json:"allowedList"`
-	CreatedAt      string  `json:"createdAt"`
-	UpdatedAt      string  `json:"updatedAt"`
+	PostID          int64   `json:"postId"`
+	AuthorID        int64   `json:"authorId"`
+	AuthorFirstName string  `json:"authorFirstName"`
+	AuthorLastName  string  `json:"authorLastName"`
+	AuthorNickname  string  `json:"authorNickname"`
+	Content         string  `json:"content"`
+	MediaIDs        []int64 `json:"mediaIds"`
+	Privacy         string  `json:"privacy"`
+	GroupID         *int64  `json:"groupId"`
+	AllowedList     []int64 `json:"allowedList"`
+	CreatedAt       string  `json:"createdAt"`
+	UpdatedAt       string  `json:"updatedAt"`
 }
 
 // UpdatePostRequest represents the request body for updating a post
@@ -114,13 +122,17 @@ type CreateCommentResponse struct {
 
 // CommentResponse represents a single comment
 type CommentResponse struct {
-	CommentID      int64   `json:"commentId"`
-	AuthorID       int64   `json:"authorId"`
-	AuthorNickname string  `json:"authorNickname"`
-	Content        string  `json:"content"`
-	MediaIDs       []int64 `json:"mediaIds"`
-	CreatedAt      string  `json:"createdAt"`
-	UpdatedAt      string  `json:"updatedAt"`
+	CommentID       int64   `json:"commentId"`
+	AuthorID        int64   `json:"authorId"`
+	AuthorFirstName string  `json:"authorFirstName"`
+	AuthorLastName  string  `json:"authorLastName"`
+	AuthorNickname  string  `json:"authorNickname"`
+	Content         string  `json:"content"`
+	MediaIDs        []int64 `json:"mediaIds"`
+	IsLikedByUser   bool    `json:"isLikedByUser"`
+	LikeCount       int     `json:"likeCount"`
+	CreatedAt       string  `json:"createdAt"`
+	UpdatedAt       string  `json:"updatedAt"`
 }
 
 // ListCommentsResponse represents the response for listing comments

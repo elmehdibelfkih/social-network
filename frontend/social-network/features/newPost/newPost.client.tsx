@@ -1,137 +1,223 @@
-'use client'
-
-import { useState, useRef } from 'react';
+'use client';
+import { useState, useRef, useEffect } from 'react';
 import styles from './styles.module.css';
-import { ImageIcon, GlobeIcon, DropdownIcon } from '@/components/ui/icons';
-import { postsService } from '@/features/posts/postsService';
-import { Post } from '@/features/posts/types';
+import {} from '../mini_profile/styles.module.css';
+import { ImageIcon, GlobeIcon, DropdownIcon, LockIcon, UsersIcon } from '@/components/ui/icons';
+import AddFriends from '@/components/ui/AddFriends/addFriends';
+import { postsService } from './services/postsService';
+import type { PrivacyLevel } from './types';
+import { useAuth } from '@/providers/authProvider';
+import AvatarHolder from '@/components/ui/avatar_holder/avatarholder.client';
 
-interface NewPostProps {
-    userAvatar: string;
-    onPostCreated?: (post: Post) => void;
-}
+export const privacyOptions = [
+  { value: 'public', label: 'Public', description: 'Anyone can see this post', icon: 'globe' },
+  { value: 'followers', label: 'Followers', description: 'Only your followers can see', icon: 'users' },
+  { value: 'private', label: 'Private', description: 'Only you can see', icon: 'lock' },
+  { value: 'restricted', label: 'Restricted', description: 'Only share with...', icon: 'users' }
+] as const;
 
-export function NewPost({ userAvatar, onPostCreated }: NewPostProps) {
-    const [content, setContent] = useState("");
-    const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
-    const [privacy, setPrivacy] = useState<'public' | 'private'>('public');
-    const [showPrivacyDropdown, setShowPrivacyDropdown] = useState(false);
-    const fileInputRef = useRef<HTMLInputElement>(null);
+export function NewPostClient() {
+  const { user } = useAuth();
+  const [content, setContent] = useState('');
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [privacy, setPrivacy] = useState<PrivacyLevel>('public');
+  const [showPrivacyDropdown, setShowPrivacyDropdown] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showAddFriends, setShowAddFriends] = useState(false);
+  const [selectedFollowers, setSelectedFollowers] = useState<number[]>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  
 
-    const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const files = Array.from(e.target.files || []);
-        setSelectedFiles(files);
-    };
+  const [isMounted, setIsMounted] = useState(false);
+  useEffect(() => setIsMounted(true), []);
+  if (!isMounted || !user) return null;
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) =>
+    setSelectedFiles(Array.from(e.target.files || []));
 
-        if (!content.trim()) return;
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!content.trim()) return;
 
-        try {
-            let mediaIds: number[] = [];
-            
-            if (selectedFiles.length > 0) {
-                const uploadPromises = selectedFiles.map(file => postsService.uploadMedia(file));
-                const uploadResults = await Promise.all(uploadPromises);
-                mediaIds = uploadResults.map(result => result.mediaId);
-            }
+    setIsSubmitting(true);
 
-            const postData = await postsService.createPost({ 
-                content: content.trim(), 
-                privacy: privacy,
-                mediaIds: mediaIds.length > 0 ? mediaIds : undefined
-            });
-            
-            const newPost: Post = {
-                postId: postData.postId,
-                authorId: postData.authorId,
-                authorFirstName: 'Current',
-                authorLastName: 'User',
-                content: content.trim(),
-                privacy: privacy,
-                mediaIds: postData.mediaIds,
-                isLikedByUser: false,
-                stats: { reactionCount: 0, commentCount: 0 },
-                createdAt: postData.createdAt,
-                updatedAt: postData.createdAt
-            };
-            
-            onPostCreated?.(newPost);
-            setContent("");
-            setSelectedFiles([]);
-            if (fileInputRef.current) fileInputRef.current.value = '';
-        } catch (error) {
-            console.error("Failed to post:", error);
-            alert("Failed to create post");
-        }
-    };
+    try {
+      let mediaIds: number[] = [];
 
+      if (selectedFiles.length > 0) {
+        const uploaded = await Promise.all(selectedFiles.map(postsService.uploadMedia));
+        mediaIds = uploaded.map(r => r.mediaId);
+      }
 
-    return (
-        <form onSubmit={handleSubmit} className={styles.form}>
-            <div className={styles.leftPart}>
-                <img className={styles.avatar} src={userAvatar} />
-            </div>
-            <div className={styles.rightPart}>
-                <div className={styles.topPart}>
-                    <textarea placeholder="what's on your mind?" className={styles.textArea} value={content}
-                        onChange={(e) => setContent(e.target.value)} />
-                </div>
-                <div className={styles.bottomPart}>
-                    <button className={styles.uploadImageButton} type='button' onClick={() => fileInputRef.current?.click()}>
-                        <ImageIcon />
-                        <span>Photo</span>
+      await postsService.createPost({
+        content: content.trim(),
+        privacy,
+        mediaIds: mediaIds.length ? mediaIds : undefined,
+        allowedList:
+          privacy === 'restricted' && selectedFollowers.length ? selectedFollowers : undefined
+      });
+
+      setContent('');
+      setSelectedFiles([]);
+      setPrivacy('public');
+      setSelectedFollowers([]);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const getPrivacyIcon = (icon: string) => {
+    if (icon === 'globe') return <GlobeIcon fillColor="currentColor" />;
+    if (icon === 'users') return <UsersIcon  />;
+    if (icon === 'lock') return <LockIcon  />;
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className={styles.form}>
+      <div className={styles.leftPart}>
+        <AvatarHolder avatarId={user?.avatarId ?? null} size={60} />
+      </div>
+      
+      <div className={styles.rightPart}>
+        <div className={styles.userInfo}>
+          <div className={styles.miniHandle}>{user.firstName + ' ' + user.lastName}</div>
+          <h4 className={styles.miniName}>{'@'+user.nickname}</h4>
+        </div>
+        
+        {/* Textarea */}
+        <div className={styles.topPart}>
+          <textarea
+            className={styles.textArea}
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+            placeholder="What's on your mind?"
+          />
+        </div>
+
+        {/* File list */}
+        {selectedFiles.length > 0 && (
+          <div className={styles.selectedFiles}>
+            {selectedFiles.map((file, i) => (
+              <div key={i} className={styles.fileItem}>
+                <img 
+                  src={URL.createObjectURL(file)} 
+                  alt={file.name}
+                  className={styles.previewImage}
+                />
+                <span className={styles.fileName}>{file.name}</span>
+                <button
+                  type="button"
+                  className={styles.removeFileButton}
+                  onClick={() =>
+                    setSelectedFiles(prev => prev.filter((_, idx) => idx !== i))
+                  }
+                >
+                  ×
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Bottom controls */}
+        <div className={styles.bottomPart}>
+
+          {/* Upload button */}
+          <button
+            type="button"
+            className={styles.uploadImageButton}
+            onClick={() => fileInputRef.current?.click()}
+          >
+            <ImageIcon /> Photo
+          </button>
+
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            multiple
+            hidden
+            onChange={handleFileSelect}
+          />
+
+          {/* PRIVACY */}
+          <div className={styles.privacyContainer}>
+            <button
+              type="button"
+              className={styles.privacyButton}
+              onClick={() => setShowPrivacyDropdown(!showPrivacyDropdown)}
+            >
+              {getPrivacyIcon(privacyOptions.find(p => p.value === privacy)?.icon || '')}
+              {privacyOptions.find(p => p.value === privacy)?.label}
+              <DropdownIcon />
+            </button>
+
+            {showPrivacyDropdown && (
+              <>
+                {/* Backdrop */}
+                <div
+                  className={styles.dropdownBackdrop}
+                  onClick={() => setShowPrivacyDropdown(false)}
+                />
+
+                <div className={styles.privacyDropdown}>
+                  {privacyOptions.map(opt => (
+                    <button
+                      key={opt.value}
+                      type="button"
+                      className={`${styles.privacyOption} ${privacy === opt.value ? styles.active : ''}`}
+                      onClick={() => {
+                        setPrivacy(opt.value);
+                        setShowPrivacyDropdown(false);
+                        if (opt.value === 'restricted') setShowAddFriends(true);
+                      }}
+                    >
+                      <div className={styles.privacyOptionIcon}>
+                        {getPrivacyIcon(opt.icon)}
+                      </div>
+
+                      <div className={styles.privacyOptionContent}>
+                        <div className={styles.privacyOptionLabel}>{opt.label}</div>
+                        <div className={styles.privacyOptionDesc}>{opt.description}</div>
+                      </div>
+
+                      {privacy === opt.value && (
+                        <div className={styles.privacyOptionCheck}>✓</div>
+                      )}
                     </button>
-                    <input
-                        ref={fileInputRef}
-                        type="file"
-                        accept="image/*"
-                        multiple
-                        onChange={handleFileSelect}
-                        style={{ display: 'none' }}
-                    />
-                    {selectedFiles.length > 0 && (
-                        <div className={styles.selectedFiles}>
-                            {selectedFiles.map((file, index) => (
-                                <span key={index}>{file.name}</span>
-                            ))}
-                        </div>
-                    )}
-                    <div className={styles.privacyContainer}>
-                        <button 
-                            className={styles.privacyButton} 
-                            type='button'
-                            onClick={() => setShowPrivacyDropdown(!showPrivacyDropdown)}
-                        >
-                            <GlobeIcon fillColor='#737373' />
-                            <span>{privacy === 'public' ? 'Public' : 'private' }</span>
-                            <DropdownIcon />
-                        </button>
-                        {showPrivacyDropdown && (
-                            <div className={styles.privacyDropdown}>
-                                <button 
-                                    type='button'
-                                    onClick={() => { setPrivacy('public'); setShowPrivacyDropdown(false); }}
-                                    className={privacy === 'public' ? styles.active : ''}
-                                >
-                                    Public
-                                </button>
-                                <button 
-                                    type='button'
-                                    onClick={() => { setPrivacy('private'); setShowPrivacyDropdown(false); }}
-                                    className={privacy === 'private' ? styles.active : ''}
-                                >
-                                    Private
-                                </button>
-                            </div>
-                        )}
-                    </div>
-                    <button className={styles.actionButton} type='submit'>
-                        Post
-                    </button>
+                  ))}
                 </div>
+              </>
+            )}
+          </div>
+
+          {/* Add friends (restricted mode) */}
+          {showAddFriends && (
+            <div className={styles.addFriendsPopup}>
+              <AddFriends
+                title="Allowed followers"
+                desc="Choose who can see"
+                groupId="0"
+                purpose="post"
+                onComplete={(ids) => {
+                  setSelectedFollowers(ids);
+                  setShowAddFriends(false);
+                }}
+                onClose={() => setShowAddFriends(false)}
+              />
             </div>
-        </form>
-    );
+          )}
+
+          {/* Action button */}
+          <button
+            type="submit"
+            className={styles.actionButton}
+            disabled={isSubmitting || !content.trim()}
+          >
+            {isSubmitting ? 'Posting...' : 'Post'}
+          </button>
+        </div>
+      </div>
+    </form>
+  );
 }

@@ -8,6 +8,10 @@ import { useRouter, usePathname } from "next/navigation";
 import { getProfileServer } from '../mini_profile';
 import { getUserId } from '@/libs/helpers';
 import { SettingsIcon, ProfileIcon, LogoutIcon, HomeIcon, GroupsIcon, SearchIcon, BellIcon } from '@/components/ui/icons';
+import { http } from '@/libs/apiFetch';
+import { useAuth } from '@/providers/authProvider';
+import Snackbar, { ShowSnackbar } from '@/components/ui/snackbar/snackbar';
+import { useUserStats } from '@/providers/userStatsContext';
 
 type Props = {
   userId?: string | number
@@ -18,6 +22,11 @@ export function NavProfile({ userId: initialUserId, data: initialData }: Props) 
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [profile, setProfile] = useState<ProfileAPIResponse | null>(initialData ?? null);
+  const { setUser } = useAuth();
+
+  const { state } = useUserStats();
+  console.log(state);
+  
 
   useEffect(() => {
     let mounted = true;
@@ -64,6 +73,18 @@ export function NavProfile({ userId: initialUserId, data: initialData }: Props) 
     };
   }, [initialUserId, initialData]);
 
+  const handleLogout = async () => {
+    try {
+      await http.post('/api/v1/auth/logout');
+      setUser(null);
+      ShowSnackbar({ status: true, message: 'Logged out successfully.' });
+      router.push('/auth');
+    } catch (error) {
+      console.error('Logout failed', error);
+      // Optionally: show an error message to the user.
+    }
+  };
+
   const displayName = profile?.nickname ?? profile?.firstName ?? "";
 
   return (
@@ -103,7 +124,7 @@ export function NavProfile({ userId: initialUserId, data: initialData }: Props) 
           <button
             className={`${styles.menuItem} ${styles.logout}`}
             type="button"
-            onClick={() => router.push("/logout")}
+            onClick={handleLogout}
           >
             <LogoutIcon />
             <span>Log Out</span>
@@ -160,7 +181,7 @@ export function NotificationClient() {
   return (
     <div className={styles.navbarRight}>
       <button className={styles.notificationBtn} aria-label="Notifications">
-        <BellIcon /> 
+        <BellIcon />
         {/* <p>Notifications</p> */}
       </button>
     </div>

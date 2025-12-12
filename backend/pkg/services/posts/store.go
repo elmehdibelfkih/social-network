@@ -14,6 +14,7 @@ import (
 
 // CreatePost creates a new post in the database
 func CreatePost(post *Post) error {
+	fmt.Printf("%+v\n", post)
 	err := database.WrapWithTransaction(func(tx *sql.Tx) error {
 		_, err := tx.Exec(QUERY_CREATE_POST,
 			post.ID,
@@ -23,7 +24,6 @@ func CreatePost(post *Post) error {
 			post.Privacy,
 			post.CreatedAt,
 			post.UpdatedAt,
-			post.Pinned,
 		)
 		if err != nil {
 			if e, ok := err.(sqlite3.Error); ok && e.Code == sqlite3.ErrConstraint {
@@ -32,6 +32,7 @@ func CreatePost(post *Post) error {
 			utils.SQLiteErrorTarget(err, "CreatePost")
 			return fmt.Errorf("failed to create post: %w", err)
 		}
+		fmt.Println("hani hana")
 
 		// Increment posts_count
 		// if err := database.UpdateCounter(tx, database.DBCounterSetter{
@@ -71,7 +72,6 @@ func GetPostByID(postID int64) (*Post, error) {
 		&post.Privacy,
 		&post.CreatedAt,
 		&post.UpdatedAt,
-		&post.Pinned,
 	)
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -198,7 +198,6 @@ func GetUserPosts(userID int64, limit, offset int) ([]Post, int, error) {
 			&post.Privacy,
 			&post.CreatedAt,
 			&post.UpdatedAt,
-			&post.Pinned,
 		)
 		if err != nil {
 			utils.SQLiteErrorTarget(err, "GetUserPosts (scan)")
@@ -513,20 +512,80 @@ func CheckPostReactionExists(postID, userID int64) bool {
 	return err == nil
 }
 
-// GetAuthorNickname retrieves the author's nickname
-func GetAuthorNickname(authorID int64) (string, error) {
+func GetAuthorDetails(authorID int64) (*AuthorDetails, error) {
+	var firstName, lastName sql.NullString
 	var nickname sql.NullString
-	err := config.DB.QueryRow(QUERY_GET_AUTHOR_NICKNAME, authorID).Scan(&nickname)
+
+	err := config.DB.QueryRow(QUERY_GET_AUTHOR_DETAILS, authorID).Scan(&firstName, &lastName, &nickname)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return "", err
+			return nil, err
 		}
-		utils.SQLiteErrorTarget(err, "GetAuthorNickname")
-		return "", err
+		utils.SQLiteErrorTarget(err, "GetAuthorDetails")
+		return nil, fmt.Errorf("failed to get author details: %w", err)
 	}
 
-	if nickname.Valid {
-		return nickname.String, nil
+	details := &AuthorDetails{}
+	if firstName.Valid {
+		details.FirstName = firstName.String
 	}
-	return "", nil
+	if lastName.Valid {
+		details.LastName = lastName.String
+	}
+	if nickname.Valid {
+		details.Nickname = nickname.String
+	}
+
+	return details, nil
+}
+
+// CreateCommentReaction creates a like reaction on a comment
+func CreateCommentReaction(commentID, userID int64, reaction string) error {
+	now := time.Now().Format(time.RFC3339)
+	_, err := config.DB.Exec(QUERY_CREATE_COMMENT_REACTION, commentID, userID, reaction, now)
+	if err != nil {
+		if e, ok := err.(sqlite3.Error); ok && e.Code == sqlite3.ErrConstraint {
+			return fmt.Errorf("reaction already exists")
+		}
+		utils.SQLiteErrorTarget(err, "CreateCommentReaction")
+		return fmt.Errorf("failed to create comment reaction: %w", err)
+	}
+	return nil
+}
+
+// DeleteCommentReaction removes a reaction from a comment
+func DeleteCommentReaction(commentID, userID int64) error {
+	result, err := config.DB.Exec(QUERY_DELETE_COMMENT_REACTION, commentID, userID)
+	if err != nil {
+		utils.SQLiteErrorTarget(err, "DeleteCommentReaction")
+		return fmt.Errorf("failed to delete comment reaction: %w", err)
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	if rowsAffected == 0 {
+		return sql.ErrNoRows
+	}
+
+	return nil
+}
+
+// CheckCommentReactionExists checks if a reaction already exists on a comment
+func CheckCommentReactionExists(commentID, userID int64) bool {
+	var exists int
+	err := config.DB.QueryRow(QUERY_CHECK_COMMENT_REACTION_EXISTS, commentID, userID).Scan(&exists)
+	return err == nil
+}
+
+// GetCommentLikeCount returns the number of likes on a comment
+func GetCommentLikeCount(commentID int64) int {
+	var count int
+	err := config.DB.QueryRow(QUERY_COUNT_COMMENT_LIKES, commentID).Scan(&count)
+	if err != nil {
+		return 0
+	}
+	return count
 }

@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { authService } from './auth';
 import styles from './styles.module.css';
 import { useAuth } from '@/providers/authProvider';
+import { ShowSnackbar } from '@/components/ui/snackbar/snackbar';
 
 
 export function RegisterForm({ onAuthSuccess }: { onAuthSuccess?: () => void }) {
@@ -39,8 +40,9 @@ export function RegisterForm({ onAuthSuccess }: { onAuthSuccess?: () => void }) 
 
             localStorage.setItem('social_network-user', JSON.stringify(newUser));
             setUser(newUser);
-
+            ShowSnackbar({ status: true, message: 'signup successfully.' });
             router.push('/');
+
         } catch (error) {
             console.error("Failed to register:", error);
         } finally {
@@ -54,7 +56,7 @@ export function RegisterForm({ onAuthSuccess }: { onAuthSuccess?: () => void }) 
 
         try {
             const avatarResp = await authService.uploadAvatar(avatar);
-            const avatarId = avatarResp.mediaId
+            const avatarId = avatarResp?.mediaId
             setFormData(prev => ({ ...prev, avatarId: avatarId }));
         } catch (error) {
             console.error("Failed to upload avatar:", error);

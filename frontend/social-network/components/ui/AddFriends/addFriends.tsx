@@ -14,9 +14,10 @@ interface AddFriendsProps {
     componentId: string
     purpose: 'group' | 'post'
     onComplete?: (selectedUserIds: number[]) => void
+    onClose?: () => void
 }
 
-export default function AddFriends({ title, desc, componentId, purpose, onComplete }: AddFriendsProps) {
+export default function AddFriends({ title, desc, componentId, purpose, onComplete, onClose }: AddFriendsProps) {
     const { user } = useAuth()
     const [followers, setFollowers] = useState<Follower[]>([])
     const [searchQuery, setSearchQuery] = useState('')
@@ -89,8 +90,15 @@ export default function AddFriends({ title, desc, componentId, purpose, onComple
     return (
         <div className={styles.outerContainer}>
             <div className={styles.header}>
-                <h3>{title}</h3>
-                <h4>{desc}</h4>
+                <div>
+                    <h3>{title}</h3>
+                    <h4>{desc}</h4>
+                </div>
+                {onClose && (
+                    <button className={styles.closeBtn} onClick={onClose}>
+                        ×
+                    </button>
+                )}
             </div>
             <div className={styles.searchContainer}>
                 <input

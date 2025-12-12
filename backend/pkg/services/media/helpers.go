@@ -1,10 +1,11 @@
 package media
 
 import (
+	"database/sql"
+	"net/http"
 	"os"
 	"path/filepath"
 
-	"net/http"
 	"social/pkg/config"
 	"social/pkg/utils"
 )
@@ -12,7 +13,7 @@ import (
 func getStoragePathForPurpose(purpose string) string {
 	baseDir := "../data/uploads"
 	dir := filepath.Join(baseDir, purpose+"s")
-	os.MkdirAll(dir, 0755)
+	os.MkdirAll(dir, 0o755)
 	return dir
 }
 
@@ -21,16 +22,17 @@ func getMediaID(r *http.Request) (int64, error) {
 }
 
 func canGetMedia(userID, mediaID int64) bool {
-	var ownerID int64
+	var ownerID sql.NullInt64
 	var purpose string
 
 	err := config.DB.QueryRow(QUERY_GET_MEDIA_OWNER_AND_PURPOSE, mediaID).Scan(&ownerID, &purpose)
 	if err != nil {
+		println("4: ", err.Error())
 		return false
 	}
 
 	// Owner can always access
-	if ownerID == userID {
+	if ownerID.Valid && ownerID.Int64 == userID {
 		return true
 	}
 
@@ -48,6 +50,7 @@ func canGetMedia(userID, mediaID int64) bool {
 			return true
 		}
 	}
+	println("5")
 
 	return false
 }

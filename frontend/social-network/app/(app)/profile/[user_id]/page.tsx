@@ -1,16 +1,22 @@
 import { Profile } from '@/features/profile';
+import getProfileData from '@/features/profile/profileSrevice';
+import ProfileFeed from '@/features/profile_feed/profile_feed.server';
 
 interface PageProps {
-  user_id: string;
+  params: Promise<{ user_id: string }>;
+  searchParams: Promise<{ tab?: string }>;
 }
 
-export default async function ProfilePage(  { children, params }: { children: React.ReactNode; params: PageProps }
-) {
+export default async function ProfilePage({ params, searchParams }: PageProps) {
   const { user_id } = await params;
+  const { tab } = await searchParams;
+
+  const profile = await getProfileData(user_id)
+
   return (
     <>
-      <Profile user_id={user_id} />
-      {children}
+      <Profile profile={profile} />
+      <ProfileFeed profile={profile} tab={tab || 'about'} />
     </>
   );
 }

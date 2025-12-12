@@ -359,25 +359,35 @@ No need for a request body.
 
   [
     {
-      "userId": 1289843874323,
-      "nickname": "alice123",
-      "firstName": "Alice",
-      "lastName": "Johnson",
-      "avatarId": 5956843825683,
-      "followedAt": "2025-10-10T12:00:00Z",
-      "status": "accepted", // pending/accepted/declined or null
-      "chatId": 45678654356756 // or null
+      "userId": 1823393649397760,
+      "status": "accepted",
+      "nickname": "Kirsten Grant",
+      "firstName": "Jaquelyn",
+      "lastName": "Mcguire",
+      "avatarId": 1823389853552640,
+      "privacy": "public",
+      "chatId": null,
+      "stats": {
+          "postsCount": 0,
+          "followersCount": 3,
+          "followingCount": 2
+      }
     },
     {
-      "userId": 1289843874334,
-      "nickname": "bob_dev",
-      "firstName": "Bob",
-      "lastName": "Smith",
-      "avatarId": 5956843825683,
-      "followedAt": "2025-10-12T15:30:00Z",
-      "status": "accepted", // pending/accepted/declined or null
-      "chatId": 32456786543567 // or null
-    }
+      "userId": 565768679875975957,
+      "status": "accepted",
+      "nickname": "hola nahoda",
+      "firstName": "sdfdf",
+      "lastName": "eegtrytr",
+      "avatarId": 76537574867477698695,
+      "privacy": "public",
+      "chatId": null,
+      "stats": {
+          "postsCount": 10,
+          "followersCount": 4,
+          "followingCount": 2
+      }
+    },
   ]
 
 ```
@@ -394,25 +404,35 @@ No need for a request body.
 
   [
     {
-      "userId": 1289843874323,
-      "nickname": "alice123",
-      "firstName": "Alice",
-      "lastName": "Johnson",
-      "avatarId": 5956843825683,
-      "followedAt": "2025-10-10T12:00:00Z",
-      "status": "accepted", // pending/accepted
-      "chatId": null
+      "userId": 1823393649397760,
+      "status": "accepted",
+      "nickname": "Kirsten Grant",
+      "firstName": "Jaquelyn",
+      "lastName": "Mcguire",
+      "avatarId": 1823389853552640,
+      "privacy": "public",
+      "chatId": null,
+      "stats": {
+          "postsCount": 0,
+          "followersCount": 3,
+          "followingCount": 2
+      }
     },
     {
-      "userId": 1289843874334,
-      "nickname": "bob_dev",
-      "firstName": "Bob",
-      "lastName": "Smith",
-      "avatarId": 5956843825683,
-      "followedAt": "2025-10-12T15:30:00Z",
-      "status": "accepted", // pending/accepted
-      "chatId": 4567876543 // or null
-    }
+      "userId": 565768679875975957,
+      "status": "accepted",
+      "nickname": "hola nahoda",
+      "firstName": "sdfdf",
+      "lastName": "eegtrytr",
+      "avatarId": 76537574867477698695,
+      "privacy": "public",
+      "chatId": null,
+      "stats": {
+          "postsCount": 10,
+          "followersCount": 4,
+          "followingCount": 2
+      }
+    },
   ]
 
 ```
@@ -429,25 +449,35 @@ No need for a request body.
 
   [
     {
-      "userId": 6249843274333,
-      "nickname": "alice123",
-      "firstName": "Alice",
-      "lastName": "Johnson",
-      "avatarId": 5956843825683,
-      "followedAt": "2025-10-20T14:30:00Z",
-      "status": "pending", // pending/accepted/declined or null
-      "chatId": null
+      "userId": 1823393649397760,
+      "status": "accepted",
+      "nickname": "Kirsten Grant",
+      "firstName": "Jaquelyn",
+      "lastName": "Mcguire",
+      "avatarId": 1823389853552640,
+      "privacy": "public",
+      "chatId": null,
+      "stats": {
+          "postsCount": 0,
+          "followersCount": 3,
+          "followingCount": 2
+      }
     },
     {
-      "userId": 3489443834339,
-      "nickname": "bob_dev",
-      "firstName": "Bob",
-      "lastName": "Smith",
-      "avatarId": 5956843825683,
-      "followedAt": "2025-10-21T10:15:00Z",
-      "status": "pending", // pending/accepted/declined or null
-      "chatId": 98765434567 // or null
-    }
+      "userId": 565768679875975957,
+      "status": "accepted",
+      "nickname": "hola nahoda",
+      "firstName": "sdfdf",
+      "lastName": "eegtrytr",
+      "avatarId": 76537574867477698695,
+      "privacy": "public",
+      "chatId": null,
+      "stats": {
+          "postsCount": 10,
+          "followersCount": 4,
+          "followingCount": 2
+      }
+    },
   ]
 
 ```
@@ -524,7 +554,7 @@ No need for a request body.
       "postId": 3389843874075,
       "authorId": 1289843874339,
       "authorNickname": "charlie_dev", // or null
-      "authorlastName": "alice",
+      "authorLastName": "alice",
       "authorFirstName": "khalifa",
       "content": "Deploying a new Go microservice!",
       "mediaIds": [23456543456787654], // or null
@@ -542,7 +572,7 @@ No need for a request body.
       "postId": 8689843874069,
       "authorId": 1289843874339,
       "authorNickname": "diana_ops",
-      "authorlastName": "alice",
+      "authorLastName": "alice",
       "authorFirstName": "khalifa",
       "content": "Cloud architecture tips.",
       "mediaIds": null,
@@ -581,7 +611,7 @@ No need for a request body.
       "postId": 1289843874332,
       "authorId": 1289843874339,
       "authorNickname": "charlie_dev",
-      "authorlastName": "alice",
+      "authorLastName": "alice",
       "authorFirstName": "khalifa",
       "content": "Working on a new distributed system...",
       "mediaIds": null,
@@ -598,7 +628,7 @@ No need for a request body.
       "postId": 1289843874658,
       "authorId": 1289843874339,
       "authorNickname": "charlie_dev",
-      "authorlastName": "alice",
+      "authorLastName": "alice",
       "authorFirstName": "khalifa",
       "content": "Private note only visible to followers.",
       "mediaIds": null,
@@ -636,7 +666,7 @@ No need for a request body.
       "postId": 1289843874332,
       "authorId": 1289843874339,
       "authorNickname": "charlie_dev",
-      "authorlastName": "alice",
+      "authorLastName": "alice",
       "authorFirstName": "khalifa",
       "content": "Working on a new distributed system...",
       "mediaIds": [1234567890987],
@@ -653,7 +683,7 @@ No need for a request body.
       "postId": 1289843874658,
       "authorId": 1289843874339,
       "authorNickname": "charlie_dev",
-      "authorlastName": "alice",
+      "authorLastName": "alice",
       "authorFirstName": "khalifa",
       "content": "Private note only visible to followers.",
       "mediaIds": null,
@@ -721,7 +751,7 @@ No need for a request body.
   "postId": 128984387246925,
   "authorId": 128984387246929,
   "authorNickname": "devops_mehdi", // or null
-  "authorlastName": "alice",
+  "authorLastName": "alice",
   "authorFirstName": "khalifa",
   "content": "Hello world — launching my new service today!",
   "mediaIds": [1289843874657, 1289843872746], // or null
@@ -826,7 +856,7 @@ No need for a request body.
       "postId": 128984387246923,
       "authorId": 128984387246925,
       "authorNickname": "charlie_dev", // or null
-      "authorlastName": "alice",
+      "authorLastName": "alice",
       "authorFirstName": "khalifa",
       "content": "Working on a new distributed system...",
       "mediaIds": [1289843874657, 1289843872746], // or null
@@ -844,7 +874,7 @@ No need for a request body.
       "postId": 128984387246922,
       "authorId": 128984387246925,
       "authorNickname": "charlie_dev",
-      "authorlastName": "alice",
+      "authorLastName": "alice",
       "authorFirstName": "khalifa",
       "content": "Private note only visible to followers.",
       "mediaIds": [1289843872746],
@@ -920,7 +950,7 @@ No need for a request body.
       "commentId": 43765876897987,
       "authorId": 787598687987987,
       "authorNickname": "devops_mehdi",
-      "authorlastName": "alice",
+      "authorLastName": "alice",
       "authorFirstName": "khalifa",
       "content": "Great post! Learned a lot.",
       "mediaIds": [23456789876567],
@@ -931,7 +961,7 @@ No need for a request body.
       "commentId": 879875987698998,
       "authorId": 787989968686,
       "authorNickname": "charlie_dev",
-      "authorlastName": "alice",
+      "authorLastName": "alice",
       "authorFirstName": "khalifa",
       "content": "Thanks for sharing!",
       "mediaIds": null,
@@ -1764,12 +1794,12 @@ No need for a request body.
 
 ***pagination***
 
-> - example of use: GET /api/v1/notifications?page=2&limit=10&read=unread
+> - example of use: GET /api/v1/notifications?last_id=2&limit=10&read=unread
 
 |Parameter| Type| Description|
 |----------|-------|--------------|
-|page| integer| Page number (default = 1)|
-|limit| integer| Number of items per page (default = 20)|
+|last_id| integer| last_id number (default = 1)|
+|limit| integer| Number of items per last_id (default = 20)|
 |read| string| Optional filter: read / unread|
 |type| string| Optional filter: follow_request, post_liked, etc.|
 
@@ -1882,19 +1912,25 @@ No need for a request body.
 ``` json
  [
     {
-      "userId": 1289843874323,
-      "nickname": "alice123",
-      "firstName": "Alice",
-      "lastName": "Johnson",
-      "avatarId": 5956843825683,
-      "status": "accepted", // pending/accepted
-      "chatId": null
+      "userId": 1823393649397760,
+      "status": "accepted",
+      "nickname": "Kirsten Grant",
+      "firstName": "Jaquelyn",
+      "lastName": "Mcguire",
+      "avatarId": 1823389853552640,
+      "privacy": "public",
+      "chatId": null,
+      "stats": {
+          "postsCount": 0,
+          "followersCount": 3,
+          "followingCount": 2
+      }
     },
     {
       "postId": 3389843874075,
       "authorId": 1289843874339,
       "authorNickname": "charlie_dev", // or null
-      "authorlastName": "alice",
+      "authorLastName": "alice",
       "authorFirstName": "khalifa",
       "content": "Deploying a new Go microservice!",
       "mediaIds": [23456543456787654], // or null

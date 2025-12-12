@@ -1,9 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Post } from './types';
 import { postsService } from './postsService';
 import styles from './styles.module.css';
+import { Post } from '@/libs/globalTypes';
 
 interface FeedProps {
   newPost?: Post | null;

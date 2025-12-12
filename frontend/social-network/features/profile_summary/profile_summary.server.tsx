@@ -1,15 +1,16 @@
 import { getProfileServer } from './profile_summary.services'
-import { formatDisplayName, formatHandle } from './profile_summary.hooks'
 import type { ProfileAPIResponse } from './types'
 import styles from './styles.module.css'
 import { AvatarHolder } from '@/components/ui/avatar_holder/avatarholder.client'
+import { displayName, handleName } from '@/libs/helpers'
 
 type Props = { userId: string | number }
+
 
 export default async function ProfileSummaryServer({ userId }: Props) {
   const api: ProfileAPIResponse | null = await getProfileServer(userId)
 
-  const profile: ProfileAPIResponse = api ?? {
+  const profile: Partial<ProfileAPIResponse> = api ?? {
     userId: Number(userId),
     status: null,
     nickname: null,
@@ -23,8 +24,10 @@ export default async function ProfileSummaryServer({ userId }: Props) {
     joinedAt: null,
   }
 
-  const displayName = formatDisplayName(profile)
-  const handle = formatHandle(profile)
+  // const displayName = formatDisplayName(profile)
+  // const handle = formatHandle(profile)
+  const name = displayName(profile)
+  const handle = handleName(profile)
 
   const joinedLabel = profile.joinedAt
     ? new Date(profile.joinedAt).toLocaleDateString(undefined, {
@@ -39,7 +42,7 @@ export default async function ProfileSummaryServer({ userId }: Props) {
       <div className={styles.header}>
         <AvatarHolder avatarId={profile.avatarId ?? null} size={90} />
         <div className={styles.textWrap}>
-          <h3 className={styles.displayName}>{displayName}</h3>
+          <h3 className={styles.displayName}>{name}</h3>
           <div className={styles.username}>{handle}</div>
           {profile.privacy !== 'public' && (
             <div className={styles.privacy} aria-label="Private profile">

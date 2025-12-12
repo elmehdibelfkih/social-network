@@ -1,22 +1,26 @@
 import { getProfileServer } from './mini_profile.services'
-import { displayName, handleName } from './mini_profile.hooks'
+import { displayName, handleName } from '@/libs/helpers'
 import styles from './styles.module.css'
 import type { ProfileAPIResponse } from '@/libs/globalTypes'
 import { MiniProfileActions } from './mini_profile.client'
 import { AvatarHolder } from '@/components/ui/avatar_holder/avatarholder.client'
-import { getUserId } from '@/libs/helpers'
 
 
 type Props = {
   userId?: string | number
   data?: ProfileAPIResponse
+  isMyprofile: boolean
 }
 
-export default async function MiniProfile({ userId, data }: Props) {
+export default function MiniProfile({ userId, data, isMyprofile }: Props) {
   let profile: ProfileAPIResponse | null = data ?? null
-
+  console.log("=>",profile);
+  
   if (!profile && userId != null) {
-    profile = await getProfileServer(userId)
+    const fetchProfile = async () => {
+      profile = await getProfileServer(userId)
+    }    
+    fetchProfile()
   }
 
   if (!profile) {
@@ -42,9 +46,7 @@ export default async function MiniProfile({ userId, data }: Props) {
     ? new Date(profile.joinedAt).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })
     : ''
 
-  let isOnline = false;
-  let isMyprofile = profile.userId !== await getUserId() 
-
+  // todo
   return (
     <aside className={styles.miniCardLarge} aria-label={`Mini profile for ${name}`}>
       <div className={styles.miniHeaderLarge}>
@@ -63,13 +65,10 @@ export default async function MiniProfile({ userId, data }: Props) {
 
           <div className={styles.miniHandleRow}>
             <div className={styles.miniHandle}>{handle}</div>
-            {profile.privacy !== 'public' && <span className={styles.badge}>Private</span>}
+            {/* {profile.privacy !== 'public' && <span className={styles.badge}>Private</span>} */}
           </div>
 
           <div className={styles.statusBadges}>
-            <span className={isOnline ? styles.badgeOnline : styles.badgeOffline}>
-              {isOnline ? 'Online' : 'Offline'}
-            </span>
             <span className={styles.badgePrivacy}>
               {profile.privacy === 'public' ? 'Public' : 'Private'}
             </span>
@@ -103,8 +102,8 @@ export default async function MiniProfile({ userId, data }: Props) {
         <a className={styles.viewProfileBtnLarge} href={`/profile/${profile.userId}`}>
           View Profile
         </a>
-        
-        {isMyprofile? <MiniProfileActions
+
+        {isMyprofile ? <MiniProfileActions
           userId={profile.userId}
           initialStatus={profile.status ?? null}
           initialChatId={profile.chatId ?? null}

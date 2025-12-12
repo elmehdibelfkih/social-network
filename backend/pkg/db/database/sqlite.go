@@ -2,6 +2,8 @@ package database
 
 import (
 	"database/sql"
+	"errors"
+	"fmt"
 	config "social/pkg/config"
 
 	"github.com/golang-migrate/migrate/v4"
@@ -37,6 +39,18 @@ type DBCounterGetter struct {
 	EntityType  string
 	EntityID    int64
 }
+
+const SELECT_COUNTS = `
+  SELECT
+    followers_count,
+    followees_count,
+    posts_count,
+    comments_count,
+    reactions_count,
+    shares_count
+  FROM counters
+  WHERE entity_type = ? AND entity_id = ?
+`
 
 const UPDATE_COUNT = `
     INSERT INTO counters (
@@ -74,9 +88,48 @@ func UpdateCounter(tx *sql.Tx, counter DBCounterSetter) error {
 	return err
 }
 
-func GetCounter(counter DBCounterGetter) (int, error) {
+func GetCounter(counter DBCounterGetter) (int64, error) {
+	if counter.CounterName == "" {
+		return 0, errors.New("counter name is empty")
+	}
+	if config.DB == nil {
+		return 0, errors.New("database not initialized (DB is nil)")
+	}
 
-	return 0, nil
+	var followers, followees, posts, comments, reactions, shares sql.NullInt64
+	err := config.DB.QueryRow(SELECT_COUNTS, counter.EntityType, counter.EntityID).
+		Scan(&followers, &followees, &posts, &comments, &reactions, &shares)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return 0, nil
+		}
+		return 0, err
+	}
+
+	nv := func(n sql.NullInt64) int64 {
+		if n.Valid {
+			return (n.Int64)
+		}
+		return 0
+	}
+
+	switch counter.CounterName {
+	case FOLLOWERS_ENTITY_NAME:
+		return nv(followers), nil
+	case FOLLOWEES_ENTITY_NAME:
+		return nv(followees), nil
+	case POSTS_ENTITY_NAME:
+		return nv(posts), nil
+	case COMMENTS_ENTITY_NAME:
+		return nv(comments), nil
+	case REACTIONS_ENTITY_NAME:
+		return nv(reactions), nil
+	// case SHARSE_ENTITY_TYPE, "shares": // tolerate both constant or raw string
+	// return nv(shares), nil
+	default:
+		return 0, fmt.Errorf("unknown counter name: %q", counter.CounterName)
+	}
 }
 
 func InitDB() error {

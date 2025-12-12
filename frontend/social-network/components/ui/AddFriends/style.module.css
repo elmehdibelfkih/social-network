@@ -11,6 +11,30 @@
 .header {
     padding: 24px 24px 16px;
     border-bottom: 1px solid #e5e7eb;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.closeBtn {
+    background: none;
+    border: none;
+    font-size: 28px;
+    color: #6b7280;
+    cursor: pointer;
+    padding: 0;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    transition: all 0.2s;
+}
+
+.closeBtn:hover {
+    background: #f3f4f6;
+    color: #111827;
 }
 
 .header h3 {

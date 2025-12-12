@@ -21,7 +21,7 @@ const (
 			   SELECT 1 FROM follows 
 			   WHERE follower_id = ? AND followed_id = p.author_id AND status = 'accepted'
 		   ))
-		   OR (p.privacy = 'privatey' AND EXISTS (
+		   OR (p.privacy = 'private' AND EXISTS (
 			   SELECT 1 FROM post_allowed_viewers 
 			   WHERE post_id = p.id AND user_id = ?
 		   ))

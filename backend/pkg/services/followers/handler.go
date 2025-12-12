@@ -44,7 +44,9 @@ func UnfollowHandler(w http.ResponseWriter, r *http.Request) {
 // GET /api/v1/users/:user_id/followers => list followers
 func FollowersListHandler(w http.ResponseWriter, r *http.Request) {
 	targetUserId := utils.GetWildCardValue(w, r, "user_id")
-	res, err := GetFollowersByUserID(targetUserId)
+	userId := utils.GetUserIdFromContext(r)
+
+	res, err := GetFollowersByUserID(targetUserId, userId)
 	if err != nil {
 		utils.InternalServerError(w)
 		return
@@ -55,7 +57,9 @@ func FollowersListHandler(w http.ResponseWriter, r *http.Request) {
 // GET /api/v1/users/:user_id/following  => list followees
 func FolloweesListHandler(w http.ResponseWriter, r *http.Request) {
 	targetUserId := utils.GetWildCardValue(w, r, "user_id")
-	res, err := GetFolloweesByUserID(targetUserId)
+	userId := utils.GetUserIdFromContext(r)
+
+	res, err := GetFolloweesByUserID(targetUserId, userId)
 	if err != nil {
 		utils.InternalServerError(w)
 		return

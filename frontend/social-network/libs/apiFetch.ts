@@ -211,7 +211,10 @@ export const http = {
 
 export async function fetchMediaClient(mediaId: string): Promise<MediaResponse | null> {
   try {
-    const res = await http.get(`/api/v1/media/${encodeURIComponent(mediaId)}`);
+    const res = await http.get(`/api/v1/media/${encodeURIComponent(mediaId)}`, {
+      redirectOnError: false,
+      throwOnError: false
+    });
     if (!res) return null;
     if (typeof res === "object" && "payload" in (res as any)) {
       return (res as any).payload as MediaResponse;

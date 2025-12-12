@@ -15,7 +15,7 @@ class WebSocketManger {
         this.ws = new WebSocket(this.url);
 
         this.ws.onopen = () => {
-            console.log("ws connection opened")
+            // console.log("ws connection opened")
             this.#burstQueue();
             this.reconnectTimer = null;
         }
@@ -24,7 +24,7 @@ class WebSocketManger {
             this.#broadcast(e.data)
         }
         this.ws.onerror = (err) => {
-            console.log("ws error", err)
+            // console.log("ws error", err)
             this.ws?.close()
         }
         this.ws.onclose = () => {

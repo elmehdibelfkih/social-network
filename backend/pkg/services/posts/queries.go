@@ -3,12 +3,12 @@ package posts
 const (
 	// Post queries
 	QUERY_CREATE_POST = `
-		INSERT INTO posts (id, author_id, group_id, content, privacy, created_at, updated_at, pinned)
-		VALUES (?, ?, ?, ?, ?, ?, ?, ?);
+		INSERT INTO posts (id, author_id, group_id, content, privacy, created_at, updated_at)
+		VALUES (?, ?, ?, ?, ?, ?, ?);
 	`
 
 	QUERY_GET_POST_BY_ID = `
-		SELECT id, author_id, group_id, content, privacy, created_at, updated_at, pinned
+		SELECT id, author_id, group_id, content, privacy, created_at, updated_at
 		FROM posts
 		WHERE id = ?;
 	`
@@ -25,7 +25,7 @@ const (
 	`
 
 	QUERY_GET_USER_POSTS = `
-		SELECT id, author_id, group_id, content, privacy, created_at, updated_at, pinned
+		SELECT id, author_id, group_id, content, privacy, created_at, updated_at
 		FROM posts
 		WHERE author_id = ?
 		ORDER BY created_at DESC
@@ -40,6 +40,12 @@ const (
 
 	QUERY_GET_AUTHOR_NICKNAME = `
 		SELECT nickname
+		FROM users
+		WHERE id = ?;
+	`
+
+	QUERY_GET_AUTHOR_DETAILS = `
+		SELECT first_name, last_name, nickname
 		FROM users
 		WHERE id = ?;
 	`
@@ -173,4 +179,27 @@ const (
 		VALUES (?, ?, ?, ?, ?);
 	`
 
+	// Comment reaction queries
+	QUERY_CREATE_COMMENT_REACTION = `
+		INSERT INTO comment_reactions (comment_id, user_id, reaction_type, reacted_at)
+		VALUES (?, ?, ?, ?);
+	`
+
+	QUERY_DELETE_COMMENT_REACTION = `
+		DELETE FROM comment_reactions
+		WHERE comment_id = ? AND user_id = ?;
+	`
+
+	QUERY_CHECK_COMMENT_REACTION_EXISTS = `
+		SELECT 1
+		FROM comment_reactions
+		WHERE comment_id = ? AND user_id = ?
+		LIMIT 1;
+	`
+
+	QUERY_COUNT_COMMENT_LIKES = `
+		SELECT COUNT(*)
+		FROM comment_reactions
+		WHERE comment_id = ?;
+	`
 )

@@ -1,21 +1,16 @@
 'use client';
-import AddFriends from '@/components/ui/AddFriends/addFriends';
+import Snackbar from '@/components/ui/snackbar/snackbar';
 import AuthForm from '@/features/auth/auth.client';
 import { AuthProvider } from '@/providers/authProvider';
 
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
-      <body>
         <main>
           <AuthProvider>
-            {children}
-            {/* <AddFriends title='' desc='' componentId='' purpose='post' onComplete={() => console.log("Sent group invites.")} /> */}
+            <Snackbar />
             <AuthForm />
           </AuthProvider>
         </main>
-      </body>
-    </html>
   );
 }

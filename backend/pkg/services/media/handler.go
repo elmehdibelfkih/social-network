@@ -15,6 +15,7 @@ import (
 )
 
 func HandleUploadMedia(w http.ResponseWriter, r *http.Request) {
+	userId := utils.GetUserIdFromContext(r)
 	var req UploadMediaRequest
 	r.Body = http.MaxBytesReader(w, r.Body, MaxRequestSize)
 	defer r.Body.Close()
@@ -47,7 +48,6 @@ func HandleUploadMedia(w http.ResponseWriter, r *http.Request) {
 
 	detectedMediaType := http.DetectContentType(data)
 	if !AllowedMimeTypes[detectedMediaType] {
-		println("2")
 		utils.UnsupportedMediaType(w)
 		return
 	}
@@ -69,10 +69,17 @@ func HandleUploadMedia(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	var ownerId *int64
+	if req.Purpose == "avatar" {
+		ownerId = nil
+	} else {
+		ownerId = &userId
+	}
+
 	media := &Media{
 		ID:        mediaID,
 		Path:      filePath,
-		OwnerId:   nil,
+		OwnerId:   ownerId,
 		Mime:      detectedMediaType,
 		Size:      len(data),
 		Purpose:   req.Purpose,

@@ -13,6 +13,20 @@ import (
 	"github.com/mattn/go-sqlite3"
 )
 
+func toStringPtr(ns sql.NullString) *string {
+	if !ns.Valid {
+		return nil
+	}
+	return &ns.String
+}
+
+func toInt64Ptr(ni sql.NullInt64) *int64 {
+	if !ni.Valid {
+		return nil
+	}
+	return &ni.Int64
+}
+
 func selectFollowStatus(followerId, followedId int64) (string, error) {
 	var status string
 
@@ -102,13 +116,22 @@ func followUser(followerId, followedId int64) error {
 			return nil
 		}
 
+		// Update followers count for the followed user
 		counter := followUnfollowUpdateCounterStruct(database.USER_ENTITY_TYPE, followedId, database.FOLLOWERS_ENTITY_NAME, "increment")
-
 		err = database.UpdateCounter(tx, counter)
 		if err != nil {
 			utils.SQLiteErrorTarget(err, database.USER_ENTITY_TYPE)
 			return err
 		}
+
+		// Update followees count for the follower user
+		counter = followUnfollowUpdateCounterStruct(database.USER_ENTITY_TYPE, followerId, database.FOLLOWEES_ENTITY_NAME, "increment")
+		err = database.UpdateCounter(tx, counter)
+		if err != nil {
+			utils.SQLiteErrorTarget(err, database.USER_ENTITY_TYPE)
+			return err
+		}
+
 		return nil
 	})
 }
@@ -260,8 +283,25 @@ func unfollowUser(followerId, followedId int64) error {
 			return err
 		}
 
-		counter := followUnfollowUpdateCounterStruct(database.USER_ENTITY_TYPE, followedId, database.FOLLOWERS_ENTITY_NAME, "decrement")
+		status, err := selectFollowStatus(followerId, followedId)
+		if err != nil {
+			return err
+		}
 
+		if status != "accepted" {
+			return nil
+		}
+
+		// Update followers count for the followed user
+		counter := followUnfollowUpdateCounterStruct(database.USER_ENTITY_TYPE, followedId, database.FOLLOWERS_ENTITY_NAME, "decrement")
+		err = database.UpdateCounter(tx, counter)
+		if err != nil {
+			utils.SQLiteErrorTarget(err, UNFOLLOW_REQUEST_QUERY)
+			return err
+		}
+
+		// Update followees count for the follower user
+		counter = followUnfollowUpdateCounterStruct(database.USER_ENTITY_TYPE, followerId, database.FOLLOWEES_ENTITY_NAME, "decrement")
 		err = database.UpdateCounter(tx, counter)
 		if err != nil {
 			utils.SQLiteErrorTarget(err, UNFOLLOW_REQUEST_QUERY)
@@ -272,140 +312,127 @@ func unfollowUser(followerId, followedId int64) error {
 	})
 }
 
-func GetFollowersByUserID(userID int64) ([]map[string]any, error) {
-	rows, err := config.DB.Query(GET_FOLLOWERS_QUERY, userID)
+func getFollowList(query string, args ...any) ([]UserFollowItem, error) {
+	rows, err := config.DB.Query(query, args...)
 	if err != nil {
-		utils.SQLiteErrorTarget(err, GET_FOLLOWERS_QUERY)
+		utils.SQLiteErrorTarget(err, query)
 		return nil, err
 	}
 	defer rows.Close()
 
-	var followers []map[string]any
+	var items []UserFollowItem
 
 	for rows.Next() {
 		var (
-			userId     int64
-			nickname   sql.NullString
-			firstName  sql.NullString
-			lastName   sql.NullString
-			avatarId   sql.NullInt64
-			followedAt string
-			status     string
+			userId    int64
+			status    sql.NullString
+			nickname  sql.NullString
+			firstName string
+			lastName  string
+			avatarId  sql.NullInt64
+			privacy   string
+			chatId    sql.NullInt64
 		)
 
-		err = rows.Scan(&userId, &nickname, &firstName, &lastName, &avatarId, &followedAt, &status)
-		if err != nil {
-			utils.SQLiteErrorTarget(err, GET_FOLLOWERS_QUERY)
+		if err := rows.Scan(
+			&userId,
+			&status,
+			&nickname,
+			&firstName,
+			&lastName,
+			&avatarId,
+			&privacy,
+			&chatId,
+		); err != nil {
+			utils.SQLiteErrorTarget(err, query)
 			return nil, err
 		}
 
-		follower := map[string]any{
-			"userId":     userId,
-			"nickname":   nickname.String,
-			"firstName":  firstName.String,
-			"lastName":   lastName.String,
-			"avatarId":   avatarId.Int64,
-			"followedAt": followedAt,
-			"status":     status,
-		}
-
-		followers = append(followers, follower)
-	}
-
-	if err = rows.Err(); err != nil {
-		utils.SQLiteErrorTarget(err, GET_FOLLOWERS_QUERY)
-		return nil, err
-	}
-
-	return followers, nil
-}
-
-func GetFolloweesByUserID(userID int64) ([]map[string]any, error) {
-	rows, err := config.DB.Query(GET_FOLLOWEES_QUERY, userID)
-	if err != nil {
-		utils.SQLiteErrorTarget(err, GET_FOLLOWEES_QUERY)
-		return nil, err
-	}
-	defer rows.Close()
-
-	var followers []map[string]any
-
-	for rows.Next() {
-		var (
-			userId     int64
-			nickname   sql.NullString
-			firstName  string
-			lastName   string
-			avatarId   sql.NullInt64
-			followedAt string
-			status     string
-		)
-
-		err = rows.Scan(&userId, &nickname, &firstName, &lastName, &avatarId, &followedAt, &status)
+		stats, err := getState(userId)
 		if err != nil {
-			utils.SQLiteErrorTarget(err, GET_FOLLOWEES_QUERY)
+			utils.SQLiteErrorTarget(err, "getState")
 			return nil, err
 		}
 
-		follower := map[string]any{
-			"userId":     userId,
-			"nickname":   nickname.String,
-			"firstName":  firstName,
-			"lastName":   lastName,
-			"avatarId":   avatarId.Int64,
-			"followedAt": followedAt,
-			"status":     status,
+		item := UserFollowItem{
+			UserId:    userId,
+			Status:    toStringPtr(status),
+			Nickname:  toStringPtr(nickname),
+			FirstName: firstName,
+			LastName:  lastName,
+			AvatarId:  toInt64Ptr(avatarId),
+			Privacy:   privacy,
+			ChatId:    toInt64Ptr(chatId),
+			Stats:     stats,
 		}
 
-		followers = append(followers, follower)
+		items = append(items, item)
 	}
 
-	if err = rows.Err(); err != nil {
-		utils.SQLiteErrorTarget(err, GET_FOLLOWEES_QUERY)
+	if err := rows.Err(); err != nil {
+		utils.SQLiteErrorTarget(err, query)
 		return nil, err
 	}
 
-	return followers, nil
+	return items, nil
 }
 
-func GetFollowRequestByUserID(userID int64) ([]map[string]any, error) {
-	rows, err := config.DB.Query(GET_FOLLOW_REQUEST_QUERY, userID)
+func GetFollowersByUserID(targetUser int64, userID int64) ([]UserFollowItem, error) {
+	return getFollowList(GET_FOLLOWERS_QUERY, userID, userID, targetUser)
+}
+
+func GetFolloweesByUserID(targetUser int64, userID int64) ([]UserFollowItem, error) {
+	return getFollowList(GET_FOLLOWEES_QUERY, userID, userID, targetUser)
+}
+
+func GetFollowRequestByUserID(userID int64) ([]UserFollowItem, error) {
+	rows, err := config.DB.Query(GET_FOLLOW_REQUEST_QUERY, userID, userID)
 	if err != nil {
 		utils.SQLiteErrorTarget(err, GET_FOLLOW_REQUEST_QUERY)
 		return nil, err
 	}
 	defer rows.Close()
 
-	var followers []map[string]any
+	var followRequests []UserFollowItem
 
 	for rows.Next() {
 		var (
-			userId     int64
-			nickname   sql.NullString
-			firstName  string
-			lastName   string
-			avatarId   sql.NullInt64
-			followedAt string
-			status     string
+			userId    int64
+			status    string
+			nickname  sql.NullString
+			firstName string
+			lastName  string
+			avatarId  sql.NullInt64
+			privacy   string
+			chatId    sql.NullInt64
 		)
 
-		err = rows.Scan(&userId, &nickname, &firstName, &lastName, &avatarId, &followedAt, &status)
+		err = rows.Scan(&userId, &status, &nickname, &firstName, &lastName, &avatarId, &privacy, &chatId)
 		if err != nil {
 			utils.SQLiteErrorTarget(err, GET_FOLLOW_REQUEST_QUERY)
 			return nil, err
 		}
 
-		follower := map[string]any{
-			"userId":     userId,
-			"nickname":   nickname.String,
-			"firstName":  firstName,
-			"lastName":   lastName,
-			"avatarId":   avatarId.Int64,
-			"followedAt": followedAt,
-			"status":     status,
+		// Populate Stats
+		stats, err := getState(userId)
+		if err != nil {
+			utils.SQLiteErrorTarget(err, "getState")
+			return nil, err
 		}
 
-		followers = append(followers, follower)
+		followRequest := UserFollowItem{
+			UserId:    userId,
+			Status:    &status,
+			Nickname:  toStringPtr(nickname),
+			FirstName: firstName,
+			LastName:  lastName,
+			AvatarId:  toInt64Ptr(avatarId),
+			Privacy:   privacy,
+			ChatId:    toInt64Ptr(chatId),
+			Stats:     stats,
+		}
+
+		followRequests = append(followRequests, followRequest)
 	}
 
 	if err = rows.Err(); err != nil {
@@ -413,7 +440,42 @@ func GetFollowRequestByUserID(userID int64) ([]map[string]any, error) {
 		return nil, err
 	}
 
-	return followers, nil
+	return followRequests, nil
+}
+
+func getState(userId int64) (UserProfileStatsJson, error) {
+	var ret UserProfileStatsJson
+
+	val, err := database.GetCounter(database.DBCounterGetter{
+		CounterName: "followers",
+		EntityType:  "user",
+		EntityID:    userId,
+	})
+	if err != nil {
+		return ret, err
+	}
+	ret.FollowersCount = val
+
+	val, err = database.GetCounter(database.DBCounterGetter{
+		CounterName: "followees",
+		EntityType:  "user",
+		EntityID:    userId,
+	})
+	if err != nil {
+		return ret, err
+	}
+	ret.FollowingCount = val
+
+	val, err = database.GetCounter(database.DBCounterGetter{
+		CounterName: "posts",
+		EntityType:  "user",
+		EntityID:    userId,
+	})
+	if err != nil {
+		return ret, err
+	}
+	ret.PostsCount = val
+	return ret, nil
 }
 
 func acceptFollowRequest(followerId, followedId int64) error {
@@ -426,8 +488,16 @@ func acceptFollowRequest(followerId, followedId int64) error {
 			return err
 		}
 
+		// Update followers count for the followed user
 		counter := followUnfollowUpdateCounterStruct(database.USER_ENTITY_TYPE, followedId, database.FOLLOWERS_ENTITY_NAME, "increment")
+		err = database.UpdateCounter(tx, counter)
+		if err != nil {
+			utils.SQLiteErrorTarget(err, UNFOLLOW_REQUEST_QUERY)
+			return err
+		}
 
+		// Update followees count for the follower user
+		counter = followUnfollowUpdateCounterStruct(database.USER_ENTITY_TYPE, followerId, database.FOLLOWEES_ENTITY_NAME, "increment")
 		err = database.UpdateCounter(tx, counter)
 		if err != nil {
 			utils.SQLiteErrorTarget(err, UNFOLLOW_REQUEST_QUERY)
