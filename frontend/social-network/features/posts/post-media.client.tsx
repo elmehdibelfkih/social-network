@@ -1,64 +1,49 @@
 'use client'
 import { useState, useEffect } from 'react'
-import styles from './styles.module.css'
 import { fetchMediaClient } from '@/libs/apiFetch'
+import { MediaCarousel } from './media-carousel.client'
 
-type Props = {
-  mediaIds: number[]
+async function getMediaData(mediaId: number): Promise<string | null> {
+  try {
+    const media = await fetchMediaClient(String(mediaId))
+    if (media?.mediaEncoded) {
+      return `data:image/jpeg;base64,${media.mediaEncoded}`
+    }
+    return null
+  } catch {
+    return null
+  }
 }
 
-export function PostMediaClient({ mediaIds }: Props) {
-  return (
-    <div className={styles.media}>
-      {mediaIds.map((mediaId) => (
-        <PostImage key={mediaId} mediaId={mediaId} />
-      ))}
-    </div>
-  )
-}
-
-function PostImage({ mediaId }: { mediaId: number }) {
-  const [imgSrc, setImgSrc] = useState<string | null>(null)
-  const [loading, setLoading] = useState(true)
+export function PostMedia({ mediaIds }: { mediaIds: number[] }) {
+  const [mediaDataList, setMediaDataList] = useState<(string | null)[]>([])
+  const [isLoadingMedia, setIsLoadingMedia] = useState(true)
 
   useEffect(() => {
-    const fetchImage = async () => {
-      try {
-        const media = await fetchMediaClient(String(mediaId))
-        if (media?.mediaEncoded) {
-          setImgSrc(`data:image/png;base64,${media.mediaEncoded}`)
-        }
-      } catch (error) {
-        console.error('Failed to fetch image:', error)
-      } finally {
-        setLoading(false)
+    const loadData = async () => {
+      if (mediaIds && mediaIds.length > 0) {
+        const mediaData = await Promise.all(
+          mediaIds.map(mediaId => getMediaData(mediaId))
+        )
+        setMediaDataList(mediaData)
+        setIsLoadingMedia(false)
+      } else {
+        setIsLoadingMedia(false)
       }
     }
 
-    fetchImage()
-  }, [mediaId])
+    loadData()
+  }, [mediaIds])
 
-  if (loading) {
+  if (!mediaIds || mediaIds.length === 0) return null
+
+  if (isLoadingMedia) {
     return (
-      <div className={styles.mediaPlaceholder}>
-        <div className={styles.mediaSpinner}></div>
+      <div style={{ padding: '40px', textAlign: 'center', color: '#6b7280' }}>
+        Loading media...
       </div>
     )
   }
 
-  if (!imgSrc) {
-    return (
-      <div className={styles.mediaError}>
-        Image not available
-      </div>
-    )
-  }
-
-  return (
-    <img
-      src={imgSrc}
-      alt="Post media"
-      className={styles.mediaImage}
-    />
-  )
+  return <MediaCarousel mediaDataList={mediaDataList.filter(Boolean) as string[]} />
 }

@@ -7,7 +7,7 @@ import { getUserId } from "@/libs/helpers";
 import { ProfileAPIResponse } from "@/libs/globalTypes";
 import { NewPost } from "@/features/newPost";
 import { postsService } from "@/features/posts";
-import PostServer from "@/features/posts/posts.server";
+import { PostServer } from "@/features/posts";
 import { useUserStats } from "@/providers/userStatsContext";
 
 export default async function HomePage(): Promise<JSX.Element> {
