@@ -4,9 +4,9 @@ import { useRouter, useSearchParams } from "next/navigation"
 import { getPosts } from "./profile_feed.services"
 import { useEffect, useState } from "react"
 import { Post } from "@/libs/globalTypes"
-import PostServer from "../posts/posts.server"
 
 import styles from "./styles.module.css"
+import { PostCard } from "../posts"
 
 export function PostsSection({ userId, avatarId }: { userId: string, avatarId: number }) {
     const searchParams = useSearchParams()
@@ -42,8 +42,7 @@ export function PostsSection({ userId, avatarId }: { userId: string, avatarId: n
 
     useEffect(() => {
         const handleScroll = () => {
-            if (hasMore && !isLoading && window.innerHeight + document.documentElement.scrollTop >=
-                document.documentElement.offsetHeight - 200) {
+            if (hasMore && !isLoading && document.documentElement.scrollTop + window.innerHeight >= document.documentElement.scrollHeight - 200) {
                 setPage(prev => {
                     const nextPage = prev + 1
                     loadPosts(nextPage)
@@ -62,8 +61,8 @@ export function PostsSection({ userId, avatarId }: { userId: string, avatarId: n
                 (posts.length === 0 && !isLoading) ?
                     <EmptyContent />
                     :
-                    posts.map((post) => (
-                        <PostServer key={post.postId} post={post} />
+                    posts.map((post, i) => (
+                        <PostCard key={i} post={post} avatarId={avatarId} />
                     ))
             }
             {isLoading && <div>Loading...</div>}
