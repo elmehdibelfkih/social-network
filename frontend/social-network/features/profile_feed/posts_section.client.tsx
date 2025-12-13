@@ -1,7 +1,7 @@
 'use client'
 
 import { getPosts } from "./profile_feed.services"
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 import { Post } from "@/libs/globalTypes"
 
 import styles from "./styles.module.css"
@@ -12,10 +12,10 @@ export function PostsSection({ userId, avatarId }: { userId: string, avatarId: n
     const [posts, setPosts] = useState<Post[]>([])
     const [hasMore, setHasMore] = useState(true)
     const [isLoading, setIsLoading] = useState(false)
+    const initialLoadDone = useRef(false)
+
 
     const loadPosts = async (page: number) => {
-        console.log("PAGE", page);
-
         if (isLoading || !hasMore) return
         setIsLoading(true)
         try {
@@ -24,6 +24,10 @@ export function PostsSection({ userId, avatarId }: { userId: string, avatarId: n
             if (newPosts.length == 0 || newPosts.length < limit) setHasMore(false)
 
             setPosts(prev => page === 1 ? newPosts : [...prev, ...newPosts])
+
+            if (page === 1) {
+                initialLoadDone.current = true
+            }
         } catch (error) {
             console.log("Erorr loading posts: ", error)
         } finally {
@@ -32,12 +36,16 @@ export function PostsSection({ userId, avatarId }: { userId: string, avatarId: n
     }
 
     useEffect(() => {
+        initialLoadDone.current = false
+        setHasMore(true)
+        setPage(1)
+        loadPosts(1)
         loadPosts(1)
     }, [userId])
 
     useEffect(() => {
         const handleScroll = () => {
-            if (hasMore && !isLoading && document.documentElement.scrollTop + window.innerHeight >= document.documentElement.scrollHeight - 200) {
+            if (initialLoadDone.current && hasMore && !isLoading && document.documentElement.scrollTop + window.innerHeight >= document.documentElement.scrollHeight - 200) {
                 setPage(prev => {
                     const nextPage = prev + 1
                     loadPosts(nextPage)
