@@ -1,6 +1,6 @@
 'use client'
 
-import { Stats } from "@/libs/globalTypes";
+// import { Stats } from "@/libs/globalTypes";
 import { useState, useEffect } from 'react'
 import styles from './styles.module.css'
 import { unfollowPerson, followPerson } from './profileSrevice'
@@ -9,11 +9,13 @@ import { ProfileData } from './types'
 import { FollowStatus } from '@/libs/globalTypes'
 import { useAuth } from '@/providers/authProvider'
 import { useUserStats } from '@/providers/userStatsContext'
+import { useProfileStats } from "./profile.provider";
 
 export function FollowButton({ targetUserId, initialStatus, isPrivate = false }: { targetUserId: string, initialStatus: FollowStatus, isPrivate?: boolean }) {
     const [status, setStatus] = useState<FollowStatus>(initialStatus);
 
-    const { state, dispatch } = useUserStats();
+    const { dispatch } = useUserStats();
+    const { incrementFollowers, decrementFollowers } = useProfileStats();
 
     const handleFollow = async () => {
         if (status == 'follow' || status == 'none') {
@@ -25,7 +27,10 @@ export function FollowButton({ targetUserId, initialStatus, isPrivate = false }:
                 setStatus(previousStatus)
                 return
             })
-            dispatch({ type: 'INCREMENT_FOLLOWING' });
+            if (!isPrivate) {
+                dispatch({ type: 'INCREMENT_FOLLOWING' });
+                incrementFollowers();
+            }
         } else {
             const previousStatus = status
             setStatus('follow');
@@ -34,7 +39,10 @@ export function FollowButton({ targetUserId, initialStatus, isPrivate = false }:
                 setStatus(previousStatus)
                 return
             })
-            dispatch({ type: 'DECREMENT_FOLLOWING' });
+            if (status === 'accepted') {
+                dispatch({ type: 'DECREMENT_FOLLOWING' });
+                decrementFollowers();
+            }
         }
     }
 
@@ -116,7 +124,7 @@ export function Privacy({ userId, privacy }: { userId: number, privacy: string }
 }
 
 
-export function Counts({ userId, stats }: { userId: number, stats: Stats }) {
+export function Counts({ userId }: { userId: number }) {
     const { state } = useUserStats();
     if (state.userId === userId) {
         return (
@@ -127,6 +135,8 @@ export function Counts({ userId, stats }: { userId: number, stats: Stats }) {
             </div>
         )
     }
+
+    const { stats } = useProfileStats();
 
     return (
         <div className={styles.stats}>

@@ -4,11 +4,18 @@ import { CalendarIcon, GlobeIcon } from '../../components/ui/icons'
 import { ProfileSettings } from './privacy.client'
 import { ProfileData } from './types'
 import AvatarHolder from '@/components/ui/avatar_holder/avatarholder.client'
+import { ProfileProvider } from './profile.provider'
 
 export function Profile({ profile }: { profile: ProfileData }) {
 
     if (profile == null) return
+    const initialStats = {
+        followersCount: profile.stats.followersCount,
+        followingCount: profile.stats.followingCount,
+        postsCount: profile.stats.postsCount
+    }
     return (
+        <ProfileProvider initialStats={initialStats}>
         <div className={styles.profileContainer}>
             <ProfileTopActions userId={String(profile.userId)} profile={profile} />
 
@@ -22,7 +29,7 @@ export function Profile({ profile }: { profile: ProfileData }) {
                         <h3 className={styles.nickname}>@{profile.nickname}</h3>
                         <p className={styles.aboutMe}>{profile.aboutMe}</p>
 
-                        <Counts userId={profile.userId} stats={profile.stats} />
+                        <Counts userId={profile.userId}/>
                         <div className={styles.meta}>
                             <span className={styles.joinDate}>
                                 <CalendarIcon />
@@ -36,8 +43,6 @@ export function Profile({ profile }: { profile: ProfileData }) {
 
             </div>
         </div>
+        </ProfileProvider>
     )
 }
-
-
-
