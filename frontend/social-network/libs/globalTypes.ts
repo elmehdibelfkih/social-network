@@ -217,7 +217,13 @@ export interface Post {
 
 // /////////////////////////////////////////////////
 export interface UserId {
-    Id: number;
+  Id: number;
+}
+
+export type Stats = {
+  postsCount: number
+  followersCount: number
+  followingCount: number
 }
 
 export type ProfileAPIResponse = {
@@ -230,11 +236,7 @@ export type ProfileAPIResponse = {
   aboutMe: string | null
   dateOfBirth: string | null
   privacy: 'public' | 'private' | string
-  stats: {
-    postsCount: number
-    followersCount: number
-    followingCount: number
-  }
+  stats: Stats
   joinedAt: string | null
   chatId?: number | null
 }
@@ -280,10 +282,6 @@ export type MiniProfile = {
   avatarId: number | null;
   privacy: 'public' | 'private' | string;
   chatId: number | null;
-  stats: {
-    postsCount: number
-    followersCount: number
-    followingCount: number
-  }
+  stats: Stats
   joinedAt: string | null;
 }

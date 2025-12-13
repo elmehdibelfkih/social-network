@@ -1,5 +1,5 @@
 import styles from './styles.module.css'
-import { Privacy, ProfileTopActions } from './profile.client'
+import { Counts, Privacy, ProfileTopActions } from './profile.client'
 import { CalendarIcon, GlobeIcon } from '../../components/ui/icons'
 import { ProfileSettings } from './privacy.client'
 import { ProfileData } from './types'
@@ -22,21 +22,13 @@ export function Profile({ profile }: { profile: ProfileData }) {
                         <h3 className={styles.nickname}>@{profile.nickname}</h3>
                         <p className={styles.aboutMe}>{profile.aboutMe}</p>
 
-                        <div className={styles.stats}>
-                            <span><b>{profile.stats.postsCount || 0}</b> Posts</span>
-                            <span><b>{profile.stats.followersCount}</b> Followers</span>
-                            <span><b>{profile.stats.followingCount}</b> Following</span>
-                        </div>
+                        <Counts userId={profile.userId} stats={profile.stats} />
                         <div className={styles.meta}>
                             <span className={styles.joinDate}>
                                 <CalendarIcon />
                                 Joined {new Date(profile.joinedAt).toLocaleDateString()}
                             </span>
                             <Privacy userId={profile.userId} privacy={profile.privacy}/>
-                            {/* <span className={`${styles.privacy} ${styles[profile.privacy]}`}>
-                                <GlobeIcon fillColor={profile.privacy === 'public' ? '#01a63f' : '#F7773D'} />
-                                {profile.privacy} profile
-                            </span> */}
                         </div>
                     </div>
                 </div>

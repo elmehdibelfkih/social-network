@@ -1,5 +1,6 @@
 'use client'
 
+import { Stats } from "@/libs/globalTypes";
 import { useState, useEffect } from 'react'
 import styles from './styles.module.css'
 import { unfollowPerson, followPerson } from './profileSrevice'
@@ -111,5 +112,27 @@ export function Privacy({ userId, privacy }: { userId: number, privacy: string }
                 {state.privacy} profile
             </span>
         </span>
+    )
+}
+
+
+export function Counts({ userId, stats }: { userId: number, stats: Stats }) {
+    const { state } = useUserStats();
+    if (state.userId === userId) {
+        return (
+            <div className={styles.stats}>
+                <span><b>{state.postsCount}</b> Posts</span>
+                <span><b>{state.followersCount}</b> Followers</span>
+                <span><b>{state.followingCount}</b> Following</span>
+            </div>
+        )
+    }
+
+    return (
+        <div className={styles.stats}>
+            <span><b>{stats.postsCount || 0}</b> Posts</span>
+            <span><b>{stats.followersCount}</b> Followers</span>
+            <span><b>{stats.followingCount}</b> Following</span>
+        </div>
     )
 }

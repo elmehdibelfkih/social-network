@@ -9,7 +9,6 @@ type ProfileState = {
 
 const ProfileContext = createContext<ProfileState | null>(null);
 
-// 1. Accepts 'initialCount' from the Server
 export const ProfileProvider = ({ 
   children, 
   initialCount 
@@ -17,11 +16,9 @@ export const ProfileProvider = ({
   children: ReactNode; 
   initialCount: number 
 }) => {
-  // 2. Hydrate Server Data into Client State
   const [count, setCount] = useState(initialCount);
 
   const toggleFollow = () => {
-    // In a real app, you would also call a Server Action here
     setCount((prev) => prev + 1); 
   };
 
@@ -32,7 +29,6 @@ export const ProfileProvider = ({
   );
 };
 
-// Custom Hook for easier consumption
 export const useProfile = () => {
   const context = useContext(ProfileContext);
   if (!context) throw new Error("useProfile must be used within ProfileProvider");
