@@ -96,20 +96,20 @@ export function PostCard({ post, avatarId }: { post: Post, avatarId: number}) {
     loadData()
   }, [post.mediaIds])
 
-  useEffect(() => {
-    const fetchStats = async () => {
-      try {
-        const commentsData = await http.get<any>(`/api/v1/posts/${post.postId}/comments?page=1&limit=1`)
-        setStats(prev => ({
-          ...prev,
-          commentCount: commentsData?.totalComments || 0
-        }))
-      } catch (error) {
-        console.error('Failed to fetch stats:', error)
-      }
-    }
-    fetchStats()
-  }, [post.postId])
+  // useEffect(() => {
+  //   const fetchStats = async () => {
+  //     try {
+  //       const commentsData = await http.get<any>(`/api/v1/posts/${post.postId}/comments?page=1&limit=1`)
+  //       setStats(prev => ({
+  //         ...prev,
+  //         commentCount: commentsData?.totalComments || 0
+  //       }))
+  //     } catch (error) {
+  //       console.error('Failed to fetch stats:', error)
+  //     }
+  //   }
+  //   fetchStats()
+  // }, [post.postId])
   const authorName = `${post.authorFirstName} ${post.authorLastName}`
   const timeAgo = new Date(post.createdAt).toLocaleDateString()
   
