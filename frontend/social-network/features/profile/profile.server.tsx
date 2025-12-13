@@ -1,5 +1,5 @@
 import styles from './styles.module.css'
-import { ProfileTopActions } from './profile.client'
+import { Privacy, ProfileTopActions } from './profile.client'
 import { CalendarIcon, GlobeIcon } from '../../components/ui/icons'
 import { ProfileSettings } from './privacy.client'
 import { ProfileData } from './types'
@@ -32,10 +32,11 @@ export function Profile({ profile }: { profile: ProfileData }) {
                                 <CalendarIcon />
                                 Joined {new Date(profile.joinedAt).toLocaleDateString()}
                             </span>
-                            <span className={`${styles.privacy} ${styles[profile.privacy]}`}>
+                            <Privacy userId={profile.userId} privacy={profile.privacy}/>
+                            {/* <span className={`${styles.privacy} ${styles[profile.privacy]}`}>
                                 <GlobeIcon fillColor={profile.privacy === 'public' ? '#01a63f' : '#F7773D'} />
                                 {profile.privacy} profile
-                            </span>
+                            </span> */}
                         </div>
                     </div>
                 </div>

@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import styles from './styles.module.css'
 import { unfollowPerson, followPerson } from './profileSrevice'
-import { FollowIcon, MessageIcon } from '@/components/ui/icons'
+import { FollowIcon, GlobeIcon, MessageIcon } from '@/components/ui/icons'
 import { ProfileData } from './types'
 import { FollowStatus } from '@/libs/globalTypes'
 import { useAuth } from '@/providers/authProvider'
@@ -90,5 +90,26 @@ export function ProfileTopActions({ userId, profile }: { userId: string, profile
                 </>
             )}
         </div>
+    )
+}
+
+export function Privacy({ userId, privacy }: { userId: number, privacy: string }) {
+    const { state } = useUserStats();
+    if (state.userId !== userId) {
+        return (
+            <span className={`${styles.privacy} ${styles[privacy]}`}>
+                <GlobeIcon fillColor={privacy === 'public' ? '#01a63f' : '#F7773D'} />
+                {privacy} profile
+            </span>
+        )
+    }
+
+    return (
+        <span>
+            <span className={`${styles.privacy} ${styles[state.privacy]}`}>
+                <GlobeIcon fillColor={state.privacy === 'public' ? '#01a63f' : '#F7773D'} />
+                {state.privacy} profile
+            </span>
+        </span>
     )
 }
