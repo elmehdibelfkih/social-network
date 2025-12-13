@@ -1,6 +1,5 @@
 'use client'
 
-import { useRouter, useSearchParams } from "next/navigation"
 import { getPosts } from "./profile_feed.services"
 import { useEffect, useState } from "react"
 import { Post } from "@/libs/globalTypes"
@@ -9,14 +8,14 @@ import styles from "./styles.module.css"
 import { PostCard } from "../posts"
 
 export function PostsSection({ userId, avatarId }: { userId: string, avatarId: number }) {
-    const searchParams = useSearchParams()
-    const router = useRouter()
     const [page, setPage] = useState(1)
     const [posts, setPosts] = useState<Post[]>([])
     const [hasMore, setHasMore] = useState(true)
     const [isLoading, setIsLoading] = useState(false)
 
     const loadPosts = async (page: number) => {
+        console.log("PAGE", page);
+
         if (isLoading || !hasMore) return
         setIsLoading(true)
         try {
@@ -25,10 +24,6 @@ export function PostsSection({ userId, avatarId }: { userId: string, avatarId: n
             if (newPosts.length == 0 || newPosts.length < limit) setHasMore(false)
 
             setPosts(prev => page === 1 ? newPosts : [...prev, ...newPosts])
-
-            const params = new URLSearchParams(searchParams.toString())
-            params.set('page', page.toString())
-            router.replace(`?${params.toString()}`, { scroll: false })
         } catch (error) {
             console.log("Erorr loading posts: ", error)
         } finally {
@@ -46,6 +41,7 @@ export function PostsSection({ userId, avatarId }: { userId: string, avatarId: n
                 setPage(prev => {
                     const nextPage = prev + 1
                     loadPosts(nextPage)
+
                     return nextPage
                 })
             }
