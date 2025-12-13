@@ -1,11 +1,12 @@
-import { ReactNode , useState } from "react";
+import { ReactNode  } from "react";
 import { GroupService } from "./group_card.services"
 import { Group } from "./types"
 import { UserPlusIcon, CalendarIcon, UsersIcon } from "@/components/ui/icons"
 import { AvatarHolder } from '@/components/ui/avatar_holder/avatarholder.client'
 import { formattedDate } from '@/libs/helpers'
 import styles from './styles.module.css';
-import CreateGroupModal from './creat_group.client'
+import GroupsUI from '@/features/group_card/groups.ui'
+
 
 
 interface GroupCardServerProps {
@@ -13,15 +14,18 @@ interface GroupCardServerProps {
 }
 
 export default async function GroupCardServer({ groups }: { groups: Group[] }) {
-   const [isModalOpen, setIsModalOpen] = useState(false);
+  // const [isModalOpen, setIsModalOpen] = useState(false);
 
 
   return (
+<>
  <div className={styles.group_card}>
+  
   {groups.map((group) => (
     <div key={group.groupId} className={styles.single_group_card}>
       {/* Purple Header - gradient from purple to light purple */}
-      <div className={styles.group_header}></div>
+      <div className={styles.group_header}>   <AvatarHolder avatarId={group.avatarId} size={120}/></div>
+   
       
       {/* Content with p-6 padding */}
       <div className={styles.group_content}>
@@ -67,12 +71,15 @@ export default async function GroupCardServer({ groups }: { groups: Group[] }) {
       </div>
     </div>
   ))}
-  <CreateGroupModal
+
+
+  {/* <CreateGroupModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSubmit={handleCreateGroup}
         onUploadAvatar={handleUploadAvatar}
-  />
+  /> */}
 </div>
+</>
   );
 }

@@ -2,6 +2,7 @@ import GroupCardServer from "@/features/group_card/group_card.server"
 import { GroupService } from "@/features/group_card/group_card.services";
 import { Group } from "@/features/group_card/types"
 import { log } from "console";
+import GroupsUI from '@/features/group_card/groups.ui'
 
 
 export default async function GroupsPage() {
@@ -10,7 +11,16 @@ export default async function GroupsPage() {
   
   return (
     <div>
+       <GroupsUI/>
       <GroupCardServer groups={groups} />
+       
+        {/* <CreateGroupModal
+        isOpen={true}
+        onClose={null}
+        onSubmit={null}
+        onUploadAvatar={null}
+      /> */}
+      
     </div>
   );
 }

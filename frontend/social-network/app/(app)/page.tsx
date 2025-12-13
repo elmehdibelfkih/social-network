@@ -9,8 +9,11 @@ import { NewPost } from "@/features/newPost";
 import { postsService } from "@/features/posts";
 import PostServer from "@/features/posts/posts.server";
 import { useUserStats } from "@/providers/userStatsContext";
+import CreateGroupModal from "@/features/group_card/creat_group.client"
 
 export default async function HomePage(): Promise<JSX.Element> {
+
+
   const userId = await getUserId();
   const res2 = await http.get<ProfileAPIResponse>(`/api/v1/users/${userId}/profile`);
 
@@ -34,6 +37,7 @@ export default async function HomePage(): Promise<JSX.Element> {
         )}
       </div>
       <MiniProfile data={res2} isMyprofile={false} />
+
     </>
   );
 }
