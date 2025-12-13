@@ -47,9 +47,9 @@
 }
 
 .online .statusDot {
-  background: #18c964;
+  background: var(--primary-purple-light);
 }
 
 .offline .statusDot {
-  background: #999;
+  background:  var(--gray-500);
 }

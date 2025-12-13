@@ -6,7 +6,7 @@
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    border: 1px solid rgba(0, 0, 0, 0.2 );
+    border: 1px solid rgba(0, 0, 0, 0.2);
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
     overflow: hidden;
     margin-top: 1%;
@@ -63,7 +63,7 @@
     align-self: flex-start;
 }
 
-.otherMessage .timestamp img{
+.otherMessage .timestamp img {
     display: none;
 }
 
@@ -101,3 +101,27 @@
     cursor: pointer;
 }
 
+.emojiBtn {
+    border-radius: 16px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    scale: 1.2;
+    margin: auto;
+}
+
+.emojiPalette {
+    height: 20%;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    background: var(--primary-purple);
+}
+
+.emojiPalette button {
+    width: 35px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    scale: 1.2;
+}

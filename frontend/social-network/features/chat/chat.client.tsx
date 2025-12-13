@@ -7,26 +7,38 @@ import ChatCard from './chat.card.client';
 import FloatingChat from './chat.popup.client';
 
 export function ChatSection() {
-    const [openChats, setOpenChats] = useState<number[]>([]);
+    const [openChats, setOpenChats] = useState<Map<number, User>>(new Map());
     const [users, setUsers] = useState<User[]>([]);
 
-    const handleOpenChat = (chatId: number) => {
+    const handleOpenChat = (chatId: number, users: User) => {
         setOpenChats(prev => {
-            if (prev.includes(chatId)) return prev;
-            if (prev.length < 3) return [...prev, chatId];
-            return [...prev.slice(1), chatId];
+            const next = new Map(prev);
+            next.set(chatId, users);
+
+            if (next.size > 3) {
+                const firstKey = next.keys().next().value;
+                next.delete(firstKey);
+            }
+
+            return next;
         });
     };
+
     const handleCloseChat = (chatId: number) => {
-        setOpenChats(prev => prev.filter(id => id !== chatId));
+        setOpenChats(prev => {
+            const next = new Map(prev);
+            next.delete(chatId);
+            return next;
+        });
     };
+
     const handleCloseAll = () => {
-        setOpenChats([]);
+        setOpenChats(new Map());
     }
 
     useEffect(() => {
 
-        const onUnMount = chatService.addListener((data)=>{
+        const onUnMount = chatService.addListener((data) => {
             console.log("received from sharedworker:", data);
             console.log(data.type);
             switch (data.type) {
@@ -81,29 +93,21 @@ export function ChatSection() {
                     <ChatCard
                         key={u.userId}
                         chatId={u.chatId}
-                        unreadCount={u.unreadCount}
-                        profileImage={
-                            u.avatarId ? "/svg/users.svg" : "/svg/users.svg"
-                        }
-                        firstName={u.firstName}
-                        lastName={u.lastName}
-                        nickname={u.nickname ?? ""}
-                        isOnline={u.online}
+                        user={u}
                         onClick={handleOpenChat}
                     />
                 ))}
                 <button onClick={handleCloseAll}>
                     <img src="/svg/x.svg" alt="" />
                 </button>
-                {openChats.map(chatId => {
-                    return <FloatingChat
+                {Array.from(openChats.entries()).map(([chatId, user]) => (
+                    <FloatingChat
                         key={chatId}
                         chatId={chatId}
+                        user={user}
                         onClose={() => handleCloseChat(chatId)}
                     />
-                }
-                )}
-
+                ))}
             </div>
         </div>
     );

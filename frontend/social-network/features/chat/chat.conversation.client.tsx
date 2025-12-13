@@ -2,17 +2,21 @@
 import { useEffect, useState, useRef, FormEvent } from "react";
 import styles from "./styles/chat.conversation.module.css";
 import { chatService } from "@/features/chat/services/chat";
-import { ChatMessage } from "./types";
+import { ChatMessage, User } from "./types";
 import { formatMessageDate } from "@/libs/helpers";
 import { SeenStatus } from "@/components/ui/chats/seen"
-import { useDebounce, useDebounceCbf } from "@/libs/debounce";
+import { useDebounceCbf } from "@/libs/debounce";
 
 interface ChatConversationProps {
     chatId: number;
+    user: User;
     onClose: () => void;
 }
 
 export default function ChatConversation({ chatId, onClose }: ChatConversationProps) {
+    const emojis = [
+        "😀", "😂", "😍", "🥰", "😎", "🤔", "😢", "😭", "👍", "👎", "👏", "🙏", "🔥", "❤️", "💔", "✨", "🎉", "🚀", "😡", "😴"
+    ];
     const [messages, setMessages] = useState<Map<number, ChatMessage>>(new Map());
     const [oldestMessage, setOldestMessage] = useState<ChatMessage>(null);
     const [lastMessage, setLastMessage] = useState<ChatMessage>(null);
@@ -24,6 +28,23 @@ export default function ChatConversation({ chatId, onClose }: ChatConversationPr
     const [isTyping, setIsTyping] = useState(false)
     const [isAfk, setIsAfk] = useState(true)
     const scrollRef = useRef<HTMLDivElement>(null);
+    const [emojiOpen, setEmojiOpen] = useState(false);
+    const inputRef = useRef<HTMLInputElement>(null);
+    const emojiBtnRef = useRef<HTMLButtonElement>(null);
+    const emojiRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        function onClickOutside(e: MouseEvent) {
+            const target = e.target as Node;
+            if (emojiRef.current?.contains(target)) return;
+            if (emojiBtnRef.current?.contains(target)) return;
+
+            setEmojiOpen(false);
+        }
+
+        document.addEventListener("mousedown", onClickOutside);
+        return () => document.removeEventListener("mousedown", onClickOutside);
+    }, []);
 
     useEffect(() => {
         const onUnMount = chatService.addListener((data) => {
@@ -126,7 +147,6 @@ export default function ChatConversation({ chatId, onClose }: ChatConversationPr
     async function updateSeen(last: ChatMessage) {
         last.seenState = "read"
         const resp = await chatService.sendChatSeen(last, chatId);
-        console.log("from backend", resp)
         const chatSeenResponse = {
             messageId: resp.messageId,
             chatId: resp.chatId,
@@ -144,7 +164,6 @@ export default function ChatConversation({ chatId, onClose }: ChatConversationPr
     }
 
     useEffect(() => {
-        console.log("last message", lastMessage)
         if (!lastMessage) return
         console.log(lastMessage.senderId != userData.userId)
         if (lastMessage.senderId != userData.userId) {
@@ -176,6 +195,34 @@ export default function ChatConversation({ chatId, onClose }: ChatConversationPr
         }
     }
 
+    function handleEmojiPallete(e: React.MouseEvent) {
+        e.preventDefault();
+        setEmojiOpen(v => !v);
+    }
+
+
+    function insertEmoji(emoji: string) {
+        const el = inputRef.current;
+        if (!el) return;
+
+        const start = el.selectionStart ?? input.length;
+        const end = el.selectionEnd ?? input.length;
+
+        const next =
+            input.slice(0, start) +
+            emoji +
+            input.slice(end);
+
+        setInput(next);
+
+        requestAnimationFrame(() => {
+            el.focus();
+            el.setSelectionRange(
+                start + emoji.length,
+                start + emoji.length
+            );
+        });
+    }
 
     const handleSubmitMessage = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault()
@@ -266,14 +313,29 @@ export default function ChatConversation({ chatId, onClose }: ChatConversationPr
                     placeholder="Type a message..."
                     onChange={handleInput}
                     className={styles.chatInput}
+                    ref={inputRef}
                 />
-                <button type="submit"
-                    disabled={isLoading}
-                    className={styles.sendBtn}
-                >
-                    Send
+                <button ref={emojiBtnRef} type="button" className={styles.emojiBtn} onClick={handleEmojiPallete}>
+                    <img src="/svg/smile.svg" alt="" />
+                </button>
+                <button type="submit" disabled={isLoading} className={styles.sendBtn}>
+                    <img src="/svg/send-horizontal.svg" alt="" />
                 </button>
             </form>
+
+            {emojiOpen && (
+                <div ref={emojiRef} className={styles.emojiPalette}>
+                    {emojis.map(e => (
+                        <button
+                            key={e}
+                            type="button"
+                            onClick={() => insertEmoji(e)}
+                        >
+                            {e}
+                        </button>
+                    ))}
+                </div>
+            )}
         </div>
     );
 }
