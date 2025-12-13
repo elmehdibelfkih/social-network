@@ -27,3 +27,19 @@ export function handleName(profile: Partial<ProfileAPIResponse> | null) {
   const raw = `${profile.firstName ?? ''}${profile.lastName ?? ''}`.replace(/\s+/g, '')
   return raw ? `@${raw.toLowerCase()}` : `@${profile.userId ?? 'user'}`
 }
+
+
+export function formattedDate(date: string | Date | null): string {
+  if (!date) return "";
+
+  return new Date(date)
+    .toLocaleString("en-US", {
+      month: "long",
+      day: "numeric",
+      year: "numeric",
+      hour: "numeric",
+      minute: "2-digit",
+      hour12: true,
+    })
+    .replace(",", "");
+}
