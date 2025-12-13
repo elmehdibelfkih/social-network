@@ -48,7 +48,10 @@ export function NavProfile() {
           <button
             className={styles.menuItem}
             type="button"
-            onClick={() => router.push(`/profile/${state?.userId}`)}
+            onClick={() => {
+              router.push(`/profile/${state?.userId}`);
+              setOpen(false);
+            }}
           >
             <ProfileIcon />
             <span>My Profile</span>
@@ -57,7 +60,10 @@ export function NavProfile() {
           <button
             className={styles.menuItem}
             type="button"
-            onClick={() => router.push("/settings")}
+            onClick={() => {
+              router.push(`/settings`);
+              setOpen(false);
+            }}
           >
             <SettingsIcon />
             <span>Settings</span>

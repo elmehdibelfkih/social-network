@@ -450,7 +450,7 @@ No need for a request body.
   [
     {
       "userId": 1823393649397760,
-      "status": "accepted",
+      "status": "pending",
       "nickname": "Kirsten Grant",
       "firstName": "Jaquelyn",
       "lastName": "Mcguire",
@@ -465,7 +465,7 @@ No need for a request body.
     },
     {
       "userId": 565768679875975957,
-      "status": "accepted",
+      "status": "pending",
       "nickname": "hola nahoda",
       "firstName": "sdfdf",
       "lastName": "eegtrytr",
