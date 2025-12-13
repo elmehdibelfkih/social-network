@@ -2,6 +2,7 @@ package feed
 
 import (
 	"net/http"
+
 	"social/pkg/utils"
 )
 
@@ -32,7 +33,7 @@ func GetFeed(w http.ResponseWriter, r *http.Request) {
 	// Call service layer
 	response, ok := GetPersonalFeedService(w, userId, int(page), int(limit), "GetFeed handler")
 	if ok {
-		utils.JsonResponseEncode(w, http.StatusOK, response)
+		utils.WriteSuccess(w, http.StatusOK, response)
 	}
 }
 
@@ -70,7 +71,7 @@ func GetFeedUser(w http.ResponseWriter, r *http.Request) {
 	// Call service layer
 	response, ok := GetUserFeedService(w, viewerId, profileUserId, int(page), int(limit), "GetFeedUser handler")
 	if ok {
-		utils.JsonResponseEncode(w, http.StatusOK, response)
+		utils.WriteSuccess(w, http.StatusOK, response)
 	}
 }
 
@@ -108,6 +109,6 @@ func GetFeedGroup(w http.ResponseWriter, r *http.Request) {
 	// Call service layer
 	response, ok := GetGroupFeedService(w, userId, groupId, int(page), int(limit), "GetFeedGroup handler")
 	if ok {
-		utils.JsonResponseEncode(w, http.StatusOK, response)
+		utils.WriteSuccess(w, http.StatusOK, response)
 	}
 }

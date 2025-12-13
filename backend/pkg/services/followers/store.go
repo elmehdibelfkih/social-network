@@ -145,6 +145,15 @@ func unfollowUser(followerId, followedId int64) error {
 			return err
 		}
 
+		status, err := selectFollowStatus(followerId, followedId)
+		if err != nil {
+			return err
+		}
+
+		if status != "accepted" {
+			return nil
+		}
+
 		// Update followers count for the followed user
 		counter := followUnfollowUpdateCounterStruct(database.USER_ENTITY_TYPE, followedId, database.FOLLOWERS_ENTITY_NAME, "decrement")
 		err = database.UpdateCounter(tx, counter)
@@ -164,15 +173,16 @@ func unfollowUser(followerId, followedId int64) error {
 		return nil
 	})
 }
-func GetFollowersByUserID(userID int64) ([]UserFollowItem, error) {
-	rows, err := config.DB.Query(GET_FOLLOWERS_QUERY, userID, userID, userID)
+
+func getFollowList(query string, args ...any) ([]UserFollowItem, error) {
+	rows, err := config.DB.Query(query, args...)
 	if err != nil {
-		utils.SQLiteErrorTarget(err, GET_FOLLOWERS_QUERY)
+		utils.SQLiteErrorTarget(err, query)
 		return nil, err
 	}
 	defer rows.Close()
 
-	var followers []UserFollowItem
+	var items []UserFollowItem
 
 	for rows.Next() {
 		var (
@@ -196,7 +206,7 @@ func GetFollowersByUserID(userID int64) ([]UserFollowItem, error) {
 			&privacy,
 			&chatId,
 		); err != nil {
-			utils.SQLiteErrorTarget(err, GET_FOLLOWERS_QUERY)
+			utils.SQLiteErrorTarget(err, query)
 			return nil, err
 		}
 
@@ -206,7 +216,7 @@ func GetFollowersByUserID(userID int64) ([]UserFollowItem, error) {
 			return nil, err
 		}
 
-		follower := UserFollowItem{
+		item := UserFollowItem{
 			UserId:    userId,
 			Status:    toStringPtr(status),
 			Nickname:  toStringPtr(nickname),
@@ -218,73 +228,23 @@ func GetFollowersByUserID(userID int64) ([]UserFollowItem, error) {
 			Stats:     stats,
 		}
 
-		followers = append(followers, follower)
+		items = append(items, item)
 	}
 
-	if err = rows.Err(); err != nil {
-		utils.SQLiteErrorTarget(err, GET_FOLLOWERS_QUERY)
+	if err := rows.Err(); err != nil {
+		utils.SQLiteErrorTarget(err, query)
 		return nil, err
 	}
 
-	return followers, nil
+	return items, nil
 }
 
-func GetFolloweesByUserID(userID int64) ([]UserFollowItem, error) {
-	rows, err := config.DB.Query(GET_FOLLOWEES_QUERY, userID, userID)
-	if err != nil {
-		utils.SQLiteErrorTarget(err, GET_FOLLOWEES_QUERY)
-		return nil, err
-	}
-	defer rows.Close()
+func GetFollowersByUserID(targetUser int64, userID int64) ([]UserFollowItem, error) {
+	return getFollowList(GET_FOLLOWERS_QUERY, userID, userID, targetUser)
+}
 
-	var followees []UserFollowItem
-
-	for rows.Next() {
-		var (
-			userId    int64
-			status    string
-			nickname  sql.NullString
-			firstName string
-			lastName  string
-			avatarId  sql.NullInt64
-			privacy   string
-			chatId    sql.NullInt64
-		)
-
-		err = rows.Scan(&userId, &status, &nickname, &firstName, &lastName, &avatarId, &privacy, &chatId)
-		if err != nil {
-			utils.SQLiteErrorTarget(err, GET_FOLLOWEES_QUERY)
-			return nil, err
-		}
-
-		// Populate Stats
-		stats, err := getState(userId)
-		if err != nil {
-			utils.SQLiteErrorTarget(err, "getState")
-			return nil, err
-		}
-
-		followee := UserFollowItem{
-			UserId:    userId,
-			Status:    &status,
-			Nickname:  toStringPtr(nickname),
-			FirstName: firstName,
-			LastName:  lastName,
-			AvatarId:  toInt64Ptr(avatarId),
-			Privacy:   privacy,
-			ChatId:    toInt64Ptr(chatId),
-			Stats:     stats,
-		}
-
-		followees = append(followees, followee)
-	}
-
-	if err = rows.Err(); err != nil {
-		utils.SQLiteErrorTarget(err, GET_FOLLOWEES_QUERY)
-		return nil, err
-	}
-
-	return followees, nil
+func GetFolloweesByUserID(targetUser int64, userID int64) ([]UserFollowItem, error) {
+	return getFollowList(GET_FOLLOWEES_QUERY, userID, userID, targetUser)
 }
 
 func GetFollowRequestByUserID(userID int64) ([]UserFollowItem, error) {

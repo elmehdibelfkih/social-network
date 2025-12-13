@@ -1,74 +1,103 @@
-import { http } from "@/libs/apiFetch";
-import { Post } from "@/libs/globalTypes";
+import { http } from '@/libs/apiFetch'
+import type { Post, PaginationParams } from '@/libs/globalTypes'
 
 export const postsService = {
-  async getFeed(page = 1, limit = 20): Promise<Post[]> {
+  // Get feed posts
+  async getFeed(params?: PaginationParams): Promise<Post[]> {
     try {
-      const response = await http.get(`/api/v1/feed?page=${page}&limit=${limit}`);
-      if (!response) {
-        return [];
-      }
-      return Array.isArray(response) ? response : (Array.isArray(response) ? response : []);
+      const queryParams = new URLSearchParams()
+      if (params?.page) queryParams.set('page', params.page.toString())
+      if (params?.limit) queryParams.set('limit', params.limit.toString())
+      
+      const query = queryParams.toString()
+      const url = `/api/v1/feed${query ? `?${query}` : ''}`
+      
+      return await http.get<Post[]>(url) || []
     } catch (error) {
-      return [];
+      console.error('Failed to fetch feed:', error)
+      return []
     }
   },
 
-  async createPost(data: { content: string; privacy: 'public' | 'private' | 'followers'; mediaIds?: number[] }): Promise<any> {
-    const response = await http.post('/api/v1/posts', data);
-    return response;
-  },
-
-  async uploadMedia(file: File): Promise<{ mediaId: number }> {
-    const reader = new FileReader();
-    return new Promise((resolve, reject) => {
-      reader.onload = async () => {
-        try {
-          const base64Data = (reader.result as string).split(',')[1];
-          // Direct fetch to avoid snackbar errors
-          const response = await fetch(`${process.env.NEXT_PUBLIC_GO_API_URL}/api/v1/media/upload`, {
-            method: 'POST',
-            credentials: 'include',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              fileName: file.name,
-              fileType: file.type,
-              fileData: base64Data,
-              Purpose: 'post'
-            })
-          });
-
-          if (!response.ok) {
-            throw new Error('Upload failed');
-          }
-
-          const data = await response.json();
-          if (!data || !data.payload || !data.payload.mediaId) {
-            throw new Error('Invalid upload response');
-          }
-          resolve({ mediaId: data.payload.mediaId });
-        } catch (error) {
-          reject(error);
-        }
-      };
-      reader.onerror = reject;
-      reader.readAsDataURL(file);
-    });
-  },
-
-  async toggleLike(postId: number, isLiked: boolean): Promise<boolean> {
+  // Get user posts
+  async getUserPosts(userId: string | number, params?: PaginationParams): Promise<Post[]> {
     try {
-      const method = isLiked ? 'DELETE' : 'POST';
-      const response = await fetch(`${process.env.NEXT_PUBLIC_GO_API_URL}/api/v1/posts/${postId}/like`, {
-        method,
-        credentials: 'include'
-      });
-      return response.ok;
+      const queryParams = new URLSearchParams()
+      if (params?.page) queryParams.set('page', params.page.toString())
+      if (params?.limit) queryParams.set('limit', params.limit.toString())
+      
+      const query = queryParams.toString()
+      const url = `/api/v1/users/${userId}/posts${query ? `?${query}` : ''}`
+      
+      return await http.get<Post[]>(url) || []
     } catch (error) {
-      console.error('Error toggling like:', error);
-      return false;
+      console.error('Failed to fetch user posts:', error)
+      return []
+    }
+  },
+
+  // Get single post
+  async getPost(postId: string | number): Promise<Post | null> {
+    try {
+      return await http.get<Post>(`/api/v1/posts/${postId}`)
+    } catch (error) {
+      console.error('Failed to fetch post:', error)
+      return null
+    }
+  },
+
+  // Like post
+  async likePost(postId: string | number): Promise<boolean> {
+    try {
+      await http.post(`/api/v1/posts/${postId}/like`)
+      return true
+    } catch (error) {
+      console.error('Failed to like post:', error)
+      return false
+    }
+  },
+
+  // Unlike post
+  async unlikePost(postId: string | number): Promise<boolean> {
+    try {
+      await http.delete(`/api/v1/posts/${postId}/like`)
+      return true
+    } catch (error) {
+      console.error('Failed to unlike post:', error)
+      return false
+    }
+  },
+
+  // Delete post
+  async deletePost(postId: string | number): Promise<boolean> {
+    try {
+      await http.delete(`/api/v1/posts/${postId}`)
+      return true
+    } catch (error) {
+      console.error('Failed to delete post:', error)
+      return false
+    }
+  },
+
+  // Get author avatar ID
+  async getAuthorAvatar(authorId: string | number): Promise<number | null> {
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_GO_API_URL}/api/v1/users/${authorId}/profile`, {
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+      
+      if (!response.ok) {
+        return null
+      }
+      
+      const profile = await response.json()
+      return profile?.avatarId || null
+    } catch (error) {
+      console.error('Failed to fetch author avatar:', error)
+      return null
     }
   }
-};
-
-export const createPost = postsService.createPost;
+}

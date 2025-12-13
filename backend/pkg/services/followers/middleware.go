@@ -8,6 +8,7 @@ import (
 // POST /api/v1/users/:user_id/follow => send follow request or follow immediately if target is public
 func FollowRequestMiddleWare(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+
 		userId := utils.GetUserIdFromContext(r)
 		targetUserId := utils.GetWildCardValue(w, r, "user_id")
 
@@ -31,7 +32,6 @@ func FollowRequestMiddleWare(next http.HandlerFunc) http.HandlerFunc {
 			utils.InternalServerError(w)
 			return
 		}
-
 		switch status {
 		case "pending":
 			utils.BadRequest(w, "Follow request already sent.", "alert")
@@ -63,7 +63,6 @@ func UnfollowRequestMiddleWare(next http.HandlerFunc) http.HandlerFunc {
 
 		if userId == targetUserId {
 			utils.BadRequest(w, "You cannot unfollow yourself.", "alert")
-			println("hani")
 			return
 		}
 

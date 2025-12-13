@@ -4,18 +4,17 @@ import { useRouter, useSearchParams } from "next/navigation"
 import { getPosts } from "./profile_feed.services"
 import { useEffect, useState } from "react"
 import { Post } from "@/libs/globalTypes"
-import { PostsClient } from "../posts"
-import styles from "./styles.module.css"
-import { ProfileIcon, UserIcon } from "@/components/ui/icons"
+import PostServer from "../posts/posts.server"
 
-export function PostsSection({ userId }: { userId: string }) {
+import styles from "./styles.module.css"
+
+export function PostsSection({ userId, avatarId }: { userId: string, avatarId: number }) {
     const searchParams = useSearchParams()
     const router = useRouter()
     const [page, setPage] = useState(1)
     const [posts, setPosts] = useState<Post[]>([])
     const [hasMore, setHasMore] = useState(true)
     const [isLoading, setIsLoading] = useState(false)
-
 
     const loadPosts = async (page: number) => {
         if (isLoading || !hasMore) return
@@ -64,7 +63,7 @@ export function PostsSection({ userId }: { userId: string }) {
                     <EmptyContent />
                     :
                     posts.map((post) => (
-                        <PostsClient key={post.postId} newPost={post} />
+                        <PostServer key={post.postId} post={post} />
                     ))
             }
             {isLoading && <div>Loading...</div>}

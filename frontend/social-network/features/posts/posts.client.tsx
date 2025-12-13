@@ -1,124 +1,72 @@
-'use client';
+'use client'
+import { useState } from 'react'
+import { postsService } from './postsService'
+import { Comments } from '@/components/ui/comments/comments'
+import styles from './styles.module.css'
+import { Post } from '@/libs/globalTypes'
 
-import { useState, useEffect } from 'react';
-import { Post } from '@/libs/globalTypes';
-import { postsService } from './postsService';
-import { LikeButton } from '@/components/ui/like-button/like-button';
-import { Comments } from '@/components/ui/comments/comments';
-import styles from './styles.module.css';
+export function PostsClient({ post, onStatsUpdate }: { post: Post, onStatsUpdate?: (stats: { reactionCount: number, commentCount: number }) => void }) {
+  const [liked, setLiked] = useState(post?.isLikedByUser)
+  const [isLoading, setIsLoading] = useState(false)
+  const [showComments, setShowComments] = useState(false)
+  const [commentCount, setCommentCount] = useState(post?.stats?.commentCount)
+  const [likeCount, setLikeCount] = useState(post?.stats?.reactionCount || 0)
 
-interface PostsClientProps {
-  newPost?: Post | null;
-  onNewPostDisplayed?: () => void;
-}
+  const handleLike = async () => {
+    if (isLoading) return
 
-export function PostsClient({ newPost, onNewPostDisplayed }: PostsClientProps) {
-  const [posts, setPosts] = useState<Post[]>([]);
-  const [openComments, setOpenComments] = useState<number | null>(null);
+    setIsLoading(true)
 
-  useEffect(() => {
-    postsService.getFeed().then(setPosts);
-  }, []);
+    const success = await postsService.likePost(post.postId)
 
-  useEffect(() => {
-    if (newPost) {
-      setPosts(prev => [newPost, ...prev]);
-      onNewPostDisplayed?.();
+    if (success) {
+      const newLiked = !liked
+      setLiked(newLiked)
+      const newCount = newLiked ? likeCount + 1 : likeCount - 1
+      setLikeCount(newCount)
+      if (onStatsUpdate) {
+        onStatsUpdate({ reactionCount: newCount, commentCount })
+      }
     }
-  }, [newPost, onNewPostDisplayed]);
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffMs = now.getTime() - date.getTime();
-    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+    setIsLoading(false)
+  }
 
-    if (diffHours < 1) return 'Just now';
-    if (diffHours < 24) return `${diffHours} hours ago`;
-    return date.toLocaleDateString();
-  };
+  const handleComment = () => {
+    setShowComments(true)
+  }
+
+  const handleCommentAdded = () => {
+    setCommentCount(prev => prev + 1)
+  }
 
   return (
-    <div className={styles.postsContainer}>
-      {posts.length === 0 ? (
-        <div>No posts yet. Create the first one!</div>
-      ) : (
-        posts.map((post) => (
-          <div key={post.postId} className={styles.postCard}>
-            <div className={styles.postUserSection}>
-              <div className={styles.postUserAvatar}>
-                <img src="/users.svg" alt="User Avatar" />
-              </div>
-              <div className={styles.postUserInfo}>
-                <h4>{post.authorFirstName} {post.authorLastName}</h4>
-                <span>{formatDate(post.createdAt)} · {post.privacy}</span>
-              </div>
-            </div>
+    <div className={styles.actions}>
+      <button
+        className={`${styles.actionButton} ${liked ? styles.liked : ''}`}
+        onClick={handleLike}
+        disabled={isLoading}
+      >
+        <svg width="20" height="20" viewBox="0 0 24 24" fill={liked ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2">
+          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+        </svg>
+        Like
+      </button>
 
-            <div className={styles.postCaption}>
-              <p>{post.content}</p>
-            </div>
+      <button className={styles.actionButton} onClick={handleComment}>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+        </svg>
+        Comment
+      </button>
 
-            {post.mediaIds && post.mediaIds.length > 0 && (
-              <div className={styles.postImages}>
-                {post.mediaIds.map((mediaId) => (
-                  <img
-                    key={mediaId}
-                    src={`${process.env.NEXT_PUBLIC_GO_API_URL}/api/v1/media/${mediaId}`}
-                    alt="Post image"
-                    className={styles.postImage}
-
-                    onError={(e) => {
-                      console.error('Failed to load image:', mediaId);
-                      e.currentTarget.style.display = 'none';
-                    }}
-                  />
-                ))}
-              </div>
-            )}
-
-            <div className={styles.postInteraction}>
-              <LikeButton
-                postId={post.postId}
-                isLiked={post.isLikedByUser}
-                likeCount={post.stats.reactionCount}
-                onLikeChange={(isLiked, newCount) => {
-                  setPosts(prev => prev.map(p =>
-                    p.postId === post.postId
-                      ? { ...p, isLikedByUser: isLiked, stats: { ...p.stats, reactionCount: newCount } }
-                      : p
-                  ));
-                }}
-              />
-              <button
-                className={styles.interactionItem}
-                onClick={() => setOpenComments(post.postId)}
-              >
-                <img src="/icons/comment.svg" alt="comment icon" />
-                <span>{post.stats.commentCount} comments</span>
-              </button>
-              <button className={styles.interactionItem}>
-                <img src="/icons/share.svg" alt="share icon" />
-                <span>Share</span>
-              </button>
-            </div>
-
-            <Comments
-              postId={post.postId}
-              isOpen={openComments === post.postId}
-              onClose={() => setOpenComments(null)}
-              commentCount={post.stats.commentCount}
-              onCommentAdded={() => {
-                setPosts(prev => prev.map(p =>
-                  p.postId === post.postId
-                    ? { ...p, stats: { ...p.stats, commentCount: p.stats.commentCount + 1 } }
-                    : p
-                ));
-              }}
-            />
-          </div>
-        ))
-      )}
+      <Comments
+        postId={post.postId}
+        isOpen={showComments}
+        onClose={() => setShowComments(false)}
+        commentCount={commentCount}
+        onCommentAdded={handleCommentAdded}
+      />
     </div>
-  );
+  )
 }

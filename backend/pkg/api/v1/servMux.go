@@ -60,7 +60,7 @@ func SocialMux() *router.Router {
 	socialMux.HandleFunc("GET", "/api/v1/chats/{chat_id}/participants", utils.MiddlewareChain(chat.GetParticipantsHandler, middleware.UserContext, middleware.AuthMiddleware, chat.ChatAccessMiddleware))
 
 	// media
-	socialMux.HandleFunc("POST", "/api/v1/media/upload", media.HandleUploadMedia)
+	socialMux.HandleFunc("POST", "/api/v1/media/upload", utils.MiddlewareChain(media.HandleUploadMedia, middleware.UserContext))
 	socialMux.HandleFunc("GET", "/api/v1/media/{media_id}", utils.MiddlewareChain(media.HandleGetMedia, middleware.AuthMiddleware, media.MediaMiddleware))
 	socialMux.HandleFunc("DELETE", "/api/v1/media/{media_id}", utils.MiddlewareChain(media.HandleDeleteMedia, media.MediaMiddleware, middleware.AuthMiddleware))
 
@@ -95,6 +95,8 @@ func SocialMux() *router.Router {
 	// Reactions
 	socialMux.HandleFunc("POST", "/api/v1/posts/{post_id}/like", utils.MiddlewareChain(posts.HandleLikePost, middleware.UserContext, middleware.AuthMiddleware, posts.PostViewMiddleware))
 	socialMux.HandleFunc("DELETE", "/api/v1/posts/{post_id}/like", utils.MiddlewareChain(posts.HandleUnlikePost, middleware.UserContext, middleware.AuthMiddleware, posts.PostViewMiddleware))
+	socialMux.HandleFunc("POST", "/api/v1/comments/{comment_id}/like", utils.MiddlewareChain(posts.HandleLikeComment, middleware.UserContext, middleware.AuthMiddleware))
+	socialMux.HandleFunc("DELETE", "/api/v1/comments/{comment_id}/like", utils.MiddlewareChain(posts.HandleUnlikeComment, middleware.UserContext, middleware.AuthMiddleware))
 
 	// notifications
 	socialMux.HandleFunc("GET", "/api/v1/notifications", utils.MiddlewareChain(notifications.HandleGetNotifications, middleware.AuthMiddleware))

@@ -1,10 +1,10 @@
 'use client'
-import { Suspense, useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import type { Post } from '@/libs/globalTypes'
 import { PostsClient } from './posts.client'
 import { AvatarHolder } from '@/components/ui/avatar_holder/avatarholder.client'
 import styles from './styles.module.css'
-import { http, fetchMediaClient } from '@/libs/apiFetch'
+import { fetchMediaClient, http } from '@/libs/apiFetch'
 import { UpdatePost } from '@/components/ui/UpdatePost/UpdatePost'
 import { ConfirmDelete } from '@/components/ui/ConfirmDelete/ConfirmDelete'
 import { useAuth } from '@/providers/authProvider'
@@ -52,15 +52,6 @@ function MediaCarousel({ mediaDataList }: { mediaDataList: string[] }) {
   )
 }
 
-async function getAvatarId(userId: number): Promise<number | null> {
-  try {
-    const profile = await http.get(`/api/v1/users/${userId}/profile`) as any
-    return profile?.avatarId || null
-  } catch {
-    return null
-  }
-}
-
 async function getMediaData(mediaId: number): Promise<string | null> {
   try {
     const media = await fetchMediaClient(String(mediaId))
@@ -73,10 +64,10 @@ async function getMediaData(mediaId: number): Promise<string | null> {
   }
 }
 
-export default function PostServer({ post }: { post: Post }) {
+export function PostCard({ post, avatarId }: { post: Post, avatarId: number}) {
   const { user } = useAuth()
-  const [avatarId, setAvatarId] = useState<number | null>(null)
   const [mediaDataList, setMediaDataList] = useState<(string | null)[]>([])
+  const [isLoadingMedia, setIsLoadingMedia] = useState(true)
   const [showMenu, setShowMenu] = useState(false)
   const [showUpdateModal, setShowUpdateModal] = useState(false)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
@@ -90,25 +81,41 @@ export default function PostServer({ post }: { post: Post }) {
   useEffect(() => setMounted(true), [])
 
   useEffect(() => {
-    getAvatarId(post.authorId).then(setAvatarId)
-
-    if (post.mediaIds && post.mediaIds.length > 0) {
-      Promise.all(post.mediaIds.map(getMediaData)).then(setMediaDataList)
+    const loadData = async () => {
+      if (post.mediaIds && post.mediaIds.length > 0) {
+        const mediaData = await Promise.all(
+          post.mediaIds.map(mediaId => getMediaData(mediaId))
+        )
+        setMediaDataList(mediaData)
+        setIsLoadingMedia(false)
+      } else {
+        setIsLoadingMedia(false)
+      }
     }
-  }, [post.authorId, post.mediaIds])
+
+    loadData()
+  }, [post.mediaIds])
 
   useEffect(() => {
-    if (!post.stats) {
-      http.get<any>(`/api/v1/posts/${post.postId}/comments?page=1&limit=1`)
-        .then(data => setStats(prev => ({ ...prev, commentCount: data?.totalComments || 0 })))
-        .catch(() => {})
+    const fetchStats = async () => {
+      try {
+        const commentsData = await http.get<any>(`/api/v1/posts/${post.postId}/comments?page=1&limit=1`)
+        setStats(prev => ({
+          ...prev,
+          commentCount: commentsData?.totalComments || 0
+        }))
+      } catch (error) {
+        console.error('Failed to fetch stats:', error)
+      }
     }
-  }, [post.postId, post.stats])
-
+    fetchStats()
+  }, [post.postId])
   const authorName = `${post.authorFirstName} ${post.authorLastName}`
   const timeAgo = new Date(post.createdAt).toLocaleDateString()
+  
 
   return (
+    
     <article className={styles.post}>
       <div className={styles.header}>
         <AvatarHolder avatarId={avatarId} size={40} />
@@ -143,18 +150,21 @@ export default function PostServer({ post }: { post: Post }) {
         <p>{post.content}</p>
       </div>
 
-      {post.mediaIds && post.mediaIds.length > 0 && (
-        <MediaCarousel mediaDataList={mediaDataList.filter(Boolean) as string[]} />
+      {post?.mediaIds && post.mediaIds.length > 0 && (
+        isLoadingMedia ? (
+          <div style={{ padding: '40px', textAlign: 'center', color: '#6b7280' }}>
+            Loading media...
+          </div>
+        ) : (
+          <MediaCarousel mediaDataList={mediaDataList.filter(Boolean) as string[]} />
+        )
       )}
 
       <div className={styles.stats}>
-        <span>{stats.reactionCount} like{stats.reactionCount !== 1 ? 's' : ''}</span>
+        <span>{stats.reactionCount} likes</span>
         <span>{stats.commentCount} comment{stats.commentCount !== 1 ? 's' : ''}</span>
       </div>
-
-      <Suspense fallback={<div className={styles.actionsLoading}>Loading...</div>}>
-        <PostsClient post={{ ...post, stats }} onStatsUpdate={setStats} />
-      </Suspense>
+      <PostsClient post={{ ...post, stats }} onStatsUpdate={setStats} />
 
       {showUpdateModal && (
         <UpdatePost
@@ -177,5 +187,7 @@ export default function PostServer({ post }: { post: Post }) {
         />
       )}
     </article>
+    
   )
+
 }

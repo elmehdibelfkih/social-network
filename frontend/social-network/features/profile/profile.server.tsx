@@ -23,6 +23,7 @@ export function Profile({ profile }: { profile: ProfileData }) {
                         <p className={styles.aboutMe}>{profile.aboutMe}</p>
 
                         <div className={styles.stats}>
+                            <span><b>{profile.stats.postsCount || 0}</b> Posts</span>
                             <span><b>{profile.stats.followersCount}</b> Followers</span>
                             <span><b>{profile.stats.followingCount}</b> Following</span>
                         </div>

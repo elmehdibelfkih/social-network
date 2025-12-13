@@ -44,6 +44,12 @@ const (
 		WHERE id = ?;
 	`
 
+	QUERY_GET_AUTHOR_DETAILS = `
+		SELECT first_name, last_name, nickname
+		FROM users
+		WHERE id = ?;
+	`
+
 	// Post media queries
 	QUERY_INSERT_POST_MEDIA = `
 		INSERT INTO post_media (post_id, media_id, ordinal)
@@ -171,5 +177,29 @@ const (
 	QUERY_CREATE_COUNTERS_ENTITY = `
 		INSERT INTO counters (entity_type, entity_id, reaction, created_at, updated_at)
 		VALUES (?, ?, ?, ?, ?);
+	`
+
+	// Comment reaction queries
+	QUERY_CREATE_COMMENT_REACTION = `
+		INSERT INTO comment_reactions (comment_id, user_id, reaction_type, reacted_at)
+		VALUES (?, ?, ?, ?);
+	`
+
+	QUERY_DELETE_COMMENT_REACTION = `
+		DELETE FROM comment_reactions
+		WHERE comment_id = ? AND user_id = ?;
+	`
+
+	QUERY_CHECK_COMMENT_REACTION_EXISTS = `
+		SELECT 1
+		FROM comment_reactions
+		WHERE comment_id = ? AND user_id = ?
+		LIMIT 1;
+	`
+
+	QUERY_COUNT_COMMENT_LIKES = `
+		SELECT COUNT(*)
+		FROM comment_reactions
+		WHERE comment_id = ?;
 	`
 )

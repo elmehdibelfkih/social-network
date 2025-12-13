@@ -32,7 +32,6 @@ func NewClient(wsHub *Hub, conn *websocket.Conn, id int64, token string) *Client
 }
 
 func (c *Client) pongHandler(pongMsg string) error {
-	log.Println("pong")
 	return c.connection.SetReadDeadline(time.Now().Add(pongWait))
 }
 
@@ -88,7 +87,6 @@ func (c *Client) writeMessages() {
 				return
 			}
 		case <-ticker.C:
-			log.Println("ping")
 			c.connection.SetWriteDeadline(time.Now().Add(10 * time.Second))
 			if err := c.connection.WriteMessage(websocket.PingMessage, []byte{}); err != nil {
 				log.Println("write msg: ", err)

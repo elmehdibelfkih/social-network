@@ -48,9 +48,8 @@ export function FollowersList({ userId, type }: FollowersListProps) {
         } finally {
             setIsLoading(false)
         }
-        
+
     }
-    console.log("===???>",followers);
 
     useEffect(() => {
         loadFollowers()
@@ -59,14 +58,13 @@ export function FollowersList({ userId, type }: FollowersListProps) {
     if (isLoading) {
         return <div>Loading...</div>
     }
-
+    
     return (
         <div className={styles.followersGrid}>
-            {followers.length === 0 && !isLoading ?
+            {!followers && !isLoading ?
                 <EmptyContent type={type} />
                 : followers.map((follower) => (
-                    
-                    <MiniProfile key={follower.userId} data={followerToProfile(follower)} isMyprofile={String(follower.userId) !== user.userId} />
+                    <MiniProfile key={follower.userId} data={followerToProfile(follower)} isMyprofile={String(follower.userId) !== user?.userId}  />
                 ))}
         </div>
     )

@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { authService } from './index';
 import styles from './styles.module.css';
 import { useAuth } from '@/providers/authProvider';
-import { User } from "@/features/navbar/types";
+import { ShowSnackbar } from '@/components/ui/snackbar/snackbar';
 
 
 export function LoginForm({ onAuthSuccess }: { onAuthSuccess?: () => void }) {
@@ -25,7 +25,7 @@ export function LoginForm({ onAuthSuccess }: { onAuthSuccess?: () => void }) {
 
         try {
             const resp = await authService.login(formData);
-            const User  = {
+            const User = {
                 userId: String(resp.userId),
                 avatarId: resp.avatarId,
                 nickname: resp.nickname,
@@ -36,6 +36,8 @@ export function LoginForm({ onAuthSuccess }: { onAuthSuccess?: () => void }) {
             localStorage.setItem('social_network-user', JSON.stringify(User));
             setUser(User);
             router.push('/');
+            ShowSnackbar({ status: true, message: 'login successfully.' });
+
         } catch (error) {
             setIsLoading(false);
             console.error("Login failed:", error);

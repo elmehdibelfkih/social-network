@@ -1,5 +1,5 @@
 import { http } from '@/libs/apiFetch'
-import type { ProfileAPIResponse } from './types'
+import type { ProfileAPIResponse } from '@/libs/globalTypes'
 
 export async function getProfileServer(userId: string | number): Promise<ProfileAPIResponse | null> {
   try {

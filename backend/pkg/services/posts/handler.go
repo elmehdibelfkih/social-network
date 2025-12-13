@@ -314,6 +314,7 @@ func HandleCreateComment(w http.ResponseWriter, r *http.Request) {
 
 // HandleGetComments handles GET /api/v1/posts/{post_id}/comments
 func HandleGetComments(w http.ResponseWriter, r *http.Request) {
+	viewerID := utils.GetUserIdFromContext(r)
 	postID, err := getPostID(r)
 	if err != nil {
 		utils.BadRequest(w, "Invalid post ID", utils.ErrorTypeAlert)
@@ -331,7 +332,7 @@ func HandleGetComments(w http.ResponseWriter, r *http.Request) {
 
 	var commentResponses []CommentResponse
 	for _, comment := range comments {
-		commentResponse, err := buildCommentResponse(&comment)
+		commentResponse, err := buildCommentResponse(&comment, viewerID)
 		if err != nil {
 			utils.SQLiteErrorTarget(err, "HandleGetComments (buildCommentResponse)")
 			continue
@@ -393,7 +394,16 @@ func HandleLikePost(w http.ResponseWriter, r *http.Request) {
 
 	// Check if already liked
 	if CheckPostReactionExists(postID, userID) {
-		utils.BadRequest(w, "You have already liked this post", utils.ErrorTypeAlert)
+		if err := DeletePostReaction(postID, userID); err != nil {
+			utils.SQLiteErrorTarget(err, "HandleLikePost (DeletePostReaction)")
+			utils.InternalServerError(w)
+			return
+		}
+		utils.WriteSuccess(w, http.StatusOK, UnlikePostResponse{
+			Message: "Like removed successfully.",
+			PostID:  postID,
+			UserID:  userID,
+		})
 		return
 	}
 
@@ -457,4 +467,63 @@ func DeletePostAllowedViewers(postID int64) error {
 		return err
 	}
 	return nil
+}
+
+// HandleLikeComment handles POST /api/v1/comments/{comment_id}/like
+func HandleLikeComment(w http.ResponseWriter, r *http.Request) {
+	userID := utils.GetUserIdFromContext(r)
+	commentID, err := getCommentID(r)
+	if err != nil {
+		utils.BadRequest(w, "Invalid comment ID", utils.ErrorTypeAlert)
+		return
+	}
+
+	if CheckCommentReactionExists(commentID, userID) {
+		if err := DeleteCommentReaction(commentID, userID); err != nil {
+			utils.SQLiteErrorTarget(err, "HandleLikeComment (DeleteCommentReaction)")
+			utils.InternalServerError(w)
+			return
+		}
+		utils.WriteSuccess(w, http.StatusOK, map[string]interface{}{
+			"message":   "Like removed successfully.",
+			"commentId": commentID,
+		})
+		return
+	}
+
+	if err := CreateCommentReaction(commentID, userID, ReactionLike); err != nil {
+		utils.SQLiteErrorTarget(err, "HandleLikeComment (CreateCommentReaction)")
+		utils.InternalServerError(w)
+		return
+	}
+
+	utils.WriteSuccess(w, http.StatusOK, map[string]interface{}{
+		"message":   "Comment liked successfully.",
+		"commentId": commentID,
+	})
+}
+
+// HandleUnlikeComment handles DELETE /api/v1/comments/{comment_id}/like
+func HandleUnlikeComment(w http.ResponseWriter, r *http.Request) {
+	userID := utils.GetUserIdFromContext(r)
+	commentID, err := getCommentID(r)
+	if err != nil {
+		utils.BadRequest(w, "Invalid comment ID", utils.ErrorTypeAlert)
+		return
+	}
+
+	if err := DeleteCommentReaction(commentID, userID); err != nil {
+		if err == sql.ErrNoRows {
+			utils.NotFoundError(w, "Like not found")
+			return
+		}
+		utils.SQLiteErrorTarget(err, "HandleUnlikeComment (DeleteCommentReaction)")
+		utils.InternalServerError(w)
+		return
+	}
+
+	utils.WriteSuccess(w, http.StatusOK, map[string]interface{}{
+		"message":   "Like removed successfully.",
+		"commentId": commentID,
+	})
 }
