@@ -27,6 +27,7 @@ type UserFollowItem struct {
 	Privacy   string               `json:"privacy"`
 	ChatId    *int64               `json:"chatId"`
 	Stats     UserProfileStatsJson `json:"stats"`
+	JoinedAt  *string              `json:"joinedAt"`
 }
 
 type UserProfileStatsJson struct {

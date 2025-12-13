@@ -4,10 +4,13 @@ import { useState, useEffect } from 'react'
 import styles from './styles.module.css'
 import { togglePrivacy } from './profileSrevice'
 import { useAuth } from '@/providers/authProvider'
+import { useUserStats } from '@/providers/userStatsContext'
 
 export default function PrivacyToggle({ privacy }: { privacy: string }) {
     const [isPublic, setIsPublic] = useState(privacy == 'public' ? true : false)
     const { user } = useAuth()
+    const { dispatch } = useUserStats();
+
 
     const handleToggle = async () => {
         try {
@@ -18,6 +21,11 @@ export default function PrivacyToggle({ privacy }: { privacy: string }) {
                 userId: user.userId,
                 body: payload
             })
+            if (resp) {
+                dispatch({ type: 'SET_PRIVACY', payload: payload.privacy })
+            } else {
+                return
+            }
             setIsPublic(!isPublic)
         } catch (error) {
             console.error("Failed to toggle privacy", error)

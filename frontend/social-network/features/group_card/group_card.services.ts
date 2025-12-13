@@ -1,5 +1,5 @@
 import { http } from "@/libs/apiFetch"
-import { Group, GroupsResponse, CreateGroupPayload, JoinGroupResponse , GroupEventsResponse , Event } from "./types"
+import { Group, GroupsResponse, CreateGroupPayload, JoinGroupResponse , GroupEventsResponse , Event , MediaUploadResponse } from "./types"
 import { group, log } from "console";
 import { getgroups } from "process";
 
@@ -82,6 +82,34 @@ async getGroups(limit = 10, lastItemId?: number): Promise<Group[]> {
     }
   },
 
+
+    async uploadMedia(file: File): Promise<MediaUploadResponse> {
+      const arrayBuffer = await file.arrayBuffer();
+      const base64 = btoa(
+        new Uint8Array(arrayBuffer).reduce(
+          (data, byte) => data + String.fromCharCode(byte),
+          ''
+        )
+      );
+  
+      const payload = {
+        fileName: file.name,
+        fileType: file.type || 'application/octet-stream',
+        fileData: base64,
+        purpose: 'avatar'
+      };
+  
+      const response = await http.post<MediaUploadResponse>(
+        '/api/v1/media/upload',
+        payload
+      );
+  
+      if (!response) {
+        throw new Error('Failed to upload media');
+      }
+  
+      return response;
+    },
 
 
 

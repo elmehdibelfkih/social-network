@@ -1,3 +1,1 @@
-export { default as ProfileSummaryServer } from './profile_summary.server'
-export * from './types'
-export * from './profile_summary.services'
+export { default as ProfileSummary } from './profile_summary.client'

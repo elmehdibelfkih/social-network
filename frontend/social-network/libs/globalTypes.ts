@@ -4,8 +4,8 @@
 //     limit?: number;
 // }
 
-// export type PrivacyLevel = 'public' | 'followers' | 'private' | 'group' | 'restricted';
-// export type FollowStatus = 'none' | 'follow' | 'accepted' | 'pending' | 'declined';
+export type PrivacyLevel = 'public' | 'followers' | 'private' | 'group' | 'restricted';
+export type FollowStatus = 'none' | 'follow' | 'accepted' | 'pending' | 'declined';
 // export type ReactionType = 'like';
 // export type MediaType = 'image/png' | 'image/jpeg' | 'image/gif';
 
@@ -59,44 +59,45 @@
 //     commentsReceived: number;
 // }
 
-// export interface Follower {
-//     userId: number;
-//     nickname: string | null;
-//     firstName: string;
-//     lastName: string;
-//     avatarId: number | null;
-//     followedAt?: string;
-//     status: FollowStatus;
-//     privacy: 'public' | 'private';
-//     chatId: number | null;
-//     stats: {
-//         postsCount: number;
-//         followersCount: number;
-//         followingCount: number;
-//     };
-// }
+export interface Follower {
+  userId: number;
+  nickname: string | null;
+  firstName: string;
+  lastName: string;
+  avatarId: number | null;
+  followedAt?: string;
+  status: FollowStatus;
+  privacy: 'public' | 'private';
+  chatId: number | null;
+  stats: {
+    postsCount: number;
+    followersCount: number;
+    followingCount: number;
+  };
+  joinedAt: string | null;
+}
 
-// export interface PostStats {
-//     reactionCount: number;
-//     commentCount: number;
-// }
+export interface PostStats {
+  reactionCount: number;
+  commentCount: number;
+}
 
-// export interface Post {
-//     postId: number;
-//     authorId: number;
-//     authorNickname: string | null;
-//     authorLastName: string;
-//     authorFirstName: string;
-//     content: string;
-//     mediaIds?: number[] | null;
-//     privacy: PrivacyLevel;
-//     isLikedByUser: boolean;
-//     stats: PostStats;
-//     groupId: number | null;
-//     allowedList?: number[] | null;
-//     createdAt: string;
-//     updatedAt: string;
-// }
+export interface Post {
+  postId: number;
+  authorId: number;
+  authorNickname: string | null;
+  authorLastName: string;
+  authorFirstName: string;
+  content: string;
+  mediaIds?: number[] | null;
+  privacy: PrivacyLevel;
+  isLikedByUser: boolean;
+  stats: PostStats;
+  groupId: number | null;
+  allowedList?: number[] | null;
+  createdAt: string;
+  updatedAt: string;
+}
 
 
 
@@ -213,11 +214,17 @@
 // export type SearchResultItem = Post | Group | Follower;
 
 // export type MediaResponse = { mediaEncoded?: string }
-// export interface UserId {
-//     Id: number;
-// }
 
 // /////////////////////////////////////////////////
+export interface UserId {
+  Id: number;
+}
+
+export type Stats = {
+  postsCount: number
+  followersCount: number
+  followingCount: number
+}
 
 export type ProfileAPIResponse = {
   userId: number
@@ -229,17 +236,13 @@ export type ProfileAPIResponse = {
   aboutMe: string | null
   dateOfBirth: string | null
   privacy: 'public' | 'private' | string
-  stats: {
-    postsCount: number
-    followersCount: number
-    followingCount: number
-  }
+  stats: Stats
   joinedAt: string | null
   chatId?: number | null
 }
 
 export type NotificationCount = {
-    unreadNotifications: number
+  unreadNotifications: number
 }
 
 export type Counts = {
@@ -269,3 +272,16 @@ export type UserStatsState = {
   dateOfBirth: string | null;
   joinedAt: string | null;
 };
+
+export type MiniProfile = {
+  userId: number;
+  status: 'pending' | 'accepted' | 'declined' | 'follow' | null;
+  nickname: string | null;
+  firstName: string;
+  lastName: string;
+  avatarId: number | null;
+  privacy: 'public' | 'private' | string;
+  chatId: number | null;
+  stats: Stats
+  joinedAt: string | null;
+}

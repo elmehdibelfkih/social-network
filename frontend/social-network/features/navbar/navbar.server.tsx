@@ -3,7 +3,6 @@ import NavbarCenter, { NavProfile, NotificationClient } from './navbar.client';
 import styles from './styles.module.css';
 
 export function Navbar() {
-  // return <NavbarClient />;
   return (
     <nav className={styles.navbar}>
       <div className={styles.navbarLeft}>

@@ -3,12 +3,7 @@
 import React, { useState } from 'react';
 import { X, Upload, Image } from 'lucide-react';
 import styles from './creategroup.module.css';
-
-interface CreateGroupPayload {
-  title: string;
-  description: string;
-  avatarId: number;
-}
+import { CreateGroupPayload } from './types'
 
 interface CreateGroupModalProps {
   isOpen: boolean;

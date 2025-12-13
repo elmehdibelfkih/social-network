@@ -46,3 +46,11 @@ export type JoinGroupResponse = {
   groupId: number;
   status: 'pending' | 'approved'; // Add other statuses if needed
 };
+
+
+export interface MediaUploadResponse {
+  mediaId: number;
+  mediaPath: string;
+  fileType: string;
+  uploadedAt: string;
+}

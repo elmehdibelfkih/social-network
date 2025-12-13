@@ -41,7 +41,7 @@ export function FollowersList({ userId, type }: FollowersListProps) {
         try {
             const data = type === 'followers'
                 ? await getFollowers(userId)
-                : await getFollowing(userId)
+                : await getFollowing(userId)                
             setFollowers(data)
         } catch (err) {
             console.error("Error loading followers:", err)
@@ -58,13 +58,13 @@ export function FollowersList({ userId, type }: FollowersListProps) {
     if (isLoading) {
         return <div>Loading...</div>
     }
-    
+
     return (
         <div className={styles.followersGrid}>
-            {!followers && !isLoading ?
+            {followers.length === 0 && !isLoading ?
                 <EmptyContent type={type} />
                 : followers.map((follower) => (
-                    <MiniProfile key={follower.userId} data={followerToProfile(follower)} isMyprofile={String(follower.userId) !== user?.userId}  />
+                    <MiniProfile key={follower.userId} data={followerToProfile(follower)} isMyprofile={String(follower.userId) !== user?.userId} />
                 ))}
         </div>
     )

@@ -10,7 +10,8 @@
     "paths": {
       "@/*": ["./*"]
     },
-    "allowJs": true,
+    "allowJs": false,
+    "checkJs": false,
     "skipLibCheck": true,
     "strict": false,
     "noEmit": true,

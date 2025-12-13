@@ -3,18 +3,29 @@
 
 import { useState } from "react";
 import CreateGroupModal from "./creat_group.client";
+import { GroupService } from "./group_card.services"
 
 export default function GroupsUI() {
   const [isOpen, setIsOpen] = useState(false);
 
   async function handleUploadAvatar(file: File): Promise<number> {
-    // later: call API / server action
-    console.log("uploading file", file);
-    return 1; // fake avatarId for now
+    let mediaId: number;
+    try {
+      if (file) {
+        const uploaded = await GroupService.uploadMedia(file)
+        mediaId = uploaded.mediaId
+      }
+    } catch {
+      console.log("uploading file", file);
+    }
+  
+   // console.log("uploading file", file);
+    return mediaId; // fake avatarId for now
   }
 
   function handleSubmit(payload) {
-    console.log("create group payload", payload);
+    const creat = GroupService.createGroup(payload)
+    console.log("create group payload", creat);
     setIsOpen(false);
   }
 
