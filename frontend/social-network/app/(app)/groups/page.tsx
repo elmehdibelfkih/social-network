@@ -13,14 +13,6 @@ export default async function GroupsPage() {
     <div>
        <GroupsUI/>
       <GroupCardServer groups={groups} />
-       
-        {/* <CreateGroupModal
-        isOpen={true}
-        onClose={null}
-        onSubmit={null}
-        onUploadAvatar={null}
-      /> */}
-      
     </div>
   );
 }

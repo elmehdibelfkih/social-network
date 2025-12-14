@@ -4,19 +4,18 @@ import React, { useState } from 'react';
 import { X, Upload, Image } from 'lucide-react';
 import styles from './creategroup.module.css';
 import { CreateGroupPayload } from './types'
+import { GroupService } from "./group_card.services"
 
 interface CreateGroupModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (payload: CreateGroupPayload) => void;
-  onUploadAvatar: (file: File) => Promise<number>;
 }
 
-const CreateGroupModal: React.FC<CreateGroupModalProps> = ({ 
-  isOpen, 
-  onClose, 
-  onSubmit, 
-  onUploadAvatar 
+const CreateGroupModal: React.FC<CreateGroupModalProps> = ({
+  isOpen,
+  onClose,
+  onSubmit,
 }) => {
   const [formData, setFormData] = useState({
     title: '',
@@ -26,6 +25,7 @@ const CreateGroupModal: React.FC<CreateGroupModalProps> = ({
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [error, setError] = useState('');
   const [isUploading, setIsUploading] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -36,73 +36,94 @@ const CreateGroupModal: React.FC<CreateGroupModalProps> = ({
   };
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
+    const file = e.currentTarget.files?.[0];
     setError('');
 
     if (file) {
-      // Validate file size (10 MB max)
       if (file.size > 10 * 1024 * 1024) {
         setError('Image size must be less than 10 MB');
         return;
       }
 
-      // Validate file type
       if (!file.type.startsWith('image/')) {
         setError('Please upload a valid image file');
         return;
       }
 
-      // Create preview
+      setSelectedFile(file);
+      setIsUploading(true);
+
       const reader = new FileReader();
+
       reader.onloadend = () => {
         setImagePreview(reader.result as string);
+        setIsUploading(false);
+      };
+
+      reader.onerror = () => {
+        setError('Failed to read the image file');
+        reader.abort();
+      };
+
+      reader.onabort = () => {
+        setError('Image reading was aborted');
+        setImagePreview(null);
+        setIsUploading(false);
+        return;
       };
       reader.readAsDataURL(file);
-
-      // Upload avatar and get avatarId
-      if (onUploadAvatar) {
-        setIsUploading(true);
-        try {
-          const avatarId = await onUploadAvatar(file);
-          setFormData(prev => ({
-            ...prev,
-            avatarId: avatarId
-          }));
-        } catch (err) {
-          setError('Failed to upload avatar. Please try again.');
-          setImagePreview(null);
-        } finally {
-          setIsUploading(false);
-        }
-      }
     }
+    setIsUploading(false);
+    setFormData(prev => ({
+        ...prev,
+        avatarId: -1
+      }));
+
   };
 
-  const handleSubmit = () => {
+  async function handleSubmit() {
     if (!formData.title.trim() || !formData.description.trim()) {
       setError('Please fill in all required fields');
       return;
     }
 
-    if (!formData.avatarId) {
+
+    if (!selectedFile) {
       setError('Please upload a group image');
       return;
     }
 
-    // Create payload matching CreateGroupPayload type
-    const payload: CreateGroupPayload = {
-      title: formData.title,
-      description: formData.description,
-      avatarId: formData.avatarId
-    };
 
-    onSubmit(payload);
-    handleClose();
+    setIsUploading(true);
+    try {
+      // 1) upload file now
+      const resp = await GroupService.uploadMedia(selectedFile);
+
+
+      if (!resp) {
+        setError('Failed to upload avatar. Please try again.');
+        return;
+      }
+      const payload: CreateGroupPayload = {
+        title: formData.title,
+        description: formData.description,
+        avatarId: resp.mediaId
+      };
+      onSubmit(payload);
+
+      handleClose();
+    } catch (err) {
+      setError('Failed to create group. Please try again.');
+    } finally {
+      setIsUploading(false);
+    }
+
   };
 
   const handleClose = () => {
     setFormData({ title: '', description: '', avatarId: null });
     setImagePreview(null);
+    setIsUploading(false)
     setError('');
     onClose();
   };
@@ -212,7 +233,7 @@ const CreateGroupModal: React.FC<CreateGroupModalProps> = ({
           {/* Create Button */}
           <button
             onClick={handleSubmit}
-            disabled={!formData.title.trim() || !formData.description.trim() || !formData.avatarId || isUploading}
+            disabled={ formData.title.trim()=='' || formData.description.trim()=='' || formData.avatarId==null }
             className={styles.submitButton}
           >
             Create Group

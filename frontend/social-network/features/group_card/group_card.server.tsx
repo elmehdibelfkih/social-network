@@ -14,7 +14,6 @@ interface GroupCardServerProps {
 }
 
 export default async function GroupCardServer({ groups }: { groups: Group[] }) {
-  // const [isModalOpen, setIsModalOpen] = useState(false);
 
 
   return (
