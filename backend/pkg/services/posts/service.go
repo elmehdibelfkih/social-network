@@ -7,6 +7,7 @@ import (
 	"strconv"
 
 	"social/pkg/config"
+	"social/pkg/db/database"
 	"social/pkg/utils"
 )
 
@@ -316,4 +317,15 @@ func filterVisiblePosts(requesterID int64, posts []Post) []Post {
 		}
 	}
 	return visiblePosts
+}
+
+func addRemovePostActionsUpdateCounterStruct(entityType string, entityID int64, counterName string, action string) database.DBCounterSetter {
+	var counter database.DBCounterSetter
+
+	counter.CounterName = counterName
+	counter.EntityType = entityType
+	counter.EntityID = entityID
+	counter.Action = action
+
+	return counter
 }
