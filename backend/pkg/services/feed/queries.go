@@ -106,15 +106,15 @@ const (
 
 	// Count reactions for a post
 	SELECT_POST_REACTION_COUNT = `
-		SELECT COUNT(*) 
-		FROM post_reactions 
-		WHERE post_id = ?`
+		SELECT COALESCE(reactions_count, 0) 
+		FROM counters 
+		WHERE entity_type = 'post' AND entity_id = ?`
 
 	// Count comments for a post
 	SELECT_POST_COMMENT_COUNT = `
-		SELECT COUNT(*) 
-		FROM comments 
-		WHERE post_id = ?`
+		SELECT COALESCE(comments_count, 0) 
+		FROM counters 
+		WHERE entity_type = 'post' AND entity_id = ?`
 
 	// Get media IDs for a post
 	SELECT_POST_MEDIA_IDS = `
