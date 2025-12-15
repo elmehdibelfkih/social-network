@@ -1,14 +1,21 @@
 import styles from './styles.module.css'
-import { ProfileTopActions } from './profile.client'
+import { Counts, Privacy, ProfileTopActions } from './profile.client'
 import { CalendarIcon, GlobeIcon } from '../../components/ui/icons'
 import { ProfileSettings } from './privacy.client'
 import { ProfileData } from './types'
 import AvatarHolder from '@/components/ui/avatar_holder/avatarholder.client'
+import { ProfileProvider } from './profile.provider'
 
 export function Profile({ profile }: { profile: ProfileData }) {
 
     if (profile == null) return
+    const initialStats = {
+        followersCount: profile.stats.followersCount,
+        followingCount: profile.stats.followingCount,
+        postsCount: profile.stats.postsCount
+    }
     return (
+        <ProfileProvider initialStats={initialStats}>
         <div className={styles.profileContainer}>
             <ProfileTopActions userId={String(profile.userId)} profile={profile} />
 
@@ -22,20 +29,13 @@ export function Profile({ profile }: { profile: ProfileData }) {
                         <h3 className={styles.nickname}>@{profile.nickname}</h3>
                         <p className={styles.aboutMe}>{profile.aboutMe}</p>
 
-                        <div className={styles.stats}>
-                            <span><b>{profile.stats.postsCount || 0}</b> Posts</span>
-                            <span><b>{profile.stats.followersCount}</b> Followers</span>
-                            <span><b>{profile.stats.followingCount}</b> Following</span>
-                        </div>
+                        <Counts userId={profile.userId}/>
                         <div className={styles.meta}>
                             <span className={styles.joinDate}>
                                 <CalendarIcon />
                                 Joined {new Date(profile.joinedAt).toLocaleDateString()}
                             </span>
-                            <span className={`${styles.privacy} ${styles[profile.privacy]}`}>
-                                <GlobeIcon fillColor={profile.privacy === 'public' ? '#01a63f' : '#F7773D'} />
-                                {profile.privacy} profile
-                            </span>
+                            <Privacy userId={profile.userId} privacy={profile.privacy}/>
                         </div>
                     </div>
                 </div>
@@ -43,8 +43,6 @@ export function Profile({ profile }: { profile: ProfileData }) {
 
             </div>
         </div>
+        </ProfileProvider>
     )
 }
-
-
-

@@ -25,7 +25,7 @@ export function LoginForm({ onAuthSuccess }: { onAuthSuccess?: () => void }) {
 
         try {
             const resp = await authService.login(formData);
-            const User  = {
+            const User = {
                 userId: String(resp.userId),
                 avatarId: resp.avatarId,
                 nickname: resp.nickname,

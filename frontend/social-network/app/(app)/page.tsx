@@ -1,6 +1,5 @@
 
-import MiniProfile from "@/features/mini_profile";
-import { ProfileSummaryServer } from "@/features/profile_summary";
+import { ProfileSummary } from "@/features/profile_summary";
 import { http } from "@/libs/apiFetch";
 import { JSX } from "react";
 import { getUserId } from "@/libs/helpers";
@@ -20,9 +19,24 @@ export default async function HomePage(): Promise<JSX.Element> {
 
   return (
     <>
+      <ProfileSummary/>
+      <div>
+        <NewPost data={res2} isMyprofile={false} />
+      </div>
+      <div>
+        {posts.length === 0 ? (
+          <p>
+            No posts yet. Be the first to create one!
+          </p>
+        ) : (
+          posts.map((post) => (
+            <PostServer key={post.postId} post={post} />
+          ))
+        )}
+      </div>
       <main className={styles.main}>
         <div className={styles.firstSection}>
-          <ProfileSummaryServer userId={userId} />
+          <ProfileSummary userId={userId} />
         </div>
         <div className={styles.secondSection}>
           <NewPost data={res2} isMyprofile={false} />

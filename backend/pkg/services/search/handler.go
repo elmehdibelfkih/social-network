@@ -2,6 +2,7 @@ package search
 
 import (
 	"net/http"
+	"strings"
 
 	"social/pkg/utils"
 )
@@ -10,6 +11,7 @@ func HandleSearch(w http.ResponseWriter, r *http.Request) {
 	userID := utils.GetUserIdFromContext(r)
 
 	q := r.URL.Query().Get("q")
+	q = strings.Trim(q, " ")
 	if q == "" {
 		utils.BadRequest(w, "Search query 'q' is required.", utils.ErrorTypeAlert)
 		return
@@ -26,10 +28,6 @@ func HandleSearch(w http.ResponseWriter, r *http.Request) {
 		utils.InternalServerError(w)
 		return
 	}
-
-	// response := SearchResponse{
-	// 	Results: results,
-	// }
 
 	utils.WriteSuccess(w, http.StatusOK, results)
 }

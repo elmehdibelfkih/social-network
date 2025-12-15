@@ -32,7 +32,6 @@ func CreatePost(post *Post) error {
 			utils.SQLiteErrorTarget(err, "CreatePost")
 			return fmt.Errorf("failed to create post: %w", err)
 		}
-		fmt.Println("hani hana")
 
 		// Increment posts_count
 		// if err := database.UpdateCounter(tx, database.DBCounterSetter{

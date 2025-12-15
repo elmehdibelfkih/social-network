@@ -1,15 +1,21 @@
 'use client'
 
+// import { Stats } from "@/libs/globalTypes";
 import { useState, useEffect } from 'react'
 import styles from './styles.module.css'
 import { unfollowPerson, followPerson } from './profileSrevice'
-import { FollowIcon, MessageIcon } from '@/components/ui/icons'
+import { FollowIcon, GlobeIcon, MessageIcon } from '@/components/ui/icons'
 import { ProfileData } from './types'
 import { FollowStatus } from '@/libs/globalTypes'
 import { useAuth } from '@/providers/authProvider'
+import { useUserStats } from '@/providers/userStatsContext'
+import { useProfileStats } from "./profile.provider";
 
 export function FollowButton({ targetUserId, initialStatus, isPrivate = false }: { targetUserId: string, initialStatus: FollowStatus, isPrivate?: boolean }) {
     const [status, setStatus] = useState<FollowStatus>(initialStatus);
+
+    const { dispatch } = useUserStats();
+    const { incrementFollowers, decrementFollowers } = useProfileStats();
 
     const handleFollow = async () => {
         if (status == 'follow' || status == 'none') {
@@ -19,14 +25,24 @@ export function FollowButton({ targetUserId, initialStatus, isPrivate = false }:
 
             followPerson(targetUserId).catch(() => {
                 setStatus(previousStatus)
+                return
             })
+            if (!isPrivate) {
+                dispatch({ type: 'INCREMENT_FOLLOWING' });
+                incrementFollowers();
+            }
         } else {
             const previousStatus = status
             setStatus('follow');
 
             unfollowPerson(targetUserId).catch(() => {
                 setStatus(previousStatus)
+                return
             })
+            if (status === 'accepted') {
+                dispatch({ type: 'DECREMENT_FOLLOWING' });
+                decrementFollowers();
+            }
         }
     }
 
@@ -82,6 +98,51 @@ export function ProfileTopActions({ userId, profile }: { userId: string, profile
                     <MessageButton />
                 </>
             )}
+        </div>
+    )
+}
+
+export function Privacy({ userId, privacy }: { userId: number, privacy: string }) {
+    const { state } = useUserStats();
+    if (state.userId !== userId) {
+        return (
+            <span className={`${styles.privacy} ${styles[privacy]}`}>
+                <GlobeIcon fillColor={privacy === 'public' ? '#01a63f' : '#F7773D'} />
+                {privacy} profile
+            </span>
+        )
+    }
+
+    return (
+        <span>
+            <span className={`${styles.privacy} ${styles[state.privacy]}`}>
+                <GlobeIcon fillColor={state.privacy === 'public' ? '#01a63f' : '#F7773D'} />
+                {state.privacy} profile
+            </span>
+        </span>
+    )
+}
+
+
+export function Counts({ userId }: { userId: number }) {
+    const { state } = useUserStats();
+    if (state.userId === userId) {
+        return (
+            <div className={styles.stats}>
+                <span><b>{state.postsCount}</b> Posts</span>
+                <span><b>{state.followersCount}</b> Followers</span>
+                <span><b>{state.followingCount}</b> Following</span>
+            </div>
+        )
+    }
+
+    const { stats } = useProfileStats();
+
+    return (
+        <div className={styles.stats}>
+            <span><b>{stats.postsCount || 0}</b> Posts</span>
+            <span><b>{stats.followersCount}</b> Followers</span>
+            <span><b>{stats.followingCount}</b> Following</span>
         </div>
     )
 }

@@ -1,77 +1,20 @@
 'use client';
 
 import styles from './styles.module.css';
-import type { ProfileAPIResponse } from '@/libs/globalTypes'
 import AvatarHolder from '@/components/ui/avatar_holder/avatarholder.client';
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
-import { getProfileServer } from '../mini_profile';
-import { getUserId } from '@/libs/helpers';
 import { SettingsIcon, ProfileIcon, LogoutIcon, HomeIcon, GroupsIcon, SearchIcon, BellIcon } from '@/components/ui/icons';
 import { http } from '@/libs/apiFetch';
 import { useAuth } from '@/providers/authProvider';
-import Snackbar, { ShowSnackbar } from '@/components/ui/snackbar/snackbar';
+import { ShowSnackbar } from '@/components/ui/snackbar/snackbar';
 import { useUserStats } from '@/providers/userStatsContext';
 
-type Props = {
-  userId?: string | number
-  data?: ProfileAPIResponse
-}
-
-export function NavProfile({ userId: initialUserId, data: initialData }: Props) {
+export function NavProfile() {
   const router = useRouter();
   const [open, setOpen] = useState(false);
-  const [profile, setProfile] = useState<ProfileAPIResponse | null>(initialData ?? null);
   const { setUser } = useAuth();
-
   const { state } = useUserStats();
-  console.log(state);
-  
-
-  useEffect(() => {
-    let mounted = true;
-    async function loadProfile() {
-      let uid = initialUserId ?? null;
-      if (!uid) {
-        try {
-          uid = await getUserId();
-        } catch {
-          uid = null;
-        }
-      }
-      let p: ProfileAPIResponse | null = initialData ?? null;
-      if (!p && uid != null) {
-        try {
-          p = await getProfileServer(uid);
-        } catch {
-          p = null;
-        }
-      }
-      if (!p && mounted) {
-        p = {
-          userId: Number(uid ?? 0),
-          status: null,
-          nickname: null,
-          firstName: "",
-          lastName: "",
-          avatarId: null,
-          aboutMe: null,
-          dateOfBirth: null,
-          privacy: "public",
-          stats: { postsCount: 0, followersCount: 0, followingCount: 0 },
-          joinedAt: null,
-          chatId: null,
-        };
-      }
-      if (mounted) {
-        setProfile(p);
-      }
-    }
-    loadProfile();
-    return () => {
-      mounted = false;
-    };
-  }, [initialUserId, initialData]);
 
   const handleLogout = async () => {
     try {
@@ -81,11 +24,10 @@ export function NavProfile({ userId: initialUserId, data: initialData }: Props) 
       router.push('/auth');
     } catch (error) {
       console.error('Logout failed', error);
-      // Optionally: show an error message to the user.
     }
   };
 
-  const displayName = profile?.nickname ?? profile?.firstName ?? "";
+  const displayName = state?.nickname ?? state?.firstName ?? "";
 
   return (
     <>
@@ -96,7 +38,7 @@ export function NavProfile({ userId: initialUserId, data: initialData }: Props) 
         tabIndex={0}
         aria-expanded={open}
       >
-        <AvatarHolder avatarId={profile?.avatarId ?? null} size={40} />
+        <AvatarHolder avatarId={state?.avatarId ?? null} size={40} />
         <span className={styles.userName}>{displayName}</span>
       </div>
 
@@ -106,7 +48,7 @@ export function NavProfile({ userId: initialUserId, data: initialData }: Props) 
           <button
             className={styles.menuItem}
             type="button"
-            onClick={() => router.push(`/profile/${profile?.userId}`)}
+            onClick={() => router.push(`/profile/${state?.userId}`)}
           >
             <ProfileIcon />
             <span>My Profile</span>

@@ -1,7 +1,6 @@
 package follow
 
 import (
-	"fmt"
 	"net/http"
 	"social/pkg/utils"
 )
@@ -33,7 +32,6 @@ func FollowRequestMiddleWare(next http.HandlerFunc) http.HandlerFunc {
 			utils.InternalServerError(w)
 			return
 		}
-		println(status, userId, targetUserId)
 		switch status {
 		case "pending":
 			utils.BadRequest(w, "Follow request already sent.", "alert")
@@ -65,7 +63,6 @@ func UnfollowRequestMiddleWare(next http.HandlerFunc) http.HandlerFunc {
 
 		if userId == targetUserId {
 			utils.BadRequest(w, "You cannot unfollow yourself.", "alert")
-			println("hani")
 			return
 		}
 
@@ -90,7 +87,6 @@ func FollowersFolloweesListMiddleWare(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		userId := utils.GetUserIdFromContext(r)
 		targetUserId := utils.GetWildCardValue(w, r, "user_id")
-		fmt.Println(userId, targetUserId)
 
 		isExist, err := userExists(targetUserId)
 		if err != nil {

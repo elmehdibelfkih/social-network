@@ -23,8 +23,8 @@ func RateLimiterMiddleware(next http.Handler, limit float64, burst int64) http.H
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ip := getIP(r)
 
-		limiter, exists := ipLimiterMap[ip]
 		mu.Lock()
+		limiter, exists := ipLimiterMap[ip]
 		if !exists {
 			limiter = newTokenBucketLimiter(limit, burst)
 			ipLimiterMap[ip] = limiter
