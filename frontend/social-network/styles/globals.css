@@ -22,3 +22,10 @@ body {
   min-height: 100vh;
   background-color: var(--background-cream);
 }
+
+
+.g_layout{
+      max-width: 1240px;
+    min-height: 100vh;
+    margin: 0 auto;
+}

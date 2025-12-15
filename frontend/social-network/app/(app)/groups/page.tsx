@@ -11,7 +11,7 @@ export default async function GroupsPage() {
   
   return (
     <div>
-       <GroupsUI/>
+      <GroupsUI/>
       <GroupCardServer groups={groups} />
     </div>
   );

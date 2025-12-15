@@ -19,7 +19,6 @@ const (
 		FROM users 
 		WHERE id = ?`
 
-
 	// Get Follow STATUS ('pending'|'accepted'|'declined') or NULL if no relationship
 	SELECT_FOLLOW_STATUS = `
 		SELECT status 
@@ -45,35 +44,33 @@ const (
 
 	// Count posts by user
 	SELECT_POSTS_COUNT = `
-		SELECT COUNT(*) 
-		FROM posts 
-		WHERE author_id = ? AND group_id IS NULL`
+		SELECT COALESCE(posts_count, 0) 
+		FROM counters 
+		WHERE entity_id = ? AND entity_type = 'user'`
 
 	// Count followers
 	SELECT_FOLLOWERS_COUNT = `
-		SELECT COUNT(*) 
-		FROM follows 
-		WHERE followed_id = ? AND status = ?`
+		SELECT COALESCE(followers_count, 0)
+		FROM counters 
+		WHERE entity_id = ? AND entity_type = 'user'`
 
 	// Count following
 	SELECT_FOLLOWING_COUNT = `
-		SELECT COUNT(*) 
-		FROM follows 
-		WHERE follower_id = ? and status = ?`
+		SELECT COALESCE(followes_count, 0) 
+		FROM counters 
+		WHERE entity_id = ? AND entity_type = 'user'`
 
-	// Count likes received on user's posts
+	// Get likes received count from counters table for user
 	SELECT_LIKES_RECEIVED = `
-		SELECT COUNT(*) 
-		FROM post_reactions pr
-		INNER JOIN posts p ON pr.post_id = p.id
-		WHERE p.author_id = ? AND p.group_id IS NULL`
+		SELECT COALESCE(reactions_count, 0)
+		FROM counters
+		WHERE entity_id = ? AND entity_type = 'user'`
 
-	// Count comments received on user's posts
+	// Get comments received count from counters table for user
 	SELECT_COMMENTS_RECEIVED = `
-		SELECT COUNT(*) 
-		FROM comments c
-		INNER JOIN posts p ON c.post_id = p.id
-		WHERE p.author_id = ? AND p.group_id IS NULL AND c.author_id != ?`
+		SELECT COALESCE(comments_count, 0)
+		FROM counters
+		WHERE entity_id = ? AND entity_type = 'user'`
 
 	// Check email uniqueness (excluding current user)
 	SELECT_EMAIL_EXISTS = `
@@ -88,12 +85,7 @@ const (
 		WHERE nickname = ? AND id != ? AND nickname IS NOT NULL`
 )
 
-// insert
-
-const ()
-
 // update
-
 const (
 	// Update user profile fields
 	UPDATE_USER_PROFILE = `
@@ -117,7 +109,3 @@ const (
 			updated_at = CURRENT_TIMESTAMP
 		WHERE id = ?`
 )
-
-// delete
-
-const ()

@@ -3,10 +3,10 @@ package groups
 import (
 	"database/sql"
 	"math"
+	"strings"
 	"social/pkg/config"
 	"social/pkg/db/database"
 	"social/pkg/utils"
-	"strings"
 )
 
 // read
@@ -77,8 +77,12 @@ func SelectGroupsById(limit, lastItemId int64, l *BrowseGroupsResponseJson) erro
 			&item.MemberCount,
 		)
 		if err != nil {
-			utils.SQLiteErrorTarget(err, SELECT_GROUP_MEMBERS_COUNT)
-			return err
+			if err == sql.ErrNoRows {
+				item.MemberCount = 0
+			} else {
+				utils.SQLiteErrorTarget(err, SELECT_GROUP_MEMBERS_COUNT)
+				return err
+			}
 		}
 		l.TotalGroups++
 		l.Groups = append(l.Groups, item)
@@ -109,8 +113,12 @@ func SelectGroupById(groupId int64, g *GetGroupResponseJson) error {
 		&g.MemberCount,
 	)
 	if err != nil {
-		utils.SQLiteErrorTarget(err, SELECT_GROUP_MEMBERS_COUNT)
-		return err
+		if err == sql.ErrNoRows {
+			g.MemberCount = 0 // No counter row = 0 members
+		} else {
+			utils.SQLiteErrorTarget(err, SELECT_GROUP_MEMBERS_COUNT)
+			return err
+		}
 	}
 	return err
 }
@@ -232,10 +240,7 @@ func SelectAllGoupEvent(groupId int64, l *ListEventsResponseJson) error {
 	return err
 }
 
-// write
-
-//insert
-
+// insert
 func InsertNewGroup(cg *CreateGroupRequestJson, g *CreateGroupResponseJson, userId int64) error {
 	return database.WrapWithTransaction(func(tx *sql.Tx) error {
 		err := tx.QueryRow(INSERT_GROUP_BY_USER_ID,
@@ -270,8 +275,19 @@ func InsertNewGroupOwner(groupId, userId int64, status, role string) error {
 		)
 		if err != nil {
 			utils.SQLiteErrorTarget(err, INSERT_GROUP_MEMBER_BY_GROUP_ID)
+			return err
 		}
-		return err
+
+		if status == "accepted" {
+			counter := addRemoveMemberUpdateCounterStruct(database.GROUP_ENTITY_TYPE, groupId, database.FOLLOWERS_ENTITY_NAME, database.ACTION_INCREMENT)
+			err = database.UpdateCounter(tx, counter)
+			if err != nil {
+				utils.SQLiteErrorTarget(err, database.GROUP_ENTITY_TYPE)
+				return err
+			}
+		}
+
+		return nil
 	})
 }
 
@@ -380,14 +396,13 @@ func insertNewGroupEvent(userId, groupId int64, e *CreateEventRequestJson, er *C
 	})
 }
 
-//update
-
+// update
 func UpdateMemberStatusAccepted(groupId, userId int64, a *AcceptMemberResponseJson) error {
 	return database.WrapWithTransaction(func(tx *sql.Tx) error {
 		err := tx.QueryRow(UPDATE_GROUP_MEMBER_STATUS,
+			"accepted",
 			groupId,
 			userId,
-			"accepted",
 		).Scan(
 			&a.GroupId,
 			&a.UserId,
@@ -396,8 +411,17 @@ func UpdateMemberStatusAccepted(groupId, userId int64, a *AcceptMemberResponseJs
 		)
 		if err != nil {
 			utils.SQLiteErrorTarget(err, UPDATE_GROUP_MEMBER_STATUS)
+			return err
 		}
-		return err
+
+		counter := addRemoveMemberUpdateCounterStruct(database.GROUP_ENTITY_TYPE, groupId, database.FOLLOWERS_ENTITY_NAME, database.ACTION_INCREMENT)
+		err = database.UpdateCounter(tx, counter)
+		if err != nil {
+			utils.SQLiteErrorTarget(err, database.GROUP_ENTITY_TYPE)
+			return err
+		}
+
+		return nil
 	})
 }
 
@@ -470,7 +494,34 @@ func UpdateRsvp(eventId, userId int64, r *RSVPRequestJson, rs *RSVPResponseJson)
 	})
 }
 
-//delete
+// delete
+func DeleteGroupMember(groupId, userId int64) error {
+	return database.WrapWithTransaction(func(tx *sql.Tx) error {
+		var isMember bool
+		err := tx.QueryRow(SELECT_GROUP_MEMBER_ACCEPTED, groupId, userId).Scan(&isMember)
+		if err != nil {
+			utils.SQLiteErrorTarget(err, "SELECT group_member status")
+			return err
+		}
+
+		_, err = tx.Exec(DELETE_GROUP_MEMBER, groupId, userId)
+		if err != nil {
+			utils.SQLiteErrorTarget(err, DELETE_GROUP_MEMBER)
+			return err
+		}
+
+		if isMember {
+			counter := addRemoveMemberUpdateCounterStruct(database.GROUP_ENTITY_TYPE, groupId, database.FOLLOWERS_ENTITY_NAME, database.ACTION_DECREMENT)
+			err = database.UpdateCounter(tx, counter)
+			if err != nil {
+				utils.SQLiteErrorTarget(err, database.GROUP_ENTITY_TYPE)
+				return err
+			}
+		}
+
+		return nil
+	})
+}
 
 func DeleteGroupFromGroups(groupId, userId int64) error {
 	return database.WrapWithTransaction(func(tx *sql.Tx) error {

@@ -58,16 +58,12 @@
 }
 
 .group_card {
-  display: grid;
-    grid-template-columns: repeat(1, 1fr);
-    grid-template-rows: repeat(1, 1fr);
   font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
   /* display: flex; */
   /* flex-direction:row; */
   gap: var(--spacing-lg);
-  padding: var(--spacing-md);
+  padding-block: var(--spacing-md);
   background-color: var(--background-cream);
-  min-height: 100vh;
   /* align-items: center; */
   /* justify-content: center; */
   max-width: 1240px;
@@ -75,12 +71,6 @@
   margin: 0 auto;
 }
 
-@media (min-width: 768px) {
-  .group_card {
-    padding: var(--spacing-2xl);
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
 
 
 .single_group_card {
@@ -88,7 +78,6 @@
   border-radius: var(--border-radius-xl);
   border: 1px solid var(--gray-200);
   overflow: hidden;
-  max-width: 600px;
   width: 100%;
   display: flex;
   flex-direction: column;
@@ -104,8 +93,16 @@
 }
 
 .group_header {
-  height: 128px;
-  background: linear-gradient(to right, var(--primary-purple), var(--primary-purple-light));
+  height: 192px;
+  background: linear-gradient(
+    to right,
+    var(--primary-purple),
+    var(--primary-purple-light)
+  );
+
+  display: flex;
+  justify-content: center; /* horizontal center */
+  align-items: center;     /* vertical center */
 }
 
 .group_content {
@@ -129,7 +126,7 @@
 }
 
 .groupcardtitle {
-  font-size: 24px;
+  font-size: 20px;
   font-weight: 600;
   color: var(--gray-900);
   margin: 0 0 var(--spacing-sm) 0;
@@ -137,7 +134,7 @@
 
 @media (min-width: 768px) {
   .groupcardtitle {
-    font-size: 20px;
+    font-size: 36px;
   }
 }
 
@@ -145,7 +142,6 @@
   color: var(--gray-600);
   margin: 0 0 var(--spacing-md) 0;
   line-height: 1.5;
-  font-size: 14px;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
@@ -156,7 +152,6 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  font-size: 14px;
   color: var(--gray-500);
   margin-bottom: var(--spacing-md);
 }
@@ -168,8 +163,8 @@
 }
 
 .member_info svg {
-  width: 16px;
-  height: 16px;
+  width: 20px;
+  height: 20px;
   margin-right: 4px;
 }
 

@@ -45,6 +45,24 @@ async getGroups(limit = 10, lastItemId?: number): Promise<Group[]> {
 },
 
 
+async getGroup(groupId: number): Promise<Group | null> {
+  try {
+    if (!groupId) return null;
+    const response = await http.get<Group>(`/api/v1/groups/${groupId}`);
+    if (!response) return null;
+    const events = await this.getGroupEvents(groupId);
+    const groupWithEvents = {
+      ...response,
+      events,
+    };
+    console.log("group with events:", groupWithEvents);
+    return groupWithEvents;
+  } catch (error) {
+    console.error("Failed to fetch group:", error);
+    return null;
+  }
+},
+  
 
   async createGroup(data: CreateGroupPayload): Promise<Group | null> {
     try {
