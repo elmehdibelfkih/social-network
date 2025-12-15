@@ -25,6 +25,7 @@ CREATE TABLE
     ),
     reference_id INTEGER,
     content TEXT,
+    status  TEXT NOT NULL DEFAULT 'active' CHECK(status IN ('suspended', 'active')),
     is_read INTEGER NOT NULL DEFAULT 0 CHECK (is_read IN (0, 1)),
     created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
     read_at TEXT,
