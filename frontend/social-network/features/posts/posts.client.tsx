@@ -4,6 +4,7 @@ import { postsService } from './postsService'
 import { Comments } from '@/components/ui/comments/comments'
 import styles from './styles.module.css'
 import { Post } from '@/libs/globalTypes'
+import { http } from '@/libs/apiFetch'
 
 export function PostsClient({ post, onStatsUpdate }: { post: Post, onStatsUpdate?: (stats: { reactionCount: number, commentCount: number }) => void }) {
   const [liked, setLiked] = useState(post?.isLikedByUser)
@@ -36,8 +37,18 @@ export function PostsClient({ post, onStatsUpdate }: { post: Post, onStatsUpdate
     setShowComments(true)
   }
 
-  const handleCommentAdded = () => {
-    setCommentCount(prev => prev + 1)
+  const handleCommentAdded = async () => {
+    // Fetch real comment count from server
+    try {
+      const data = await http.get<any>(`/api/v1/posts/${post.postId}/comments?page=1&limit=1`)
+      const realCount = data?.totalComments || commentCount + 1
+      setCommentCount(realCount)
+      if (onStatsUpdate) {
+        onStatsUpdate({ reactionCount: likeCount, commentCount: realCount })
+      }
+    } catch {
+      setCommentCount(prev => prev + 1)
+    }
   }
 
   return (
