@@ -1,3 +1,4 @@
+import { FooterServer } from '@/features/footer';
 import { Profile } from '@/features/profile';
 import getProfileData from '@/features/profile/profileSrevice';
 import ProfileFeed from '@/features/profile_feed/profile_feed.server';
