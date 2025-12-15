@@ -14,7 +14,6 @@ import (
 
 // CreatePost creates a new post in the database
 func CreatePost(post *Post) error {
-	fmt.Printf("%+v\n", post)
 	err := database.WrapWithTransaction(func(tx *sql.Tx) error {
 		_, err := tx.Exec(QUERY_CREATE_POST,
 			post.ID,
@@ -33,27 +32,21 @@ func CreatePost(post *Post) error {
 			return fmt.Errorf("failed to create post: %w", err)
 		}
 
-		// Increment posts_count
-		// if err := database.UpdateCounter(tx, database.DBCounterSetter{
-		// 	CounterName: database.POSTS_ENTITY_NAME,
-		// 	EntityType:  database.USER_ENTITY_TYPE,
-		// 	EntityID:    post.AuthorID,
-		// 	Action:      database.ACTION_INCREMENT,
-		// }); err != nil {
-		// 	fmt.Println("=----->", err)
-		// 	return err
-		// }
+		counter := addRemovePostActionsUpdateCounterStruct(database.USER_ENTITY_TYPE, post.AuthorID, database.POSTS_ENTITY_NAME, database.ACTION_INCREMENT)
+		err = database.UpdateCounter(tx, counter)
+		if err != nil {
+			utils.SQLiteErrorTarget(err, database.USER_ENTITY_TYPE)
+			return err
+		}
 
-		// if post.GroupID != nil {
-		// 	if err := database.UpdateCounter(tx, database.DBCounterSetter{
-		// 		CounterName: database.POSTS_ENTITY_NAME,
-		// 		EntityType:  database.GROUP_ENTITY_TYPE,
-		// 		EntityID:    *post.GroupID,
-		// 		Action:      database.ACTION_INCREMENT,
-		// 	}); err != nil {
-		// 		return err
-		// 	}
-		// }
+		if post.GroupID != nil {
+			counter = addRemovePostActionsUpdateCounterStruct(database.GROUP_ENTITY_TYPE, *post.GroupID, database.POSTS_ENTITY_NAME, database.ACTION_INCREMENT)
+			err = database.UpdateCounter(tx, counter)
+			if err != nil {
+				utils.SQLiteErrorTarget(err, database.GROUP_ENTITY_TYPE)
+				return err
+			}
+		}
 
 		return nil
 	})
@@ -175,8 +168,12 @@ func GetUserPosts(userID int64, limit, offset int) ([]Post, int, error) {
 	// Get total count
 	err := config.DB.QueryRow(QUERY_COUNT_USER_POSTS, userID).Scan(&totalPosts)
 	if err != nil {
-		utils.SQLiteErrorTarget(err, "GetUserPosts (count)")
-		return nil, 0, fmt.Errorf("failed to count posts: %w", err)
+		if err == sql.ErrNoRows {
+			totalPosts = 0 // No counter row = 0 posts
+		} else {
+			utils.SQLiteErrorTarget(err, "GetUserPosts (count)")
+			return nil, 0, fmt.Errorf("failed to count posts: %w", err)
+		}
 	}
 
 	// Get posts
@@ -283,7 +280,15 @@ func GetPostAllowedViewers(postID int64) ([]int64, error) {
 // CreateComment creates a new comment
 func CreateComment(comment *Comment) error {
 	err := database.WrapWithTransaction(func(tx *sql.Tx) error {
-		_, err := tx.Exec(QUERY_CREATE_COMMENT,
+		// Get post author ID
+		var postAuthorID int64
+		err := tx.QueryRow(QUERY_GET_POST_AUTHORID, comment.PostID).Scan(&postAuthorID)
+		if err != nil {
+			utils.SQLiteErrorTarget(err, QUERY_GET_POST_AUTHORID)
+			return fmt.Errorf("failed to get post author: %w", err)
+		}
+
+		_, err = tx.Exec(QUERY_CREATE_COMMENT,
 			comment.ID,
 			comment.PostID,
 			comment.AuthorID,
@@ -301,24 +306,20 @@ func CreateComment(comment *Comment) error {
 		}
 
 		// Increment post's comments_count
-		// if err := database.UpdateCounter(tx, database.DBCounterSetter{
-		// 	CounterName: database.COMMENTS_ENTITY_NAME,
-		// 	EntityType:  database.POST_ENTITY_TYPE,
-		// 	EntityID:    comment.PostID,
-		// 	Action:      database.ACTION_INCREMENT,
-		// }); err != nil {
-		// 	return err
-		// }
+		counter := addRemovePostActionsUpdateCounterStruct(database.POST_ENTITY_TYPE, comment.PostID, database.COMMENTS_ENTITY_NAME, database.ACTION_INCREMENT)
+		err = database.UpdateCounter(tx, counter)
+		if err != nil {
+			utils.SQLiteErrorTarget(err, database.POST_ENTITY_TYPE)
+			return err
+		}
 
-		// Increment user's comments_count
-		// if err := database.UpdateCounter(tx, database.DBCounterSetter{
-		// 	CounterName: database.COMMENTS_ENTITY_NAME,
-		// 	EntityType:  database.USER_ENTITY_TYPE,
-		// 	EntityID:    comment.AuthorID,
-		// 	Action:      database.ACTION_INCREMENT,
-		// }); err != nil {
-		// 	return err
-		// }
+		// Increment post author's comments_count (comments received)
+		counter = addRemovePostActionsUpdateCounterStruct(database.USER_ENTITY_TYPE, postAuthorID, database.COMMENTS_ENTITY_NAME, database.ACTION_INCREMENT)
+		err = database.UpdateCounter(tx, counter)
+		if err != nil {
+			utils.SQLiteErrorTarget(err, database.USER_ENTITY_TYPE)
+			return err
+		}
 
 		return nil
 	})
@@ -355,6 +356,14 @@ func DeleteComment(commentID, authorID int64) error {
 			return fmt.Errorf("failed to delete comment: %w", err)
 		}
 
+		// Get post author ID
+		var postAuthorID int64
+		err = tx.QueryRow(QUERY_GET_POST_AUTHORID, comment.PostID).Scan(&postAuthorID)
+		if err != nil {
+			utils.SQLiteErrorTarget(err, QUERY_GET_POST_AUTHORID)
+			return fmt.Errorf("failed to get post author: %w", err)
+		}
+
 		result, err := tx.Exec(QUERY_DELETE_COMMENT, commentID, authorID)
 		if err != nil {
 			utils.SQLiteErrorTarget(err, "DeleteComment")
@@ -380,11 +389,11 @@ func DeleteComment(commentID, authorID int64) error {
 			return err
 		}
 
-		// decrement user's comments_count
+		// decrement post author's comments_count (comments received)
 		if err := database.UpdateCounter(tx, database.DBCounterSetter{
 			CounterName: database.COMMENTS_ENTITY_NAME,
 			EntityType:  database.USER_ENTITY_TYPE,
-			EntityID:    comment.AuthorID,
+			EntityID:    postAuthorID,
 			Action:      database.ACTION_DECREMENT,
 		}); err != nil {
 			return err
@@ -402,8 +411,12 @@ func GetPostComments(postID int64, limit, offset int) ([]Comment, int, error) {
 	// Get total count
 	err := config.DB.QueryRow(QUERY_COUNT_POST_COMMENTS, postID).Scan(&totalComments)
 	if err != nil {
-		utils.SQLiteErrorTarget(err, "GetPostComments (count)")
-		return nil, 0, fmt.Errorf("failed to count comments: %w", err)
+		if err == sql.ErrNoRows {
+			totalComments = 0 // No counter row = 0 comments
+		} else {
+			utils.SQLiteErrorTarget(err, "GetPostComments (count)")
+			return nil, 0, fmt.Errorf("failed to count comments: %w", err)
+		}
 	}
 
 	// Get comments
@@ -472,36 +485,91 @@ func GetCommentMediaIDs(commentID int64) ([]int64, error) {
 
 // CreatePostReaction creates a like/dislike reaction
 func CreatePostReaction(postID, userID int64, reaction string) error {
-	now := time.Now().Format(time.RFC3339)
-	_, err := config.DB.Exec(QUERY_CREATE_POST_REACTION, postID, userID, reaction, now)
-	if err != nil {
-		if e, ok := err.(sqlite3.Error); ok && e.Code == sqlite3.ErrConstraint {
-			return fmt.Errorf("reaction already exists")
+	err := database.WrapWithTransaction(func(tx *sql.Tx) error {
+		// Get post author ID
+		var authorID int64
+		err := tx.QueryRow(QUERY_GET_POST_AUTHORID, postID).Scan(&authorID)
+		if err != nil {
+			utils.SQLiteErrorTarget(err, QUERY_GET_POST_AUTHORID)
+			return fmt.Errorf("failed to get post author: %w", err)
 		}
-		utils.SQLiteErrorTarget(err, "CreatePostReaction")
-		return fmt.Errorf("failed to create reaction: %w", err)
-	}
-	return nil
+
+		now := time.Now().Format(time.RFC3339)
+		_, err = tx.Exec(QUERY_CREATE_POST_REACTION, postID, userID, reaction, now)
+		if err != nil {
+			if e, ok := err.(sqlite3.Error); ok && e.Code == sqlite3.ErrConstraint {
+				return fmt.Errorf("reaction already exists")
+			}
+			utils.SQLiteErrorTarget(err, "CreatePostReaction")
+			return fmt.Errorf("failed to create reaction: %w", err)
+		}
+
+		// Increment post's reactions_count
+		counter := addRemovePostActionsUpdateCounterStruct(database.POST_ENTITY_TYPE, postID, database.REACTIONS_ENTITY_NAME, database.ACTION_INCREMENT)
+		err = database.UpdateCounter(tx, counter)
+		if err != nil {
+			utils.SQLiteErrorTarget(err, database.POST_ENTITY_TYPE)
+			return err
+		}
+
+		// Increment post author's reactions_count (likes received)
+		counter = addRemovePostActionsUpdateCounterStruct(database.USER_ENTITY_TYPE, authorID, database.REACTIONS_ENTITY_NAME, database.ACTION_INCREMENT)
+		err = database.UpdateCounter(tx, counter)
+		if err != nil {
+			utils.SQLiteErrorTarget(err, database.USER_ENTITY_TYPE)
+			return err
+		}
+
+		return nil
+	})
+	return err
 }
 
 // DeletePostReaction removes a reaction
 func DeletePostReaction(postID, userID int64) error {
-	result, err := config.DB.Exec(QUERY_DELETE_POST_REACTION, postID, userID)
-	if err != nil {
-		utils.SQLiteErrorTarget(err, "DeletePostReaction")
-		return fmt.Errorf("failed to delete reaction: %w", err)
-	}
+	err := database.WrapWithTransaction(func(tx *sql.Tx) error {
+		// Get post author ID before deleting
+		var authorID int64
+		err := tx.QueryRow(QUERY_GET_POST_AUTHORID, postID).Scan(&authorID)
+		if err != nil {
+			utils.SQLiteErrorTarget(err, QUERY_GET_POST_AUTHORID)
+			return fmt.Errorf("failed to get post author: %w", err)
+		}
 
-	rowsAffected, err := result.RowsAffected()
-	if err != nil {
-		return err
-	}
+		result, err := tx.Exec(QUERY_DELETE_POST_REACTION, postID, userID)
+		if err != nil {
+			utils.SQLiteErrorTarget(err, "DeletePostReaction")
+			return fmt.Errorf("failed to delete reaction: %w", err)
+		}
 
-	if rowsAffected == 0 {
-		return sql.ErrNoRows
-	}
+		rowsAffected, err := result.RowsAffected()
+		if err != nil {
+			return err
+		}
 
-	return nil
+		if rowsAffected == 0 {
+			return sql.ErrNoRows
+		}
+
+		// Decrement post's reactions_count
+		counter := addRemovePostActionsUpdateCounterStruct(database.POST_ENTITY_TYPE, postID, database.REACTIONS_ENTITY_NAME, database.ACTION_DECREMENT)
+		err = database.UpdateCounter(tx, counter)
+		if err != nil {
+			utils.SQLiteErrorTarget(err, database.POST_ENTITY_TYPE)
+			return err
+		}
+
+		// Decrement post author's reactions_count (likes received)
+		counter = addRemovePostActionsUpdateCounterStruct(database.USER_ENTITY_TYPE, authorID, database.REACTIONS_ENTITY_NAME, database.ACTION_DECREMENT)
+		err = database.UpdateCounter(tx, counter)
+		if err != nil {
+			utils.SQLiteErrorTarget(err, database.USER_ENTITY_TYPE)
+			return err
+		}
+
+		return nil
+	})
+	return err
 }
 
 // CheckPostReactionExists checks if a reaction already exists
@@ -540,36 +608,57 @@ func GetAuthorDetails(authorID int64) (*AuthorDetails, error) {
 
 // CreateCommentReaction creates a like reaction on a comment
 func CreateCommentReaction(commentID, userID int64, reaction string) error {
-	now := time.Now().Format(time.RFC3339)
-	_, err := config.DB.Exec(QUERY_CREATE_COMMENT_REACTION, commentID, userID, reaction, now)
-	if err != nil {
-		if e, ok := err.(sqlite3.Error); ok && e.Code == sqlite3.ErrConstraint {
-			return fmt.Errorf("reaction already exists")
+	err := database.WrapWithTransaction(func(tx *sql.Tx) error {
+		now := time.Now().Format(time.RFC3339)
+		_, err := tx.Exec(QUERY_CREATE_COMMENT_REACTION, commentID, userID, reaction, now)
+		if err != nil {
+			if e, ok := err.(sqlite3.Error); ok && e.Code == sqlite3.ErrConstraint {
+				return fmt.Errorf("reaction already exists")
+			}
+			utils.SQLiteErrorTarget(err, "CreateCommentReaction")
+			return fmt.Errorf("failed to create comment reaction: %w", err)
 		}
-		utils.SQLiteErrorTarget(err, "CreateCommentReaction")
-		return fmt.Errorf("failed to create comment reaction: %w", err)
-	}
-	return nil
+
+		counter := addRemovePostActionsUpdateCounterStruct(database.COMMENT_ENTITY_TYPE, commentID, database.REACTIONS_ENTITY_NAME, database.ACTION_INCREMENT)
+		err = database.UpdateCounter(tx, counter)
+		if err != nil {
+			utils.SQLiteErrorTarget(err, database.COMMENT_ENTITY_TYPE)
+			return err
+		}
+
+		return nil
+	})
+	return err
 }
 
 // DeleteCommentReaction removes a reaction from a comment
 func DeleteCommentReaction(commentID, userID int64) error {
-	result, err := config.DB.Exec(QUERY_DELETE_COMMENT_REACTION, commentID, userID)
-	if err != nil {
-		utils.SQLiteErrorTarget(err, "DeleteCommentReaction")
-		return fmt.Errorf("failed to delete comment reaction: %w", err)
-	}
+	err := database.WrapWithTransaction(func(tx *sql.Tx) error {
+		result, err := tx.Exec(QUERY_DELETE_COMMENT_REACTION, commentID, userID)
+		if err != nil {
+			utils.SQLiteErrorTarget(err, "DeleteCommentReaction")
+			return fmt.Errorf("failed to delete comment reaction: %w", err)
+		}
 
-	rowsAffected, err := result.RowsAffected()
-	if err != nil {
-		return err
-	}
+		rowsAffected, err := result.RowsAffected()
+		if err != nil {
+			return err
+		}
 
-	if rowsAffected == 0 {
-		return sql.ErrNoRows
-	}
+		if rowsAffected == 0 {
+			return sql.ErrNoRows
+		}
 
-	return nil
+		counter := addRemovePostActionsUpdateCounterStruct(database.COMMENT_ENTITY_TYPE, commentID, database.REACTIONS_ENTITY_NAME, database.ACTION_DECREMENT)
+		err = database.UpdateCounter(tx, counter)
+		if err != nil {
+			utils.SQLiteErrorTarget(err, database.COMMENT_ENTITY_TYPE)
+			return err
+		}
+
+		return nil
+	})
+	return err
 }
 
 // CheckCommentReactionExists checks if a reaction already exists on a comment
@@ -584,7 +673,29 @@ func GetCommentLikeCount(commentID int64) int {
 	var count int
 	err := config.DB.QueryRow(QUERY_COUNT_COMMENT_LIKES, commentID).Scan(&count)
 	if err != nil {
+		if err == sql.ErrNoRows {
+			return 0 // No counter row = 0 likes
+		}
 		return 0
 	}
 	return count
+}
+
+// GetPostStats returns reaction and comment counts for a post
+func GetPostStats(postID int64) (Stats, error) {
+	var stats Stats
+	
+	// Get reaction count
+	err := config.DB.QueryRow(QUERY_COUNT_POST_REACTIONS, postID).Scan(&stats.ReactionCount)
+	if err != nil {
+		stats.ReactionCount = 0
+	}
+	
+	// Get comment count
+	err = config.DB.QueryRow(QUERY_COUNT_POST_COMMENTS, postID).Scan(&stats.CommentCount)
+	if err != nil {
+		stats.CommentCount = 0
+	}
+	
+	return stats, nil
 }

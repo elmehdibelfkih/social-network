@@ -7,6 +7,7 @@ import (
 	"strconv"
 
 	"social/pkg/config"
+	"social/pkg/db/database"
 	"social/pkg/utils"
 )
 
@@ -226,7 +227,7 @@ func validateReaction(reaction string) bool {
 }
 
 // buildPostResponse builds a complete post response with media and allowed list
-func buildPostResponse(post *Post) (*GetPostResponse, error) {
+func buildPostResponse(post *Post, viewerID int64) (*GetPostResponse, error) {
 	// Get author nickname
 	authorDetails, err := GetAuthorDetails(post.AuthorID)
 	if err != nil && err != sql.ErrNoRows {
@@ -251,6 +252,12 @@ func buildPostResponse(post *Post) (*GetPostResponse, error) {
 		allowedList = []int64{}
 	}
 
+	// Get stats
+	stats, err := GetPostStats(post.ID)
+	if err != nil {
+		return nil, err
+	}
+
 	return &GetPostResponse{
 		PostID:          post.ID,
 		AuthorID:        post.AuthorID,
@@ -262,8 +269,10 @@ func buildPostResponse(post *Post) (*GetPostResponse, error) {
 		Privacy:         post.Privacy,
 		GroupID:         post.GroupID,
 		AllowedList:     allowedList,
+		IsLikedByUser:   CheckPostReactionExists(post.ID, viewerID),
 		CreatedAt:       post.CreatedAt,
 		UpdatedAt:       post.UpdatedAt,
+		Stats:           stats,
 	}, nil
 }
 
@@ -308,4 +317,15 @@ func filterVisiblePosts(requesterID int64, posts []Post) []Post {
 		}
 	}
 	return visiblePosts
+}
+
+func addRemovePostActionsUpdateCounterStruct(entityType string, entityID int64, counterName string, action string) database.DBCounterSetter {
+	var counter database.DBCounterSetter
+
+	counter.CounterName = counterName
+	counter.EntityType = entityType
+	counter.EntityID = entityID
+	counter.Action = action
+
+	return counter
 }

@@ -70,8 +70,15 @@ type GetPostResponse struct {
 	Privacy         string  `json:"privacy"`
 	GroupID         *int64  `json:"groupId"`
 	AllowedList     []int64 `json:"allowedList"`
+	IsLikedByUser   bool    `json:"isLikedByUser"`
 	CreatedAt       string  `json:"createdAt"`
 	UpdatedAt       string  `json:"updatedAt"`
+	Stats           Stats   `json:"stats"`
+}
+
+type Stats struct {
+	ReactionCount int64 `json:"reactionCount"`
+	CommentCount  int64 `json:"commentCount"`
 }
 
 // UpdatePostRequest represents the request body for updating a post
