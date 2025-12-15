@@ -2,6 +2,7 @@ package groups
 
 import (
 	"net/http"
+	"social/pkg/db/database"
 	"social/pkg/utils"
 )
 
@@ -377,4 +378,15 @@ func IsFollowing(userId, follower int64) (bool, error) {
 func IsFollowed(userId, follower int64) (bool, error) {
 	check, err := SelectFollows(follower, userId)
 	return check, err
+}
+
+func addRemoveMemberUpdateCounterStruct(entityType string, entityID int64, counterName string, action string) database.DBCounterSetter {
+	var counter database.DBCounterSetter
+
+	counter.CounterName = counterName
+	counter.EntityType = entityType
+	counter.EntityID = entityID
+	counter.Action = action
+
+	return counter
 }

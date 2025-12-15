@@ -110,6 +110,9 @@ func SelectPostsCount(userId int64) (int64, error) {
 	var count int64
 	err := config.DB.QueryRow(SELECT_POSTS_COUNT, userId).Scan(&count)
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return 0, nil // No counter row = 0 posts
+		}
 		utils.SQLiteErrorTarget(err, SELECT_POSTS_COUNT)
 		return 0, err
 	}
@@ -119,8 +122,11 @@ func SelectPostsCount(userId int64) (int64, error) {
 // SelectFollowersCount returns how many users follow the given user.
 func SelectFollowersCount(userId int64) (int64, error) {
 	var count int64
-	err := config.DB.QueryRow(SELECT_FOLLOWERS_COUNT, userId, "accepted").Scan(&count)
+	err := config.DB.QueryRow(SELECT_FOLLOWERS_COUNT, userId).Scan(&count)
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return 0, nil // No counter row = 0 followers
+		}
 		if strings.Contains(err.Error(), "no such column") {
 			return 0, nil
 		}
@@ -133,8 +139,11 @@ func SelectFollowersCount(userId int64) (int64, error) {
 // SelectFollowingCount returns how many users the given user follows.
 func SelectFollowingCount(userId int64) (int64, error) {
 	var count int64
-	err := config.DB.QueryRow(SELECT_FOLLOWING_COUNT, userId, "accepted").Scan(&count)
+	err := config.DB.QueryRow(SELECT_FOLLOWING_COUNT, userId).Scan(&count)
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return 0, nil // No counter row = 0 following
+		}
 		if strings.Contains(err.Error(), "no such column") {
 			return 0, nil
 		}
@@ -149,17 +158,23 @@ func SelectLikesReceived(userId int64) (int64, error) {
 	var count int64
 	err := config.DB.QueryRow(SELECT_LIKES_RECEIVED, userId).Scan(&count)
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return 0, nil // No counter row = 0 likes received
+		}
 		utils.SQLiteErrorTarget(err, SELECT_LIKES_RECEIVED)
 		return 0, err
 	}
 	return count, nil
 }
 
-// SelectCommentsReceived returns total comments on the user's posts from others.
+// SelectCommentsReceived returns total comments received on the user's posts from counters table.
 func SelectCommentsReceived(userId int64) (int64, error) {
 	var count int64
-	err := config.DB.QueryRow(SELECT_COMMENTS_RECEIVED, userId, userId).Scan(&count)
+	err := config.DB.QueryRow(SELECT_COMMENTS_RECEIVED, userId).Scan(&count)
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return 0, nil // No counter row = 0 comments received
+		}
 		utils.SQLiteErrorTarget(err, SELECT_COMMENTS_RECEIVED)
 		return 0, err
 	}

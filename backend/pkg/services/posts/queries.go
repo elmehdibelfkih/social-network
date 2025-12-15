@@ -33,9 +33,9 @@ const (
 	`
 
 	QUERY_COUNT_USER_POSTS = `
-		SELECT COUNT(*)
-		FROM posts
-		WHERE author_id = ?;
+		SELECT COALESCE(posts_count, 0)
+		FROM counters
+		WHERE entity_type = 'user' AND entity_id = ?;
 	`
 
 	QUERY_GET_AUTHOR_NICKNAME = `
@@ -118,9 +118,9 @@ const (
 	`
 
 	QUERY_COUNT_POST_COMMENTS = `
-		SELECT COUNT(*)
-		FROM comments
-		WHERE post_id = ?;
+		SELECT COALESCE(comments_count, 0)
+		FROM counters
+		WHERE entity_type = 'post' AND entity_id = ?;
 	`
 
 	// Comment media queries
@@ -198,9 +198,13 @@ const (
 	`
 
 	QUERY_COUNT_COMMENT_LIKES = `
-		SELECT COUNT(*)
-		FROM comment_reactions
-		WHERE comment_id = ?;
+		SELECT COALESCE(reactions_count, 0)
+		FROM counters
+		WHERE entity_type = 'comment' AND entity_id = ?;
+	`
+
+	QUERY_GET_POST_AUTHORID = `
+		SELECT author_id FROM posts WHERE id = ?;
 	`
 
 	// Post stats queries
