@@ -16,9 +16,15 @@ export function FeedClient({ initialPosts }: { initialPosts: Post[] }) {
     const handleUpdatePost = (event: CustomEvent) => {
       const updatedData = event.detail
       if (!updatedData?.postId) return
+      
       setPosts(prev => prev.map(post => 
         post.postId === updatedData.postId 
-          ? { ...post, ...updatedData }
+          ? { 
+              ...post, 
+              content: updatedData.content ?? post.content,
+              privacy: updatedData.privacy ?? post.privacy,
+              mediaIds: updatedData.mediaIds ?? post.mediaIds
+            }
           : post
       ))
     }

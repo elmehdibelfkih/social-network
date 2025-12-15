@@ -75,8 +75,9 @@ async function getMediaData(mediaId: number): Promise<string | null> {
   }
 }
 
-export default function PostServer({ post }: { post: Post }) {
+export default function PostServer({ post: initialPost }: { post: Post }) {
   const { user } = useAuth()
+  const [post, setPost] = useState(initialPost)
   const [avatarId, setAvatarId] = useState<number | null>(null)
   const [mediaDataList, setMediaDataList] = useState<(string | null)[]>([])
   const [showMenu, setShowMenu] = useState(false)
@@ -123,6 +124,46 @@ export default function PostServer({ post }: { post: Post }) {
       case 'private': return <LockIcon />
       case 'restricted': return <UsersIcon />
       default: return <GlobeIcon fillColor="currentColor" />
+    }
+  }
+
+  const handleUpdate = (updatedPost: any) => {
+    // Update local state immediately
+    setPost(prev => ({
+      ...prev,
+      content: updatedPost.content || prev.content,
+      privacy: updatedPost.privacy || prev.privacy,
+      mediaIds: updatedPost.mediaIds || prev.mediaIds
+    }))
+
+    // Reload media if changed
+    if (updatedPost.mediaIds) {
+      Promise.all(updatedPost.mediaIds.map(getMediaData)).then(setMediaDataList)
+    }
+
+    // Dispatch event for other components
+    window.dispatchEvent(new CustomEvent('updatePost', { 
+      detail: { 
+        postId: post.postId,
+        ...updatedPost
+      } 
+    }))
+    
+    setShowUpdateModal(false)
+  }
+
+  const handleDelete = async () => {
+    try {
+      await http.delete(`/api/v1/posts/${post.postId}`)
+      
+      // Dispatch event for feed to remove this post
+      window.dispatchEvent(new CustomEvent('deletePost', { 
+        detail: { postId: post.postId } 
+      }))
+      
+      setShowDeleteConfirm(false)
+    } catch (error) {
+      console.error('Failed to delete post:', error)
     }
   }
 
@@ -184,19 +225,13 @@ export default function PostServer({ post }: { post: Post }) {
           initialPrivacy={post.privacy}
           initialMediaIds={post.mediaIds || []}
           onClose={() => setShowUpdateModal(false)}
-          onUpdate={(updatedPost) => {
-            window.dispatchEvent(new CustomEvent('updatePost', { detail: updatedPost }))
-          }}
+          onUpdate={handleUpdate}
         />
       )}
 
       {showDeleteConfirm && (
         <ConfirmDelete
-          onConfirm={async () => {
-            await http.delete(`/api/v1/posts/${post.postId}`);
-            window.dispatchEvent(new CustomEvent('deletePost', { detail: { postId: post.postId } }))
-            setShowDeleteConfirm(false)
-          }}
+          onConfirm={handleDelete}
           onCancel={() => setShowDeleteConfirm(false)}
         />
       )}
