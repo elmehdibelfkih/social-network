@@ -81,9 +81,9 @@ export default function PostServer({ post }: { post: Post }) {
   const [showUpdateModal, setShowUpdateModal] = useState(false)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const [mounted, setMounted] = useState(false)
-  const [stats, setStats] = useState({ 
-    reactionCount: post.stats?.reactionCount || 0, 
-    commentCount: post.stats?.commentCount || 0 
+  const [stats, setStats] = useState({
+    reactionCount: post.stats?.reactionCount || 0,
+    commentCount: post.stats?.commentCount || 0
   })
   const isAuthor = mounted && user && Number(user.userId) === post.authorId
 
@@ -101,7 +101,7 @@ export default function PostServer({ post }: { post: Post }) {
     if (!post.stats) {
       http.get<any>(`/api/v1/posts/${post.postId}/comments?page=1&limit=1`)
         .then(data => setStats(prev => ({ ...prev, commentCount: data?.totalComments || 0 })))
-        .catch(() => {})
+        .catch(() => { })
     }
   }, [post.postId, post.stats])
 
