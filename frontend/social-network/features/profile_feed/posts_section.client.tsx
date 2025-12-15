@@ -5,7 +5,7 @@ import { useEffect, useState } from "react"
 import { Post } from "@/libs/globalTypes"
 
 import styles from "./styles.module.css"
-import { PostCard } from "../posts"
+import PostServer from "@/features/posts/posts.server";
 
 export function PostsSection({ userId, avatarId }: { userId: string, avatarId: number }) {
     const [page, setPage] = useState(1)
@@ -58,7 +58,8 @@ export function PostsSection({ userId, avatarId }: { userId: string, avatarId: n
                     <EmptyContent />
                     :
                     posts.map((post, i) => (
-                        <PostCard key={i} post={post} avatarId={avatarId} />
+                                    <PostServer key={post.postId} post={post} />
+                        
                     ))
             }
             {isLoading && <div>Loading...</div>}

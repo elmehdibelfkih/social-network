@@ -202,4 +202,11 @@ const (
 		FROM comment_reactions
 		WHERE comment_id = ?;
 	`
+
+	// Post stats queries
+	QUERY_COUNT_POST_REACTIONS = `
+		SELECT COUNT(*)
+		FROM post_reactions
+		WHERE post_id = ?;
+	`
 )

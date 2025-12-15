@@ -88,6 +88,9 @@ export default function PostServer({ post }: { post: Post }) {
   })
   const isAuthor = mounted && user && Number(user.userId) === post.authorId
 
+  console.log(post);
+  
+
   useEffect(() => setMounted(true), [])
 
   useEffect(() => {

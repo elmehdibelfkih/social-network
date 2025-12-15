@@ -93,7 +93,8 @@ func HandleGetPost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	postResponse, err := buildPostResponse(post)
+	viewerID := utils.GetUserIdFromContext(r)
+	postResponse, err := buildPostResponse(post, viewerID)
 	if err != nil {
 		utils.SQLiteErrorTarget(err, "HandleGetPost (buildPostResponse)")
 		utils.InternalServerError(w)
@@ -173,7 +174,7 @@ func HandleUpdatePost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	postResponse, err := buildPostResponse(post)
+	postResponse, err := buildPostResponse(post, userID)
 	if err != nil {
 		utils.SQLiteErrorTarget(err, "HandleUpdatePost (buildPostResponse)")
 		utils.InternalServerError(w)
@@ -232,7 +233,7 @@ func HandleGetUserPosts(w http.ResponseWriter, r *http.Request) {
 
 	var postResponses []GetPostResponse
 	for _, post := range visiblePosts {
-		postResponse, err := buildPostResponse(&post)
+		postResponse, err := buildPostResponse(&post, requesterID)
 		if err != nil {
 			utils.SQLiteErrorTarget(err, "HandleGetUserPosts (buildPostResponse)")
 			continue

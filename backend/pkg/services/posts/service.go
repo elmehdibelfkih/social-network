@@ -226,7 +226,7 @@ func validateReaction(reaction string) bool {
 }
 
 // buildPostResponse builds a complete post response with media and allowed list
-func buildPostResponse(post *Post) (*GetPostResponse, error) {
+func buildPostResponse(post *Post, viewerID int64) (*GetPostResponse, error) {
 	// Get author nickname
 	authorDetails, err := GetAuthorDetails(post.AuthorID)
 	if err != nil && err != sql.ErrNoRows {
@@ -251,6 +251,12 @@ func buildPostResponse(post *Post) (*GetPostResponse, error) {
 		allowedList = []int64{}
 	}
 
+	// Get stats
+	stats, err := GetPostStats(post.ID)
+	if err != nil {
+		return nil, err
+	}
+
 	return &GetPostResponse{
 		PostID:          post.ID,
 		AuthorID:        post.AuthorID,
@@ -262,8 +268,10 @@ func buildPostResponse(post *Post) (*GetPostResponse, error) {
 		Privacy:         post.Privacy,
 		GroupID:         post.GroupID,
 		AllowedList:     allowedList,
+		IsLikedByUser:   CheckPostReactionExists(post.ID, viewerID),
 		CreatedAt:       post.CreatedAt,
 		UpdatedAt:       post.UpdatedAt,
+		Stats:           stats,
 	}, nil
 }
 
