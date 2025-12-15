@@ -9,6 +9,7 @@ import { UpdatePost } from '@/components/ui/UpdatePost/UpdatePost'
 import { ConfirmDelete } from '@/components/ui/ConfirmDelete/ConfirmDelete'
 import { useAuth } from '@/providers/authProvider'
 import { GlobeIcon, LockIcon, UsersIcon } from '@/components/ui/icons'
+import { timeAgo } from '@/libs/helpers'
 
 function MediaCarousel({ mediaDataList }: { mediaDataList: string[] }) {
   const [currentIndex, setCurrentIndex] = useState(0)
@@ -86,12 +87,16 @@ export default function PostServer({ post }: { post: Post }) {
     reactionCount: post.stats?.reactionCount || 0, 
     commentCount: post.stats?.commentCount || 0 
   })
+  const [currentTime, setCurrentTime] = useState(new Date())
   const isAuthor = mounted && user && Number(user.userId) === post.authorId
-
-  console.log(post);
   
 
   useEffect(() => setMounted(true), [])
+
+  useEffect(() => {
+    const timer = setInterval(() => setCurrentTime(new Date()), 60000)
+    return () => clearInterval(timer)
+  }, [])
 
   useEffect(() => {
     getAvatarId(post.authorId).then(setAvatarId)
@@ -110,7 +115,6 @@ export default function PostServer({ post }: { post: Post }) {
   }, [post.postId, post.stats])
 
   const authorName = `${post.authorFirstName} ${post.authorLastName}`
-  const timeAgo = new Date(post.createdAt).toLocaleDateString()
   
   const getPrivacyIcon = (privacy: string) => {
     switch (privacy) {
@@ -129,7 +133,7 @@ export default function PostServer({ post }: { post: Post }) {
         <div className={styles.authorInfo}>
           <h3 className={styles.authorName} onClick={() => window.location.href = `/profile/${post.authorId}`}>{authorName}</h3>
           <div className={styles.postMeta}>
-            <span className={styles.timeAgo}>{timeAgo}</span>
+            <span className={styles.timeAgo}>{timeAgo(post.createdAt)}</span>
             <span className={styles.privacy}>
               {getPrivacyIcon(post.privacy)}
               {post.privacy}
@@ -180,7 +184,9 @@ export default function PostServer({ post }: { post: Post }) {
           initialPrivacy={post.privacy}
           initialMediaIds={post.mediaIds || []}
           onClose={() => setShowUpdateModal(false)}
-          onUpdate={() => window.location.reload()}
+          onUpdate={(updatedPost) => {
+            window.dispatchEvent(new CustomEvent('updatePost', { detail: updatedPost }))
+          }}
         />
       )}
 
@@ -188,7 +194,8 @@ export default function PostServer({ post }: { post: Post }) {
         <ConfirmDelete
           onConfirm={async () => {
             await http.delete(`/api/v1/posts/${post.postId}`);
-            window.location.reload();
+            window.dispatchEvent(new CustomEvent('deletePost', { detail: { postId: post.postId } }))
+            setShowDeleteConfirm(false)
           }}
           onCancel={() => setShowDeleteConfirm(false)}
         />

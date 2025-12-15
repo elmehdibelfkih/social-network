@@ -51,7 +51,7 @@ export function NewPostClient() {
         mediaIds = uploaded.map(r => r.mediaId);
       }
 
-      await postsService.createPost({
+      const newPost = await postsService.createPost({
         content: content.trim(),
         privacy,
         mediaIds: mediaIds.length ? mediaIds : undefined,
@@ -64,6 +64,17 @@ export function NewPostClient() {
       setPrivacy('public');
       setSelectedFollowers([]);
       dispatch({ type: 'INCREMENT_POSTS' })
+      
+      // Ensure all required fields are present
+      const completePost = {
+        ...newPost,
+        authorFirstName: newPost.authorFirstName || user.firstName,
+        authorLastName: newPost.authorLastName || user.lastName,
+        content: newPost.content || content.trim()
+      }
+      
+      // Dispatch custom event to update feed with complete post data
+      window.dispatchEvent(new CustomEvent('newPost', { detail: completePost }))
     } finally {
       setIsSubmitting(false);
     }
