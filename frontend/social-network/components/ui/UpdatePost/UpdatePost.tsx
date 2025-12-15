@@ -209,13 +209,11 @@ export function UpdatePost({ postId, initialContent, initialPrivacy, initialMedi
             </button>
 
             {showPrivacyDropdown && (
-              <>
-                <div
-                  className={styles.dropdownBackdrop}
-                  onClick={() => setShowPrivacyDropdown(false)}
-                />
-
-                <div className={styles.privacyDropdown}>
+              <div
+                className={styles.dropdownBackdrop}
+                onClick={() => setShowPrivacyDropdown(false)}
+              >
+                <div className={styles.privacyDropdown} onClick={(e) => e.stopPropagation()}>
                   {privacyOptions.map(opt => (
                     <button
                       key={opt.value}
@@ -242,7 +240,7 @@ export function UpdatePost({ postId, initialContent, initialPrivacy, initialMedi
                     </button>
                   ))}
                 </div>
-              </>
+              </div>
             )}
           </div>
 

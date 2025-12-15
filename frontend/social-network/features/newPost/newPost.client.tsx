@@ -35,7 +35,7 @@ export function NewPostClient() {
   if (!isMounted || !user) return null;
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) =>
-    setSelectedFiles(Array.from(e.target.files || []));
+    setSelectedFiles(Array.from(e.target.files || []).slice(0, 10));
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -141,6 +141,8 @@ export function NewPostClient() {
             type="button"
             className={styles.uploadImageButton}
             onClick={() => fileInputRef.current?.click()}
+            disabled={selectedFiles.length >= 10}
+            title={selectedFiles.length >= 10 ? "Maximum 10 photos allowed" : "Add photos"}
           >
             <ImageIcon /> Photo
           </button>
