@@ -7,18 +7,20 @@ const (
 )
 
 var validTypes = map[string]bool{
-	"post_liked":    true,
-	"post_comment": true,
+	"post_liked":     true,
+	"post_commented": true,
 	"group_invite":   true,
-	"event_created":   true,
-	"follow_request":    true,
+	"group_join":     true,
+	"event_created":  true,
+	"follow_request": true,
+	"custom":         true,
 }
 
 type Notification struct {
 	ID            int64          `json:"notificationId" db:"id"`
 	UserID        int64          `json:"-" db:"user_id"`
 	Type          string         `json:"type" db:"type"`
-	ReferenceType sql.NullString `json:"referenceType" db:"reference_type"`
+	ReferenceType string         `json:"referenceType" db:"reference_type"`
 	ReferenceID   sql.NullInt64  `json:"referenceId" db:"reference_id"`
 	Content       sql.NullString `json:"content" db:"content"`
 	IsRead        int            `json:"isRead" db:"is_read"`
@@ -26,8 +28,7 @@ type Notification struct {
 	ReadAt        sql.NullString `json:"readAt" db:"read_at"`
 }
 
-type PaginatedNotificationsResponse struct {
-	Page          int             `json:"page"`
+type NotificationsResponse struct {
 	Limit         int             `json:"limit"`
 	Notifications []*Notification `json:"notifications"`
 }

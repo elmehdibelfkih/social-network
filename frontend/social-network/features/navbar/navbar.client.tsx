@@ -9,6 +9,7 @@ import { http } from '@/libs/apiFetch';
 import { useAuth } from '@/providers/authProvider';
 import { ShowSnackbar } from '@/components/ui/snackbar/snackbar';
 import { useUserStats } from '@/providers/userStatsContext';
+import { NotificationsServer } from '../notifications';
 
 export function NavProfile() {
   const router = useRouter();
@@ -130,7 +131,7 @@ export function NotificationClient() {
     <div className={styles.navbarRight}>
       <button className={styles.notificationBtn} aria-label="Notifications">
         <BellIcon />
-        {/* <p>Notifications</p> */}
+        <NotificationsServer />
       </button>
     </div>
   )
