@@ -31,8 +31,8 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
     ...counts
   };
 
-  // console.log("Initial User Stats:", stats);
-
+  console.log(profileRes);
+  
   return (
     <AppProviders>
       <UserStatsProvider initialState={stats}>

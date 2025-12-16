@@ -157,7 +157,6 @@ export default function PostServer({ post: initialPost }: { post: Post }) {
   const handleDelete = async () => {
     try {
       const res = await http.delete(`/api/v1/posts/${post.postId}`)
-      console.log("====<", res);
       if (!res) return
       dispatch({ type: 'DECREMENT_POSTS' })
       // Dispatch event for feed to remove this post

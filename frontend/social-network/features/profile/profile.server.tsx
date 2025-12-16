@@ -1,10 +1,11 @@
 import styles from './styles.module.css'
 import { Counts, Privacy, ProfileTopActions } from './profile.client'
-import { CalendarIcon, GlobeIcon } from '../../components/ui/icons'
+import { CalendarIcon } from '../../components/ui/icons'
 import { ProfileSettings } from './privacy.client'
 import { ProfileData } from './types'
 import AvatarHolder from '@/components/ui/avatar_holder/avatarholder.client'
 import { ProfileProvider } from './profile.provider'
+import { timeAgo } from "@/libs/helpers";
 
 export function Profile({ profile }: { profile: ProfileData }) {
 
@@ -33,7 +34,7 @@ export function Profile({ profile }: { profile: ProfileData }) {
                         <div className={styles.meta}>
                             <span className={styles.joinDate}>
                                 <CalendarIcon />
-                                Joined {new Date(profile.joinedAt).toLocaleDateString()}
+                                Joined {timeAgo(profile.joinedAt)} 
                             </span>
                             <Privacy userId={profile.userId} privacy={profile.privacy}/>
                         </div>

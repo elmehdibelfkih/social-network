@@ -4,6 +4,8 @@ import { ProfileData } from '../profile/types'
 
 export function AboutSection({ profile }: { profile: ProfileData }) {
 
+    // console.log("-------",profile);
+    
     if (!profile) {
         return (
             <div className={styles.aboutContainer}>

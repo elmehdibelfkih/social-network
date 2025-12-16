@@ -28,12 +28,12 @@ export function handleName(profile: MiniProfile | null) {
 }
 
 export function timeAgo(dateString: string): string {
-  if (!dateString) return 'now'
+  if (!dateString) return 'just now'
   
   const now = new Date()
   const date = new Date(dateString)
   
-  if (isNaN(date.getTime())) return 'now'
+  if (isNaN(date.getTime())) return 'just now'
   
   const diffMs = now.getTime() - date.getTime()
   const diffSec = Math.floor(diffMs / 1000)
@@ -42,10 +42,10 @@ export function timeAgo(dateString: string): string {
   const diffDay = Math.floor(diffHour / 24)
   const diffWeek = Math.floor(diffDay / 7)
 
-  if (diffSec < 60) return 'now'
-  if (diffMin < 60) return `${diffMin}m`
-  if (diffHour < 24) return `${diffHour}h`
-  if (diffDay < 7) return `${diffDay}d`
-  if (diffWeek < 4) return `${diffWeek}w`
+  if (diffSec < 60) return 'just now'
+  if (diffMin < 60) return `${diffMin}m ago`
+  if (diffHour < 24) return `${diffHour}h ago`
+  if (diffDay < 7) return `${diffDay}d ago`
+  if (diffWeek < 4) return `${diffWeek}w ago`
   return date.toLocaleDateString()
 }

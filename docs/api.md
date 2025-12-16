@@ -203,7 +203,6 @@ No need for a request body.
 ``` json
 {
   "userId": 1289843874339, // the user id of the profile owner 
-  "status": "follow",  // pending/accepted/declined or null
   "nickname": "nickname", // or null
   "firstName": "first",
   "lastName": "last",
@@ -211,6 +210,8 @@ No need for a request body.
   "aboutMe": "Full-stack developer and cloud enthusiast.", // or null
   "dateOfBirth": "2001-01-01",
   "privacy": "public",
+  "status": "follow",  // pending/accepted/declined or null
+  "chatId": 554624523465245, // or null
   "stats": {
     "postsCount": 123,
     "followersCount": 890,
@@ -237,7 +238,9 @@ No need for a request body.
   "nickname": "nickname",  // optinal
   "aboutMe": "Cloud and DevOps engineer passionate about scalable systems.", // optinal
   "dateOfBirth": "2001-01-01", // optinal
-  "email": "email@example.com"  // optinal
+  "email": "email@example.com",  // optinal
+  "avatarId": 1289843874780  // optinal
+
 }
 ```
   
