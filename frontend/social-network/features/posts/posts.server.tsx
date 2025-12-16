@@ -10,6 +10,7 @@ import { ConfirmDelete } from '@/components/ui/ConfirmDelete/ConfirmDelete'
 import { useAuth } from '@/providers/authProvider'
 import { GlobeIcon, LockIcon, UsersIcon } from '@/components/ui/icons'
 import { timeAgo } from '@/libs/helpers'
+import { useUserStats } from '@/providers/userStatsContext'
 
 function MediaCarousel({ mediaDataList }: { mediaDataList: string[] }) {
   const [currentIndex, setCurrentIndex] = useState(0)
@@ -88,6 +89,7 @@ export default function PostServer({ post: initialPost }: { post: Post }) {
     reactionCount: post.stats?.reactionCount || 0,
     commentCount: post.stats?.commentCount || 0
   })
+  const { dispatch } = useUserStats();
   const [currentTime, setCurrentTime] = useState(new Date())
   const isAuthor = mounted && user && Number(user.userId) === post.authorId
   
@@ -154,13 +156,14 @@ export default function PostServer({ post: initialPost }: { post: Post }) {
 
   const handleDelete = async () => {
     try {
-      await http.delete(`/api/v1/posts/${post.postId}`)
-      
+      const res = await http.delete(`/api/v1/posts/${post.postId}`)
+      console.log("====<", res);
+      if (!res) return
+      dispatch({ type: 'DECREMENT_POSTS' })
       // Dispatch event for feed to remove this post
       window.dispatchEvent(new CustomEvent('deletePost', { 
         detail: { postId: post.postId } 
       }))
-      
       setShowDeleteConfirm(false)
     } catch (error) {
       console.error('Failed to delete post:', error)
