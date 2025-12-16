@@ -9,11 +9,12 @@
   border-radius: 0.75rem;
   border: 1px solid #e5e7eb;
   padding: 1.5rem;
+    font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
 }
 
 .groupMembersTitle {
   margin-bottom: 1rem;
-  font-size: 1.125rem;
+  font-size: 2rem;
   font-weight: 600;
 }
 
@@ -79,11 +80,13 @@
 .memberName {
   font-weight: 500;
   font-size: 0.875rem;
+  margin: 4 0 4 4;
 }
 
 .memberJoined {
   font-size: 0.875rem;
   color: #6b7280;
+  margin: 4 0 4 4;
 }
 
 .memberRoleBadge {

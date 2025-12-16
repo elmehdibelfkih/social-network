@@ -277,3 +277,28 @@
   height: 16px;
   margin-right: 8px;
 }
+
+
+.btn_creat_group {
+  margin: 8px 0 0 12px;
+  background-color: var(--primary-purple);
+  color: var(--white);
+  font-weight: 500;
+  padding: 8px 16px;
+  height: 28px;
+  border-radius: var(--border-radius);
+  border: none;
+  cursor: pointer;
+  transition: all var(--transition-base);
+  font-size: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  white-space: nowrap;
+}
+
+
+.btn_creat_group:hover {
+  background-color: var(--primary-purple-dark);
+}

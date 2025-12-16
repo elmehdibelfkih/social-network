@@ -13,6 +13,9 @@ export default async function GroupMembersCard({ groups }: { groups: GroupMember
                     {groups.map((group, index) => (
                         <div key={`${group.user_id}-${index}`} className={styles.memberItem}>
                             <div className={styles.memberInfo}>
+
+                                {/* todo change this with avatar holder 
+                                change griuos params to send avatarId with it */}
                                 <span className={styles.memberAvatar}>
                                     <div className={styles.memberAvatarContent}>
                                         {group.full_name.charAt(0).toUpperCase()}
