@@ -2,7 +2,7 @@ import { http } from '@/libs/apiFetch';
 import { MediaResponse, ProfileAPIResponse } from '../../libs/globalTypes';
 import { FollowResponse, PrivacyToggleResponse } from './types';
 
-export default async function getProfileData(userId: string): Promise<ProfileAPIResponse> {
+export default async function getProfileData(userId: string | number): Promise<ProfileAPIResponse> {
     return http.get(`/api/v1/users/${userId}/profile`);
 }
 

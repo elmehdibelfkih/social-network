@@ -1,6 +1,5 @@
 'use client'
 
-// import { Stats } from "@/libs/globalTypes";
 import { useState, useEffect } from 'react'
 import styles from './styles.module.css'
 import { unfollowPerson, followPerson } from './profileSrevice'

@@ -1,4 +1,3 @@
-import { FooterServer } from '@/features/footer';
 import { Profile } from '@/features/profile';
 import getProfileData from '@/features/profile/profileSrevice';
 import ProfileFeed from '@/features/profile_feed/profile_feed.server';
@@ -10,9 +9,8 @@ interface PageProps {
 
 export default async function ProfilePage({ searchParams }: PageProps) {
   const userId = await getUserId();
-  const { tab } = await searchParams;
-
   const profile = await getProfileData(String(userId))
+  const { tab } = await searchParams;
   
   return (
     <>
