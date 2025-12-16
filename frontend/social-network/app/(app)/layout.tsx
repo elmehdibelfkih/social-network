@@ -19,7 +19,7 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
     http.get<Counts>(`/api/v1/users/${userId}/stats`)
   ]);
 
-  if (!profileRes || !notificationsRes) {
+  if (!profileRes || !notificationsRes || !counts) {
     return null;
   }
   const { stats: profileStats, ...profileRest } = profileRes;
@@ -31,7 +31,10 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
     ...counts
   };
 
-  console.log(profileRes);
+  console.log("stats :>", stats);
+  console.log("profileRes :>", profileRes);
+  console.log("notificationsRes :>", notificationsRes);
+  console.log("counts :>", counts);
   
   return (
     <AppProviders>
