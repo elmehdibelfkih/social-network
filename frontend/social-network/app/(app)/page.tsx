@@ -6,7 +6,7 @@ import { getUserId } from "@/libs/helpers";
 import { ProfileAPIResponse } from "@/libs/globalTypes";
 import { NewPost } from "@/features/newPost";
 import { postsService } from "@/features/posts";
-import { FeedClient } from "@/features/posts/feed.client";
+import { Feed } from "@/features/posts/Feed";
 
 export default async function HomePage(): Promise<JSX.Element> {
   const userId = await getUserId();
@@ -20,7 +20,7 @@ export default async function HomePage(): Promise<JSX.Element> {
       <div>
         <NewPost data={res2} isMyprofile={false} />
       </div>
-      <FeedClient initialPosts={posts} />
+      <Feed initialPosts={posts} />
     </>
   );
 }

@@ -1,7 +1,7 @@
 'use client'
 import { Suspense, useState, useEffect } from 'react'
 import type { Post } from '@/libs/globalTypes'
-import { PostsClient } from './posts.client'
+import { PostActions } from './PostActions'
 import { AvatarHolder } from '@/components/ui/avatar_holder/avatarholder.client'
 import styles from './styles.module.css'
 import { http, fetchMediaClient } from '@/libs/apiFetch'
@@ -76,7 +76,9 @@ async function getMediaData(mediaId: number): Promise<string | null> {
   }
 }
 
-export default function PostServer({ post: initialPost }: { post: Post }) {
+const CONTENT_PREVIEW_LENGTH = 300
+
+export default function PostCard({ post: initialPost }: { post: Post }) {
   const { user } = useAuth()
   const [post, setPost] = useState(initialPost)
   const [avatarId, setAvatarId] = useState<number | null>(null)
@@ -85,21 +87,16 @@ export default function PostServer({ post: initialPost }: { post: Post }) {
   const [showUpdateModal, setShowUpdateModal] = useState(false)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const [mounted, setMounted] = useState(false)
+  const [isExpanded, setIsExpanded] = useState(false)
   const [stats, setStats] = useState({
     reactionCount: post.stats?.reactionCount || 0,
     commentCount: post.stats?.commentCount || 0
   })
-  const { dispatch } = useUserStats();
-  const [currentTime, setCurrentTime] = useState(new Date())
+  const { dispatch } = useUserStats()
   const isAuthor = mounted && user && Number(user.userId) === post.authorId
-  
+  const isLongContent = post.content.length > CONTENT_PREVIEW_LENGTH
 
   useEffect(() => setMounted(true), [])
-
-  useEffect(() => {
-    const timer = setInterval(() => setCurrentTime(new Date()), 60000)
-    return () => clearInterval(timer)
-  }, [])
 
   useEffect(() => {
     getAvatarId(post.authorId).then(setAvatarId)
@@ -204,7 +201,19 @@ export default function PostServer({ post: initialPost }: { post: Post }) {
       </div>
 
       <div className={styles.content}>
-        <p>{post.content}</p>
+        <p>
+          {isLongContent && !isExpanded
+            ? `${post.content.substring(0, CONTENT_PREVIEW_LENGTH)}...`
+            : post.content}
+        </p>
+        {isLongContent && (
+          <button
+            className={styles.readMoreButton}
+            onClick={() => setIsExpanded(!isExpanded)}
+          >
+            {isExpanded ? 'Show less' : 'Read more'}
+          </button>
+        )}
       </div>
 
       {post.mediaIds && post.mediaIds.length > 0 && (
@@ -217,7 +226,7 @@ export default function PostServer({ post: initialPost }: { post: Post }) {
       </div>
 
       <Suspense fallback={<div className={styles.actionsLoading}>Loading...</div>}>
-        <PostsClient post={{ ...post, stats }} onStatsUpdate={setStats} />
+        <PostActions post={{ ...post, stats }} onStatsUpdate={setStats} />
       </Suspense>
 
       {showUpdateModal && (

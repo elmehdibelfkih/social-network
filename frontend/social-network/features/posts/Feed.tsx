@@ -1,17 +1,19 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { Post } from '@/libs/globalTypes'
-import PostServer from './posts.server'
+import PostCard from './PostCard'
 import { postsService } from './postsService'
 import { useDebounce } from '@/libs/debounce'
 
-export function FeedClient({ initialPosts }: { initialPosts: Post[] }) {
+export function Feed({ initialPosts }: { initialPosts: Post[] }) {
   const [posts, setPosts] = useState<Post[]>(initialPosts)
   const [page, setPage] = useState(1)
   const [loading, setLoading] = useState(false)
   const [hasMore, setHasMore] = useState(true)
   const debouncedLoading = useDebounce(loading, 300)
+  const throttleTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const isLoadingRef = useRef(false)
 
   useEffect(() => {
     const handleNewPost = (event: CustomEvent) => {
@@ -51,9 +53,13 @@ export function FeedClient({ initialPosts }: { initialPosts: Post[] }) {
     }
   }, [])
 
+  useEffect(() => {
+    isLoadingRef.current = loading
+  }, [loading])
+
   const loadMorePosts = useCallback(async () => {
-    if (loading || !hasMore) return
-    
+    if (isLoadingRef.current || !hasMore) return
+
     setLoading(true)
     try {
       const newPosts = await postsService.getFeed({ page: page + 1, limit: 10 })
@@ -72,28 +78,29 @@ export function FeedClient({ initialPosts }: { initialPosts: Post[] }) {
     } finally {
       setLoading(false)
     }
-  }, [loading, hasMore, page])
-
-  const throttledScroll = useCallback(
-    (() => {
-      let timeoutId: NodeJS.Timeout | null = null
-      return () => {
-        if (timeoutId) return
-        timeoutId = setTimeout(() => {
-          const { scrollTop, scrollHeight, clientHeight } = document.documentElement
-          if (scrollTop + clientHeight >= scrollHeight - 1000) {
-            loadMorePosts()
-          }
-          timeoutId = null
-        }, 200)
-      }
-    })()
-  , [loadMorePosts])
+  }, [hasMore, page])
 
   useEffect(() => {
-    window.addEventListener('scroll', throttledScroll)
-    return () => window.removeEventListener('scroll', throttledScroll)
-  }, [throttledScroll])
+    const handleScroll = () => {
+      if (throttleTimeoutRef.current) return
+
+      throttleTimeoutRef.current = setTimeout(() => {
+        const { scrollTop, scrollHeight, clientHeight } = document.documentElement
+        if (scrollTop + clientHeight >= scrollHeight - 1000 && hasMore && !isLoadingRef.current) {
+          loadMorePosts()
+        }
+        throttleTimeoutRef.current = null
+      }, 200)
+    }
+
+    window.addEventListener('scroll', handleScroll)
+    return () => {
+      window.removeEventListener('scroll', handleScroll)
+      if (throttleTimeoutRef.current) {
+        clearTimeout(throttleTimeoutRef.current)
+      }
+    }
+  }, [loadMorePosts, hasMore])
 
   return (
     <div>
@@ -101,7 +108,7 @@ export function FeedClient({ initialPosts }: { initialPosts: Post[] }) {
         <p>No posts yet. Be the first to create one!</p>
       ) : (
         posts.map((post, index) => (
-          <PostServer key={`${post.postId}-${index}`} post={post} />
+          <PostCard key={`${post.postId}-${index}`} post={post} />
         ))
       )}
       {debouncedLoading && (

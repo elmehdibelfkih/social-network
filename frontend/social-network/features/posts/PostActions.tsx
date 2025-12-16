@@ -6,7 +6,7 @@ import styles from './styles.module.css'
 import { Post } from '@/libs/globalTypes'
 import { http } from '@/libs/apiFetch'
 
-export function PostsClient({ post, onStatsUpdate }: { post: Post, onStatsUpdate?: (stats: { reactionCount: number, commentCount: number }) => void }) {
+export function PostActions({ post, onStatsUpdate }: { post: Post, onStatsUpdate?: (stats: { reactionCount: number, commentCount: number }) => void }) {
   const [liked, setLiked] = useState(post?.isLikedByUser)
   const [isLoading, setIsLoading] = useState(false)
   const [showComments, setShowComments] = useState(false)
