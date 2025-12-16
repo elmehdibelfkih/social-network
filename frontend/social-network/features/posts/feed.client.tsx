@@ -1,88 +1,119 @@
-'use client';
+'use client'
 
-import { useState, useEffect } from 'react';
-import { postsService } from './postsService';
-import styles from './styles.module.css';
-import { Post } from '@/libs/globalTypes';
+import { useState, useEffect, useCallback } from 'react'
+import { Post } from '@/libs/globalTypes'
+import PostServer from './posts.server'
+import { postsService } from './postsService'
+import { useDebounce } from '@/libs/debounce'
 
-interface FeedProps {
-  newPost?: Post | null;
-  onNewPostDisplayed?: () => void;
-}
+export function FeedClient({ initialPosts }: { initialPosts: Post[] }) {
+  const [posts, setPosts] = useState<Post[]>(initialPosts)
+  const [page, setPage] = useState(1)
+  const [loading, setLoading] = useState(false)
+  const [hasMore, setHasMore] = useState(true)
+  const debouncedLoading = useDebounce(loading, 300)
 
-export function Feed({ newPost, onNewPostDisplayed }: FeedProps) {
-  const [posts, setPosts] = useState<Post[]>([]);
-
-  // Fetch initial posts
   useEffect(() => {
-    const fetchPosts = async () => {
-      try {
-        const fetchedPosts = await postsService.getFeed();
-        setPosts(fetchedPosts);
-      } catch (error) {
-        console.error('Failed to fetch posts:', error);
-      }
-    };
-    fetchPosts();
-  }, []);
-
-  // Add new post to the top of the feed
-  useEffect(() => {
-    if (newPost) {
-      setPosts(prev => [newPost, ...prev]);
-      onNewPostDisplayed?.();
+    const handleNewPost = (event: CustomEvent) => {
+      const newPost = event.detail as Post
+      setPosts(prev => [newPost, ...prev])
     }
-  }, [newPost, onNewPostDisplayed]);
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffMs = now.getTime() - date.getTime();
-    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+    const handleUpdatePost = (event: CustomEvent) => {
+      const updatedData = event.detail
+      if (!updatedData?.postId) return
+      
+      setPosts(prev => prev.map(post => 
+        post.postId === updatedData.postId 
+          ? { 
+              ...post, 
+              content: updatedData.content ?? post.content,
+              privacy: updatedData.privacy ?? post.privacy,
+              mediaIds: updatedData.mediaIds ?? post.mediaIds
+            }
+          : post
+      ))
+    }
+
+    const handleDeletePost = (event: CustomEvent) => {
+      const { postId } = event.detail
+      setPosts(prev => prev.filter(post => post.postId !== postId))
+    }
+
+    window.addEventListener('newPost', handleNewPost as EventListener)
+    window.addEventListener('updatePost', handleUpdatePost as EventListener)
+    window.addEventListener('deletePost', handleDeletePost as EventListener)
     
-    if (diffHours < 1) return 'Just now';
-    if (diffHours < 24) return `${diffHours} hours ago`;
-    return date.toLocaleDateString();
-  };
+    return () => {
+      window.removeEventListener('newPost', handleNewPost as EventListener)
+      window.removeEventListener('updatePost', handleUpdatePost as EventListener)
+      window.removeEventListener('deletePost', handleDeletePost as EventListener)
+    }
+  }, [])
+
+  const loadMorePosts = useCallback(async () => {
+    if (loading || !hasMore) return
+    
+    setLoading(true)
+    try {
+      const newPosts = await postsService.getFeed({ page: page + 1, limit: 10 })
+      if (newPosts.length === 0) {
+        setHasMore(false)
+      } else {
+        setPosts(prev => {
+          const existingIds = new Set(prev.map(p => p.postId))
+          const uniqueNewPosts = newPosts.filter(p => !existingIds.has(p.postId))
+          return [...prev, ...uniqueNewPosts]
+        })
+        setPage(prev => prev + 1)
+      }
+    } catch (error) {
+      console.error('Failed to load more posts:', error)
+    } finally {
+      setLoading(false)
+    }
+  }, [loading, hasMore, page])
+
+  const throttledScroll = useCallback(
+    (() => {
+      let timeoutId: NodeJS.Timeout | null = null
+      return () => {
+        if (timeoutId) return
+        timeoutId = setTimeout(() => {
+          const { scrollTop, scrollHeight, clientHeight } = document.documentElement
+          if (scrollTop + clientHeight >= scrollHeight - 1000) {
+            loadMorePosts()
+          }
+          timeoutId = null
+        }, 200)
+      }
+    })()
+  , [loadMorePosts])
+
+  useEffect(() => {
+    window.addEventListener('scroll', throttledScroll)
+    return () => window.removeEventListener('scroll', throttledScroll)
+  }, [throttledScroll])
 
   return (
-    <div className={styles.postsContainer}>
+    <div>
       {posts.length === 0 ? (
-        <div>No posts yet. Create the first one!</div>
+        <p>No posts yet. Be the first to create one!</p>
       ) : (
-        posts.map((post) => (
-        <div key={post.postId} className={styles.postCard}>
-          <div className={styles.postUserSection}>
-            <div className={styles.postUserAvatar}>
-              <img src="/users.svg" alt="User Avatar" />
-            </div>
-            <div className={styles.postUserInfo}>
-              <h4>{post.authorFirstName} {post.authorLastName}</h4>
-              <span>{formatDate(post.createdAt)} · {post.privacy}</span>
-            </div>
-          </div>
-
-          <div className={styles.postCaption}>
-            <p>{post.content}</p>
-          </div>
-
-          <div className={styles.postInteraction}>
-            <button className={styles.interactionItem}>
-              <img src="/icons/like.svg" alt="like icon" />
-              <span>{post.stats.reactionCount} likes</span>
-            </button>
-            <button className={styles.interactionItem}>
-              <img src="/icons/comment.svg" alt="comment icon" />
-              <span>{post.stats.commentCount} comments</span>
-            </button>
-            <button className={styles.interactionItem}>
-              <img src="/icons/share.svg" alt="share icon" />
-              <span>Share</span>
-            </button>
-          </div>
-        </div>
+        posts.map((post, index) => (
+          <PostServer key={`${post.postId}-${index}`} post={post} />
         ))
       )}
+      {debouncedLoading && (
+        <div style={{ textAlign: 'center', padding: '20px', color: '#6b7280' }}>
+          Loading more posts...
+        </div>
+      )}
+      {!hasMore && posts.length > 0 && (
+        <div style={{ textAlign: 'center', padding: '20px', color: '#9ca3af' }}>
+          No more posts to load
+        </div>
+      )}
     </div>
-  );
+  )
 }

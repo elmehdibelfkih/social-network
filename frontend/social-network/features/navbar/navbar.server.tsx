@@ -1,4 +1,4 @@
-import { SocialIcon } from '@/components/ui/icons';
+import { SocialIcon, UserRequests } from '@/components/ui/icons';
 import NavbarCenter, { NavProfile, NotificationClient } from './navbar.client';
 import styles from './styles.module.css';
 

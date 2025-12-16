@@ -9,6 +9,8 @@ import { UpdatePost } from '@/components/ui/UpdatePost/UpdatePost'
 import { ConfirmDelete } from '@/components/ui/ConfirmDelete/ConfirmDelete'
 import { useAuth } from '@/providers/authProvider'
 import { GlobeIcon, LockIcon, UsersIcon } from '@/components/ui/icons'
+import { timeAgo } from '@/libs/helpers'
+import { useUserStats } from '@/providers/userStatsContext'
 
 function MediaCarousel({ mediaDataList }: { mediaDataList: string[] }) {
   const [currentIndex, setCurrentIndex] = useState(0)
@@ -74,8 +76,9 @@ async function getMediaData(mediaId: number): Promise<string | null> {
   }
 }
 
-export default function PostServer({ post }: { post: Post }) {
+export default function PostServer({ post: initialPost }: { post: Post }) {
   const { user } = useAuth()
+  const [post, setPost] = useState(initialPost)
   const [avatarId, setAvatarId] = useState<number | null>(null)
   const [mediaDataList, setMediaDataList] = useState<(string | null)[]>([])
   const [showMenu, setShowMenu] = useState(false)
@@ -86,12 +89,17 @@ export default function PostServer({ post }: { post: Post }) {
     reactionCount: post.stats?.reactionCount || 0,
     commentCount: post.stats?.commentCount || 0
   })
+  const { dispatch } = useUserStats();
+  const [currentTime, setCurrentTime] = useState(new Date())
   const isAuthor = mounted && user && Number(user.userId) === post.authorId
-
-  console.log(post);
   
 
   useEffect(() => setMounted(true), [])
+
+  useEffect(() => {
+    const timer = setInterval(() => setCurrentTime(new Date()), 60000)
+    return () => clearInterval(timer)
+  }, [])
 
   useEffect(() => {
     getAvatarId(post.authorId).then(setAvatarId)
@@ -110,7 +118,6 @@ export default function PostServer({ post }: { post: Post }) {
   }, [post.postId, post.stats])
 
   const authorName = `${post.authorFirstName} ${post.authorLastName}`
-  const timeAgo = new Date(post.createdAt).toLocaleDateString()
   
   const getPrivacyIcon = (privacy: string) => {
     switch (privacy) {
@@ -122,6 +129,47 @@ export default function PostServer({ post }: { post: Post }) {
     }
   }
 
+  const handleUpdate = (updatedPost: any) => {
+    // Update local state immediately
+    setPost(prev => ({
+      ...prev,
+      content: updatedPost.content || prev.content,
+      privacy: updatedPost.privacy || prev.privacy,
+      mediaIds: updatedPost.mediaIds || prev.mediaIds
+    }))
+
+    // Reload media if changed
+    if (updatedPost.mediaIds) {
+      Promise.all(updatedPost.mediaIds.map(getMediaData)).then(setMediaDataList)
+    }
+
+    // Dispatch event for other components
+    window.dispatchEvent(new CustomEvent('updatePost', { 
+      detail: { 
+        postId: post.postId,
+        ...updatedPost
+      } 
+    }))
+    
+    setShowUpdateModal(false)
+  }
+
+  const handleDelete = async () => {
+    try {
+      const res = await http.delete(`/api/v1/posts/${post.postId}`)
+      console.log("====<", res);
+      if (!res) return
+      dispatch({ type: 'DECREMENT_POSTS' })
+      // Dispatch event for feed to remove this post
+      window.dispatchEvent(new CustomEvent('deletePost', { 
+        detail: { postId: post.postId } 
+      }))
+      setShowDeleteConfirm(false)
+    } catch (error) {
+      console.error('Failed to delete post:', error)
+    }
+  }
+
   return (
     <article className={styles.post}>
       <div className={styles.header}>
@@ -129,7 +177,7 @@ export default function PostServer({ post }: { post: Post }) {
         <div className={styles.authorInfo}>
           <h3 className={styles.authorName} onClick={() => window.location.href = `/profile/${post.authorId}`}>{authorName}</h3>
           <div className={styles.postMeta}>
-            <span className={styles.timeAgo}>{timeAgo}</span>
+            <span className={styles.timeAgo}>{timeAgo(post.createdAt)}</span>
             <span className={styles.privacy}>
               {getPrivacyIcon(post.privacy)}
               {post.privacy}
@@ -180,16 +228,13 @@ export default function PostServer({ post }: { post: Post }) {
           initialPrivacy={post.privacy}
           initialMediaIds={post.mediaIds || []}
           onClose={() => setShowUpdateModal(false)}
-          onUpdate={() => window.location.reload()}
+          onUpdate={handleUpdate}
         />
       )}
 
       {showDeleteConfirm && (
         <ConfirmDelete
-          onConfirm={async () => {
-            await http.delete(`/api/v1/posts/${post.postId}`);
-            window.location.reload();
-          }}
+          onConfirm={handleDelete}
           onCancel={() => setShowDeleteConfirm(false)}
         />
       )}

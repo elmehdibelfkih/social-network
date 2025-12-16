@@ -144,14 +144,16 @@
 .mediaCarousel {
   position: relative;
   width: 100%;
+  max-height: 400px;
   overflow: hidden;
+  cursor: pointer;
 }
 
 .mediaImage {
   width: 100%;
   height: auto;
-  max-height: 500px;
-  object-fit: cover;
+  max-height: 400px;
+  object-fit: contain;
   display: block;
 }
 
