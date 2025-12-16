@@ -103,7 +103,7 @@ export function MiniProfileActions({ data }: Props) {
       <div className={styles.miniActionsLarge}>
         <a
           className={styles.viewProfileBtnLarge}
-          href={`/profile/${data.userId}`}
+          href={`/profile/${state.userId === data.userId ? '' : data.userId}`}
         >
           View Profile
         </a>

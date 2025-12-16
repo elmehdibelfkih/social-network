@@ -5,8 +5,7 @@ import { useState, useEffect } from 'react'
 import styles from './styles.module.css'
 import { unfollowPerson, followPerson } from './profileSrevice'
 import { FollowIcon, GlobeIcon, MessageIcon } from '@/components/ui/icons'
-import { ProfileData } from './types'
-import { FollowStatus } from '@/libs/globalTypes'
+import { FollowStatus, ProfileAPIResponse } from '@/libs/globalTypes'
 import { useAuth } from '@/providers/authProvider'
 import { useUserStats } from '@/providers/userStatsContext'
 import { useProfileStats } from "./profile.provider";
@@ -18,7 +17,7 @@ export function FollowButton({ targetUserId, initialStatus, isPrivate = false }:
     const { incrementFollowers, decrementFollowers } = useProfileStats();
 
     const handleFollow = async () => {
-        if (status == 'follow' || status == 'none') {
+        if (status == 'follow' || !status) {
             const previousStatus = status
             const nextState = isPrivate ? 'pending' : 'accepted';
             setStatus(nextState);
@@ -75,7 +74,7 @@ export function MessageButton() {
     )
 }
 
-export function ProfileTopActions({ userId, profile }: { userId: string, profile: ProfileData }) {
+export function ProfileTopActions({ userId, profile }: { userId: string, profile: ProfileAPIResponse }) {
     const { user } = useAuth()
     const [mounted, setMounted] = useState(false)
 
@@ -92,7 +91,7 @@ export function ProfileTopActions({ userId, profile }: { userId: string, profile
                 <>
                     <FollowButton
                         targetUserId={userId}
-                        initialStatus={profile.status || 'none'}
+                        initialStatus={profile.status || null}
                         isPrivate={profile.privacy === 'private'}
                     />
                     <MessageButton />

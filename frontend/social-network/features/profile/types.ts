@@ -1,24 +1,3 @@
-import { FollowStatus } from "../../libs/globalTypes";
-
-export type ProfileData = {
-    userId: number;
-    status: FollowStatus;
-    nickname: string | null;
-    firstName: string;
-    lastName: string;
-    avatarId: number | null;
-    aboutMe: string | null;
-    dateOfBirth: string;
-    privacy: "public" | "private";
-    chatId: number | null;
-    stats: {
-        postsCount: number;
-        followersCount: number;
-        followingCount: number;
-    };
-    joinedAt: string;
-};
-
 export type FollowResponse = {
     message: string
     status: string

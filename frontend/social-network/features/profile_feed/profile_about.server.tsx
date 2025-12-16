@@ -1,11 +1,9 @@
+// 'use client'
+
 import styles from './about.module.css'
-import getProfileData from '../profile/profileSrevice'
-import { ProfileData } from '../profile/types'
-
-export function AboutSection({ profile }: { profile: ProfileData }) {
-
-    // console.log("-------",profile);
-    
+import { useUserStats } from "@/providers/userStatsContext";
+import { ProfileAPIResponse } from "@/libs/globalTypes";
+export function AboutSection({ profile }: { profile: ProfileAPIResponse }) {
     if (!profile) {
         return (
             <div className={styles.aboutContainer}>
