@@ -53,8 +53,8 @@ const (
     gm.user_id, u.first_name, u.last_name, gm.role, gm.joined_at
 	FROM group_members AS gm
 	JOIN users AS u ON gm.user_id = u.id
-	WHERE group_id < ? AND status = 'accepted'
-	ORDER BY created_at DESC
+	WHERE group_id = ? AND status = 'accepted'
+	ORDER BY gm.created_at DESC
 	LIMIT ?
 	`
 	SELECT_GROUP_MEMBERS_BY_GROUP = `

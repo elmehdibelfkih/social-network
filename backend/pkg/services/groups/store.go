@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"math"
 	"strings"
+
 	"social/pkg/config"
 	"social/pkg/db/database"
 	"social/pkg/utils"
@@ -11,7 +12,11 @@ import (
 
 // read
 func SelectGroupMembers(groupId, limit, lastItemId int64, l *ListGroupMembersResponseJson) error {
+	if lastItemId == 0 {
+		lastItemId = math.MaxInt64
+	}
 	rows, err := config.DB.Query(SELECT_GROUP_MEMBERS_BY_GROUP_ID,
+		groupId,
 		lastItemId,
 		limit,
 	)

@@ -5,11 +5,8 @@ import type { ReactNode } from "react";
 import { Group } from "../group_card/types"
 import { AvatarHolder } from '@/components/ui/avatar_holder/avatarholder.client'
 import styles from "./styles.module.css";
-import { UserPlusIcon, CalendarIcon, UsersIcon } from "@/components/ui/icons"
+import { UsersIcon } from "@/components/ui/icons"
 
-interface GroupPageServerProps {
-  children?: ReactNode;
-}
 
 export default function GroupPageServer({ group }: { group: Group }) {
    return (

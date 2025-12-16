@@ -3,7 +3,7 @@ import { GroupService } from "@/features/group_card/group_card.services";
 import { Group } from "@/features/group_card/types"
 import { AvatarHolder } from '@/components/ui/avatar_holder/avatarholder.client'
 import GroupPageServer from '@/features/group_page/group_page.server'
-import TabbedNavigation from '@/features/group_page/group_page.client'
+import TabbedNavigation from '@/features/group_page/Tabbed_Navigation.client'
 
 export default async function GroupLayout({ children, params }: { children: ReactNode, params: Promise<{ id: string }> }) {
     const { id } = await params;
