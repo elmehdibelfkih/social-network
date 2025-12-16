@@ -1,44 +1,54 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import type { Notification } from './types'
-import { NotificationItem } from './components/notification-item.client'
-import { notificationsService } from './notificationsService'
+import { useState, useEffect, useRef } from 'react'
 import styles from './styles.module.css'
+import { notificationsService } from './notificationsService'
+import { Notification } from './types'
+import { FollowNotification } from './components/notification-item.client'
+import { BellIcon } from '@/components/ui/icons'
 
-type Props = {
-  initialNotifications?: Notification[]
-  initialLimit?: number
-}
-
-export function NotificationsClient({ initialNotifications = [], initialLimit = 20 }: Props) {
-  const [notifications, setNotifications] = useState<Notification[]>(initialNotifications)
-  const [limit] = useState(initialLimit)
-  const [hasMore, setHasMore] = useState(true)
+export function NotificationsDropdown() {
+  const [isOpen, setIsOpen] = useState(false)
+  const [notifications, setNotifications] = useState<Notification[]>([])
+  const [unreadCount, setUnreadCount] = useState(0)
   const [loading, setLoading] = useState(false)
+  const dropdownRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    notificationsService.getUnreadCount().then(setUnreadCount)
+  }, [])
+
+  useEffect(() => {
+    if (isOpen && notifications?.length === 0) {
+      loadNotifications()
+    }
+  }, [isOpen])
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsOpen(false)
+      }
+    }
+
+    if (isOpen) {
+      document.addEventListener('mousedown', handleClickOutside)
+      return () => document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [isOpen])
 
   const loadNotifications = async () => {
-    if (loading) return
-
     setLoading(true)
     try {
-      const lastItemId = notifications.length > 0 ? notifications[notifications.length - 1].notificationId : undefined
-      const response = await notificationsService.getNotifications(limit, lastItemId)
-
-      setNotifications((prev) => [...prev, ...response.notifications])
-      setHasMore(response.notifications.length >= limit)
+      const lastId = notifications.length > 0 ? notifications[notifications.length - 1].notificationId : undefined
+      const response = await notificationsService.getNotifications(20, lastId)
+      setNotifications(response.notifications)
     } catch (error) {
       console.error('Failed to load notifications:', error)
     } finally {
       setLoading(false)
     }
   }
-
-  useEffect(() => {
-    if (initialNotifications.length === 0) {
-      loadNotifications()
-    }
-  }, [])
 
   const handleMarkAsRead = async (notificationId: number) => {
     const success = await notificationsService.markAsRead(notificationId)
@@ -48,6 +58,7 @@ export function NotificationsClient({ initialNotifications = [], initialLimit = 
           notif.notificationId === notificationId ? { ...notif, isRead: 1 } : notif
         )
       )
+      setUnreadCount((prev) => Math.max(0, prev - 1))
     }
   }
 
@@ -55,55 +66,53 @@ export function NotificationsClient({ initialNotifications = [], initialLimit = 
     const success = await notificationsService.markAllAsRead()
     if (success) {
       setNotifications((prev) => prev.map((notif) => ({ ...notif, isRead: 1 })))
+      setUnreadCount(0)
     }
   }
 
-  const handleLoadMore = () => {
-    loadNotifications()
-  }
-
-  const unreadCount = notifications.filter((n) => n.isRead === 0).length
-
   return (
-    <div className={styles.notificationsContainer}>
-      <div className={styles.notificationsHeader}>
-        <h2 className={styles.notificationsTitle}>Notifications</h2>
+    <div className={styles.notificationDropdown} ref={dropdownRef}>
+      <button
+        className={styles.notificationBtn}
+        onClick={() => setIsOpen(!isOpen)}
+        aria-label="Notifications"
+      >
+        <BellIcon />
         {unreadCount > 0 && (
-          <button className={styles.markAllReadBtn} onClick={handleMarkAllAsRead}>
-            Mark all as read
-          </button>
+          <span className={styles.badge}>{unreadCount > 9 ? '9+' : unreadCount}</span>
         )}
-      </div>
+      </button>
 
-      <div className={styles.notificationsList}>
-        {loading && notifications.length === 0 ? (
-          <div className={styles.loadingState}>Loading notifications...</div>
-        ) : notifications.length === 0 ? (
-          <div className={styles.emptyState}>
-            <span className={styles.emptyIcon}>🔔</span>
-            <p>No notifications yet</p>
-          </div>
-        ) : (
-          <>
-            {notifications.map((notification) => (
-              <NotificationItem
-                key={notification.notificationId}
-                notification={notification}
-                onMarkAsRead={handleMarkAsRead}
-              />
-            ))}
-            {hasMore && (
-              <button
-                className={styles.loadMoreBtn}
-                onClick={handleLoadMore}
-                disabled={loading}
-              >
-                {loading ? 'Loading...' : 'Load more'}
+      {isOpen && (
+        <div className={styles.dropdownPanel}>
+          <div className={styles.dropdownHeader}>
+            <h3>Notifications</h3>
+            {unreadCount > 0 && (
+              <button onClick={handleMarkAllAsRead} className={styles.markAllBtn}>
+                Mark all as read
               </button>
             )}
-          </>
-        )}
-      </div>
+          </div>
+
+          <div className={styles.dropdownBody}>
+            {loading ? (
+              <div className={styles.loading}>Loading...</div>
+            ) : notifications?.length === 0 ? (
+              <div className={styles.empty}>
+                <p>No notifications</p>
+              </div>
+            ) : (
+              notifications?.map((notification) => (
+                <FollowNotification
+                  key={notification.notificationId}
+                  notification={notification}
+                  onMarkAsRead={handleMarkAsRead}
+                />
+              ))
+            )}
+          </div>
+        </div>
+      )}
     </div>
   )
 }

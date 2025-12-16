@@ -1,5 +1,3 @@
 export { notificationsService } from './notificationsService'
-export { NotificationsClient } from './notifications.client'
-export { NotificationsServer } from './notifications.server'
-export { default as Notifications } from './notifications.server'
+export { NotificationsDropdown } from './notifications.client'
 export * from './types'

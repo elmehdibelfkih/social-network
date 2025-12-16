@@ -1,7 +1,5 @@
 package notifications
 
-import "database/sql"
-
 const (
 	MAX_NUM_OF_NOTIFICATIONS = 20
 )
@@ -17,15 +15,15 @@ var validTypes = map[string]bool{
 }
 
 type Notification struct {
-	ID            int64          `json:"notificationId" db:"id"`
-	UserID        int64          `json:"-" db:"user_id"`
-	Type          string         `json:"type" db:"type"`
-	ReferenceType string         `json:"referenceType" db:"reference_type"`
-	ReferenceID   sql.NullInt64  `json:"referenceId" db:"reference_id"`
-	Content       sql.NullString `json:"content" db:"content"`
-	IsRead        int            `json:"isRead" db:"is_read"`
-	CreatedAt     string         `json:"createdAt" db:"created_at"`
-	ReadAt        sql.NullString `json:"readAt" db:"read_at"`
+	ID            int64   `json:"notificationId" db:"id"`
+	UserID        int64   `json:"-" db:"user_id"`
+	Type          string  `json:"type" db:"type"`
+	ReferenceType string  `json:"referenceType" db:"reference_type"`
+	ReferenceID   *int64  `json:"referenceId" db:"reference_id"`
+	Content       *string `json:"content" db:"content"`
+	IsRead        int     `json:"isRead" db:"is_read"`
+	CreatedAt     string  `json:"createdAt" db:"created_at"`
+	ReadAt        *string `json:"readAt" db:"read_at"`
 }
 
 type NotificationsResponse struct {

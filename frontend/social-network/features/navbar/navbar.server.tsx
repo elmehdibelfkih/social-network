@@ -1,6 +1,7 @@
 import { SocialIcon } from '@/components/ui/icons';
-import NavbarCenter, { NavProfile, NotificationClient } from './navbar.client';
+import NavbarCenter, { NavProfile } from './navbar.client';
 import styles from './styles.module.css';
+import { NotificationsDropdown } from '../notifications';
 
 export function Navbar() {
   return (
@@ -8,7 +9,7 @@ export function Navbar() {
       <div className={styles.navbarLeft}>
         <a href="/" aria-label="Go to homepage" className={styles.logoLink}>
           <div className={styles.logoIcon}>
-            <SocialIcon/>
+            <SocialIcon />
           </div>
           <span className={styles.brandText}>Social Network</span>
         </a>
@@ -18,4 +19,12 @@ export function Navbar() {
       <NavProfile />
     </nav>
   );
+}
+
+export function NotificationClient() {
+  return (
+    <div className={styles.navbarRight}>
+      <NotificationsDropdown />
+    </div>
+  )
 }

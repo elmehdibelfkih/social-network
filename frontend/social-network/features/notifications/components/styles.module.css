@@ -1,0 +1,147 @@
+.notifContainer {
+    display: flex;
+    gap: 12px;
+    padding: 16px;
+    border-bottom: 1px solid #e5e7eb;
+    transition: background-color 0.2s;
+    cursor: pointer;
+}
+
+.notifContainer:hover {
+    background-color: #f9fafb;
+}
+
+.notifContainer:last-child {
+    border-bottom: none;
+}
+
+.avatar {
+    display: flex;
+    align-self: center;
+}
+
+.avatarSection {
+    flex-shrink: 0;
+}
+
+.contentSection {
+    flex: 1;
+    min-width: 0;
+}
+
+.contentContainer {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 4px;
+}
+
+.contentContainer p {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.5;
+    color: #1f2937;
+    flex: 1;
+}
+
+.contentContainer span {
+    color: #1f2937;
+}
+
+.contentContainer strong {
+    font-weight: 600;
+    color: #1f2937;
+}
+
+.unreadDot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #8a63d2;
+    flex-shrink: 0;
+    margin-top: 6px;
+}
+
+.timeAgo {
+    font-size: 13px;
+    color: #6b7280;
+    margin: 0 0 8px 0;
+}
+
+.actionButtons {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.acceptButton,
+.declineButton {
+    padding: 6px 16px;
+    border: none;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.acceptButton {
+    background: #8a63d2;
+    color: white;
+}
+
+.acceptButton:hover {
+    background: #7952c4;
+}
+
+.acceptButton:disabled {
+    background: #d1d5db;
+    cursor: not-allowed;
+}
+
+.declineButton {
+    background: #f3f4f6;
+    color: #6b7280;
+}
+
+.declineButton:hover {
+    background: #e5e7eb;
+    color: #374151;
+}
+
+.declineButton:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.loadingContainer {
+    padding: 16px;
+    text-align: center;
+    color: #6b7280;
+    font-size: 14px;
+}
+
+.notifContainer.read {
+    opacity: 0.7;
+}
+
+.notifContainer.unread {
+    background-color: #f9fafb;
+}
+
+.notifContainer.unread:hover {
+    background-color: #f3f4f6;
+}
+
+.referenceLink {
+    color: #8a63d2;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s;
+}
+
+.referenceLink:hover {
+    color: #7952c4;
+    text-decoration: underline;
+}
