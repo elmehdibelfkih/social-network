@@ -6,26 +6,6 @@
 
 
 
-// export interface Session {
-//     sessionId: number;
-//     sessionToken?: string;
-//     ipAddress: string;
-//     device: string;
-//     createdAt: string;
-//     expiresAt: string;
-//     current?: boolean;
-// }
-
-// export interface AuthResponse {
-//     userId: number;
-//     email: string;
-//     firstName: string;
-//     lastName: string;
-//     dateOfBirth: string;
-//     nickname: string | null;
-//     aboutMe: string | null;
-//     avatarId: number | null;
-// }
 
 // export interface UserProfile {
 //     userId: number;
@@ -88,13 +68,6 @@
 //     Purpose: 'avatar' | 'post' | 'message' | 'comment';
 // }
 
-// export interface MediaUploadResponse {
-//     message: string;
-//     mediaId: number;
-//     mediaPath: string;
-//     fileType: string;
-//     uploadedAt: string;
-// }
 
 // export interface Group {
 //     groupId: number;
@@ -181,8 +154,16 @@
 
 export type PrivacyLevel = 'public' | 'followers' | 'private' | 'group' | 'restricted';
 export type FollowStatus =  'follow' | 'accepted' | 'pending' | 'declined' | null;
+
 export type MediaResponse = { mediaEncoded?: string }
 
+export interface MediaUploadResponse {
+    message: string;
+    mediaId: number;
+    mediaPath: string;
+    fileType: string;
+    uploadedAt: string;
+}
 export interface UserId {
   Id: number;
 }
@@ -291,3 +272,4 @@ export interface Follower {
   Stats: Stats;
   joinedAt: string | null;
 }
+
