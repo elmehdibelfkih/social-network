@@ -42,6 +42,15 @@ const (
 		SELECT id, chat_id, sender_id, content, seen_status, created_at, updated_at FROM messages WHERE chat_id = ? AND sender_id <> ? AND seen_status = ?
 	`
 
+	// insert
+	UPSERT_NOTIFICATION = `
+	INSERT INTO notifications (id, user_id, type, reference_type, reference_id, content, status, is_read, created_at, read_at)
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+	ON CONFLICT (id)
+	DO UPDATE SET status = excluded.status
+	RETURNING id, user_id, type, reference_type, reference_id, content, status, is_read, created_at, read_at;
+	`
+
 	// update
 	UPDATE_MESSAGE_STATUS = `
 		UPDATE messages SET seen_status = ? WHERE chat_id = ? AND sender_id <> ? AND seen_status = 'sent'

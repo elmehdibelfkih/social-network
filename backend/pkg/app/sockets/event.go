@@ -56,6 +56,7 @@ type Notification struct {
 	RefrenceId     int64  `json:"refrenceId"`
 	RefrenceType   int64  `json:"refrenceType"`
 	Content        string `json:"content"`
+	Status         string `json:"status"`
 	IsRead         string `json:"isRead"`
 	CreatedAt      string `json:"createdAt"`
 	ReadAt         string `json:"readAt"`

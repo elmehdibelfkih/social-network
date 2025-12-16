@@ -125,3 +125,29 @@ func (h *Hub) BroadcastToChat(userId, chatId int64, event Event) {
 		}
 	}
 }
+
+func (h *Hub) Notify(n Notification) {
+	h.mu.Lock()
+	defer h.mu.Unlock()
+
+	for _, c := range h.clients[n.UserId] {
+		c.events <- Event{
+			Source: "server",
+			Type:   "notification",
+			Payload: &ClientMessage{
+				Notification: &Notification{
+					NotificationId: n.NotificationId,
+					UserId:         n.UserId,
+					Type:           n.Type,
+					RefrenceId:     n.RefrenceId,
+					RefrenceType:   n.RefrenceType,
+					Content:        n.Content,
+					Status:         n.Status,
+					IsRead:         n.IsRead,
+					CreatedAt:      n.CreatedAt,
+					ReadAt:         n.ReadAt,
+				},
+			},
+		}
+	}
+}

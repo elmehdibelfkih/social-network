@@ -9,7 +9,6 @@ import (
 )
 
 // read
-
 func SelectUserChats(c *Client) error {
 	return database.WrapWithTransaction(func(tx *sql.Tx) error {
 		rows, err := tx.Query(
@@ -29,7 +28,7 @@ func SelectUserChats(c *Client) error {
 				utils.SQLiteErrorTarget(err, SELECT_USER_CHATS)
 				return err
 			}
-			fmt.Println("chatId",chatId)
+			fmt.Println("chatId", chatId)
 			c.userChats[chatId] = struct{}{}
 		}
 		return nil
@@ -175,4 +174,44 @@ func UpdateMessagesStatus(chatId, senderId int64, status string) error {
 		}
 		return nil
 	})
+}
+
+func InsertNotification(n Notification) error {
+	err := database.WrapWithTransaction(func(tx *sql.Tx) error {
+		err := tx.QueryRow(UPSERT_NOTIFICATION,
+			n.NotificationId,
+			n.UserId,
+			n.Type,
+			n.RefrenceType,
+			n.RefrenceId,
+			n.Content,
+			n.Status,
+			n.IsRead,
+			n.CreatedAt,
+			n.ReadAt,
+		).Scan(
+			&n.NotificationId,
+			&n.UserId,
+			&n.Type,
+			&n.RefrenceType,
+			&n.RefrenceId,
+			&n.Content,
+			&n.Status,
+			&n.IsRead,
+			&n.CreatedAt,
+			&n.ReadAt,
+		)
+		if err != nil {
+			utils.SQLiteErrorTarget(err, UPSERT_NOTIFICATION)
+			return err
+		}
+		return err
+	})
+	if err != nil {
+		utils.SQLiteErrorTarget(err, UPSERT_NOTIFICATION)
+		return err
+	}
+
+	WSManger.Notify(n)
+	return nil
 }
