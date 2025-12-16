@@ -12,8 +12,19 @@ export function Feed({ initialPosts }: { initialPosts: Post[] }) {
   const [loading, setLoading] = useState(false)
   const [hasMore, setHasMore] = useState(true)
   const debouncedLoading = useDebounce(loading, 300)
-  const throttleTimeoutRef = useRef<NodeJS.Timeout | null>(null)
-  const isLoadingRef = useRef(false)
+  
+  const observer = useRef<IntersectionObserver>()
+
+  const lastPostElementRef = useCallback(node => {
+    if (loading) return
+    if (observer.current) observer.current.disconnect()
+    observer.current = new IntersectionObserver(entries => {
+      if (entries[0].isIntersecting && hasMore) {
+        loadMorePosts()
+      }
+    })
+    if (node) observer.current.observe(node)
+  }, [loading, hasMore])
 
   useEffect(() => {
     const handleNewPost = (event: CustomEvent) => {
@@ -53,12 +64,8 @@ export function Feed({ initialPosts }: { initialPosts: Post[] }) {
     }
   }, [])
 
-  useEffect(() => {
-    isLoadingRef.current = loading
-  }, [loading])
-
   const loadMorePosts = useCallback(async () => {
-    if (isLoadingRef.current || !hasMore) return
+    if (loading || !hasMore) return
 
     setLoading(true)
     try {
@@ -78,38 +85,20 @@ export function Feed({ initialPosts }: { initialPosts: Post[] }) {
     } finally {
       setLoading(false)
     }
-  }, [hasMore, page])
-
-  useEffect(() => {
-    const handleScroll = () => {
-      if (throttleTimeoutRef.current) return
-
-      throttleTimeoutRef.current = setTimeout(() => {
-        const { scrollTop, scrollHeight, clientHeight } = document.documentElement
-        if (scrollTop + clientHeight >= scrollHeight - 1000 && hasMore && !isLoadingRef.current) {
-          loadMorePosts()
-        }
-        throttleTimeoutRef.current = null
-      }, 200)
-    }
-
-    window.addEventListener('scroll', handleScroll)
-    return () => {
-      window.removeEventListener('scroll', handleScroll)
-      if (throttleTimeoutRef.current) {
-        clearTimeout(throttleTimeoutRef.current)
-      }
-    }
-  }, [loadMorePosts, hasMore])
+  }, [loading, hasMore, page])
 
   return (
     <div>
       {posts.length === 0 ? (
         <p>No posts yet. Be the first to create one!</p>
       ) : (
-        posts.map((post, index) => (
-          <PostCard key={`${post.postId}-${index}`} post={post} />
-        ))
+        posts.map((post, index) => {
+          if (posts.length === index + 1) {
+            return <div ref={lastPostElementRef} key={post.postId}><PostCard post={post} /></div>
+          } else {
+            return <PostCard key={post.postId} post={post} />
+          }
+        })
       )}
       {debouncedLoading && (
         <div style={{ textAlign: 'center', padding: '20px', color: '#6b7280' }}>
