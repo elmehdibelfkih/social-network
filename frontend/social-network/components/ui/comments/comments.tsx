@@ -49,6 +49,8 @@ function CommentImage({ mediaId }: { mediaId: number }) {
   );
 }
 
+const COMMENT_PREVIEW_LENGTH = 200;
+
 interface Comment {
   commentId: number;
   authorId: number;
@@ -100,6 +102,8 @@ export function Comments({
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
+
+  const [expandedComments, setExpandedComments] = useState<Set<number>>(new Set());
 
   /* -------------------- FETCH COMMENTS -------------------- */
 
@@ -208,6 +212,20 @@ export function Comments({
         document.removeEventListener('mousedown', handleClickOutside);
       };
     }, []);
+
+  /* -------------------- TOGGLE COMMENT EXPANSION -------------------- */
+
+  const toggleCommentExpansion = (commentId: number) => {
+    setExpandedComments(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(commentId)) {
+        newSet.delete(commentId);
+      } else {
+        newSet.add(commentId);
+      }
+      return newSet;
+    });
+  };
 
   /* -------------------- LIKE COMMENT -------------------- */
 
@@ -365,6 +383,8 @@ export function Comments({
           {comments.map(comment => {
             const isLiked = comment.isLikedByUser === true;
             const isAuthor = user?.userId === String(comment.authorId);
+            const isExpanded = expandedComments.has(comment.commentId);
+            const isLongContent = comment.content.length > COMMENT_PREVIEW_LENGTH;
 
             return (
               <div key={comment.commentId} className={styles.comment}>
@@ -389,7 +409,21 @@ export function Comments({
                     </span>
                   </div>
 
-                  <p className={styles.commentText}>{comment.content}</p>
+                  <div className={styles.commentTextContainer}>
+                    <p className={styles.commentText}>
+                      {isLongContent && !isExpanded
+                        ? `${comment.content.substring(0, COMMENT_PREVIEW_LENGTH)}...`
+                        : comment.content}
+                    </p>
+                    {isLongContent && (
+                      <button
+                        className={styles.readMoreButton}
+                        onClick={() => toggleCommentExpansion(comment.commentId)}
+                      >
+                        {isExpanded ? 'Show less' : 'Read more'}
+                      </button>
+                    )}
+                  </div>
 
                   {comment.mediaIds && comment.mediaIds.length > 0 && (
                     <div className={styles.commentMedia}>

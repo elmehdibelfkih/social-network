@@ -136,12 +136,33 @@
     font-weight: 500;
   }
 
+  .commentTextContainer {
+    margin-bottom: var(--spacing-sm);
+  }
+
   .commentText {
-    margin: 0 0 var(--spacing-sm) 0;
+    margin: 0 0 var(--spacing-xs) 0;
     font-size: 15px;
     line-height: 1.5;
     color: var(--gray-700);
     word-wrap: break-word;
+    white-space: pre-wrap;
+  }
+
+  .readMoreButton {
+    background: none;
+    border: none;
+    color: var(--primary-purple);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 4px 0;
+    transition: all var(--transition-base) ease;
+  }
+
+  .readMoreButton:hover {
+    color: var(--primary-purple-light);
+    text-decoration: underline;
   }
   
   .commentActions {
