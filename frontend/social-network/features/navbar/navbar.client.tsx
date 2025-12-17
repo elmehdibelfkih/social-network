@@ -9,7 +9,6 @@ import { http } from '@/libs/apiFetch';
 import { useAuth } from '@/providers/authProvider';
 import { ShowSnackbar } from '@/components/ui/snackbar/snackbar';
 import { useUserStats } from '@/providers/userStatsContext';
-import { NotificationsDropdown } from '../notifications';
 
 export function NavProfile() {
   const router = useRouter();

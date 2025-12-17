@@ -2,27 +2,31 @@
 
 import { useState, useEffect, useRef } from 'react'
 import styles from './styles.module.css'
-import { notificationsService } from './notificationsService'
-import { Notification } from './types'
-import { FollowNotification } from './components/notification-item.client'
+import {
+  FollowNotification,
+  GroupInviteNotification,
+  EventNotification,
+  PostLikedNotification,
+  PostCommentedNotification,
+  CustomNotification,
+} from './components/notification-item.client'
 import { BellIcon } from '@/components/ui/icons'
+import { useNotifications } from '@/providers/notifsProvider'
 
 export function NotificationsDropdown() {
   const [isOpen, setIsOpen] = useState(false)
-  const [notifications, setNotifications] = useState<Notification[]>([])
-  const [unreadCount, setUnreadCount] = useState(0)
-  const [loading, setLoading] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
+  const scrollContainerRef = useRef<HTMLDivElement>(null)
 
-  useEffect(() => {
-    notificationsService.getUnreadCount().then(setUnreadCount)
-  }, [])
-
-  useEffect(() => {
-    if (isOpen && notifications?.length === 0) {
-      loadNotifications()
-    }
-  }, [isOpen])
+  const {
+    notifications,
+    unreadCount,
+    loading,
+    hasMore,
+    loadMore,
+    markAsRead,
+    markAllAsRead,
+  } = useNotifications()
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -37,38 +41,31 @@ export function NotificationsDropdown() {
     }
   }, [isOpen])
 
-  const loadNotifications = async () => {
-    setLoading(true)
-    try {
-      const lastId = notifications.length > 0 ? notifications[notifications.length - 1].notificationId : undefined
-      const response = await notificationsService.getNotifications(20, lastId)
-      setNotifications(response.notifications)
-    } catch (error) {
-      console.error('Failed to load notifications:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
+  useEffect(() => {
+    const scrollContainer = scrollContainerRef.current
+    if (!scrollContainer || !isOpen) return
 
-  const handleMarkAsRead = async (notificationId: number) => {
-    const success = await notificationsService.markAsRead(notificationId)
-    if (success) {
-      setNotifications((prev) =>
-        prev.map((notif) =>
-          notif.notificationId === notificationId ? { ...notif, isRead: 1 } : notif
-        )
-      )
-      setUnreadCount((prev) => Math.max(0, prev - 1))
-    }
-  }
+    let isThrottled = false
 
-  const handleMarkAllAsRead = async () => {
-    const success = await notificationsService.markAllAsRead()
-    if (success) {
-      setNotifications((prev) => prev.map((notif) => ({ ...notif, isRead: 1 })))
-      setUnreadCount(0)
+    const handleScroll = () => {
+      if (isThrottled || loading || !hasMore) return
+
+      const { scrollTop, scrollHeight, clientHeight } = scrollContainer
+      const scrollPercentage = (scrollTop + clientHeight) / scrollHeight
+
+      if (scrollPercentage > 0.8) {
+        isThrottled = true
+        loadMore()
+
+        setTimeout(() => {
+          isThrottled = false
+        }, 1000)
+      }
     }
-  }
+
+    scrollContainer.addEventListener('scroll', handleScroll)
+    return () => scrollContainer.removeEventListener('scroll', handleScroll)
+  }, [isOpen, loading, hasMore, loadMore])
 
   return (
     <div className={styles.notificationDropdown} ref={dropdownRef}>
@@ -79,7 +76,7 @@ export function NotificationsDropdown() {
       >
         <BellIcon />
         {unreadCount > 0 && (
-          <span className={styles.badge}>{unreadCount > 9 ? '9+' : unreadCount}</span>
+          <span className={styles.badge}>{unreadCount > 99 ? '99+' : unreadCount}</span>
         )}
       </button>
 
@@ -88,27 +85,50 @@ export function NotificationsDropdown() {
           <div className={styles.dropdownHeader}>
             <h3>Notifications</h3>
             {unreadCount > 0 && (
-              <button onClick={handleMarkAllAsRead} className={styles.markAllBtn}>
+              <button onClick={markAllAsRead} className={styles.markAllBtn}>
                 Mark all as read
               </button>
             )}
           </div>
 
-          <div className={styles.dropdownBody}>
-            {loading ? (
+          <div className={styles.dropdownBody} ref={scrollContainerRef}>
+            {loading && notifications.length === 0 ? (
               <div className={styles.loading}>Loading...</div>
-            ) : notifications?.length === 0 ? (
+            ) : notifications.length === 0 ? (
               <div className={styles.empty}>
                 <p>No notifications</p>
               </div>
             ) : (
-              notifications?.map((notification) => (
-                <FollowNotification
-                  key={notification.notificationId}
-                  notification={notification}
-                  onMarkAsRead={handleMarkAsRead}
-                />
-              ))
+              <>
+                {notifications.map((notification) => {
+                  const props = {
+                    notification,
+                    onMarkAsRead: markAsRead,
+                  }
+
+                  switch (notification.type) {
+                    case 'follow_request':
+                      return <FollowNotification key={notification.notificationId} {...props} />
+                    case 'group_invite':
+                    case 'group_join':
+                      return <GroupInviteNotification key={notification.notificationId} {...props} />
+                    case 'event_created':
+                      return <EventNotification key={notification.notificationId} {...props} />
+                    case 'post_liked':
+                      return <PostLikedNotification key={notification.notificationId} {...props} />
+                    case 'post_commented':
+                      return <PostCommentedNotification key={notification.notificationId} {...props} />
+                    case 'custom':
+                      return <CustomNotification key={notification.notificationId} {...props} />
+                    default:
+                      return <CustomNotification key={notification.notificationId} {...props} />
+                  }
+                })}
+
+                {loading && notifications.length > 0 && (
+                  <div className={styles.loadingMore}>Loading more...</div>
+                )}
+              </>
             )}
           </div>
         </div>

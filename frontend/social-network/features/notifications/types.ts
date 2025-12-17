@@ -26,6 +26,31 @@ export type Notification = {
     readAt?: string
 }
 
+export type GroupType = {
+    groupId: number
+    creatorId: number
+    title: string
+    description: string
+    memberCount: number
+    avatarId: number
+    status: string
+    chatId: number
+    createdAt: string
+    updatedAt: string
+}
+
+export type EventType = {
+    eventId: number
+    groupId: number
+    title: string
+    description: string
+    startAt: string
+    endAt: string
+    location: string
+    createdBy: number
+    createdAt: string
+}
+
 export type NotificationsResponse = {
     limit: number
     notifications: Notification[]
