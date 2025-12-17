@@ -71,7 +71,21 @@ export function UpdatePost({ postId, initialContent, initialPrivacy, initialMedi
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || [])
+    const totalPhotos = mediaIds.length + selectedFiles.length + files.length
+
+    if (totalPhotos > 10) {
+      const remaining = 10 - (mediaIds.length + selectedFiles.length)
+      if (remaining > 0) {
+        setSelectedFiles(prev => [...prev, ...files.slice(0, remaining)])
+        alert(`Maximum 10 photos allowed. Added ${remaining} photo(s).`)
+      } else {
+        alert('Maximum 10 photos allowed.')
+      }
+      return
+    }
+
     setSelectedFiles(prev => [...prev, ...files])
+    if (e.target) e.target.value = ''
   }
 
   const removeFile = (index: number) => {
@@ -184,8 +198,12 @@ export function UpdatePost({ postId, initialContent, initialPrivacy, initialMedi
               type="button"
               className={styles.uploadBtn}
               onClick={() => fileInputRef.current?.click()}
+              disabled={mediaIds.length + selectedFiles.length >= 10}
             >
-              <ImageIcon /> Add Photos
+              <ImageIcon />
+              {mediaIds.length + selectedFiles.length > 0
+                ? `${mediaIds.length + selectedFiles.length}/10 Photos`
+                : 'Add Photos'}
             </button>
             <input
               ref={fileInputRef}
@@ -195,53 +213,53 @@ export function UpdatePost({ postId, initialContent, initialPrivacy, initialMedi
               hidden
               onChange={handleFileSelect}
             />
-          </div>
 
-          <div className={styles.privacyContainer}>
-            <button
-              type="button"
-              className={styles.privacyButton}
-              onClick={() => setShowPrivacyDropdown(!showPrivacyDropdown)}
-            >
-              {getPrivacyIcon(privacyOptions.find(p => p.value === privacy)?.icon || '')}
-              {privacyOptions.find(p => p.value === privacy)?.label}
-              <DropdownIcon />
-            </button>
-
-            {showPrivacyDropdown && (
-              <div
-                className={styles.dropdownBackdrop}
-                onClick={() => setShowPrivacyDropdown(false)}
+            <div className={styles.privacyContainer}>
+              <button
+                type="button"
+                className={styles.privacyButton}
+                onClick={() => setShowPrivacyDropdown(!showPrivacyDropdown)}
               >
-                <div className={styles.privacyDropdown} onClick={(e) => e.stopPropagation()}>
-                  {privacyOptions.map(opt => (
-                    <button
-                      key={opt.value}
-                      type="button"
-                      className={`${styles.privacyOption} ${privacy === opt.value ? styles.active : ''}`}
-                      onClick={() => {
-                        setPrivacy(opt.value)
-                        setShowPrivacyDropdown(false)
-                        if (opt.value === 'restricted') setShowAddFriends(true)
-                      }}
-                    >
-                      <div className={styles.privacyOptionIcon}>
-                        {getPrivacyIcon(opt.icon)}
-                      </div>
+                {getPrivacyIcon(privacyOptions.find(p => p.value === privacy)?.icon || '')}
+                {privacyOptions.find(p => p.value === privacy)?.label}
+                <DropdownIcon />
+              </button>
 
-                      <div className={styles.privacyOptionContent}>
-                        <div className={styles.privacyOptionLabel}>{opt.label}</div>
-                        <div className={styles.privacyOptionDesc}>{opt.description}</div>
-                      </div>
+              {showPrivacyDropdown && (
+                <div
+                  className={styles.dropdownBackdrop}
+                  onClick={() => setShowPrivacyDropdown(false)}
+                >
+                  <div className={styles.privacyDropdown} onClick={(e) => e.stopPropagation()}>
+                    {privacyOptions.map(opt => (
+                      <button
+                        key={opt.value}
+                        type="button"
+                        className={`${styles.privacyOption} ${privacy === opt.value ? styles.active : ''}`}
+                        onClick={() => {
+                          setPrivacy(opt.value)
+                          setShowPrivacyDropdown(false)
+                          if (opt.value === 'restricted') setShowAddFriends(true)
+                        }}
+                      >
+                        <div className={styles.privacyOptionIcon}>
+                          {getPrivacyIcon(opt.icon)}
+                        </div>
 
-                      {privacy === opt.value && (
-                        <div className={styles.privacyOptionCheck}>✓</div>
-                      )}
-                    </button>
-                  ))}
+                        <div className={styles.privacyOptionContent}>
+                          <div className={styles.privacyOptionLabel}>{opt.label}</div>
+                          <div className={styles.privacyOptionDesc}>{opt.description}</div>
+                        </div>
+
+                        {privacy === opt.value && (
+                          <div className={styles.privacyOptionCheck}>✓</div>
+                        )}
+                      </button>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
+            </div>
           </div>
 
           {showAddFriends && (
