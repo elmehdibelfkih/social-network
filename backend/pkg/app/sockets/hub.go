@@ -116,10 +116,7 @@ func (h *Hub) BroadcastToChat(userId, chatId int64, event Event) {
 	h.mu.Lock()
 	defer h.mu.Unlock()
 
-	for id, clients := range h.chatUsers[chatId] {
-		if id == userId {
-			continue
-		}
+	for _, clients := range h.chatUsers[chatId] {
 		for _, c := range clients {
 			c.events <- event
 		}

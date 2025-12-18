@@ -15,8 +15,9 @@ class WebSocketManger {
         this.ws = new WebSocket(this.url);
 
         this.ws.onopen = () => {
-            // console.log("ws connection opened")
+            console.log("ws connection opened")
             this.#burstQueue();
+            clearInterval(this.reconnectTimer)
             this.reconnectTimer = null;
         }
         this.ws.onmessage = (e) => {
@@ -24,12 +25,12 @@ class WebSocketManger {
             this.#broadcast(e.data)
         }
         this.ws.onerror = (err) => {
-            // console.log("ws error", err)
+            console.log("ws error", err)
             this.ws?.close()
         }
         this.ws.onclose = () => {
             console.log("closing websocket")
-            this.#broadcast(JSON.parse({ source: "shared_worker", type: "websocket_close" }))
+            this.#broadcast(JSON.stringify({ source: "shared_worker", type: "websocket_close", payload: null }))
             this.ws = null;
             this.#tryReconnect();
         }
@@ -50,9 +51,10 @@ class WebSocketManger {
 
     #tryReconnect() {
         if (this.reconnectTimer) return // we are already trying o reconnect 
-        this.reconnectTimer = setTimeout(() => {
+        console.log("reconnecting to ws...")
+        this.reconnectTimer = setInterval(() => {
             this.#initWebsocket()
-            if (this.ws && this.ws.readyState == WebSocket.OPEN) this.#sendOrQueue(JSON.stringify({ source: "shared_worker", type: "reconnect" }))
+            if (this.ws && this.ws.readyState == WebSocket.OPEN) this.#sendOrQueue({ source: "shared_worker", type: "reconnect" })
         }, this.reconnectDelay)
     }
 
@@ -72,6 +74,8 @@ class WebSocketManger {
 
     #attachPortHandlers(port) {
         port.onmessage = (e) => {
+            console.log("init", e.data)
+            console.log("ws:", this.ws)
             if (e.data.type === "init_ws") {
                 this.#initWebsocket();
                 return;
@@ -84,6 +88,7 @@ class WebSocketManger {
     #sendOrQueue(data) {
         if (!this.ws || this.ws.readyState !== WebSocket.OPEN) {
             this.messagesQueue.push(JSON.stringify(data))
+            console.log(this.messagesQueue)
             return
         }
         this.ws.send(JSON.stringify(data))

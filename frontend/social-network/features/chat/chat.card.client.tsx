@@ -3,6 +3,7 @@
 import React from "react";
 import styles from "./styles/chatcard.module.css";
 import { User } from "./types";
+import { ChatImage } from "./chat.avatar.client";
 
 export interface ChatContactProps {
   chatId: number;
@@ -18,11 +19,9 @@ export const ChatCard: React.FC<ChatContactProps> = ({
   return (
     <div
       className={`${styles.contactItem} ${user.online ? styles.online : styles.offline}`} onClick={() => onClick(chatId, user)} >
-      <img
-        // src={user.avatarId}
-        alt={`${user.firstName} ${user.lastName}`}
-        className={styles.avatar}
-      />
+      <div className={styles.avatar}>
+        <ChatImage mediaId={user.avatarId} />
+      </div>
 
       <div className={styles.info}>
         <div className={styles.name}>

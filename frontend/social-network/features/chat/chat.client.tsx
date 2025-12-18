@@ -72,6 +72,7 @@ export function ChatSection() {
             }
         })
 
+
         chatService.sendToWorker({ source: 'client', type: 'online_status', payload: null });
 
         return onUnMount;

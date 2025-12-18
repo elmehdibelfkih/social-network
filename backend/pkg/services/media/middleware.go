@@ -15,9 +15,8 @@ func MediaMiddleware(next http.HandlerFunc) http.HandlerFunc {
 			return
 		}
 
-		mediaID, err := getMediaID(r)
-		if err != nil {
-			utils.NotFoundError(w, "can't get the requested media")
+		mediaID := utils.GetWildCardValue(w, r, "media_id")
+		if mediaID == -1 {
 			return
 		}
 

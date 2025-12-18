@@ -87,8 +87,6 @@ export default function PostServer({ post }: { post: Post }) {
     commentCount: post.stats?.commentCount || 0
   })
   const isAuthor = mounted && user && Number(user.userId) === post.authorId
-
-  console.log(post);
   
 
   useEffect(() => setMounted(true), [])

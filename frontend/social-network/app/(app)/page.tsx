@@ -19,27 +19,12 @@ export default async function HomePage(): Promise<JSX.Element> {
 
   return (
     <>
-      <ProfileSummary/>
-      <div>
-        <NewPost data={res2} isMyprofile={false} />
-      </div>
-      <div>
-        {posts.length === 0 ? (
-          <p>
-            No posts yet. Be the first to create one!
-          </p>
-        ) : (
-          posts.map((post) => (
-            <PostServer key={post.postId} post={post} />
-          ))
-        )}
-      </div>
       <main className={styles.main}>
         <div className={styles.firstSection}>
-          <ProfileSummary userId={userId} />
+          <ProfileSummary/>
         </div>
         <div className={styles.secondSection}>
-          <NewPost data={res2} isMyprofile={false} />
+          <NewPost/>
           {posts.length === 0 ? (
             <p>
               No posts yet. Be the first to create one!

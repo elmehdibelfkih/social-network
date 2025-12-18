@@ -7,7 +7,6 @@ import { useUserStats } from '@/providers/userStatsContext';
 
 export default function ProfileSummary() {
   const { state: profile } = useUserStats();
-  console.log(profile);
 
   const name = displayName(profile)
   const handle = handleName(profile)

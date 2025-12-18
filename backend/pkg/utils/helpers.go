@@ -70,6 +70,7 @@ func GetWildCardValue(w http.ResponseWriter, r *http.Request, key string) int64 
 	if err != nil {
 		BackendErrorTarget(err, "UserContext")
 		NotFoundError(w, "not found")
+		return -1
 	}
 	return wildCard
 }
