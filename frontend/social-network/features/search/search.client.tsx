@@ -97,7 +97,6 @@ function SearchCard({ onSearched }: { onSearched: (results: types.User[] | types
           onChange={(e) => setSearchQuery(e.target.value)}
           maxLength={50}
           required
-          minLength={1}
         />
       </div>
       <div className={styles.buttonsContainer}>

@@ -34,8 +34,20 @@ export function NewPostClient() {
   useEffect(() => setIsMounted(true), []);
   if (!isMounted || !user) return null;
 
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) =>
-    setSelectedFiles(Array.from(e.target.files || []).slice(0, 10));
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    const MAX_SIZE = 10 * 1024 * 1024; // 10MB
+
+    const validFiles = files.filter(file => {
+      if (file.size > MAX_SIZE) {
+        alert(`File ${file.name} is too large. Maximum size is 10MB.`);
+        return false;
+      }
+      return true;
+    });
+
+    setSelectedFiles(validFiles.slice(0, 10));
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -107,7 +119,7 @@ export function NewPostClient() {
             placeholder="What's on your mind?"
             maxLength={500}
             required
-            minLength={1}
+            
           />
         </div>
 
@@ -260,7 +272,7 @@ export function TopPart() {
             placeholder="What's on your mind?"
             className={styles.textArea}
             required
-            minLength={1}
+            
             maxLength={500}
           />
         </div>

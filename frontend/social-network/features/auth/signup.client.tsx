@@ -54,6 +54,11 @@ export function RegisterForm({ onAuthSuccess }: { onAuthSuccess?: () => void }) 
         const avatar = e.target.files?.[0];
         if (!avatar) return;
 
+        if (avatar.size > 10 * 1024 * 1024) {
+            alert("Avatar is too large. Maximum size is 10MB.");
+            return;
+        }
+
         try {
             const avatarResp = await authService.uploadAvatar(avatar);
             const avatarId = avatarResp?.mediaId
@@ -81,7 +86,7 @@ export function RegisterForm({ onAuthSuccess }: { onAuthSuccess?: () => void }) 
                         onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
                         required
                         maxLength={50}
-                        minLength={1}
+                        
                     />
                 </div>
                 <div className={styles.inputGroup}>
@@ -94,7 +99,7 @@ export function RegisterForm({ onAuthSuccess }: { onAuthSuccess?: () => void }) 
                         onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
                         required
                         maxLength={50}
-                        minLength={1}
+                        
                     />
                 </div>
             </div>
@@ -109,7 +114,7 @@ export function RegisterForm({ onAuthSuccess }: { onAuthSuccess?: () => void }) 
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     required
                     maxLength={50}
-                    minLength={1}
+                    
                 />
             </div>
 
@@ -123,7 +128,7 @@ export function RegisterForm({ onAuthSuccess }: { onAuthSuccess?: () => void }) 
                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                     required
                     maxLength={50}
-                    minLength={1}
+                    
                 />
             </div>
 
@@ -147,7 +152,7 @@ export function RegisterForm({ onAuthSuccess }: { onAuthSuccess?: () => void }) 
                     className={styles.input}
                     onChange={(e) => setFormData({ ...formData, nickname: e.target.value })}
                     maxLength={50}
-                    minLength={1}
+                    
                 />
             </div>
 

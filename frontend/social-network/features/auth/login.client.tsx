@@ -63,7 +63,6 @@ export function LoginForm({ onAuthSuccess }: { onAuthSuccess?: () => void }) {
                     required
                     disabled={isLoading}
                     maxLength={50}
-                    minLength={1}
                 />
             </div>
 
@@ -79,7 +78,7 @@ export function LoginForm({ onAuthSuccess }: { onAuthSuccess?: () => void }) {
                     required
                     disabled={isLoading}
                     maxLength={50}
-                    minLength={1}
+                    
                 />
             </div>
 
