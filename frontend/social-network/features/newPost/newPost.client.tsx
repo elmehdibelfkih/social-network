@@ -19,7 +19,7 @@ export const privacyOptions = [
 
 export function NewPostClient() {
   const { user } = useAuth();
-  const { dispatch } = useUserStats();
+  const { state, dispatch } = useUserStats();
   const [content, setContent] = useState('');
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [privacy, setPrivacy] = useState<PrivacyLevel>('public');
@@ -89,13 +89,13 @@ export function NewPostClient() {
   return (
     <form onSubmit={handleSubmit} className={styles.form}>
       <div className={styles.leftPart}>
-        <AvatarHolder avatarId={user?.avatarId ?? null} size={60} />
+        <AvatarHolder avatarId={state.avatarId ?? user?.avatarId ?? null} size={60} />
       </div>
 
       <div className={styles.rightPart}>
         <div className={styles.userInfo}>
-          <div className={styles.miniHandle}>{user.firstName + ' ' + user.lastName}</div>
-          <h4 className={styles.miniName}>{'@' + user.nickname}</h4>
+          <div className={styles.miniHandle}>{(state.firstName || user.firstName) + ' ' + (state.lastName || user.lastName)}</div>
+          <h4 className={styles.miniName}>{'@' + (state.nickname || user.nickname)}</h4>
         </div>
 
         {/* Textarea */}
