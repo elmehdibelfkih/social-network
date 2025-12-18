@@ -17,3 +17,14 @@ export type  GroupMembersResponse = {
     group_id: number;
     members: GroupMember[];
 };
+
+export type Event = {
+  event_id: number;
+  title: string;
+  description: string;
+  startAt: string; // ISO string
+  endAt: string;   // ISO string
+  location: string;
+  created_by: number;
+  created_at: string;
+};

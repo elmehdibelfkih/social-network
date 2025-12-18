@@ -12,7 +12,6 @@ export default async function PostPage({ params }){
     const groups = await GroupService.getGroupMembers(groupId, 10, 0)
     return (
         <>
-
            <GroupMembersCard groups={groups}/>
         </>
     );
