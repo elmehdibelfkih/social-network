@@ -1,16 +1,11 @@
-export type RegisterRequest = {
-    email: string
-    password: string
-    firstName: string
-    lastName: string
-    dateOfBirth: string
-    nickname?: string
-    aboutme?: string
-    avatarId?: number
-}
 
-export type LoginRequest = {
-    identifier: string
-    password: string
-    rememberMe: boolean
+
+export interface UserProfile {
+  firstName: string;
+  lastName: string;
+  email: string;
+  about?: string;
+  location?: string;
+  birthday?: string;
+  profilePhotoUrl?: string;
 }

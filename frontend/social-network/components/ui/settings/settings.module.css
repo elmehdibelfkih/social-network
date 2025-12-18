@@ -1,0 +1,66 @@
+
+.settingsLayout {
+  display: flex;
+  min-height: 100vh;
+}
+
+.settingsSidebar {
+  font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+  width: 260px;
+  background-color: white;
+  border-right: 1px solid #e5e7eb;
+  padding: 20px;
+  margin-top: -20px;
+}
+
+.settingsHeader {
+  margin-bottom: 20px;
+}
+
+.settingsHeader h1 {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.settingsHeader p {
+  font-size: 15px;
+  color: #6b7280;
+  margin-top: -6px;
+
+}
+
+/* Navigation */
+.settingsNav ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.settingsNav a {
+  display: block;
+  padding: 15px 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+  text-decoration: none;
+
+}
+
+.settingsNav a:hover {
+  background-color: #e5d2f0;
+  color:#7c3aed
+}
+
+/* Active link */
+.active {
+  background-color: #f3e8ff;
+  color: #7c3aed;
+}
+
+/* Main content */
+.settingsContent {
+  flex: 1;
+  padding: 32px;
+  /* background-color: #ffffff; */
+}

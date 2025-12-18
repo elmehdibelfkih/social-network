@@ -1,3 +1,4 @@
+import { Settings } from '@/components/ui/settings/settingsPage';
 import { getUserId } from '@/libs/helpers';
 
 export default async function SettingsPage({ children }: { children: React.ReactNode }) {
@@ -6,6 +7,7 @@ export default async function SettingsPage({ children }: { children: React.React
   return (
     <>
       <h1 />
+      <Settings userId={userId} />
       {children}
     </>
   );
