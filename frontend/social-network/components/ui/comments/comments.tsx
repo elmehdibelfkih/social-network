@@ -517,6 +517,9 @@ export function Comments({
               placeholder="Write a comment..."
               className={styles.commentInput}
               disabled={loading}
+              maxLength={200}
+              required
+              minLength={1}
             />
             <button
               type="button"

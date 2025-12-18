@@ -160,6 +160,9 @@ export function UpdatePost({ postId, initialContent, initialPrivacy, initialMedi
             onChange={(e) => setContent(e.target.value)}
             placeholder="What's on your mind?"
             rows={6}
+            maxLength={500}
+            required
+            minLength={1}
           />
 
           {(mediaIds.length > 0 || selectedFiles.length > 0) && (

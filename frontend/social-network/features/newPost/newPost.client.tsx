@@ -64,7 +64,7 @@ export function NewPostClient() {
       setPrivacy('public');
       setSelectedFollowers([]);
       dispatch({ type: 'INCREMENT_POSTS' })
-      
+
       // Ensure all required fields are present
       const completePost = {
         ...newPost,
@@ -72,7 +72,7 @@ export function NewPostClient() {
         authorLastName: newPost.authorLastName || user.lastName,
         content: newPost.content || content.trim()
       }
-      
+
       // Dispatch custom event to update feed with complete post data
       window.dispatchEvent(new CustomEvent('newPost', { detail: completePost }))
     } finally {
@@ -105,6 +105,9 @@ export function NewPostClient() {
             value={content}
             onChange={(e) => setContent(e.target.value)}
             placeholder="What's on your mind?"
+            maxLength={500}
+            required
+            minLength={1}
           />
         </div>
 
@@ -258,6 +261,7 @@ export function TopPart() {
             className={styles.textArea}
             required
             minLength={1}
+            maxLength={500}
           />
         </div>
       </div >

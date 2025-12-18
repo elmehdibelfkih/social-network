@@ -62,6 +62,8 @@ export function LoginForm({ onAuthSuccess }: { onAuthSuccess?: () => void }) {
                     onChange={(e) => setFormData({ ...formData, identifier: e.target.value })}
                     required
                     disabled={isLoading}
+                    maxLength={50}
+                    minLength={1}
                 />
             </div>
 
@@ -76,6 +78,8 @@ export function LoginForm({ onAuthSuccess }: { onAuthSuccess?: () => void }) {
                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                     required
                     disabled={isLoading}
+                    maxLength={50}
+                    minLength={1}
                 />
             </div>
 
