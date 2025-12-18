@@ -51,6 +51,9 @@ func PasswordValidation(password string) (bool, string) {
 
 func FirstNameLastName(name string) (bool, string) {
 	n := strings.TrimSpace(name)
+	if len(n) < 1 || len(n) > 50 {
+		return false, n
+	}
 	return nameRegex.MatchString(n), n
 }
 

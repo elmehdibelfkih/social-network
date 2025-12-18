@@ -86,7 +86,7 @@ export function RegisterForm({ onAuthSuccess }: { onAuthSuccess?: () => void }) 
                         onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
                         required
                         maxLength={50}
-                        
+
                     />
                 </div>
                 <div className={styles.inputGroup}>
@@ -99,7 +99,7 @@ export function RegisterForm({ onAuthSuccess }: { onAuthSuccess?: () => void }) 
                         onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
                         required
                         maxLength={50}
-                        
+
                     />
                 </div>
             </div>
@@ -113,8 +113,9 @@ export function RegisterForm({ onAuthSuccess }: { onAuthSuccess?: () => void }) 
                     className={styles.input}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     required
-                    maxLength={50}
-                    
+                    maxLength={256}
+                    minLength={10}
+
                 />
             </div>
 
@@ -127,8 +128,9 @@ export function RegisterForm({ onAuthSuccess }: { onAuthSuccess?: () => void }) 
                     className={styles.input}
                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                     required
-                    maxLength={50}
-                    
+                    maxLength={16}
+                    minLength={8}
+
                 />
             </div>
 
@@ -152,7 +154,7 @@ export function RegisterForm({ onAuthSuccess }: { onAuthSuccess?: () => void }) 
                     className={styles.input}
                     onChange={(e) => setFormData({ ...formData, nickname: e.target.value })}
                     maxLength={50}
-                    
+
                 />
             </div>
 
@@ -163,7 +165,8 @@ export function RegisterForm({ onAuthSuccess }: { onAuthSuccess?: () => void }) 
                     placeholder="Tell us about yourself"
                     className={`${styles.input} ${styles.textarea}`}
                     rows={3}
-                    maxLength={500}
+                    maxLength={2048}
+                    minLength={5}
                     onChange={(e) => setFormData({ ...formData, aboutMe: e.target.value })}
                 ></textarea>
             </div>
