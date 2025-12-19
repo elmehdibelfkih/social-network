@@ -4,8 +4,8 @@ import type {
   RegisterRequest
 } from './types';
 
-import { Session, AuthResponse, MediaUploadResponse } from '@/libs/globalTypes';
-
+import { MediaUploadResponse } from '@/libs/globalTypes';
+import { Session, AuthResponse } from "./types";
 export const authService = {
   async register(data: RegisterRequest): Promise<AuthResponse> {
     return http.post<AuthResponse>('/api/v1/auth/register', data)

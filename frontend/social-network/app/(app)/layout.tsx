@@ -19,19 +19,29 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
     http.get<Counts>(`/api/v1/users/${userId}/stats`)
   ]);
 
-  if (!profileRes || !notificationsRes) {
+  if (!profileRes || !notificationsRes || !counts) {
     return null;
   }
-  const { stats: profileStats, ...profileRest } = profileRes;
-
   const stats: UserStatsState = {
-    ...profileStats,
-    ...profileRest,
+    userId: profileRes.userId,
+    nickname: profileRes.nickname,
+    firstName: profileRes.firstName,
+    lastName: profileRes.lastName,
+    avatarId: profileRes.avatarId,
+    aboutMe: profileRes.aboutMe,
+    dateOfBirth: profileRes.dateOfBirth,
+    privacy: profileRes.privacy,
+    joinedAt: profileRes.joinedAt,
+    email: profileRes.email, 
     unreadNotifications: notificationsRes.unreadNotifications,
-    ...counts
+    postsCount: counts.postsCount,
+    followersCount: counts.followersCount,
+    followingCount: counts.followingCount,
+    likesReceived: counts.likesReceived,
+    commentsReceived: counts.commentsReceived,
   };
 
-  // console.log("Initial User Stats:", stats);
+  console.log("stats :>", stats);
 
   return (
     <AppProviders>

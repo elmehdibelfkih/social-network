@@ -58,9 +58,9 @@ func GetUserProfile(w http.ResponseWriter, profileUserId, viewerUserId int64, co
 		return response, false
 	}
 
-	// Get chatId if users can chat (status is "accepted")
+	// Get chatId if users are different
 	var chatId *int64
-	if viewerUserId != profileUserId && followStatus != nil && *followStatus == "accepted" {
+	if viewerUserId != profileUserId {
 		chatId, err = SelectChatIdBetweenUsers(viewerUserId, profileUserId)
 		if err != nil {
 			utils.BackendErrorTarget(err, context)
@@ -71,11 +71,19 @@ func GetUserProfile(w http.ResponseWriter, profileUserId, viewerUserId int64, co
 
 	// Build response
 	response.UserId = profile.Id
-	if viewerUserId == profileUserId || followStatus == nil {
-		response.Status = nil
-	} else {
-		response.Status = followStatus
+	if viewerUserId != profileUserId {
+		if followStatus == nil {
+			status := "follow"
+			response.Status = &status
+		} else {
+			response.Status = followStatus
+		}
 	}
+
+	if viewerUserId == profileUserId {
+		response.Email = &profile.Email
+	}
+
 	response.Nickname = profile.Nickname
 	response.FirstName = profile.FirstName
 	response.LastName = profile.LastName

@@ -49,7 +49,7 @@ export function NavProfile() {
             className={styles.menuItem}
             type="button"
             onClick={() => {
-              router.push(`/profile/${state?.userId}`);
+              router.push(`/profile/`);
               setOpen(false);
             }}
           >

@@ -680,3 +680,22 @@ func GetCommentLikeCount(commentID int64) int {
 	}
 	return count
 }
+
+// GetPostStats returns reaction and comment counts for a post
+func GetPostStats(postID int64) (Stats, error) {
+	var stats Stats
+	
+	// Get reaction count
+	err := config.DB.QueryRow(QUERY_COUNT_POST_REACTIONS, postID).Scan(&stats.ReactionCount)
+	if err != nil {
+		stats.ReactionCount = 0
+	}
+	
+	// Get comment count
+	err = config.DB.QueryRow(QUERY_COUNT_POST_COMMENTS, postID).Scan(&stats.CommentCount)
+	if err != nil {
+		stats.CommentCount = 0
+	}
+	
+	return stats, nil
+}

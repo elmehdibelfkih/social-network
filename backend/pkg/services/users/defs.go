@@ -19,6 +19,7 @@ type UpdatePrivacyRequestJson struct {
 type UserProfileResponseJson struct {
 	UserId      int64                `json:"userId"`
 	Status      *string              `json:"status"` // pending/accepted/declined or NULL
+	Email       *string              `json:"email"`
 	Nickname    *string              `json:"nickname"`
 	FirstName   string               `json:"firstName"`
 	LastName    string               `json:"lastName"`
