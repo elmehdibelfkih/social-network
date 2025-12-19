@@ -1,10 +1,4 @@
 "use client";
-// group_page.client.tsx
-// Minimal client component
-
-// export default function GroupPageClient() {
-//   return <div className="group_page">{/* client UI: GroupPageClient */}</div>;
-// }
 
 import React, { useState } from 'react';
 import { MessageSquare } from 'lucide-react';
