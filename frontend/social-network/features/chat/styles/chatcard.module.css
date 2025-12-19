@@ -1,4 +1,3 @@
-
 .contactItem {
   background-color: white;
   display: flex;
@@ -7,18 +6,17 @@
   cursor: pointer;
   gap: 12px;
   border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-  transition: background 0.2s;
+  /* transition: background 0.2s; */
 }
 
 .contactItem:hover {
   background: rgba(0, 0, 0, 0.04);
 }
 
-.avatar {
-  width: 42px;
-  height: 42px;
+.avatar img{
   border-radius: 50%;
-  border: 1px solid rgba(0, 0, 0, 0.2);;
+  background-color: var(--primary-purple-light);
+  border: solid 1px grey;
   object-fit: cover;
 }
 
@@ -51,5 +49,5 @@
 }
 
 .offline .statusDot {
-  background:  var(--gray-500);
+  background: var(--gray-500);
 }

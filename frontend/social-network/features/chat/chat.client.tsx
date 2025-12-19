@@ -86,8 +86,13 @@ export function ChatSection() {
     return (
         <div className={styles.wrapper}>
             <div className={styles.header}>
-                <img src="/svg/message-square.svg" alt="" />
-                <h2>Contacts</h2>
+                <div className={styles.banner}>
+                    <img src="/svg/message-square.svg" alt="" />
+                    <h2>Chats</h2>
+                </div>
+                    <button className={styles.closeAll} onClick={handleCloseAll}>
+                        <img src="/svg/x.svg" alt="" />
+                    </button>
             </div>
             <div className={styles.scrollArea}>
                 {users?.map((u) => (
@@ -98,9 +103,6 @@ export function ChatSection() {
                         onClick={handleOpenChat}
                     />
                 ))}
-                <button onClick={handleCloseAll}>
-                    <img src="/svg/x.svg" alt="" />
-                </button>
                 {Array.from(openChats.entries()).map(([chatId, user]) => (
                     <FloatingChat
                         key={chatId}

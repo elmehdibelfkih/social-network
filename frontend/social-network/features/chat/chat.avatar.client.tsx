@@ -34,9 +34,11 @@ export function ChatImage({ mediaId }: { mediaId: number }) {
 
     if (!imgSrc) {
         return (
-            <div className={styles.mediaError}>
-                Image not available
-            </div>
+            <img
+            src="/svg/circle-user.svg"
+            alt="Post media"
+            className={styles.mediaImage}
+        />
         )
     }
 

@@ -6,6 +6,8 @@ import { ChatMessage, User } from "./types";
 import { formatMessageDate } from "@/libs/helpers";
 import { SeenStatus } from "@/components/ui/chats/seen"
 import { useDebounceCbf } from "@/libs/debounce";
+import { ChatImage } from "./chat.avatar.client";
+import TypingIndicator from "./typing.indicator";
 
 interface ChatConversationProps {
     chatId: number;
@@ -13,7 +15,7 @@ interface ChatConversationProps {
     onClose: () => void;
 }
 
-export default function ChatConversation({ chatId, onClose }: ChatConversationProps) {
+export default function ChatConversation({ chatId, user, onClose }: ChatConversationProps) {
     const emojis = [
         "😀", "😂", "😍", "🥰", "😎", "🤔", "😢", "😭", "👍", "👎", "👏", "🙏", "🔥", "❤️", "💔", "✨", "🎉", "🚀", "😡", "😴"
     ];
@@ -26,7 +28,7 @@ export default function ChatConversation({ chatId, onClose }: ChatConversationPr
     const [input, setInput] = useState("");
     const [userData, setUserData] = useState(JSON.parse(localStorage.getItem("social_network-user")))
     const [isTyping, setIsTyping] = useState(false)
-    const [isAfk, setIsAfk] = useState(true)
+    // const [isAfk, setIsAfk] = useState(true)
     const scrollRef = useRef<HTMLDivElement>(null);
     const [emojiOpen, setEmojiOpen] = useState(false);
     const inputRef = useRef<HTMLInputElement>(null);
@@ -80,7 +82,7 @@ export default function ChatConversation({ chatId, onClose }: ChatConversationPr
                     setIsTyping(true)
                     break;
                 case 'chat_afk':
-                    setIsAfk(true)
+                    setIsTyping(false)
                     break;
                 default:
                     break;
@@ -284,9 +286,11 @@ export default function ChatConversation({ chatId, onClose }: ChatConversationPr
         <div className={styles.chatContainer}>
 
             <div className={styles.chatHeader}>
-                <span>Chat {chatId}</span>
+                <ChatImage mediaId={user.avatarId} />
+                {/* <span>Chat {chatId}</span> */}
+                <span>{`${user.firstName} ${user.lastName}`}</span>
                 <button className={styles.closeBtn} onClick={onClose}>
-                    <img src="/svg/x.svg" alt="" />
+                    <img src="/svg/x_white.svg" alt="" />
                 </button>
             </div>
 
@@ -305,7 +309,9 @@ export default function ChatConversation({ chatId, onClose }: ChatConversationPr
                     );
                 })}
             </div>
-
+            <div className={styles.typingContainer}>
+                <TypingIndicator isTyping={isTyping} user={user} />
+            </div>
             <form className={styles.chatInputContainer} onSubmit={handleSubmit}>
                 <input
                     type="text"

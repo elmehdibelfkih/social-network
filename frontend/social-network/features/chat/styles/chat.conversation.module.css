@@ -125,3 +125,10 @@
     cursor: pointer;
     scale: 1.2;
 }
+
+.typingContainer {
+    padding: 5px 15px;
+    display: flex;
+    align-items: center;
+    background: #f5f5f5;
+}
