@@ -1,6 +1,3 @@
-import { http } from "@/libs/apiFetch";
-import { JSX } from "react";
-import PostServer from "@/features/posts/posts.server";
 import { GroupService } from "@/features/group_page/group_page.services"
 import GroupMembersCard from "@/features/group_page/group_member.server"
 

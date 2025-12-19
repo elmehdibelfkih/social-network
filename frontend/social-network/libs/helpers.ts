@@ -27,7 +27,6 @@ export function handleName(profile: MiniProfile | null) {
   return raw ? `@${raw.toLowerCase()}` : `@${profile.userId ?? 'user'}`
 }
 
-<<<<<<< HEAD
 
 export function formattedDate(date: string | Date | null): string {
   if (!date) return "";
@@ -42,7 +41,9 @@ export function formattedDate(date: string | Date | null): string {
       hour12: true,
     })
     .replace(",", "");
-=======
+  }
+
+  
 export function timeAgo(dateString: string): string {
   if (!dateString) return 'just now'
   
@@ -64,5 +65,4 @@ export function timeAgo(dateString: string): string {
   if (diffDay < 7) return `${diffDay}d ago`
   if (diffWeek < 4) return `${diffWeek}w ago`
   return date.toLocaleDateString()
->>>>>>> main
 }

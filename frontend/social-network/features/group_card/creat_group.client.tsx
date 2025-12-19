@@ -96,7 +96,6 @@ const CreateGroupModal: React.FC<CreateGroupModalProps> = ({
 
     setIsUploading(true);
     try {
-      // 1) upload file now
       const resp = await GroupService.uploadMedia(selectedFile);
 
 

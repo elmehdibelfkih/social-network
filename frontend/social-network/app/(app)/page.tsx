@@ -6,13 +6,7 @@ import { getUserId } from "@/libs/helpers";
 import { ProfileAPIResponse } from "@/libs/globalTypes";
 import { NewPost } from "@/features/newPost";
 import { postsService } from "@/features/posts";
-<<<<<<< HEAD
-import PostServer from "@/features/posts/posts.server";
-import { useUserStats } from "@/providers/userStatsContext";
-import CreateGroupModal from "@/features/group_card/creat_group.client"
-=======
 import { Feed } from "@/features/posts/Feed";
->>>>>>> main
 
 export default async function HomePage(): Promise<JSX.Element> {
 
@@ -26,25 +20,9 @@ export default async function HomePage(): Promise<JSX.Element> {
     <>
       <ProfileSummary/>
       <div>
-        <NewPost data={res2} isMyprofile={false} />
+        <NewPost  isMyprofile={false} />
       </div>
-<<<<<<< HEAD
-      <div>
-        {posts.length === 0 ? (
-          <p>
-            No posts yet. Be the first to create one!
-          </p>
-        ) : (
-          posts.map((post) => (
-            <PostServer key={post.postId} post={post} />
-          ))
-        )}
-      </div>
-      {/* <MiniProfile data={res2} isMyprofile={false} /> */}
-
-=======
       <Feed initialPosts={posts} />
->>>>>>> main
     </>
   );
 }

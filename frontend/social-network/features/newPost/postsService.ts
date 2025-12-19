@@ -6,9 +6,10 @@ export const postsService = {
   async createPost(input: CreatePostInput): Promise<Post> {
     const validPrivacy: PrivacyLevel =
       input.privacy === 'public' ||
-        input.privacy === 'private' ||
-        input.privacy === 'followers' ||
-        input.privacy === 'restricted'
+      input.privacy === 'private' ||
+      input.privacy === 'followers' ||
+      input.privacy === 'restricted' ||
+      input.privacy === 'group'
         ? input.privacy
         : 'public';
 
@@ -16,11 +17,17 @@ export const postsService = {
       content: input.content.trim(),
       privacy: validPrivacy,
     };
+
+    // Add groupId to payload if provided
+    if (input.groupId) {
+      payload.groupId = input.groupId;
+      payload.privacy = 'group';
+    }
+
     if (input.mediaIds && input.mediaIds.length > 0) payload.mediaIds = input.mediaIds;
     if (input.allowedList && input.allowedList.length > 0) payload.allowedList = input.allowedList;
 
     const response = await http.post<Post>('/api/v1/posts', payload);
-
     if (!response) {
       throw new Error('Failed to create post');
     }
