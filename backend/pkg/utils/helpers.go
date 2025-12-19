@@ -58,10 +58,19 @@ func GetQuerryPramString(r *http.Request, key string) string {
 }
 
 func OptionalJsonFields[T any](arg *T) any {
-	if arg != nil {
-		return *arg
+	if arg == nil {
+		return nil
 	}
-	return nil
+
+	v := any(*arg)
+	switch val := v.(type) {
+	case string:
+		if strings.TrimSpace(val) == "" {
+			return nil
+		}
+	}
+
+	return v
 }
 
 func GetWildCardValue(w http.ResponseWriter, r *http.Request, key string) int64 {
