@@ -27,7 +27,7 @@ export function Profile({ profile }: { profile: ProfileData }) {
                         <h2 className={styles.fullname}>
                             {profile.firstName} {profile.lastName}
                         </h2>
-                        <h3 className={styles.nickname}>@{profile.nickname}</h3>
+                        <h3 className={styles.nickname}>{profile.nickname ? `@${profile.nickname}` : `@` + profile.firstName + profile.lastName} </h3>
                         <p className={styles.aboutMe}>{profile.aboutMe}</p>
 
                         <Counts userId={profile.userId}/>

@@ -107,7 +107,7 @@ export function NewPostClient() {
       <div className={styles.rightPart}>
         <div className={styles.userInfo}>
           <div className={styles.miniHandle}>{user.firstName + ' ' + user.lastName}</div>
-          <h4 className={styles.miniName}> {user.nickname ? `@${user.nickname}` : '@' + user.firstName + ' ' + user.lastName} </h4>
+          <h4 className={styles.miniName}> {user.nickname ? `@${user.nickname}` : '@' + user.firstName +  user.lastName} </h4>
         </div>
 
         {/* Textarea */}
