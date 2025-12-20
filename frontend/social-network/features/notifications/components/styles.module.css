@@ -7,6 +7,24 @@
     cursor: pointer;
 }
 
+.readNotif {
+    display: flex;
+    gap: 12px;
+    padding: 16px;
+    border-bottom: 1px solid #e5e7eb;
+    transition: background-color 0.2s;
+    cursor: pointer;
+    background-color: #eef5ff;
+}
+
+.readNotif:hover {
+    background-color: #e8f0fc;
+}
+
+.readNotif:last-child {
+    border-bottom: none;
+}
+
 .notifContainer:hover {
     background-color: #f9fafb;
 }

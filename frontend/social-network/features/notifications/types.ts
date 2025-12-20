@@ -21,6 +21,7 @@ export type Notification = {
     referenceType: ReferenceType
     referenceId?: number
     content?: string
+    status: string
     isRead: number
     createdAt: string
     readAt?: string

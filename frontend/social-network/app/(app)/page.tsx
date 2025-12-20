@@ -16,9 +16,9 @@ export default async function HomePage(): Promise<JSX.Element> {
 
   return (
     <>
-      <ProfileSummary/>
+      <ProfileSummary />
       <div>
-        <NewPost data={res2} isMyprofile={false} />
+        <NewPost />
       </div>
       <div>
         {posts.length === 0 ? (

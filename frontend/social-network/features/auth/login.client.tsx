@@ -35,9 +35,8 @@ export function LoginForm({ onAuthSuccess }: { onAuthSuccess?: () => void }) {
 
             localStorage.setItem('social_network-user', JSON.stringify(User));
             setUser(User);
-            router.push('/');
             ShowSnackbar({ status: true, message: 'login successfully.' });
-
+            router.push('/')
         } catch (error) {
             setIsLoading(false);
             console.error("Login failed:", error);

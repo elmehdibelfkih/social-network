@@ -1,11 +1,14 @@
 import { Notification, notificationsService } from "@/features/notifications"
 import { createContext, useCallback, useContext, useEffect, useState } from "react"
+import { useAuth } from "./authProvider"
 
 type NotificationContextType = {
     notifications: Notification[]
     unreadCount: number
     loading: boolean
     hasMore: boolean
+    prependNotifications: (newNotifications: Notification[]) => void
+    loadNotifications: () => Promise<void>
     loadMore: () => Promise<void>
     markAsRead: (notificationId: number) => Promise<void>
     markAllAsRead: () => Promise<void>
@@ -17,15 +20,13 @@ export const NotificationContext = createContext<NotificationContextType | null>
 const MAX_CACHE_SIZE = 100
 
 export function NotificationProvider({ children }) {
+    const { user } = useAuth()
     const [notifications, setNotifications] = useState<Notification[]>([])
     const [unreadCount, setUnreadCount] = useState(0)
     const [loading, setLoading] = useState(false)
     const [hasMore, setHasMore] = useState(true)
-    const [initialized, setInitialized] = useState(false)
 
     const loadNotifications = useCallback(async () => {
-        if (initialized) return
-
         setLoading(true)
         try {
             const [notificationsResponse, count] = await Promise.all([
@@ -36,18 +37,22 @@ export function NotificationProvider({ children }) {
             setNotifications(notificationsResponse.notifications)
             setUnreadCount(count)
             setHasMore(notificationsResponse.notifications.length == 20)
-            setInitialized(true)
         } catch (error) {
             console.error('Failed to load notifications:', error)
         } finally {
             setLoading(false)
         }
-    }, [initialized])
+    }, [])
 
     useEffect(() => {
-        console.log("Hello")
-        loadNotifications()
-    }, [loadNotifications])
+        if (user) {
+            loadNotifications()
+        } else {
+            setNotifications([])
+            setUnreadCount(0)
+            setHasMore(true)
+        }
+    }, [user, loadNotifications])
 
     const loadMore = useCallback(async () => {
         if (loading || !hasMore) return
@@ -132,11 +137,27 @@ export function NotificationProvider({ children }) {
         }
     }, [])
 
+    const prependNotifications = useCallback((newNotifications: Notification[]) => {
+        setNotifications((prev) => {
+            const combined = [...newNotifications, ...prev]
+            return combined.length > MAX_CACHE_SIZE
+                ? combined.slice(0, MAX_CACHE_SIZE)
+                : combined
+        })
+
+        const unreadInNew = newNotifications.filter(n => n.isRead === 0).length
+        if (unreadInNew > 0) {
+            setUnreadCount((prev) => prev + unreadInNew)
+        }
+    }, [])
+
     const value: NotificationContextType = {
         notifications,
         unreadCount,
         loading,
         hasMore,
+        prependNotifications,
+        loadNotifications,
         loadMore,
         markAsRead,
         markAllAsRead,

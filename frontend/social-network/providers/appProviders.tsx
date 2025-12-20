@@ -7,10 +7,10 @@ import { NotificationProvider } from './notifsProvider';
 // This is the primary component you will use in your layout
 export function AppProviders({ children }: { children: ReactNode }) {
   return (
-    <NotificationProvider>
-      <AuthProvider>
+    <AuthProvider>
+      <NotificationProvider>
         {children}
-      </AuthProvider>
-    </NotificationProvider>
+      </NotificationProvider>
+    </AuthProvider>
   );
 }

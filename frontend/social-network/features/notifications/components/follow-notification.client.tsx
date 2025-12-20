@@ -1,18 +1,18 @@
 'use client'
-
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import type { NotificationProps } from './shared-types'
 import styles from './styles.module.css'
 import AvatarHolder from '@/components/ui/avatar_holder/avatarholder.client'
 import { http } from '@/libs/apiFetch'
 import { ProfileAPIResponse } from '@/libs/globalTypes'
 import { formatTimeAgo } from '@/libs/helpers'
+import { useRouter } from 'next/navigation'
 
 export function FollowNotification({ notification, onMarkAsRead }: NotificationProps) {
   const [profile, setProfile] = useState<ProfileAPIResponse>(null)
   // const [isDecisionMade, setIsDecisionMade] = useState(!isActive)
   const [isRead, setIsRead] = useState(notification.isRead == 1)
-  const notifRef = useRef<HTMLDivElement>(null)
+  const router = useRouter()
 
   const getReferenceProfile = async () => {
     try {
@@ -27,7 +27,19 @@ export function FollowNotification({ notification, onMarkAsRead }: NotificationP
     getReferenceProfile()
   }, [notification.notificationId])
 
-  const acceptInvitation = async () => {
+  const handleClick = () => {
+    if (!isRead && onMarkAsRead) {
+      setIsRead(true)
+      onMarkAsRead(notification.notificationId)
+    }
+
+    if (notification.referenceId) {
+      router.push(`/profile/${notification.referenceId}`)
+    }
+  }
+
+  const acceptInvitation = async (e: React.MouseEvent) => {
+    e.stopPropagation()
     try {
       await http.post(`/api/v1/follow-requests/${notification.referenceId}/accept`)
       // setIsDecisionMade(true)
@@ -36,7 +48,8 @@ export function FollowNotification({ notification, onMarkAsRead }: NotificationP
     }
   }
 
-  const declineInvitation = async () => {
+  const declineInvitation = async (e: React.MouseEvent) => {
+    e.stopPropagation()
     try {
       await http.post(`/api/v1/follow-requests/${notification.referenceId}/decline`)
       // setIsDecisionMade(true)
@@ -44,36 +57,6 @@ export function FollowNotification({ notification, onMarkAsRead }: NotificationP
 
     }
   }
-
-  useEffect(() => {
-    // Don't set up observer if already read or no callback provided
-    if (isRead) return
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsRead(true)
-          onMarkAsRead(notification.notificationId)
-          observer.disconnect()
-        }
-      },
-      {
-        threshold: 0.5,
-      }
-    )
-
-    const currentElement = notifRef.current
-    if (currentElement) {
-      observer.observe(currentElement)
-    }
-
-    return () => {
-      if (currentElement) {
-        observer.unobserve(currentElement)
-      }
-      observer.disconnect()
-    }
-  })
 
   if (!profile) {
     return (
@@ -84,7 +67,7 @@ export function FollowNotification({ notification, onMarkAsRead }: NotificationP
   }
 
   return (
-    <div className={styles.notifContainer} ref={notifRef}>
+    <div className={isRead ? styles.readNotif : styles.notifContainer} onClick={handleClick}>
       <div className={styles.avatar}>
         <AvatarHolder avatarId={profile.avatarId} />
       </div>
@@ -101,11 +84,11 @@ export function FollowNotification({ notification, onMarkAsRead }: NotificationP
 
         <div className={styles.actionButtons}>
           <button className={styles.acceptButton}
-            onClick={() => acceptInvitation()}
+            onClick={acceptInvitation}
           // disabled={isDecisionMade}
           >✓ Accept</button>
           <button className={styles.declineButton}
-            onClick={() => declineInvitation()}
+            onClick={declineInvitation}
           // disabled={isDecisionMade}
           >× Decline</button>
         </div>

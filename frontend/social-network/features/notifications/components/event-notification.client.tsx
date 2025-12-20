@@ -1,6 +1,5 @@
 'use client'
-
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import type { EventType } from '../types'
 import type { NotificationProps } from './shared-types'
 import styles from './styles.module.css'
@@ -8,6 +7,7 @@ import AvatarHolder from '@/components/ui/avatar_holder/avatarholder.client'
 import { http } from '@/libs/apiFetch'
 import { ProfileAPIResponse } from '@/libs/globalTypes'
 import { formatTimeAgo } from '@/libs/helpers'
+import { useRouter } from 'next/navigation'
 
 function EventCard({ title, date }: { title: string, date: string }) {
   return (
@@ -22,7 +22,7 @@ export function EventNotification({ notification, onMarkAsRead }: NotificationPr
   const [event, setEvent] = useState<EventType>(null)
   const [creatorProfile, setCreatorProfile] = useState<ProfileAPIResponse>(null)
   const [isRead, setIsRead] = useState(notification.isRead == 1)
-  const notifRef = useRef<HTMLDivElement>(null)
+  const router = useRouter()
 
   const getReferenceEvent = async () => {
     if (!notification.referenceId) {
@@ -47,34 +47,16 @@ export function EventNotification({ notification, onMarkAsRead }: NotificationPr
     getReferenceEvent()
   }, [notification.notificationId])
 
-  useEffect(() => {
-    if (isRead) return
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsRead(true)
-          onMarkAsRead?.(notification.notificationId)
-          observer.disconnect()
-        }
-      },
-      {
-        threshold: 0.5,
-      }
-    )
-
-    const currentElement = notifRef.current
-    if (currentElement) {
-      observer.observe(currentElement)
+  const handleClick = () => {
+    if (!isRead && onMarkAsRead) {
+      setIsRead(true)
+      onMarkAsRead(notification.notificationId)
     }
 
-    return () => {
-      if (currentElement) {
-        observer.unobserve(currentElement)
-      }
-      observer.disconnect()
+    if (notification.referenceId && event?.groupId) {
+      router.push(`/groups/${event.groupId}`)
     }
-  })
+  }
 
   if (!event || !creatorProfile) {
     return (
@@ -85,7 +67,7 @@ export function EventNotification({ notification, onMarkAsRead }: NotificationPr
   }
 
   return (
-    <div className={styles.notifContainer} ref={notifRef}>
+    <div className={isRead ? styles.readNotif : styles.notifContainer} onClick={handleClick}>
       <div className={styles.avatar}>
         <AvatarHolder avatarId={creatorProfile.avatarId} />
       </div>
