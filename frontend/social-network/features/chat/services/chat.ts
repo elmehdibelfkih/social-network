@@ -37,7 +37,7 @@ class ChatService {
 
     sendToWorker(data: SocketMessage) {
         if (!this.port) this.initPort();
-        console.log(data)
+        console.log("sending to worker", data)
         this.port!.postMessage(data)
     }
 

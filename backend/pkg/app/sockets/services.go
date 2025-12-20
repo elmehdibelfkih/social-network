@@ -117,7 +117,7 @@ func (c *Client) typing(e Event) error {
 	if _, exists := c.userChats[chatId]; !exists {
 		return errors.New("your not a part of this chat")
 	}
-	c.BroadcastToAllUsers(Event{
+	c.BroadcastToNonSelf(Event{
 		Source: "server",
 		Type:   "chat_typing",
 		Payload: &ClientMessage{
@@ -125,7 +125,7 @@ func (c *Client) typing(e Event) error {
 				FirstName: c.user.FirstName,
 				LastName:  c.user.LastName,
 				Nickname:  c.user.Nickname,
-				ChatId:    e.Payload.ChatMessage.ChatId,
+				ChatId:    e.Payload.TypingIndicator.ChatId,
 			},
 		},
 	}, c.hub.chatUsers[chatId])
@@ -135,7 +135,7 @@ func (c *Client) typing(e Event) error {
 	}
 
 	c.typingTimer[chatId] = time.AfterFunc(typingWait, func() {
-		c.BroadcastToAllUsers(Event{
+		c.BroadcastToNonSelf(Event{
 			Source: "server",
 			Type:   "chat_afk",
 			Payload: &ClientMessage{
@@ -143,7 +143,7 @@ func (c *Client) typing(e Event) error {
 					FirstName: c.user.FirstName,
 					LastName:  c.user.LastName,
 					Nickname:  c.user.Nickname,
-					ChatId:    e.Payload.ChatMessage.ChatId,
+					ChatId:    e.Payload.TypingIndicator.ChatId,
 				},
 			},
 		}, c.hub.chatUsers[chatId])
@@ -219,6 +219,19 @@ func (c *Client) notification(e Event) error {
 func (c *Client) BroadcastToAllUsers(e Event, clients map[int64][]*Client) error {
 	var err error
 	for _, userConnections := range clients {
+		for _, c := range userConnections {
+			c.events <- e
+		}
+	}
+	return err
+}
+
+func (c *Client) BroadcastToNonSelf(e Event, clients map[int64][]*Client) error {
+	var err error
+	for userId, userConnections := range clients {
+		if userId == c.userId {
+			continue
+		}
 		for _, c := range userConnections {
 			c.events <- e
 		}

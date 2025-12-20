@@ -6,8 +6,8 @@ import { ChatMessage, User } from "./types";
 import { formatMessageDate } from "@/libs/helpers";
 import { SeenStatus } from "@/components/ui/chats/seen"
 import { useDebounceCbf } from "@/libs/debounce";
-import { ChatImage } from "./chat.avatar.client";
 import TypingIndicator from "./typing.indicator";
+import AvatarHolder from "@/components/ui/avatar_holder/avatarholder.client";
 
 interface ChatConversationProps {
     chatId: number;
@@ -275,6 +275,17 @@ export default function ChatConversation({ chatId, user, onClose }: ChatConversa
 
     const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
         setInput(e.target.value);
+        //send typing
+        chatService.sendToWorker({
+            source: "client", type: "chat_typing", payload: {
+                typingIndicator: {
+                    firstName: user.firstName,
+                    lastName: user.lastName,
+                    nickName: user.nickname || "",
+                    chatId: chatId
+                }
+            }
+        })
     };
 
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
@@ -286,7 +297,9 @@ export default function ChatConversation({ chatId, user, onClose }: ChatConversa
         <div className={styles.chatContainer}>
 
             <div className={styles.chatHeader}>
-                <ChatImage mediaId={user.avatarId} />
+                {/* <ChatImage mediaId={user.avatarId} /> */}
+                <AvatarHolder avatarId={user.avatarId} size={48} />
+
                 {/* <span>Chat {chatId}</span> */}
                 <span>{`${user.firstName} ${user.lastName}`}</span>
                 <button className={styles.closeBtn} onClick={onClose}>
