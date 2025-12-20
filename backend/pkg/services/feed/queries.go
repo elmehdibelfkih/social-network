@@ -70,25 +70,26 @@ const (
 		  )
 		ORDER BY p.created_at DESC
 		LIMIT ? OFFSET ?`
-
+	// TODO: check GET the post of the all group members or only the user post
 	// Get posts from a specific group (members only)
 	SELECT_GROUP_FEED = `
-		SELECT 
-			p.id,
-			p.author_id,
-			u.nickname,
-			u.last_name,
-			u.first_name,
-			p.content,
-			p.privacy,
-			p.group_id,
-			p.created_at,
-			p.updated_at
-		FROM posts p
-		JOIN users u ON p.author_id = u.id
-		WHERE p.group_id = ?
-		ORDER BY p.created_at DESC
-		LIMIT ? OFFSET ?`
+	SELECT 
+		p.id,
+		p.author_id,
+		u.nickname,
+		u.last_name,
+		u.first_name,
+		p.content,
+		p.privacy,
+		p.group_id,
+		p.created_at,
+		p.updated_at
+	FROM posts p
+	JOIN users u ON p.author_id = u.id
+	WHERE p.group_id = ?
+	AND p.privacy = 'group'
+	ORDER BY p.created_at DESC
+	LIMIT ? OFFSET ?`
 
 	// Check if user is group member with accepted status
 	SELECT_GROUP_MEMBER_ACCEPTED = `

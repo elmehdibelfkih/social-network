@@ -130,8 +130,8 @@ type PaginationJson struct {
 type CreateEventRequestJson struct {
 	Title       string `json:"title"`
 	Description string `json:"description"`
-	StartAt     string `json:"start_at"`
-	EndAt       string `json:"end_at"`
+	StartAt     string `json:"startAt"`
+	EndAt       string `json:"endAt"`
 	Location    string `json:"location"`
 }
 
@@ -140,8 +140,8 @@ type CreateEventResponseJson struct {
 	GroupId     int64  `json:"group_id"`
 	Title       string `json:"title"`
 	Description string `json:"description"`
-	StartAt     string `json:"start_at"`
-	EndAt       string `json:"end_at"`
+	StartAt     string `json:"startAt"`
+	EndAt       string `json:"endAt"`
 	Location    string `json:"location"`
 	CreatedBy   int64  `json:"created_by"`
 	CreatedAt   string `json:"created_at"`
@@ -157,8 +157,8 @@ type EventItemJson struct {
 	EventId     int64  `json:"event_id"`
 	Title       string `json:"title"`
 	Description string `json:"description"`
-	StartAt     string `json:"start_at"`
-	EndAt       string `json:"end_at"`
+	StartAt     string `json:"startAt" db:"startAt"`
+	EndAt       string `json:"endAt" db:"endAt"`
 	Location    string `json:"location"`
 	CreatedBy   int64  `json:"created_by"`
 	CreatedAt   string `json:"created_at"`
@@ -170,8 +170,8 @@ type GetEventResponseJson struct {
 	GroupId     int64            `json:"group_id"`
 	Title       string           `json:"title"`
 	Description string           `json:"description"`
-	StartAt     string           `json:"start_at"`
-	EndAt       string           `json:"end_at"`
+	StartAt     string           `json:"startAt" db:"startAt"`
+	EndAt       string           `json:"endAt" db:"endAt"`
 	Location    string           `json:"location"`
 	CreatedBy   EventCreatorJson `json:"created_by"`
 	CreatedAt   string           `json:"created_at"`
@@ -189,6 +189,12 @@ type RSVPRequestJson struct {
 
 type RSVPResponseJson struct {
 	Message string `json:"message"`
+}
+
+type GetRSVPResponseJson struct{
+	Countgoing int32      `json:"going_count"`
+	CountNotgoing int32   `json:"notgoing_count"`
+	Amigoing bool		  `json:"ami_going"`
 }
 
 // validators

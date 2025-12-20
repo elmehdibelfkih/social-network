@@ -9,6 +9,8 @@ import { postsService } from "@/features/posts";
 import { Feed } from "@/features/posts/Feed";
 
 export default async function HomePage(): Promise<JSX.Element> {
+
+
   const userId = await getUserId();
   const res2 = await http.get<ProfileAPIResponse>(`/api/v1/users/${userId}/profile`);
 
@@ -18,7 +20,7 @@ export default async function HomePage(): Promise<JSX.Element> {
     <>
       <ProfileSummary/>
       <div>
-        <NewPost data={res2} isMyprofile={false} />
+        <NewPost  isMyprofile={false} />
       </div>
       <Feed initialPosts={posts} />
     </>

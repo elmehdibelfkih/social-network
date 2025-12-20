@@ -19,6 +19,20 @@ export const postsService = {
     }
   },
 
+  async getGroupFeed(groupId: number, params?: PaginationParams): Promise<Post[]> {
+  try {
+    const queryParams = new URLSearchParams();
+    if (params?.page) queryParams.set('page', params.page.toString());
+    if (params?.limit) queryParams.set('limit', params.limit.toString());
+    const query = queryParams.toString();
+    const url = `/api/v1/groups/${groupId}/feed${query ? `?${query}` : ''}`;
+    return await http.get<Post[]>(url) || [];
+  } catch (error) {
+    console.error('Failed to fetch group feed:', error);
+    return [];
+  }
+},
+
   // Get user posts
   async getUserPosts(userId: string | number, params?: PaginationParams): Promise<Post[]> {
     try {

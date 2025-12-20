@@ -100,7 +100,6 @@ export default function PostCard({ post: initialPost }: { post: Post }) {
 
   useEffect(() => {
     getAvatarId(post.authorId).then(setAvatarId)
-
     if (post.mediaIds && post.mediaIds.length > 0) {
       Promise.all(post.mediaIds.map(getMediaData)).then(setMediaDataList)
     }

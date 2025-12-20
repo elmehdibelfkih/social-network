@@ -1,14 +1,12 @@
 import { Suspense } from 'react';
 import { TopPart } from "./newPost.client";
-
-
 import styles from "./styles.module.css";
 import { NewPostClient } from "./newPost.client";
 
-
-export function NewPost() {
+export function NewPost({ groupId }: { groupId: number | null }) {
   //todo: const name = displayName(state)
   const name = "test"
+  
   return (
     <div className={styles.wrapper}>
       <noscript>
@@ -32,17 +30,23 @@ export function NewPost() {
                 />
               </label>
 
-              <div className={styles.privacyButton}>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <circle cx="12" cy="12" r="10" />
-                  <path d="M12 6v6l4 2" />
-                </svg>
-                <select name="privacy" className={styles.noJsPrivacySelect}>
-                  <option value="public">Public</option>
-                  <option value="followers">Followers</option>
-                  <option value="private">Private</option>
-                </select>
-              </div>
+              {!groupId && (
+                <div className={styles.privacyButton}>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <circle cx="12" cy="12" r="10" />
+                    <path d="M12 6v6l4 2" />
+                  </svg>
+                  <select name="privacy" className={styles.noJsPrivacySelect}>
+                    <option value="public">Public</option>
+                    <option value="followers">Followers</option>
+                    <option value="private">Private</option>
+                  </select>
+                </div>
+              )}
+
+              {groupId && (
+                <input type="hidden" name="groupId" value={groupId} />
+              )}
 
               <button className={styles.actionButton} type="submit">
                 Post
@@ -52,10 +56,8 @@ export function NewPost() {
         </form>
       </noscript>
 
-      <Suspense fallback={
-        <div ></div>
-      }>
-        <NewPostClient />
+      <Suspense fallback={<div></div>}>
+        <NewPostClient groupId={groupId} />
       </Suspense>
     </div>
   );

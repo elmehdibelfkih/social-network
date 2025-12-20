@@ -31,3 +31,10 @@ body {
   flex-grow: 1;
   margin-bottom: 5rem;
 }
+
+
+.g_layout{
+      max-width: 1240px;
+    min-height: 100vh;
+    margin: 0 auto;
+}

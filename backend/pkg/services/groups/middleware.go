@@ -70,7 +70,7 @@ func IsMemeber(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		userId := utils.GetUserIdFromContext(r)
 		groupId := utils.GetWildCardValue(w, r, "group_id")
-		check, err := SelectGroupAcceptedMember(groupId, userId)
+		check, err := SelectGroupMember(groupId, userId)
 		if err != nil {
 			utils.BackendErrorTarget(err, "is group member")
 			utils.IdentifySqlError(w, err)

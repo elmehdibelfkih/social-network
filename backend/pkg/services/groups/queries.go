@@ -28,12 +28,12 @@ const (
 	`
 	SELECT_GROUP_MEMBER_ACCEPTED = `
 		SELECT EXISTS (
-			SELECT 1 FROM group_members WHERE group_id = ? AND user_id = ? AND status = 'accepted';
+			SELECT 1 FROM group_members WHERE group_id = ? AND user_id = ? AND status = 'accepted'
 		);
 	`
 	SELECT_GROUP_MEMBER_PENDING = `
 		SELECT EXISTS (
-			SELECT 1 FROM group_members WHERE group_id = ? AND user_id = ? AND status = 'pending';
+			SELECT 1 FROM group_members WHERE group_id = ? AND user_id = ? AND status = 'pending'
 		);
 	`
 	SELECT_GROUP_MEMBERS_COUNT = `
@@ -53,8 +53,8 @@ const (
     gm.user_id, u.first_name, u.last_name, gm.role, gm.joined_at
 	FROM group_members AS gm
 	JOIN users AS u ON gm.user_id = u.id
-	WHERE group_id < ? AND status = 'accepted'
-	ORDER BY created_at DESC
+	WHERE group_id = ? AND status = 'accepted'
+	ORDER BY gm.created_at DESC
 	LIMIT ?
 	`
 	SELECT_GROUP_MEMBERS_BY_GROUP = `
@@ -65,7 +65,7 @@ const (
 
 	SELECT_EVENT_BY_ID = `
 		SELECT 
-		ge.id, ge.group_id, ge.creator_id, ge.title, ge.description, ge.location, ge.event_start_date, ge.event_end_date, ge.created_at,
+		ge.id, ge.group_id, ge.creator_id, ge.title, ge.description, ge.location, ge.start_at, ge.end_at, ge.created_at,
 		u.first_name, u.last_name
 		FROM group_events AS ge
 		JOIN users AS u
@@ -74,11 +74,25 @@ const (
 	`
 
 	SELECT_EVENTS_BY_GROUP_ID = `
-		SELECT id, creator_id, title, description, location, event_start_date, event_end_date, created_at,
+		SELECT id, creator_id, title, description, location, start_at, end_at, created_at
 		FROM group_events
 		WHERE group_id = ?
 		ORDER BY created_at ASC;
 	`
+
+	COUNT_EVENT_RSVP_COUNTS = `
+			SELECT
+				SUM(CASE WHEN response = 'going' THEN 1 ELSE 0 END) AS going_count,
+				SUM(CASE WHEN response = 'not_going' THEN 1 ELSE 0 END) AS not_going_count
+			FROM group_event_responses
+			WHERE event_id = ?;
+		`
+
+	GET_USER_RSVP = `
+			SELECT response
+			FROM group_event_responses
+			WHERE event_id = ? AND user_id = ?;
+		`
 )
 
 // INSERT
@@ -98,17 +112,27 @@ const (
 	`
 
 	INSERT_GROUP_EVENT = `
-		INSERT INTO group_events (id, group_id, creator_id, title, description, location, event_start_date, event_end_date )
+		INSERT INTO group_events (id, group_id, creator_id, title, description, location, start_at, end_at )
 		VALUES (?, ?, ?, ?, ?, ?, ?, ?)
 		RETURNING id, group_id, title, description, start_at, end_at, location, creator_id, created_at;
 	`
 
+	// INSERT_EVENT_RSVP = `
+	// 	INSERT INTO event_rsvps (event_id, user_id, option)
+	// 	VALUES (?, ?, ?)
+	// 	ON CONFLICT(event_id, user_id)
+	// 	DO UPDATE SET option = excluded.option;
+	// `
+
 	INSERT_EVENT_RSVP = `
-		INSERT INTO event_rsvps (event_id, user_id, option)
-		VALUES (?, ?, ?)
-		ON CONFLICT(event_id, user_id)
-		DO UPDATE SET option = excluded.option;
+	INSERT INTO group_event_responses (event_id, user_id, response)
+	VALUES (?, ?, ?)
+	ON CONFLICT (event_id, user_id)
+	DO UPDATE SET
+		response = excluded.response,
+		responded_at = CURRENT_TIMESTAMP;
 	`
+
 	INSERT_NOTIFICATION = `
 	INSERT INTO notifications (id, user_id, type, reference_type, reference_id, content) 
 	VALUES (?, ?, ?, ?, ?, ?)
