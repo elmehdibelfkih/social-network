@@ -92,7 +92,7 @@ const CreateGroupModal: React.FC<CreateGroupModalProps> = ({
       return;
     }
 
-      if (formData.description.trim().length > 400) {
+      if (formData.description.trim().length > 250) {
       setError('the description is more than 250');
       return;
     }
