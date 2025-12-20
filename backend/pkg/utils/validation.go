@@ -51,6 +51,9 @@ func PasswordValidation(password string) (bool, string) {
 
 func FirstNameLastName(name string) (bool, string) {
 	n := strings.TrimSpace(name)
+	if len(n) < 1 || len(n) > 50 {
+		return false, n
+	}
 	return nameRegex.MatchString(n), n
 }
 
@@ -65,7 +68,7 @@ func TextContentValidationEscape(content *string, minLen, maxLen int) (bool, str
 	if trimmed == "" {
 		return false, "Content cannot be empty"
 	}
-	if len(*content) < minLen || len(*content) > maxLen {
+	if len(trimmed) < minLen || len(trimmed) > maxLen {
 		return false, "wrong length"
 	}
 	escaped := html.EscapeString(trimmed)

@@ -311,6 +311,12 @@ export function Comments({
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
+    const MAX_SIZE = 10 * 1024 * 1024; // 10MB
+
+    if (files[0] && files[0].size > MAX_SIZE) {
+      alert("File is too large. Maximum size is 10MB.");
+      return;
+    }
     setSelectedFiles(files.slice(0, 1)); // Max 1 photo for comments
   };
 
@@ -517,6 +523,8 @@ export function Comments({
               placeholder="Write a comment..."
               className={styles.commentInput}
               disabled={loading}
+              maxLength={200}
+              required
             />
             <button
               type="button"

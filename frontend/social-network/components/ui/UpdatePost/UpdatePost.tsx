@@ -71,12 +71,22 @@ export function UpdatePost({ postId, initialContent, initialPrivacy, initialMedi
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || [])
-    const totalPhotos = mediaIds.length + selectedFiles.length + files.length
+    const MAX_SIZE = 10 * 1024 * 1024; // 10MB
+
+    const validFiles = files.filter(file => {
+      if (file.size > MAX_SIZE) {
+        alert(`File ${file.name} is too large. Maximum size is 10MB.`);
+        return false;
+      }
+      return true;
+    });
+
+    const totalPhotos = mediaIds.length + selectedFiles.length + validFiles.length
 
     if (totalPhotos > 10) {
       const remaining = 10 - (mediaIds.length + selectedFiles.length)
       if (remaining > 0) {
-        setSelectedFiles(prev => [...prev, ...files.slice(0, remaining)])
+        setSelectedFiles(prev => [...prev, ...validFiles.slice(0, remaining)])
         alert(`Maximum 10 photos allowed. Added ${remaining} photo(s).`)
       } else {
         alert('Maximum 10 photos allowed.')
@@ -84,7 +94,7 @@ export function UpdatePost({ postId, initialContent, initialPrivacy, initialMedi
       return
     }
 
-    setSelectedFiles(prev => [...prev, ...files])
+    setSelectedFiles(prev => [...prev, ...validFiles])
     if (e.target) e.target.value = ''
   }
 
@@ -160,6 +170,8 @@ export function UpdatePost({ postId, initialContent, initialPrivacy, initialMedi
             onChange={(e) => setContent(e.target.value)}
             placeholder="What's on your mind?"
             rows={6}
+            maxLength={500}
+            required
           />
 
           {(mediaIds.length > 0 || selectedFiles.length > 0) && (

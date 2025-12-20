@@ -24,7 +24,7 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
   }
   const stats: UserStatsState = {
     userId: profileRes.userId,
-    nickname: profileRes.nickname,
+    nickname: profileRes.nickname ,
     firstName: profileRes.firstName,
     lastName: profileRes.lastName,
     avatarId: profileRes.avatarId,

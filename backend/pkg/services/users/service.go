@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"errors"
 	"net/http"
+	"strings"
 
 	// "social/pkg/services/chat"
 	"social/pkg/utils"
@@ -132,7 +133,12 @@ func UpdateUserProfile(w http.ResponseWriter, userId int64, req *UpdateProfileRe
 		lastName = *req.LastName
 	}
 	if req.Nickname != nil {
-		nickname = req.Nickname
+		// Normalize empty or whitespace-only nicknames to nil (no nickname)
+		if strings.TrimSpace(*req.Nickname) == "" {
+			nickname = nil
+		} else {
+			nickname = req.Nickname
+		}
 	}
 	if req.AboutMe != nil {
 		aboutMe = req.AboutMe
