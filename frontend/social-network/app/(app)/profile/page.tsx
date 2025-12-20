@@ -9,9 +9,8 @@ interface PageProps {
 
 export default async function ProfilePage({ searchParams }: PageProps) {
   const userId = await getUserId();
-  const { tab } = await searchParams;
-
   const profile = await getProfileData(String(userId))
+  const { tab } = await searchParams;
   
   return (
     <>

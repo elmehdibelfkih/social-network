@@ -107,6 +107,8 @@ export default function AddFriends({ title, desc, componentId, purpose, onComple
                     className={styles.searchInput}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
+                    maxLength={50}
+                    required
                 />
             </div>
             <div className={styles.friendsList}>

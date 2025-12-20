@@ -1,7 +1,7 @@
 'use client'
 import { Suspense, useState, useEffect } from 'react'
 import type { Post } from '@/libs/globalTypes'
-import { PostsClient } from './posts.client'
+import { PostActions } from './PostActions'
 import { AvatarHolder } from '@/components/ui/avatar_holder/avatarholder.client'
 import styles from './styles.module.css'
 import { http, fetchMediaClient } from '@/libs/apiFetch'
@@ -9,6 +9,8 @@ import { UpdatePost } from '@/components/ui/UpdatePost/UpdatePost'
 import { ConfirmDelete } from '@/components/ui/ConfirmDelete/ConfirmDelete'
 import { useAuth } from '@/providers/authProvider'
 import { GlobeIcon, LockIcon, UsersIcon } from '@/components/ui/icons'
+import { timeAgo } from '@/libs/helpers'
+import { useUserStats } from '@/providers/userStatsContext'
 
 function MediaCarousel({ mediaDataList }: { mediaDataList: string[] }) {
   const [currentIndex, setCurrentIndex] = useState(0)
@@ -74,20 +76,25 @@ async function getMediaData(mediaId: number): Promise<string | null> {
   }
 }
 
-export default function PostServer({ post }: { post: Post }) {
+const CONTENT_PREVIEW_LENGTH = 300
+
+export default function PostCard({ post: initialPost }: { post: Post }) {
   const { user } = useAuth()
+  const [post, setPost] = useState(initialPost)
   const [avatarId, setAvatarId] = useState<number | null>(null)
   const [mediaDataList, setMediaDataList] = useState<(string | null)[]>([])
   const [showMenu, setShowMenu] = useState(false)
   const [showUpdateModal, setShowUpdateModal] = useState(false)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const [mounted, setMounted] = useState(false)
+  const [isExpanded, setIsExpanded] = useState(false)
   const [stats, setStats] = useState({
     reactionCount: post.stats?.reactionCount || 0,
     commentCount: post.stats?.commentCount || 0
   })
+  const { dispatch } = useUserStats()
   const isAuthor = mounted && user && Number(user.userId) === post.authorId
-  
+  const isLongContent = post.content.length > CONTENT_PREVIEW_LENGTH
 
   useEffect(() => setMounted(true), [])
 
@@ -108,7 +115,6 @@ export default function PostServer({ post }: { post: Post }) {
   }, [post.postId, post.stats])
 
   const authorName = `${post.authorFirstName} ${post.authorLastName}`
-  const timeAgo = new Date(post.createdAt).toLocaleDateString()
   
   const getPrivacyIcon = (privacy: string) => {
     switch (privacy) {
@@ -120,6 +126,46 @@ export default function PostServer({ post }: { post: Post }) {
     }
   }
 
+  const handleUpdate = (updatedPost: any) => {
+    // Update local state immediately
+    setPost(prev => ({
+      ...prev,
+      content: updatedPost.content || prev.content,
+      privacy: updatedPost.privacy || prev.privacy,
+      mediaIds: updatedPost.mediaIds || prev.mediaIds
+    }))
+
+    // Reload media if changed
+    if (updatedPost.mediaIds) {
+      Promise.all(updatedPost.mediaIds.map(getMediaData)).then(setMediaDataList)
+    }
+
+    // Dispatch event for other components
+    window.dispatchEvent(new CustomEvent('updatePost', { 
+      detail: { 
+        postId: post.postId,
+        ...updatedPost
+      } 
+    }))
+    
+    setShowUpdateModal(false)
+  }
+
+  const handleDelete = async () => {
+    try {
+      const res = await http.delete(`/api/v1/posts/${post.postId}`)
+      if (!res) return
+      dispatch({ type: 'DECREMENT_POSTS' })
+      // Dispatch event for feed to remove this post
+      window.dispatchEvent(new CustomEvent('deletePost', { 
+        detail: { postId: post.postId } 
+      }))
+      setShowDeleteConfirm(false)
+    } catch (error) {
+      console.error('Failed to delete post:', error)
+    }
+  }
+
   return (
     <article className={styles.post}>
       <div className={styles.header}>
@@ -127,7 +173,7 @@ export default function PostServer({ post }: { post: Post }) {
         <div className={styles.authorInfo}>
           <h3 className={styles.authorName} onClick={() => window.location.href = `/profile/${post.authorId}`}>{authorName}</h3>
           <div className={styles.postMeta}>
-            <span className={styles.timeAgo}>{timeAgo}</span>
+            <span className={styles.timeAgo}>{timeAgo(post.createdAt)}</span>
             <span className={styles.privacy}>
               {getPrivacyIcon(post.privacy)}
               {post.privacy}
@@ -155,7 +201,19 @@ export default function PostServer({ post }: { post: Post }) {
       </div>
 
       <div className={styles.content}>
-        <p>{post.content}</p>
+        <p>
+          {isLongContent && !isExpanded
+            ? `${post.content.substring(0, CONTENT_PREVIEW_LENGTH)}...`
+            : post.content}
+        </p>
+        {isLongContent && (
+          <button
+            className={styles.readMoreButton}
+            onClick={() => setIsExpanded(!isExpanded)}
+          >
+            {isExpanded ? 'Show less' : 'Read more'}
+          </button>
+        )}
       </div>
 
       {post.mediaIds && post.mediaIds.length > 0 && (
@@ -168,7 +226,7 @@ export default function PostServer({ post }: { post: Post }) {
       </div>
 
       <Suspense fallback={<div className={styles.actionsLoading}>Loading...</div>}>
-        <PostsClient post={{ ...post, stats }} onStatsUpdate={setStats} />
+        <PostActions post={{ ...post, stats }} onStatsUpdate={setStats} />
       </Suspense>
 
       {showUpdateModal && (
@@ -178,16 +236,13 @@ export default function PostServer({ post }: { post: Post }) {
           initialPrivacy={post.privacy}
           initialMediaIds={post.mediaIds || []}
           onClose={() => setShowUpdateModal(false)}
-          onUpdate={() => window.location.reload()}
+          onUpdate={handleUpdate}
         />
       )}
 
       {showDeleteConfirm && (
         <ConfirmDelete
-          onConfirm={async () => {
-            await http.delete(`/api/v1/posts/${post.postId}`);
-            window.location.reload();
-          }}
+          onConfirm={handleDelete}
           onCancel={() => setShowDeleteConfirm(false)}
         />
       )}

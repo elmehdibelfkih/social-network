@@ -19,7 +19,7 @@ export const privacyOptions = [
 
 export function NewPostClient() {
   const { user } = useAuth();
-  const { dispatch } = useUserStats();
+  const { state, dispatch } = useUserStats();
   const [content, setContent] = useState('');
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [privacy, setPrivacy] = useState<PrivacyLevel>('public');
@@ -34,8 +34,20 @@ export function NewPostClient() {
   useEffect(() => setIsMounted(true), []);
   if (!isMounted || !user) return null;
 
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) =>
-    setSelectedFiles(Array.from(e.target.files || []));
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    const MAX_SIZE = 10 * 1024 * 1024; // 10MB
+
+    const validFiles = files.filter(file => {
+      if (file.size > MAX_SIZE) {
+        alert(`File ${file.name} is too large. Maximum size is 10MB.`);
+        return false;
+      }
+      return true;
+    });
+
+    setSelectedFiles(validFiles.slice(0, 10));
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -51,7 +63,7 @@ export function NewPostClient() {
         mediaIds = uploaded.map(r => r.mediaId);
       }
 
-      await postsService.createPost({
+      const newPost = await postsService.createPost({
         content: content.trim(),
         privacy,
         mediaIds: mediaIds.length ? mediaIds : undefined,
@@ -64,6 +76,17 @@ export function NewPostClient() {
       setPrivacy('public');
       setSelectedFollowers([]);
       dispatch({ type: 'INCREMENT_POSTS' })
+
+      // Ensure all required fields are present
+      const completePost = {
+        ...newPost,
+        authorFirstName: newPost.authorFirstName || user.firstName,
+        authorLastName: newPost.authorLastName || user.lastName,
+        content: newPost.content || content.trim()
+      }
+
+      // Dispatch custom event to update feed with complete post data
+      window.dispatchEvent(new CustomEvent('newPost', { detail: completePost }))
     } finally {
       setIsSubmitting(false);
     }
@@ -78,13 +101,13 @@ export function NewPostClient() {
   return (
     <form onSubmit={handleSubmit} className={styles.form}>
       <div className={styles.leftPart}>
-        <AvatarHolder avatarId={user?.avatarId ?? null} size={60} />
+        <AvatarHolder avatarId={state.avatarId ?? user?.avatarId ?? null} size={60} />
       </div>
 
       <div className={styles.rightPart}>
         <div className={styles.userInfo}>
           <div className={styles.miniHandle}>{user.firstName + ' ' + user.lastName}</div>
-          <h4 className={styles.miniName}>{'@' + user.nickname}</h4>
+          <h4 className={styles.miniName}> {user.nickname ? `@${user.nickname}` : '@' + user.firstName + ' ' + user.lastName} </h4>
         </div>
 
         {/* Textarea */}
@@ -94,6 +117,9 @@ export function NewPostClient() {
             value={content}
             onChange={(e) => setContent(e.target.value)}
             placeholder="What's on your mind?"
+            maxLength={500}
+            required
+
           />
         </div>
 
@@ -130,6 +156,8 @@ export function NewPostClient() {
             type="button"
             className={styles.uploadImageButton}
             onClick={() => fileInputRef.current?.click()}
+            disabled={selectedFiles.length >= 10}
+            title={selectedFiles.length >= 10 ? "Maximum 10 photos allowed" : "Add photos"}
           >
             <ImageIcon /> Photo
           </button>
@@ -244,7 +272,8 @@ export function TopPart() {
             placeholder="What's on your mind?"
             className={styles.textArea}
             required
-            minLength={1}
+
+            maxLength={500}
           />
         </div>
       </div >

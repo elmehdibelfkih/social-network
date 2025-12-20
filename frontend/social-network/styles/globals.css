@@ -25,6 +25,13 @@ body {
 .app-root {
   min-height: 100vh;
   background-color: var(--background-cream);
+  display: flex;
+  flex-direction: column;
+}
+
+.main-content {
+  flex-grow: 1;
+  margin-bottom: 5rem;
 }
 
 .test {

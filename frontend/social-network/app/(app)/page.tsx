@@ -6,7 +6,7 @@ import { getUserId } from "@/libs/helpers";
 import { ProfileAPIResponse } from "@/libs/globalTypes";
 import { NewPost } from "@/features/newPost";
 import { postsService } from "@/features/posts";
-import PostServer from "@/features/posts/posts.server";
+import { Feed } from "@/features/posts/Feed";
 import { useUserStats } from "@/providers/userStatsContext";
 import { ChatSection } from "@/features/chat";
 import styles from "@/styles/app.module.css"
@@ -21,24 +21,16 @@ export default async function HomePage(): Promise<JSX.Element> {
     <>
       <main className={styles.main}>
         <div className={styles.firstSection}>
-          <ProfileSummary/>
+          <ProfileSummary />
         </div>
         <div className={styles.secondSection}>
-          <NewPost/>
-          {posts.length === 0 ? (
-            <p>
-              No posts yet. Be the first to create one!
-            </p>
-          ) : (
-            posts.map((post) => (
-              <PostServer key={post.postId} post={post} />
-            ))
-          )}
+          <NewPost />
         </div>
         <div className={styles.thirdSection}>
           <ChatSection></ChatSection>
         </div>
         {/* <MiniProfile data={res2} isMyprofile={false} /> */}
+        <Feed initialPosts={posts} />
       </main>
     </>
   );
