@@ -8,6 +8,7 @@ import { ProfileAPIResponse } from '@/libs/globalTypes';
 import { useUserStats } from '@/providers/userStatsContext';
 import { useAuth } from '@/providers/authProvider';
 import AvatarHolder from '@/components/ui/avatar_holder/avatarholder.client';
+import { ConfirmationModal } from '@/components/ui/ConfirmationModal/ConfirmationModal';
 
 export function ProfileSettings({ profile }: { profile: ProfileAPIResponse }) {
   const { dispatch } = useUserStats();
@@ -22,10 +23,18 @@ export function ProfileSettings({ profile }: { profile: ProfileAPIResponse }) {
     avatarId: profile.avatarId || null,
   });
   const [isLoading, setIsLoading] = useState(false);
+  const [showConfirmation, setShowConfirmation] = useState(false);
+  const [showAvatarConfirm, setShowAvatarConfirm] = useState(false);
+  const [pendingAvatarFile, setPendingAvatarFile] = useState<File | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setShowConfirmation(true);
+  };
+
+  const confirmUpdate = async () => {
     setIsLoading(true);
+    setShowConfirmation(false);
 
     try {
       await http.put(`/api/v1/users/${profile.userId}/profile`, formData);
@@ -52,9 +61,16 @@ export function ProfileSettings({ profile }: { profile: ProfileAPIResponse }) {
   const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    setPendingAvatarFile(file);
+    setShowAvatarConfirm(true);
+  };
 
+  const confirmAvatarUpload = async () => {
+    if (!pendingAvatarFile) return;
+    setShowAvatarConfirm(false);
+    
     try {
-      const response = await authService.uploadAvatar(file);
+      const response = await authService.uploadAvatar(pendingAvatarFile);
       const newFormData = { ...formData, avatarId: response.mediaId };
       setFormData(newFormData);
       
@@ -69,6 +85,25 @@ export function ProfileSettings({ profile }: { profile: ProfileAPIResponse }) {
       }
     } catch (error) {
       console.error('Failed to upload avatar:', error);
+    } finally {
+      setPendingAvatarFile(null);
+    }
+  };
+
+  const handleRemoveAvatar = async () => {
+    try {
+      const newFormData = { ...formData, avatarId: null };
+      setFormData(newFormData);
+      
+      await http.put(`/api/v1/users/${profile.userId}/profile`, { ...formData, avatarId: null });
+      dispatch({ type: 'SET_AVATAR_ID', payload: null });
+      
+      if (user) {
+        const updatedUser = { ...user, avatarId: null };
+        setUser(updatedUser);
+      }
+    } catch (error) {
+      console.error('Failed to remove avatar:', error);
     }
   };
 
@@ -87,7 +122,7 @@ export function ProfileSettings({ profile }: { profile: ProfileAPIResponse }) {
               Upload Photo
               <input type="file" accept="image/*" onChange={handleAvatarUpload} hidden />
             </label>
-            <button className={styles.removeBtn}>Remove</button>
+            <button className={styles.removeBtn} onClick={handleRemoveAvatar}>Remove</button>
           </div>
         </div>
       </div>
@@ -156,6 +191,22 @@ export function ProfileSettings({ profile }: { profile: ProfileAPIResponse }) {
           </button>
         </div>
       </form>
+
+      <ConfirmationModal
+        isOpen={showAvatarConfirm}
+        title="Update Profile Photo"
+        message="Are you sure you want to change your profile photo?"
+        onConfirm={confirmAvatarUpload}
+        onCancel={() => { setShowAvatarConfirm(false); setPendingAvatarFile(null); }}
+      />
+
+      <ConfirmationModal
+        isOpen={showConfirmation}
+        title="Confirm Profile Update"
+        message="Are you sure you want to save these changes to your profile?"
+        onConfirm={confirmUpdate}
+        onCancel={() => setShowConfirmation(false)}
+      />
     </div>
   );
 }

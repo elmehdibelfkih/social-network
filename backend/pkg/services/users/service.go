@@ -179,6 +179,52 @@ func UpdateUserProfile(w http.ResponseWriter, userId int64, req *UpdateProfileRe
 		}
 	}
 
+	// Handle account deletion if requested
+	if req.DeleteAccount != nil && *req.DeleteAccount {
+		utils.BackendErrorTarget(nil, "Account deletion requested for user: "+string(rune(userId)))
+		err := DeleteUserAccount(userId)
+		if err != nil {
+			utils.BackendErrorTarget(err, context+" - DeleteUserAccount failed")
+			utils.InternalServerError(w)
+			return response, false
+		}
+		response.Message = "Account deleted successfully."
+		return response, true
+	}
+
+	// Validate password change if requested
+	if req.CurrentPassword != nil && req.Password != nil {
+		// Verify current password
+		currentPasswordHash, err := SelectUserPasswordHash(userId)
+		if err != nil {
+			utils.BackendErrorTarget(err, context)
+			utils.InternalServerError(w)
+			return response, false
+		}
+		
+		if !utils.CheckPasswordHash(*req.CurrentPassword, currentPasswordHash) {
+			utils.BadRequest(w, "Current password is incorrect.", "alert")
+			return response, false
+		}
+		
+		// Hash new password
+		newPasswordHash := *req.Password
+		err = utils.GeneratePasswordHash(&newPasswordHash)
+		if err != nil {
+			utils.BackendErrorTarget(err, context)
+			utils.InternalServerError(w)
+			return response, false
+		}
+		
+		// Update password
+		err = UpdateUserPasswordInDB(userId, newPasswordHash)
+		if err != nil {
+			utils.BackendErrorTarget(err, context)
+			utils.InternalServerError(w)
+			return response, false
+		}
+	}
+
 	// Update profile
 	err = UpdateUserProfileInDB(userId, firstName, lastName, nickname, aboutMe, avatarId, dateOfBirth, email)
 	if err != nil {

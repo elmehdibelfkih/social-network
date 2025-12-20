@@ -303,6 +303,111 @@
   cursor: pointer;
 }
 
+.devicesList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.devicesGrid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: 1fr;
+}
+
+.deviceCard {
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 20px;
+  background: white;
+  transition: all 0.2s;
+}
+
+.deviceCard:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.currentDevice {
+  border-color: #10b981;
+  background: #f0fdf4;
+}
+
+.deviceHeader {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.deviceIconWrapper {
+  width: 48px;
+  height: 48px;
+  background: #f3f4f6;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.deviceIcon {
+  font-size: 24px;
+}
+
+.deviceMainInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.deviceTitle {
+  font-size: 16px;
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.currentLabel {
+  background: #10b981;
+  color: white;
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.deviceSubtitle {
+  font-size: 14px;
+  color: #6b7280;
+  line-height: 1.4;
+}
+
+.deviceActions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.signOutBtn {
+  background: transparent;
+  color: #dc2626;
+  border: 1px solid #dc2626;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.signOutBtn:hover {
+  background: #dc2626;
+  color: white;
+}
+
 @media (max-width: 768px) {
   .container {
     flex-direction: column;

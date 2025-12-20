@@ -203,6 +203,20 @@ func SelectNicknameExists(nickname string, excludeUserId int64) (bool, error) {
 	return count > 0, nil
 }
 
+// SelectUserPasswordHash returns the password hash for a user.
+func SelectUserPasswordHash(userId int64) (string, error) {
+	var passwordHash string
+	err := config.DB.QueryRow("SELECT password_hash FROM users WHERE id = ?", userId).Scan(&passwordHash)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return "", sql.ErrNoRows
+		}
+		utils.SQLiteErrorTarget(err, "SELECT password_hash FROM users WHERE id = ?")
+		return "", err
+	}
+	return passwordHash, nil
+}
+
 // Write operations
 
 // UpdateUserProfileInDB persists profile changes.
@@ -246,6 +260,49 @@ func UpdateUserPrivacyInDB(userId int64, privacy string) error {
 	}
 	if rowsAffected == 0 {
 		return sql.ErrNoRows
+	}
+	return nil
+}
+
+// UpdateUserPasswordInDB updates a user's password hash.
+func UpdateUserPasswordInDB(userId int64, passwordHash string) error {
+	result, err := config.DB.Exec("UPDATE users SET password_hash = ? WHERE id = ?", passwordHash, userId)
+	if err != nil {
+		utils.SQLiteErrorTarget(err, "UPDATE users SET password_hash = ? WHERE id = ?")
+		return err
+	}
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		utils.SQLiteErrorTarget(err, "UPDATE users SET password_hash = ? WHERE id = ?")
+		return err
+	}
+	if rowsAffected == 0 {
+		return sql.ErrNoRows
+	}
+	return nil
+}
+
+// DeleteUserAccount deletes a user account and all related data.
+func DeleteUserAccount(userId int64) error {
+	// Delete user posts and related data
+	_, err := config.DB.Exec("DELETE FROM posts WHERE author_id = ?", userId)
+	if err != nil {
+		utils.SQLiteErrorTarget(err, "DELETE FROM posts WHERE author_id = ?")
+		return err
+	}
+	
+	// Delete user sessions
+	_, err = config.DB.Exec("DELETE FROM sessions WHERE user_id = ?", userId)
+	if err != nil {
+		utils.SQLiteErrorTarget(err, "DELETE FROM sessions WHERE user_id = ?")
+		return err
+	}
+	
+	// Delete user account
+	_, err = config.DB.Exec("DELETE FROM users WHERE id = ?", userId)
+	if err != nil {
+		utils.SQLiteErrorTarget(err, "DELETE FROM users WHERE id = ?")
+		return err
 	}
 	return nil
 }

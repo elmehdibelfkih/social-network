@@ -1,4 +1,4 @@
-export type SettingsTab = 'profile' | 'privacy';
+export type SettingsTab = 'profile' | 'privacy' | 'devices';
 
 export type ProfileUpdateData = {
   firstName: string;
@@ -16,3 +16,11 @@ export type PasswordUpdateData = {
 };
 
 export { ProfileAPIResponse } from '@/libs/globalTypes';
+
+export interface Session {
+  sessionId: number;
+  ipAddress: string;
+  device: string;
+  createdAt: string;
+  current: boolean;
+}

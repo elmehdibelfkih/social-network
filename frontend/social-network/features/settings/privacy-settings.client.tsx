@@ -6,6 +6,7 @@ import { http } from '@/libs/apiFetch';
 import { ProfileAPIResponse } from '@/libs/globalTypes';
 import { useUserStats } from '@/providers/userStatsContext';
 import { ShowSnackbar } from '@/components/ui/snackbar/snackbar';
+import { ConfirmationModal } from '@/components/ui/ConfirmationModal/ConfirmationModal';
 
 export function PrivacySettings({ profile }: { profile: ProfileAPIResponse }) {
   const { state, dispatch } = useUserStats();
@@ -15,6 +16,10 @@ export function PrivacySettings({ profile }: { profile: ProfileAPIResponse }) {
     confirmPassword: '',
   });
   const [isLoading, setIsLoading] = useState(false);
+  const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
+  const [showPrivacyConfirm, setShowPrivacyConfirm] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [pendingPrivacy, setPendingPrivacy] = useState<'public' | 'private'>('public');
 
   const handlePasswordUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -34,10 +39,14 @@ export function PrivacySettings({ profile }: { profile: ProfileAPIResponse }) {
       return;
     }
 
+    setShowPasswordConfirm(true);
+  };
+
+  const confirmPasswordUpdate = async () => {
     setIsLoading(true);
+    setShowPasswordConfirm(false);
     try {
       await http.put(`/api/v1/users/${profile.userId}/profile`, {
-        ...profile,
         currentPassword: passwords.currentPassword,
         password: passwords.newPassword,
       });
@@ -52,11 +61,34 @@ export function PrivacySettings({ profile }: { profile: ProfileAPIResponse }) {
   };
 
   const handlePrivacyToggle = async (privacy: 'public' | 'private') => {
+    setPendingPrivacy(privacy);
+    setShowPrivacyConfirm(true);
+  };
+
+  const confirmPrivacyUpdate = async () => {
+    setShowPrivacyConfirm(false);
     try {
-      await http.put(`/api/v1/users/${profile.userId}/privacy`, { privacy });
-      dispatch({ type: 'SET_PRIVACY', payload: privacy });
+      await http.put(`/api/v1/users/${profile.userId}/privacy`, { privacy: pendingPrivacy });
+      dispatch({ type: 'SET_PRIVACY', payload: pendingPrivacy });
     } catch (error) {
       console.error('Failed to update privacy:', error);
+    }
+  };
+
+  const handleDeleteAccount = () => {
+    setShowDeleteConfirm(true);
+  };
+
+  const confirmDeleteAccount = async () => {
+    setShowDeleteConfirm(false);
+    try {
+      await http.put(`/api/v1/users/${profile.userId}/profile`, { deleteAccount: true });
+      // Logout and redirect
+      await http.post('/api/v1/auth/logout');
+      window.location.href = '/auth';
+    } catch (error) {
+      console.error('Failed to delete account:', error);
+      ShowSnackbar({ status: false, message: 'Failed to delete account' });
     }
   };
 
@@ -139,8 +171,32 @@ export function PrivacySettings({ profile }: { profile: ProfileAPIResponse }) {
       <div className={styles.dangerZone}>
         <h3>Danger Zone</h3>
         <p>Irreversible actions</p>
-        <button className={styles.deleteBtn}>Delete Account</button>
+        <button className={styles.deleteBtn} onClick={handleDeleteAccount}>Delete Account</button>
       </div>
+
+      <ConfirmationModal
+        isOpen={showPasswordConfirm}
+        title="Confirm Password Change"
+        message="Are you sure you want to change your password? You will need to use the new password to login."
+        onConfirm={confirmPasswordUpdate}
+        onCancel={() => setShowPasswordConfirm(false)}
+      />
+
+      <ConfirmationModal
+        isOpen={showPrivacyConfirm}
+        title="Confirm Privacy Change"
+        message={`Are you sure you want to make your profile ${pendingPrivacy}?`}
+        onConfirm={confirmPrivacyUpdate}
+        onCancel={() => setShowPrivacyConfirm(false)}
+      />
+
+      <ConfirmationModal
+        isOpen={showDeleteConfirm}
+        title="Delete Account"
+        message="Are you sure you want to permanently delete your account? This action cannot be undone."
+        onConfirm={confirmDeleteAccount}
+        onCancel={() => setShowDeleteConfirm(false)}
+      />
     </div>
   );
 }

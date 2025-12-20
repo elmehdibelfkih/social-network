@@ -4,6 +4,7 @@ import { useState } from 'react';
 import styles from './styles.module.css';
 import { ProfileSettings } from './profile-settings.client';
 import { PrivacySettings } from './privacy-settings.client';
+import { DeviceSettings } from './device-settings.client';
 import { SettingsTab, ProfileAPIResponse } from './types';
 import { ProfileAPIResponse as GlobalProfileAPIResponse } from '@/libs/globalTypes';
 
@@ -29,12 +30,19 @@ export function SettingsClient({ profile }: { profile: GlobalProfileAPIResponse 
           >
             Privacy & Security
           </button>
+          <button
+            className={`${styles.navItem} ${activeTab === 'devices' ? styles.active : ''}`}
+            onClick={() => setActiveTab('devices')}
+          >
+            Manage Devices
+          </button>
         </nav>
       </div>
 
       <div className={styles.content}>
         {activeTab === 'profile' && <ProfileSettings profile={profile} />}
         {activeTab === 'privacy' && <PrivacySettings profile={profile} />}
+        {activeTab === 'devices' && <DeviceSettings />}
       </div>
     </div>
   );
