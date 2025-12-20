@@ -317,6 +317,29 @@ func EventRSVP(w http.ResponseWriter, r *http.Request,
 	return true
 }
 
+func SelectEventRSVP(w http.ResponseWriter, r *http.Request, response *GetRSVPResponseJson, context string,
+) bool {
+	userId := utils.GetUserIdFromContext(r)
+	eventId := utils.GetWildCardValue(w, r, "event_id")
+	err := SelectRsvp(eventId, userId, response)
+	if err != nil {
+		utils.BackendErrorTarget(err, context)
+		utils.IdentifySqlError(w, err)
+		return false
+	}
+	return true
+}
+
+func CountEventRSVPHttp(w http.ResponseWriter,
+	response GetRSVPResponseJson,
+) {
+	utils.JsonResponseEncode(w, http.StatusOK, map[string]any{
+		"success": true,
+		"payload": response,
+		"error":   map[string]any{},
+	})
+}
+
 func PostEventRSVPHttp(w http.ResponseWriter,
 	response RSVPResponseJson,
 ) {

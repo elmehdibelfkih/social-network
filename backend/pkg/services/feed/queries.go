@@ -87,7 +87,7 @@ const (
 	FROM posts p
 	JOIN users u ON p.author_id = u.id
 	WHERE p.group_id = ?
-	  AND p.privacy = 'group'
+	AND p.privacy = 'group'
 	ORDER BY p.created_at DESC
 	LIMIT ? OFFSET ?`
 

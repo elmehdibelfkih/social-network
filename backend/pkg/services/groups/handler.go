@@ -2,6 +2,7 @@ package groups
 
 import (
 	"net/http"
+
 	"social/pkg/utils"
 )
 
@@ -145,6 +146,13 @@ func PostEventRSVP(w http.ResponseWriter, r *http.Request) {
 	PostEventRSVPHttp(w, response)
 }
 
+func GetEventRSVP(w http.ResponseWriter, r *http.Request) {
+	var response GetRSVPResponseJson
+	if !SelectEventRSVP(w, r, &response, "CountEventRSVP handler") {
+		return
+	}
+	CountEventRSVPHttp(w, response)
+}
 
 func GetEventInfo(w http.ResponseWriter, r *http.Request) {
 	var response GetEventResponseJson

@@ -499,6 +499,22 @@ func UpdateRsvp(eventId, userId int64, r *RSVPRequestJson, rs *RSVPResponseJson)
 	})
 }
 
+func SelectRsvp(eventId, userId int64, rs *GetRSVPResponseJson) error {
+	return database.WrapWithTransaction(func(tx *sql.Tx) error {
+		err := tx.QueryRow(COUNT_EVENT_RSVP_COUNTS, eventId).Scan(&rs.Countgoing, &rs.CountNotgoing)
+		if err != nil {
+			utils.SQLiteErrorTarget(err, COUNT_EVENT_RSVP_COUNTS)
+		}
+		var userResponse sql.NullString
+		err = tx.QueryRow(GET_USER_RSVP, eventId, userId).Scan(&userResponse)
+		if err != nil && err != sql.ErrNoRows {
+			utils.SQLiteErrorTarget(err, GET_USER_RSVP)
+		}
+		rs.Amigoing = userResponse.Valid && userResponse.String == "going"
+		return err
+	})
+}
+
 // delete
 func DeleteGroupMember(groupId, userId int64) error {
 	return database.WrapWithTransaction(func(tx *sql.Tx) error {

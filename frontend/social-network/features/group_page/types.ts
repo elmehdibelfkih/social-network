@@ -5,17 +5,17 @@ export type GroupPage = {
   // add fields
 };
 
-export type  GroupMember = {
+export type GroupMember = {
   user_id: number;
   full_name: string;
   role: string;
   joined_at: string;
 };
 
-export type  GroupMembersResponse = {
-    Limit: number;
-    group_id: number;
-    members: GroupMember[];
+export type GroupMembersResponse = {
+  Limit: number;
+  group_id: number;
+  members: GroupMember[];
 };
 
 export type Event = {
@@ -30,6 +30,13 @@ export type Event = {
 };
 
 
-export type RsvpResponse {
-    message: string;
-}
+export type RsvpResponse = {
+  message: string;
+};
+
+
+export type EventRsvpResponse = {
+  going_count: number;
+  notgoing_count: number;
+  ami_going: boolean;
+};

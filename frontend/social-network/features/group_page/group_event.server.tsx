@@ -2,6 +2,7 @@ import {Event} from './types'
 import { CalendarIcon, ClockIcon } from "@/components/ui/icons"
 import styles from "./event.module.css"
 import CreateRSVP from "./group_event.client"
+import {GroupService} from "./group_page.services"
 
 
 const formatEventDate = (dateString) => {

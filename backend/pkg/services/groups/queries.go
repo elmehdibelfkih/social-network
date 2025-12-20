@@ -79,6 +79,20 @@ const (
 		WHERE group_id = ?
 		ORDER BY created_at ASC;
 	`
+
+	COUNT_EVENT_RSVP_COUNTS = `
+			SELECT
+				SUM(CASE WHEN response = 'going' THEN 1 ELSE 0 END) AS going_count,
+				SUM(CASE WHEN response = 'not_going' THEN 1 ELSE 0 END) AS not_going_count
+			FROM group_event_responses
+			WHERE event_id = ?;
+		`
+
+	GET_USER_RSVP = `
+			SELECT response
+			FROM group_event_responses
+			WHERE event_id = ? AND user_id = ?;
+		`
 )
 
 // INSERT
