@@ -31,6 +31,7 @@ export default async function HomePage(): Promise<JSX.Element> {
         </div>
         {/* <MiniProfile data={res2} isMyprofile={false} /> */}
         <Feed initialPosts={posts} />
+        <div id="chat-portals"></div>
       </main>
     </>
   );

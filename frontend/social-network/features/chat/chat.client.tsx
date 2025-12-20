@@ -44,6 +44,18 @@ export function ChatSection() {
             switch (data.type) {
                 case 'online_status':
                     setUsers(data?.payload?.onlineStatus.onlineUsers)
+                    setOpenChats(prev => {
+                        const userIds = new Set(users.map(u => u.chatId))
+                        const next = new Map(prev)
+
+                        for (const [chatId, user] of next) {
+                            if (!userIds.has(user.chatId)) {
+                                next.delete(chatId)
+                            }
+                        }
+
+                        return next
+                    })
                     break;
                 case 'onlineUser': {
                     const updated = data?.payload?.onlineUser.user;
@@ -90,9 +102,9 @@ export function ChatSection() {
                     <img src="/svg/message-square.svg" alt="" />
                     <h2>Chats</h2>
                 </div>
-                    <button className={styles.closeAll} onClick={handleCloseAll}>
-                        <img src="/svg/x.svg" alt="" />
-                    </button>
+                <button className={styles.closeAll} onClick={handleCloseAll}>
+                    <img src="/svg/x.svg" alt="" />
+                </button>
             </div>
             <div className={styles.scrollArea}>
                 {users?.map((u) => (

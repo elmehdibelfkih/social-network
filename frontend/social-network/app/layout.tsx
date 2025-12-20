@@ -29,7 +29,6 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <head />
       <body className="app-root">
         {/* {children} */}
-        <div id="chat-portals"></div>
         <main className="main-content">{children}</main>
         <Snackbar />
         <Footer />
