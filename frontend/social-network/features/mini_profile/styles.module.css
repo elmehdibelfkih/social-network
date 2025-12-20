@@ -84,6 +84,7 @@
   gap: var(--spacing-xs);
   align-items: center;
   justify-content: center;
+  width: 100%;
 }
 
 .miniName {
@@ -95,7 +96,8 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 100%;
+  flex-shrink: 1;
+  min-width: 0;
 }
 
 .miniLock {
@@ -111,6 +113,7 @@
   align-items: center;
   justify-content: center;
   flex-wrap: wrap;
+  width: 100%;
 }
 
 .miniHandle {
@@ -119,7 +122,7 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 100%;
+  min-width: 0;
 }
 
 .badge {
@@ -224,7 +227,7 @@
 }
 
 .miniStatLabel {
-  font-size: 0.9375rem;
+  font-size: .9375rem;
   color: var(--gray-600);
   line-height: 1;
   font-weight: 400;

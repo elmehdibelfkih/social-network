@@ -19,7 +19,7 @@ export const privacyOptions = [
 
 export function NewPostClient() {
   const { user } = useAuth();
-  const { dispatch } = useUserStats();
+  const { state, dispatch } = useUserStats();
   const [content, setContent] = useState('');
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [privacy, setPrivacy] = useState<PrivacyLevel>('public');
@@ -101,7 +101,7 @@ export function NewPostClient() {
   return (
     <form onSubmit={handleSubmit} className={styles.form}>
       <div className={styles.leftPart}>
-        <AvatarHolder avatarId={user?.avatarId ?? null} size={60} />
+        <AvatarHolder avatarId={state.avatarId ?? user?.avatarId ?? null} size={60} />
       </div>
 
       <div className={styles.rightPart}>
