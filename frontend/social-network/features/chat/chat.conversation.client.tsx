@@ -216,6 +216,17 @@ export default function ChatConversation({ chatId, user, onClose }: ChatConversa
             input.slice(end);
 
         setInput(next);
+        //send typing
+        chatService.sendToWorker({
+            source: "client", type: "chat_typing", payload: {
+                typingIndicator: {
+                    firstName: user.firstName,
+                    lastName: user.lastName,
+                    nickName: user.nickname || "",
+                    chatId: chatId
+                }
+            }
+        })
 
         requestAnimationFrame(() => {
             el.focus();
