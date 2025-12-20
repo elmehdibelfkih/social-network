@@ -38,14 +38,14 @@ export function ProfileSettings({ profile }: { profile: ProfileAPIResponse }) {
 
     try {
       await http.put(`/api/v1/users/${profile.userId}/profile`, formData);
-      
+
       dispatch({ type: 'SET_FIRST_NAME', payload: formData.firstName });
       dispatch({ type: 'SET_LAST_NAME', payload: formData.lastName });
       dispatch({ type: 'SET_NICKNAME', payload: formData.nickname });
       dispatch({ type: 'SET_ABOUT_ME', payload: formData.aboutMe });
       dispatch({ type: 'SET_DATE_OF_BIRTH', payload: formData.dateOfBirth });
       dispatch({ type: 'SET_AVATAR_ID', payload: formData.avatarId });
-      
+
       // Update auth provider with new email
       if (user) {
         const updatedUser = { ...user, email: formData.email, nickname: formData.nickname };
@@ -68,16 +68,16 @@ export function ProfileSettings({ profile }: { profile: ProfileAPIResponse }) {
   const confirmAvatarUpload = async () => {
     if (!pendingAvatarFile) return;
     setShowAvatarConfirm(false);
-    
+
     try {
       const response = await authService.uploadAvatar(pendingAvatarFile);
       const newFormData = { ...formData, avatarId: response.mediaId };
       setFormData(newFormData);
-      
+
       // Save avatar immediately to backend
       await http.put(`/api/v1/users/${profile.userId}/profile`, { ...formData, avatarId: response.mediaId });
       dispatch({ type: 'SET_AVATAR_ID', payload: response.mediaId });
-      
+
       // Update auth provider for NewPost component
       if (user) {
         const updatedUser = { ...user, avatarId: response.mediaId };
@@ -94,10 +94,10 @@ export function ProfileSettings({ profile }: { profile: ProfileAPIResponse }) {
     try {
       const newFormData = { ...formData, avatarId: null };
       setFormData(newFormData);
-      
+
       await http.put(`/api/v1/users/${profile.userId}/profile`, { ...formData, avatarId: null });
       dispatch({ type: 'SET_AVATAR_ID', payload: null });
-      
+
       if (user) {
         const updatedUser = { ...user, avatarId: null };
         setUser(updatedUser);
@@ -135,6 +135,8 @@ export function ProfileSettings({ profile }: { profile: ProfileAPIResponse }) {
               type="text"
               value={formData.firstName}
               onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
+              required
+              maxLength={50}
             />
           </div>
           <div className={styles.field}>
@@ -143,6 +145,8 @@ export function ProfileSettings({ profile }: { profile: ProfileAPIResponse }) {
               type="text"
               value={formData.lastName}
               onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
+              required
+              maxLength={50}
             />
           </div>
         </div>
@@ -154,6 +158,9 @@ export function ProfileSettings({ profile }: { profile: ProfileAPIResponse }) {
             value={formData.nickname}
             onChange={(e) => setFormData({ ...formData, nickname: e.target.value })}
             placeholder="Your username"
+            required
+            maxLength={50}
+
           />
         </div>
 
@@ -163,6 +170,8 @@ export function ProfileSettings({ profile }: { profile: ProfileAPIResponse }) {
             type="email"
             value={formData.email}
             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+            required
+            maxLength={256}
           />
         </div>
 
@@ -172,6 +181,8 @@ export function ProfileSettings({ profile }: { profile: ProfileAPIResponse }) {
             value={formData.aboutMe}
             onChange={(e) => setFormData({ ...formData, aboutMe: e.target.value })}
             placeholder="Brief description for your profile"
+            maxLength={2048}
+
           />
         </div>
 
