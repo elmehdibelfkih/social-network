@@ -39,7 +39,7 @@ const (
 	SELECT_GROUP_MEMBERS_COUNT = `
 		SELECT followers_count FROM counters WHERE entity_type = ? AND entity_id = ?
 	`
-	
+
 	SELECT_BROWSE_GROUPS = `
 		SELECT id, title, description, avatar_id, creator_id, created_at
 		FROM groups
@@ -103,12 +103,22 @@ const (
 		RETURNING id, group_id, title, description, start_at, end_at, location, creator_id, created_at;
 	`
 
+	// INSERT_EVENT_RSVP = `
+	// 	INSERT INTO event_rsvps (event_id, user_id, option)
+	// 	VALUES (?, ?, ?)
+	// 	ON CONFLICT(event_id, user_id)
+	// 	DO UPDATE SET option = excluded.option;
+	// `
+
 	INSERT_EVENT_RSVP = `
-		INSERT INTO event_rsvps (event_id, user_id, option)
-		VALUES (?, ?, ?)
-		ON CONFLICT(event_id, user_id)
-		DO UPDATE SET option = excluded.option;
+	INSERT INTO group_event_responses (event_id, user_id, response)
+	VALUES (?, ?, ?)
+	ON CONFLICT (event_id, user_id)
+	DO UPDATE SET
+		response = excluded.response,
+		responded_at = CURRENT_TIMESTAMP;
 	`
+
 	INSERT_NOTIFICATION = `
 	INSERT INTO notifications (id, user_id, type, reference_type, reference_id, content) 
 	VALUES (?, ?, ?, ?, ?, ?)

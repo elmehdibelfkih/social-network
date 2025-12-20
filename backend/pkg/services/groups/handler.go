@@ -145,6 +145,7 @@ func PostEventRSVP(w http.ResponseWriter, r *http.Request) {
 	PostEventRSVPHttp(w, response)
 }
 
+
 func GetEventInfo(w http.ResponseWriter, r *http.Request) {
 	var response GetEventResponseJson
 	if !EventInfo(w, r, &response, "GetEventInfo handler") {

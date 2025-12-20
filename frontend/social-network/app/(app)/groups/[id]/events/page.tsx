@@ -12,7 +12,7 @@ export default async function EventPage({ params }) {
     const events = await GroupService.getGroupEvents(groupId)
     return (
         <>
-            <GroupEventsCard events={events} />
+            <GroupEventsCard events={events} groupId={groupId} />
         </>
     );
 }

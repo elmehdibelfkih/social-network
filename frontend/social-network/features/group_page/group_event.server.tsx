@@ -1,6 +1,7 @@
 import {Event} from './types'
 import { CalendarIcon, ClockIcon } from "@/components/ui/icons"
 import styles from "./event.module.css"
+import CreateRSVP from "./group_event.client"
 
 
 const formatEventDate = (dateString) => {
@@ -18,7 +19,7 @@ const formatEventDate = (dateString) => {
 };
 
 
-export default async function GroupEventsCard({ events }: { events: Event[] }) {
+export default async function GroupEventsCard({ events , groupId }: { events: Event[] , groupId: number}) {
     return (
         <>
             {events && events.length > 0 && (
@@ -47,6 +48,7 @@ export default async function GroupEventsCard({ events }: { events: Event[] }) {
                                         </div>
                                     </div>  
                                 </div>
+                                <CreateRSVP eventId={event.event_id} groupId={groupId}/>
                             </div>
                         );
                     })}

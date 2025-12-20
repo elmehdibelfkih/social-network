@@ -28,3 +28,8 @@ export type Event = {
   created_by: number;
   created_at: string;
 };
+
+
+export type RsvpResponse {
+    message: string;
+}

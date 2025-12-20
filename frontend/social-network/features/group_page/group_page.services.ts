@@ -2,7 +2,7 @@
 // Minimal service stubs for group_page
 import { http } from "@/libs/apiFetch"
 
-import {GroupMember,GroupMembersResponse} from './types'
+import {GroupMember,GroupMembersResponse , RsvpResponse } from './types'
 
 export const GroupService = {
 
@@ -27,6 +27,33 @@ async getGroupMembers(groupId: number, limit = 10, lastItemId?: number): Promise
   } catch (error) {
     console.error(`Failed to fetch members for group ${groupId}:`, error);
     return [];
+  }
+},
+
+
+async rsvpToEvent(
+  groupId: number,
+  eventId: number,
+  option: 'going' | 'not_going'
+): Promise<RsvpResponse | null> {
+  try {
+    const response = await http.post<RsvpResponse>(
+      `/api/v1/groups/${groupId}/events/${eventId}/rsvp`,
+      {
+        option
+      },
+      {
+        throwOnError: false, 
+        redirectOnError: false 
+      }
+    );
+    console.log("this is RSVP ",response)
+
+    return response;
+
+  } catch (error) {
+    console.error('Failed to RSVP to event:', error);
+    return null;
   }
 },
 
