@@ -68,7 +68,25 @@ func DeleteMedia(mediaID int64, userID int64) (string, error) {
 			utils.SQLiteErrorTarget(err, "DeleteMedia (QueryRow)")
 			return err
 		}
-		_, err = tx.Exec(QUERY_DELETE_MEDIA, mediaID, userID)
+		
+		// Check ownership: for avatars (owner_id is NULL), allow deletion by any user who has it as their avatar
+		// For other media, check if user owns it
+		if media.Purpose == "avatar" {
+			// For avatars, check if this user has this avatar set in their profile
+			var count int
+			err = tx.QueryRow("SELECT COUNT(1) FROM users WHERE id = ? AND avatar_id = ?", userID, mediaID).Scan(&count)
+			if err != nil || count == 0 {
+				return fmt.Errorf("forbidden")
+			}
+			_, err = tx.Exec("DELETE FROM media WHERE id = ?", mediaID)
+		} else {
+			// For non-avatar media, check ownership
+			if media.OwnerId == nil || *media.OwnerId != userID {
+				return fmt.Errorf("forbidden")
+			}
+			_, err = tx.Exec(QUERY_DELETE_MEDIA, mediaID, userID)
+		}
+		
 		if err != nil {
 			utils.SQLiteErrorTarget(err, "DeleteMedia (Exec)")
 			return err
