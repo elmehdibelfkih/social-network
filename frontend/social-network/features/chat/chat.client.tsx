@@ -48,7 +48,7 @@ export function ChatSection() {
                 case 'onlineUser': {
                     const updated = data?.payload?.onlineUser.user;
                     setUsers(prev =>
-                        prev.map(u =>
+                        prev?.map(u =>
                             u.userId === updated.userId
                                 ? { ...u, online: updated.online }
                                 : u
@@ -59,7 +59,7 @@ export function ChatSection() {
                 case 'offlineUser': {
                     const updated = data?.payload?.offlineUser.user;
                     setUsers(prev =>
-                        prev.map(u =>
+                        prev?.map(u =>
                             u.userId === updated.userId
                                 ? { ...u, online: updated.online }
                                 : u

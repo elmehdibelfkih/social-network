@@ -90,3 +90,18 @@ type OnlineUser struct {
 type OfflineUser struct {
 	User User `json:"user"`
 }
+
+func (o *OnlineStatus) removeDuplicate() {
+	seen := make(map[int64]bool)
+	unique := make([]User, 0, len(o.OnlineUsers))
+
+	for _, user := range o.OnlineUsers {
+		if !seen[user.UserId] {
+			seen[user.UserId] = true
+			unique = append(unique, user)
+		}
+	}
+
+	o.OnlineUsers = unique
+}
+

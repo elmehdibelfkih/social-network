@@ -125,6 +125,7 @@ func SelectUserFollowers(userId int64) (*OnlineStatus, error) {
 		}
 		return nil
 	})
+	users.removeDuplicate()
 	return &users, err
 }
 

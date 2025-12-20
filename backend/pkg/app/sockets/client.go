@@ -160,6 +160,7 @@ func (c *Client) handleEvent(e Event) error {
 		}
 		return nil
 	case "online_status":
+		fmt.Println("ha levent",e)
 		if err := c.onlineStatus(e); err != nil {
 			c.events <- Event{
 				Source:  "server",

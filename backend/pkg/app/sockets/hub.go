@@ -42,7 +42,6 @@ func (h *Hub) Run() {
 func (h *Hub) AddChatUser(chatId, userId int64) {
 	h.mu.Lock()
 	defer h.mu.Unlock()
-
 	if len(h.clients[userId]) > 0 {
 		src := h.clients[userId]
 		if src == nil {
@@ -146,5 +145,17 @@ func (h *Hub) Notify(n Notification) {
 				},
 			},
 		}
+	}
+}
+
+func (h *Hub) UpdateChats(userId int64) {
+	h.mu.Lock()
+	defer h.mu.Unlock()
+
+	for _, c := range h.clients[userId] {
+		go c.handleEvent(Event{
+			Source: "server",
+			Type:   "online_status",
+		})
 	}
 }

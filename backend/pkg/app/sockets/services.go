@@ -2,6 +2,7 @@ package socket
 
 import (
 	"errors"
+	"fmt"
 	"time"
 
 	"social/pkg/utils"
@@ -77,20 +78,22 @@ func (c *Client) ClientRemoved(e Event) error {
 }
 
 func (c *Client) onlineStatus(e Event) error {
+	c.hub.mu.Lock()
+	defer c.hub.mu.Unlock()
+
 	var err error
 	e.Payload = &ClientMessage{}
 	users, err := SelectUserFollowers(c.userId)
+	fmt.Println("USERS", users)
 	if err != nil {
 		utils.BackendErrorTarget(err, "websocket error")
 		return err
 	}
 
-	c.hub.mu.Lock()
 	onlineIDs := make(map[int64]struct{}, len(c.hub.clients))
 	for id := range c.hub.clients {
 		onlineIDs[id] = struct{}{}
 	}
-	c.hub.mu.Unlock()
 	if users != nil {
 		for i := range users.OnlineUsers {
 			if _, exist := onlineIDs[users.OnlineUsers[i].UserId]; exist {

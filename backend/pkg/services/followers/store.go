@@ -165,6 +165,9 @@ func createConversation(followerId, followedId int64) error {
 				utils.SQLiteErrorTarget(err, UPDATE_CHAT_ACTIVE)
 				return err
 			}
+			
+			socket.WSManger.AddChatUser(chatId, followerId)
+			socket.WSManger.AddChatUser(chatId, followedId)
 			return nil
 		}
 		chatId = utils.GenerateID()
