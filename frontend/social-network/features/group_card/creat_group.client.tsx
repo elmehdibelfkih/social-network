@@ -1,7 +1,7 @@
 // CreateGroupModal.tsx
 'use client'
 import React, { useState } from 'react';
-import { X, Upload, Image } from 'lucide-react';
+import { CloseIcon, ImageIcon, UploadIcon } from "@/components/ui/icons"
 import styles from './creategroup.module.css';
 import { CreateGroupPayload } from './types'
 import { GroupService } from "./group_card.services"
@@ -75,15 +75,25 @@ const CreateGroupModal: React.FC<CreateGroupModalProps> = ({
     }
     setIsUploading(false);
     setFormData(prev => ({
-        ...prev,
-        avatarId: -1
-      }));
+      ...prev,
+      avatarId: -1
+    }));
 
   };
 
   async function handleSubmit() {
     if (!formData.title.trim() || !formData.description.trim()) {
       setError('Please fill in all required fields');
+      return;
+    }
+
+    if ( formData.title.trim().length > 40 || !formData.description.trim()) {
+      setError('the title is more than 40');
+      return;
+    }
+
+      if (formData.description.trim().length > 400) {
+      setError('the description is more than 250');
       return;
     }
 
@@ -142,7 +152,7 @@ const CreateGroupModal: React.FC<CreateGroupModalProps> = ({
 
         {/* Close Button */}
         <button onClick={handleClose} className={styles.closeButton}>
-          <X className={styles.closeIcon} />
+          <CloseIcon />
           <span className={styles.srOnly}>Close</span>
         </button>
 
@@ -200,12 +210,12 @@ const CreateGroupModal: React.FC<CreateGroupModalProps> = ({
                       className={styles.imagePreview}
                     />
                     <div className={styles.imageOverlay}>
-                      <Upload className={styles.uploadIcon} />
+                      <UploadIcon />
                     </div>
                   </div>
                 ) : (
                   <div className={styles.uploadContent}>
-                    <Image className={styles.imageIcon} />
+                    <ImageIcon />
                     <span className={styles.uploadText}>Click to upload image</span>
                     <span className={styles.uploadSubtext}>PNG, JPG, GIF up to 10MB</span>
                   </div>
@@ -232,7 +242,7 @@ const CreateGroupModal: React.FC<CreateGroupModalProps> = ({
           {/* Create Button */}
           <button
             onClick={handleSubmit}
-            disabled={ formData.title.trim()=='' || formData.description.trim()=='' || formData.avatarId==null }
+            disabled={formData.title.trim() == '' || formData.description.trim() == '' || formData.avatarId == null}
             className={styles.submitButton}
           >
             Create Group

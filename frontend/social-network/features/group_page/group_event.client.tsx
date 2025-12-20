@@ -23,14 +23,12 @@ export default function CreateRSVP({
       if (data) {
         setGoingCount(data.going_count)
         setNotGoingCount(data.notgoing_count)
-        
-        // Set initial selection based on ami_going
+
         if (data.ami_going === true) {
           setIsGoing('going')
         } else if (data.ami_going === false) {
           setIsGoing('not_going')
         }
-        // If ami_going is null/undefined, leave it as null (no selection)
       }
     }
     
@@ -38,7 +36,6 @@ export default function CreateRSVP({
   }, [groupId, eventId])
 
   const handleCreateRsvp = async (option: RsvpOption) => {
-    // Optimistic update
     const previousIsGoing = isGoing
     const previousGoingCount = goingCount
     const previousNotGoingCount = notGoingCount
