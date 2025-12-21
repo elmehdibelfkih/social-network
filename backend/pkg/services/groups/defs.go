@@ -192,8 +192,8 @@ type RSVPResponseJson struct {
 }
 
 type GetRSVPResponseJson struct{
-	Countgoing int32      `json:"going_count"`
-	CountNotgoing int32   `json:"notgoing_count"`
+	Countgoing *int32      `json:"going_count"`
+	CountNotgoing *int32   `json:"notgoing_count"`
 	Amigoing bool		  `json:"ami_going"`
 }
 
