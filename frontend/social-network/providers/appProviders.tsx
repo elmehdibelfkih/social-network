@@ -7,9 +7,9 @@ import { NotificationProvider } from './notifsProvider';
 export function AppProviders({ children }: { children: ReactNode }) {
   return (
     <AuthProvider>
-      <NotificationProvider>
+      {/* <NotificationProvider> */}
         {children}
-      </NotificationProvider>
+      {/* </NotificationProvider> */}
     </AuthProvider>
   );
 }

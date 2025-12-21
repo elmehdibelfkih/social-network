@@ -10,6 +10,7 @@ import { AuthProvider } from "@/providers/authProvider";
 import SharedWorekerClient from "@/components/ui/worker";
 import { UserStatsState } from "@/libs/globalTypes";
 import { Counts } from "@/libs/globalTypes";
+import { NotificationProvider } from "@/providers/notifsProvider";
 
 
 export default async function AppLayout({ children }: { children: ReactNode }) {
@@ -26,7 +27,7 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
   }
   const stats: UserStatsState = {
     userId: profileRes.userId,
-    nickname: profileRes.nickname ,
+    nickname: profileRes.nickname,
     firstName: profileRes.firstName,
     lastName: profileRes.lastName,
     avatarId: profileRes.avatarId,
@@ -34,7 +35,7 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
     dateOfBirth: profileRes.dateOfBirth,
     privacy: profileRes.privacy,
     joinedAt: profileRes.joinedAt,
-    email: profileRes.email, 
+    email: profileRes.email,
     unreadNotifications: notificationsRes.unreadNotifications,
     postsCount: counts.postsCount,
     followersCount: counts.followersCount,
@@ -49,8 +50,8 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
     <AppProviders>
       <UserStatsProvider initialState={stats}>
         <SharedWorekerClient />
-        <Navbar />
-        {children}
+          <Navbar />
+          {children}
       </UserStatsProvider>
     </AppProviders>
   );

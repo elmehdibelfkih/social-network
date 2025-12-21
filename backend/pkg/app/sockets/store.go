@@ -127,6 +127,10 @@ func SelectUserFollowers(userId int64) (*OnlineStatus, error) {
 	return &users, err
 }
 
+// func SelectChatParticipants(chatId int64) int64 {
+
+// }
+
 func UpdateMessagesStatus(chatId, senderId int64, status string) error {
 	return database.WrapWithTransaction(func(tx *sql.Tx) error {
 		rows, err := tx.Query(UPDATE_MESSAGE_STATUS,

@@ -43,21 +43,23 @@ func (h *Hub) Run() {
 func (h *Hub) AddChatUser(chatId, userId int64) {
 	h.mu.Lock()
 	defer h.mu.Unlock()
-	fmt.Println("add Chat user", h.clients)
+	fmt.Println("clients   ", userId, "howa", h.clients[userId])
 	if len(h.clients[userId]) > 0 {
 		src := h.clients[userId]
 		if src == nil {
 			return
 		}
-		dst := append([]*Client(nil), src...)
+		dst := append([]*Client{}, src...)
 		if h.chatUsers[chatId] == nil {
-			return
+			h.chatUsers[chatId] = make(map[int64][]*Client)
 		}
+		fmt.Println("array of conns", dst)
 		h.chatUsers[chatId][userId] = dst
 		for _, c := range h.chatUsers[chatId][userId] {
 			c.userChats[chatId] = struct{}{}
 		}
 	}
+
 }
 
 func (h *Hub) addClient(c *Client) {
@@ -109,7 +111,7 @@ func (h *Hub) removeClient(c *Client) {
 func (h *Hub) ChatOnlineUsers(chatId int64) int {
 	h.mu.Lock()
 	defer h.mu.Unlock()
-
+	fmt.Println("chat users:", h.chatUsers[chatId])
 	return len(h.chatUsers[chatId])
 }
 
