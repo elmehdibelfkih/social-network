@@ -99,7 +99,7 @@ export function NewPostClient({ groupId }: { groupId?: number | null }) {
   return (
     <form onSubmit={handleSubmit} className={styles.form}>
       <div className={styles.leftPart}>
-        <AvatarHolder avatarId={state.avatarId ?? user?.avatarId ?? null} size={60} />
+        <AvatarHolder avatarId={state.avatarId} size={60} />
       </div>
 
       <div className={styles.rightPart}>

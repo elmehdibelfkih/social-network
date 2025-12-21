@@ -219,15 +219,7 @@ func DeleteSessionBySessionId(w http.ResponseWriter, r *http.Request, sessionId 
 }
 
 func DeleteSessionHttp(w http.ResponseWriter, response RevokeSessionResponseJson) {
-	http.SetCookie(w, &http.Cookie{
-		Name:     "session_token",
-		Value:    "",
-		Expires:  time.Unix(0, 0),
-		HttpOnly: true,
-		// SameSite: http.SameSiteStrictMode,
-		Path: "/",
-	})
-	response.Message = "Logout successful."
+	response.Message = "Session revoked successfully."
 	utils.WriteSuccess(w, http.StatusOK, response)
 }
 

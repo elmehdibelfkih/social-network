@@ -13,7 +13,7 @@ const (
 	`
 	SELECT_FOLLOWS_BY_ID = `
 		SELECT EXISTS (
-			SELECT 1 FROM follows WHERE follower_id = ? AND following_id = ?
+			SELECT 1 FROM follows WHERE follower_id = ? AND followed_id = ?
 		);
 	`
 	SELECT_GROUP_BY_OWNER = `

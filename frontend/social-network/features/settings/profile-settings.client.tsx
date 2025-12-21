@@ -8,6 +8,7 @@ import { ProfileAPIResponse } from '@/libs/globalTypes';
 import { useUserStats } from '@/providers/userStatsContext';
 import { useAuth } from '@/providers/authProvider';
 import AvatarHolder from '@/components/ui/avatar_holder/avatarholder.client';
+import { ShowSnackbar } from '@/components/ui/snackbar/snackbar';
 import { ConfirmationModal } from '@/components/ui/ConfirmationModal/ConfirmationModal';
 
 export function ProfileSettings({ profile }: { profile: ProfileAPIResponse }) {
@@ -21,10 +22,14 @@ export function ProfileSettings({ profile }: { profile: ProfileAPIResponse }) {
     aboutMe: profile.aboutMe || '',
     dateOfBirth: profile.dateOfBirth || '',
     avatarId: profile.avatarId || null,
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: '',
   });
   const [isLoading, setIsLoading] = useState(false);
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [showAvatarConfirm, setShowAvatarConfirm] = useState(false);
+  const [showDeleteAvatarConfirm, setShowDeleteAvatarConfirm] = useState(false);
   const [pendingAvatarFile, setPendingAvatarFile] = useState<File | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -37,22 +42,56 @@ export function ProfileSettings({ profile }: { profile: ProfileAPIResponse }) {
     setShowConfirmation(false);
 
     try {
-      await http.put(`/api/v1/users/${profile.userId}/profile`, formData);
+      const updateData: any = {
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        nickname: formData.nickname,
+        email: formData.email,
+        aboutMe: formData.aboutMe,
+        dateOfBirth: formData.dateOfBirth,
+        avatarId: formData.avatarId,
+      };
 
+      // Add password fields if changing password
+      if (formData.currentPassword.trim() && formData.newPassword.trim()) {
+        if (formData.newPassword !== formData.confirmPassword) {
+          ShowSnackbar({ status: false, message: 'New passwords do not match' });
+          setIsLoading(false);
+          return;
+        }
+        updateData.currentPassword = formData.currentPassword;
+        updateData.password = formData.newPassword;
+      }
+
+      await http.put(`/api/v1/users/${profile.userId}/profile`, updateData);
+      
       dispatch({ type: 'SET_FIRST_NAME', payload: formData.firstName });
       dispatch({ type: 'SET_LAST_NAME', payload: formData.lastName });
       dispatch({ type: 'SET_NICKNAME', payload: formData.nickname });
       dispatch({ type: 'SET_ABOUT_ME', payload: formData.aboutMe });
       dispatch({ type: 'SET_DATE_OF_BIRTH', payload: formData.dateOfBirth });
       dispatch({ type: 'SET_AVATAR_ID', payload: formData.avatarId });
-
+      
+      // Clear password fields after successful update
+      setFormData(prev => ({
+        ...prev,
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: ''
+      }));
+      
       // Update auth provider with new email
       if (user) {
         const updatedUser = { ...user, email: formData.email, nickname: formData.nickname };
         setUser(updatedUser);
       }
-    } catch (error) {
+      
+      ShowSnackbar({ status: true, message: 'Profile updated successfully' });
+    } catch (error: any) {
       console.error('Failed to update profile:', error);
+      // Show error message to user via Snackbar
+      const errorMsg = error?.response?.data?.error?.errorMessage || 'Failed to update profile';
+      ShowSnackbar({ status: false, message: errorMsg });
     } finally {
       setIsLoading(false);
     }
@@ -71,39 +110,57 @@ export function ProfileSettings({ profile }: { profile: ProfileAPIResponse }) {
 
     try {
       const response = await authService.uploadAvatar(pendingAvatarFile);
-      const newFormData = { ...formData, avatarId: response.mediaId };
-      setFormData(newFormData);
-
+      setFormData(prev => ({ ...prev, avatarId: response.mediaId }));
+      
       // Save avatar immediately to backend
-      await http.put(`/api/v1/users/${profile.userId}/profile`, { ...formData, avatarId: response.mediaId });
+      await http.put(`/api/v1/users/${profile.userId}/profile`, { avatarId: response.mediaId });
       dispatch({ type: 'SET_AVATAR_ID', payload: response.mediaId });
-
-      // Update auth provider for NewPost component
+      
+      // Update auth provider with fresh data including avatarId
       if (user) {
         const updatedUser = { ...user, avatarId: response.mediaId };
         setUser(updatedUser);
       }
+      ShowSnackbar({ status: true, message: 'Avatar updated successfully' });
     } catch (error) {
       console.error('Failed to upload avatar:', error);
+      ShowSnackbar({ status: false, message: 'Failed to upload avatar' });
     } finally {
       setPendingAvatarFile(null);
     }
   };
 
-  const handleRemoveAvatar = async () => {
+  const handleRemoveAvatar = () => {
+    setShowDeleteAvatarConfirm(true);
+  };
+
+  const confirmRemoveAvatar = async () => {
+    setShowDeleteAvatarConfirm(false);
     try {
-      const newFormData = { ...formData, avatarId: null };
-      setFormData(newFormData);
-
-      await http.put(`/api/v1/users/${profile.userId}/profile`, { ...formData, avatarId: null });
+      // Send complete profile data with avatarId set to null
+      const updateData = {
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        nickname: formData.nickname,
+        email: formData.email,
+        aboutMe: formData.aboutMe,
+        dateOfBirth: formData.dateOfBirth,
+        avatarId: -1 // Special value to indicate removal
+      };
+      await http.put(`/api/v1/users/${profile.userId}/profile`, updateData);
+      
+      setFormData(prev => ({ ...prev, avatarId: null }));
       dispatch({ type: 'SET_AVATAR_ID', payload: null });
-
+      
+      // Update auth provider with null avatarId
       if (user) {
         const updatedUser = { ...user, avatarId: null };
         setUser(updatedUser);
       }
+      ShowSnackbar({ status: true, message: 'Avatar removed successfully' });
     } catch (error) {
       console.error('Failed to remove avatar:', error);
+      ShowSnackbar({ status: false, message: 'Failed to remove avatar' });
     }
   };
 
@@ -195,6 +252,41 @@ export function ProfileSettings({ profile }: { profile: ProfileAPIResponse }) {
           />
         </div>
 
+        <div className={styles.passwordSection}>
+          <h3>Change Password</h3>
+          <p>Leave blank to keep current password</p>
+          
+          <div className={styles.field}>
+            <label>Current Password</label>
+            <input
+              type="password"
+              value={formData.currentPassword}
+              onChange={(e) => setFormData({ ...formData, currentPassword: e.target.value })}
+              placeholder="Enter current password"
+            />
+          </div>
+
+          <div className={styles.field}>
+            <label>New Password</label>
+            <input
+              type="password"
+              value={formData.newPassword}
+              onChange={(e) => setFormData({ ...formData, newPassword: e.target.value })}
+              placeholder="Enter new password"
+            />
+          </div>
+
+          <div className={styles.field}>
+            <label>Confirm New Password</label>
+            <input
+              type="password"
+              value={formData.confirmPassword}
+              onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+              placeholder="Confirm new password"
+            />
+          </div>
+        </div>
+
         <div className={styles.actions}>
           <button type="button" className={styles.cancelBtn}>Cancel</button>
           <button type="submit" className={styles.saveBtn} disabled={isLoading}>
@@ -209,6 +301,14 @@ export function ProfileSettings({ profile }: { profile: ProfileAPIResponse }) {
         message="Are you sure you want to change your profile photo?"
         onConfirm={confirmAvatarUpload}
         onCancel={() => { setShowAvatarConfirm(false); setPendingAvatarFile(null); }}
+      />
+
+      <ConfirmationModal
+        isOpen={showDeleteAvatarConfirm}
+        title="Remove Profile Photo"
+        message="Are you sure you want to remove your profile photo? This action cannot be undone."
+        onConfirm={confirmRemoveAvatar}
+        onCancel={() => setShowDeleteAvatarConfirm(false)}
       />
 
       <ConfirmationModal
