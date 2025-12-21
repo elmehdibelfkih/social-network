@@ -2,6 +2,8 @@ package auth
 
 import (
 	"database/sql"
+	"fmt"
+	"net/url"
 	"strings"
 	"time"
 
@@ -100,17 +102,36 @@ func SelectUserSession(session string) (*SessionItemJson, error) {
 
 func SelectUserRememberMe(session string) (*RememberMeSqlRow, error) {
 	var r RememberMeSqlRow
-	err := config.DB.QueryRow(SELECT_REMEMBER_ME_BY_SELECTOR, strings.Split(session, ":")[0]).Scan(
+	decoded, err := url.QueryUnescape(session)
+	if err != nil {
+		return nil, err
+	}
+	fmt.Println(decoded)
+
+	parts := strings.Split(decoded, ":")
+	if len(parts) != 2 {
+		return nil, fmt.Errorf("invalid remember-me cookie format")
+	}
+
+	selector := parts[0]
+	fmt.Println(selector)
+
+	err = config.DB.QueryRow(
+		SELECT_REMEMBER_ME_BY_SELECTOR,
+		selector,
+	).Scan(
 		&r.RememberId,
 		&r.UserId,
 		&r.Selector,
 		&r.Token,
 		&r.ExpiresAt,
 	)
+
 	if err != nil {
 		utils.SQLiteErrorTarget(err, SELECT_REMEMBER_ME_BY_SELECTOR)
 		return &r, err
 	}
+
 	return &r, nil
 }
 
