@@ -79,6 +79,7 @@ func GetWildCardValue(w http.ResponseWriter, r *http.Request, key string) int64 
 	if err != nil {
 		BackendErrorTarget(err, "UserContext")
 		NotFoundError(w, "not found")
+		return -1
 	}
 	return wildCard
 }
@@ -156,7 +157,7 @@ func GenerateSessionToken(length int) string {
 func CheckSession(name string, r *http.Request) (string, error) {
 	session, err := r.Cookie(name)
 	if err != nil {
-		BackendErrorTarget(err, "auth")
+		BackendErrorTarget(err, r.URL.Path)
 		return "", nil
 	}
 	return session.Value, err

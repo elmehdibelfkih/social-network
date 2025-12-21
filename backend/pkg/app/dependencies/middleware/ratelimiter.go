@@ -1,9 +1,9 @@
 package middleware
 
 import (
-	"log"
 	"net"
 	"net/http"
+	"social/pkg/utils"
 	"sync"
 	"time"
 )
@@ -23,8 +23,8 @@ func RateLimiterMiddleware(next http.Handler, limit float64, burst int64) http.H
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ip := getIP(r)
 
-		limiter, exists := ipLimiterMap[ip]
 		mu.Lock()
+		limiter, exists := ipLimiterMap[ip]
 		if !exists {
 			limiter = newTokenBucketLimiter(limit, burst)
 			ipLimiterMap[ip] = limiter
@@ -46,7 +46,7 @@ func RateLimiterMiddleware(next http.Handler, limit float64, burst int64) http.H
 func getIP(r *http.Request) string {
 	host, _, err := net.SplitHostPort(r.RemoteAddr)
 	if err != nil {
-		log.Printf("Error parssing IP :%v", err)
+		utils.BackendErrorTarget(err, "Error parssing IP :%v")
 		return ""
 	}
 	return host

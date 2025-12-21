@@ -1,0 +1,53 @@
+.contactItem {
+  background-color: white;
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  cursor: pointer;
+  gap: 12px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  /* transition: background 0.2s; */
+}
+
+.contactItem:hover {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.avatar img{
+  border-radius: 50%;
+  background-color: var(--primary-purple-light);
+  border: solid 1px grey;
+  object-fit: cover;
+}
+
+.info {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.name {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #111;
+}
+
+.nickname {
+  font-size: 0.85rem;
+  color: #666;
+}
+
+.statusDot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-left: auto;
+}
+
+.online .statusDot {
+  background: var(--primary-purple-light);
+}
+
+.offline .statusDot {
+  background: var(--gray-500);
+}

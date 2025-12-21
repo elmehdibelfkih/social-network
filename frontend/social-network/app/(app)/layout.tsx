@@ -6,6 +6,8 @@ import { getUserId } from "@/libs/helpers";
 import { http } from "@/libs/apiFetch";
 import { NotificationCount } from "@/libs/globalTypes";
 import { ProfileAPIResponse } from "@/libs/globalTypes";
+import { AuthProvider } from "@/providers/authProvider";
+import SharedWorekerClient from "@/components/ui/worker";
 import { UserStatsState } from "@/libs/globalTypes";
 import { Counts } from "@/libs/globalTypes";
 
@@ -46,6 +48,7 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
   return (
     <AppProviders>
       <UserStatsProvider initialState={stats}>
+        <SharedWorekerClient />
         <Navbar />
         {children}
       </UserStatsProvider>

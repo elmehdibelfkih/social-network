@@ -139,6 +139,7 @@ func (v *RegisterRequestJson) Validate() (bool, string) {
 }
 
 func (v *LoginRequestJson) Validate() (bool, string) {
+
 	if v.Identifier == "" {
 		return false, "Identifier cannot be empty"
 	}

@@ -11,25 +11,26 @@ class WebSocketManger {
     }
 
     #initWebsocket() {
-
         if (this.ws) return // already has websocket
         this.ws = new WebSocket(this.url);
 
         this.ws.onopen = () => {
-            // console.log("ws connection opened")
+            console.log("ws connection opened")
             this.#burstQueue();
+            clearInterval(this.reconnectTimer)
             this.reconnectTimer = null;
         }
         this.ws.onmessage = (e) => {
-            // console.log(e.data)
+            console.log("recieved from server", JSON.parse(e.data))
             this.#broadcast(e.data)
         }
         this.ws.onerror = (err) => {
-            // console.log("ws error", err)
+            console.log("ws error", err)
             this.ws?.close()
         }
         this.ws.onclose = () => {
-            // console.log("closing websocket")
+            console.log("closing websocket")
+            this.#broadcast(JSON.stringify({ source: "shared_worker", type: "websocket_close", payload: null }))
             this.ws = null;
             this.#tryReconnect();
         }
@@ -39,7 +40,7 @@ class WebSocketManger {
         const alivePorts = []
         for (const p of this.ports) {
             try {
-                p.postMessage(data);
+                p.postMessage(JSON.parse(data));
                 alivePorts.push(p)
             } catch {
                 console.warn("dead port found!")
@@ -50,7 +51,11 @@ class WebSocketManger {
 
     #tryReconnect() {
         if (this.reconnectTimer) return // we are already trying o reconnect 
-        this.reconnectTimer = setTimeout(() => this.#initWebsocket(), this.reconnectDelay)
+        console.log("reconnecting to ws...")
+        this.reconnectTimer = setInterval(() => {
+            this.#initWebsocket()
+            if (this.ws && this.ws.readyState == WebSocket.OPEN) this.#sendOrQueue({ source: "shared_worker", type: "reconnect" })
+        }, this.reconnectDelay)
     }
 
     #removePort(port) {
@@ -69,22 +74,24 @@ class WebSocketManger {
 
     #attachPortHandlers(port) {
         port.onmessage = (e) => {
-            if (e.data === "INIT_WS") {
+            console.log("init", e.data)
+            console.log("ws:", this.ws)
+            if (e.data.type === "init_ws") {
                 this.#initWebsocket();
                 return;
             }
-            e.data.origin = this.ports.indexOf(port)
-            // console.log(e.data)
+            console.log(e.data)
             this.#sendOrQueue(e.data);
         };
     }
 
     #sendOrQueue(data) {
         if (!this.ws || this.ws.readyState !== WebSocket.OPEN) {
-            this.messagesQueue.push(data)
+            this.messagesQueue.push(JSON.stringify(data))
+            console.log(this.messagesQueue)
             return
         }
-        this.ws.send(data)
+        this.ws.send(JSON.stringify(data))
     }
 
     #burstQueue() {

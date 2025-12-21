@@ -1,6 +1,7 @@
 import Footer from '@/features/footer/footer.server';
 import Snackbar from '@/components/ui/snackbar/snackbar';
 import '@/styles/globals.css';
+import '@/styles/globals.css';
 import type { ReactNode } from 'react';
 
 export const metadata = {
@@ -27,6 +28,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     <html lang="en">
       <head />
       <body className="app-root">
+        {/* {children} */}
         <main className="main-content">{children}</main>
         <Snackbar />
         <Footer />

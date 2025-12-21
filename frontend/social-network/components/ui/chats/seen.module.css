@@ -1,0 +1,12 @@
+
+
+.seenIcon img{
+    height: 12px;
+    width: 12px;
+    margin-left: 4px;
+}
+
+.seenIcon {
+    margin-top: 2px;
+    display: flex;
+}

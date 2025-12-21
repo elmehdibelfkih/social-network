@@ -3,7 +3,7 @@ import { TopPart } from "./newPost.client";
 import styles from "./styles.module.css";
 import { NewPostClient } from "./newPost.client";
 
-export function NewPost({ groupId }: { groupId: number | null }) {
+export function NewPost({ groupId }: { groupId?: number | null }) {
   //todo: const name = displayName(state)
   const name = "test"
   

@@ -1,6 +1,34 @@
 package follow
 
 const (
+	UPDATE_CHAT_STATUS = `
+	UPDATE chats
+	SET status = 'suspended',
+    updated_at = CURRENT_TIMESTAMP
+	WHERE id = ? AND group_id IS NULL
+	`
+	UPDATE_CHAT_ACTIVE = `
+	UPDATE chats
+	SET status = 'active',
+    updated_at = CURRENT_TIMESTAMP
+	WHERE id = ?
+	`
+	SELECT_SHARED_CHATS = `
+	SELECT chat_id FROM chat_participants WHERE user_id = ?
+	INTERSECT
+	SELECT chat_id FROM chat_participants WHERE user_id = ?;
+	`
+	CREATE_CHAT_ROW = `
+		INSERT INTO chats (id) VALUES (?)	
+	`
+	ADD_CHAT_PARTICIPANT = `
+		INSERT INTO chat_participants (chat_id, user_id, unread_count) VALUES (?, ?, ?) 
+	`
+	FOLLOW_BACK = `
+		SELECT EXISTS (
+			SELECT 1 FROM follows WHERE follower_id = ? AND followed_id = ?
+		);
+	`
 	FOLLOW_REQUEST_QUERY = `
 	INSERT INTO follows (follower_id, followed_id, status, followed_at)
 	SELECT ?, ?, 
@@ -116,5 +144,12 @@ const (
 	    reference_id,
 	    content
 	) VALUES (?, ?, ?, ?, ?, ?)
+	`
+	UPDATE_FOLLOW_STATUS = `
+		UPDATE follows
+		SET status = 'accepted'
+		WHERE follower_id = ?
+		AND followed_id = ?
+		AND status = 'pending';
 	`
 )

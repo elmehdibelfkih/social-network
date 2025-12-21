@@ -102,7 +102,6 @@ func HandleUploadMedia(w http.ResponseWriter, r *http.Request) {
 
 func HandleGetMedia(w http.ResponseWriter, r *http.Request) {
 	mediaID := utils.GetWildCardValue(w, r, "media_id")
-
 	media, err := GetMediaByID(mediaID)
 	if err != nil {
 		if err == sql.ErrNoRows {
