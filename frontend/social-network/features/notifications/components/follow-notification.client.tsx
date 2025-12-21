@@ -10,7 +10,7 @@ import { useRouter } from 'next/navigation'
 
 export function FollowNotification({ notification, onMarkAsRead }: NotificationProps) {
   const [profile, setProfile] = useState<ProfileAPIResponse>(null)
-  // const [isDecisionMade, setIsDecisionMade] = useState(!isActive)
+  const [requestHandled, setRequestHandled] = useState(false)
   const [isRead, setIsRead] = useState(notification.isRead == 1)
   const router = useRouter()
 
@@ -18,7 +18,6 @@ export function FollowNotification({ notification, onMarkAsRead }: NotificationP
     try {
       const response = await http.get<ProfileAPIResponse>(`/api/v1/users/${notification.referenceId}/profile`)
       setProfile(response)
-      console.log("ccccc", response)
     } catch (error) {
       console.error('Failed to fetch profile:', error)
     }
@@ -43,9 +42,9 @@ export function FollowNotification({ notification, onMarkAsRead }: NotificationP
     e.stopPropagation()
     try {
       await http.post(`/api/v1/follow-requests/${notification.referenceId}/accept`)
-      // setIsDecisionMade(true)
+      setRequestHandled(true)
     } catch (error) {
-
+      console.error('Failed to accept follow request:', error)
     }
   }
 
@@ -53,9 +52,9 @@ export function FollowNotification({ notification, onMarkAsRead }: NotificationP
     e.stopPropagation()
     try {
       await http.post(`/api/v1/follow-requests/${notification.referenceId}/decline`)
-      // setIsDecisionMade(true)
+      setRequestHandled(true)
     } catch (error) {
-
+      console.error('Failed to decline follow request:', error)
     }
   }
 
@@ -86,11 +85,11 @@ export function FollowNotification({ notification, onMarkAsRead }: NotificationP
         <div className={styles.actionButtons}>
           <button className={styles.acceptButton}
             onClick={acceptInvitation}
-            disabled={profile.status === 'accepted'}
+            disabled={profile.status !== 'pending' || requestHandled}
           >✓ Accept</button>
           <button className={styles.declineButton}
             onClick={declineInvitation}
-            disabled={profile.status === 'accepted'}
+            disabled={profile.status !== 'pending' || requestHandled}
           >× Decline</button>
         </div>
       </div>

@@ -87,45 +87,49 @@ const CreateGroupModal: React.FC<CreateGroupModalProps> = ({
       return;
     }
 
-    if ( formData.title.trim().length > 40 || !formData.description.trim()) {
+    if (formData.title.trim().length > 40 || !formData.description.trim()) {
       setError('the title is more than 40');
       return;
     }
 
-      if (formData.description.trim().length > 250) {
+    if (formData.description.trim().length > 250) {
       setError('the description is more than 250');
       return;
     }
 
 
     if (!selectedFile) {
-      setError('Please upload a group image');
-      return;
-    }
-
-
-    setIsUploading(true);
-    try {
-      const resp = await GroupService.uploadMedia(selectedFile);
-
-
-      if (!resp) {
-        setError('Failed to upload avatar. Please try again.');
-        return;
-      }
       const payload: CreateGroupPayload = {
         title: formData.title,
         description: formData.description,
-        avatarId: resp.mediaId
+        avatarId: null
       };
       onSubmit(payload);
-
       handleClose();
-    } catch (err) {
-      setError('Failed to create group. Please try again.');
-    } finally {
-      setIsUploading(false);
+
+    } else {
+      setIsUploading(true);
+      try {
+        const resp = await GroupService.uploadMedia(selectedFile);
+        if (!resp) {
+          setError('Failed to upload avatar. Please try again.');
+          return;
+        }
+        const payload: CreateGroupPayload = {
+          title: formData.title,
+          description: formData.description,
+          avatarId: resp.mediaId
+        };
+        onSubmit(payload);
+
+        handleClose();
+      } catch (err) {
+        setError('Failed to create group. Please try again.');
+      } finally {
+        setIsUploading(false);
+      }
     }
+
 
   };
 
@@ -242,7 +246,7 @@ const CreateGroupModal: React.FC<CreateGroupModalProps> = ({
           {/* Create Button */}
           <button
             onClick={handleSubmit}
-            disabled={formData.title.trim() == '' || formData.description.trim() == '' || formData.avatarId == null}
+            disabled={formData.title.trim() == '' || formData.description.trim() == ''}
             className={styles.submitButton}
           >
             Create Group
