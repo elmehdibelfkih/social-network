@@ -2,7 +2,6 @@ package socket
 
 import (
 	"database/sql"
-	"fmt"
 
 	"social/pkg/db/database"
 	"social/pkg/utils"
@@ -28,7 +27,6 @@ func SelectUserChats(c *Client) error {
 				utils.SQLiteErrorTarget(err, SELECT_USER_CHATS)
 				return err
 			}
-			fmt.Println("chatId", chatId)
 			c.userChats[chatId] = struct{}{}
 		}
 		return nil
@@ -179,7 +177,12 @@ func UpdateMessagesStatus(chatId, senderId int64, status string) error {
 
 func InsertNotification(n Notification) error {
 	err := database.WrapWithTransaction(func(tx *sql.Tx) error {
-		err := tx.QueryRow(UPSERT_NOTIFICATION,
+		var id int64
+		err := tx.QueryRow(SELECT_NOTIFCATION, n.UserId, n.Type, n.RefrenceType, n.RefrenceId).Scan(&id)
+		if id != 0 {
+			n.NotificationId = id
+		}
+		err = tx.QueryRow(UPSERT_NOTIFICATION,
 			n.NotificationId,
 			n.UserId,
 			n.Type,

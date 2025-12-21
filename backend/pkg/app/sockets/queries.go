@@ -41,7 +41,10 @@ const (
 	SELECT_MESSAGES_BY_STATUS = `
 		SELECT id, chat_id, sender_id, content, seen_status, created_at, updated_at FROM messages WHERE chat_id = ? AND sender_id <> ? AND seen_status = ?
 	`
-
+	SELECT_NOTIFCATION = `
+		SELECT id FROM notifications 
+		WHERE user_id = ? AND type = ? AND reference_type = ? AND reference_id = ?
+	`
 	// insert
 	UPSERT_NOTIFICATION = `
 	INSERT INTO notifications (id, user_id, type, reference_type, reference_id, content, status, is_read, created_at, read_at)

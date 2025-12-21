@@ -54,7 +54,7 @@ type Notification struct {
 	UserId         int64  `json:"userId"`
 	Type           string `json:"type"`
 	RefrenceId     int64  `json:"refrenceId"`
-	RefrenceType   int64  `json:"refrenceType"`
+	RefrenceType   string `json:"refrenceType"`
 	Content        string `json:"content"`
 	Status         string `json:"status"`
 	IsRead         string `json:"isRead"`
@@ -104,4 +104,3 @@ func (o *OnlineStatus) removeDuplicate() {
 
 	o.OnlineUsers = unique
 }
-

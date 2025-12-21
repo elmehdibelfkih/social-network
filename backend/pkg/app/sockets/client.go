@@ -2,8 +2,6 @@ package socket
 
 import (
 	"encoding/json"
-	"fmt"
-	"log"
 	"social/pkg/utils"
 	"time"
 
@@ -52,7 +50,7 @@ func NewClient(wsHub *Hub, conn *websocket.Conn, id int64, token string, user Us
 
 func (c *Client) getClientChats() {
 	if err := SelectUserChats(c); err != nil {
-		log.Println(err)
+		utils.BackendErrorTarget(err, "getClientChats")
 		return
 	}
 }
@@ -68,7 +66,6 @@ func (c *Client) updateSentMessages() {
 }
 
 func (c *Client) pongHandler(pongMsg string) error {
-	// log.Println("pong")
 	return c.connection.SetReadDeadline(time.Now().Add(pongWait))
 }
 
@@ -79,7 +76,7 @@ func (c *Client) readMessages() {
 	}()
 	c.connection.SetReadLimit(512)
 	if err := c.pongHandler(""); err != nil {
-		log.Println(err)
+		utils.BackendErrorTarget(err, "pongHandler")
 		return
 	}
 	c.connection.SetPongHandler(c.pongHandler)
@@ -88,18 +85,17 @@ func (c *Client) readMessages() {
 		_, bytes, err := c.connection.ReadMessage()
 		if err != nil {
 			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
-				log.Println("error reading message:", err)
+				utils.BackendErrorTarget(err, "error reading message")
 			}
 			break
 		}
 		var event Event
 		if err := json.Unmarshal(bytes, &event); err != nil {
-			log.Println("invalid message format:", err)
+			utils.BackendErrorTarget(err, "invalid message format")
 			continue
 		}
-		fmt.Println("received event:", event)
 		if err = c.handleEvent(event); err != nil {
-			log.Println("error Handling the event:", err)
+			utils.BackendErrorTarget(err, "error Handling the event")
 			return
 		}
 	}
@@ -119,19 +115,18 @@ func (c *Client) writeMessages() {
 			c.connection.SetWriteDeadline(time.Now().Add(10 * time.Second))
 			if !ok {
 				if err = c.connection.WriteMessage(websocket.CloseMessage, nil); err != nil {
-					log.Println("connection closed: ", err)
+					utils.BackendErrorTarget(err, "connection closed")
 				}
 				return
 			}
 			if err = c.connection.WriteJSON(event); err != nil {
-				log.Println("cannot send the msg", err)
+				utils.BackendErrorTarget(err, "cannot send the msg")
 				return
 			}
 		case <-ticker.C:
-			// log.Println("ping")
 			c.connection.SetWriteDeadline(time.Now().Add(10 * time.Second))
 			if err = c.connection.WriteMessage(websocket.PingMessage, []byte{}); err != nil {
-				log.Println("write msg: ", err)
+				utils.BackendErrorTarget(err, "write msg")
 				return
 			}
 		}
@@ -139,7 +134,6 @@ func (c *Client) writeMessages() {
 }
 
 func (c *Client) handleEvent(e Event) error {
-	fmt.Println(e.Type)
 	switch e.Type {
 	case "onlineUser":
 		if err := c.ClientAdded(e); err != nil {
@@ -160,7 +154,6 @@ func (c *Client) handleEvent(e Event) error {
 		}
 		return nil
 	case "online_status":
-		fmt.Println("ha levent",e)
 		if err := c.onlineStatus(e); err != nil {
 			c.events <- Event{
 				Source:  "server",

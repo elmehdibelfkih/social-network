@@ -145,4 +145,11 @@ const (
 	    content
 	) VALUES (?, ?, ?, ?, ?, ?)
 	`
+	UPDATE_FOLLOW_STATUS = `
+		UPDATE follows
+		SET status = 'accepted'
+		WHERE follower_id = ?
+		AND followed_id = ?
+		AND status = 'pending';
+	`
 )

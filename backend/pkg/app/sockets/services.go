@@ -84,7 +84,6 @@ func (c *Client) onlineStatus(e Event) error {
 	var err error
 	e.Payload = &ClientMessage{}
 	users, err := SelectUserFollowers(c.userId)
-	fmt.Println("USERS", users)
 	if err != nil {
 		utils.BackendErrorTarget(err, "websocket error")
 		return err
@@ -117,6 +116,7 @@ func (c *Client) typing(e Event) error {
 		return errors.New("no typing indicator on the payload")
 	}
 	var chatId = e.Payload.TypingIndicator.ChatId
+	fmt.Print(chatId, c.userChats)
 	if _, exists := c.userChats[chatId]; !exists {
 		return errors.New("your not a part of this chat")
 	}

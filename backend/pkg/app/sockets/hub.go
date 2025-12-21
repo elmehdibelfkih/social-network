@@ -1,6 +1,7 @@
 package socket
 
 import (
+	"fmt"
 	"sync"
 )
 
@@ -42,6 +43,7 @@ func (h *Hub) Run() {
 func (h *Hub) AddChatUser(chatId, userId int64) {
 	h.mu.Lock()
 	defer h.mu.Unlock()
+	fmt.Println("add Chat user", h.clients)
 	if len(h.clients[userId]) > 0 {
 		src := h.clients[userId]
 		if src == nil {

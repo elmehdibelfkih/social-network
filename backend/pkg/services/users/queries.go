@@ -108,4 +108,10 @@ const (
 			privacy = ?,
 			updated_at = CURRENT_TIMESTAMP
 		WHERE id = ?`
+	UPDATE_FOLLOWS = `
+		UPDATE follows
+		SET status = 'accepted'
+		AND followed_id = ?
+		AND status = 'pending';
+	`
 )

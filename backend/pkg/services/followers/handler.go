@@ -1,7 +1,6 @@
 package follow
 
 import (
-	"fmt"
 	"net/http"
 	socket "social/pkg/app/sockets"
 	"social/pkg/utils"
@@ -22,7 +21,7 @@ func FollowHandler(w http.ResponseWriter, r *http.Request) {
 		utils.IdentifySqlError(w, err)
 		return
 	}
-	fmt.Println("follow")
+	
 	socket.WSManger.UpdateChats(userId)
 	socket.WSManger.UpdateChats(targetUserId)
 	followResponse(w, r)
@@ -43,7 +42,6 @@ func UnfollowHandler(w http.ResponseWriter, r *http.Request) {
 		utils.IdentifySqlError(w, err)
 		return
 	}
-	fmt.Println("unfollow")
 	socket.WSManger.UpdateChats(userId)
 	socket.WSManger.UpdateChats(targetUserId)
 	unfollowResponse(w, r)

@@ -3,6 +3,7 @@ package follow
 import (
 	"database/sql"
 	"errors"
+	"fmt"
 	"strings"
 
 	socket "social/pkg/app/sockets"
@@ -91,21 +92,27 @@ func followUser(followerId, followedId int64) error {
 			utils.SQLiteErrorTarget(err, FOLLOW_REQUEST_QUERY)
 			return err
 		}
-
+		follower, err := followBack(followerId, followedId)
+		if follower {
+			_, err = tx.Exec(UPDATE_FOLLOW_STATUS,
+				followedId,
+				followerId,
+			)
+			if err != nil {
+				utils.SQLiteErrorTarget(err, UPDATE_FOLLOW_STATUS)
+				return err
+			}
+		}
 		status, err := selectFollowStatus(followerId, followedId)
 		if err != nil {
 			return err
 		}
 
-		n := followNotification(followerId, followedId, status)
-		_, err = tx.Exec(INSERT_NOTIFICATION,
-			n.id, n.UserId, n.Type, n.ReferenceType, n.ReferenceId, n.Content,
-		)
+		n := followNotification(followerId, followedId, status, "active")
+		err = socket.InsertNotification(n)
 		if err != nil {
-			utils.SQLiteErrorTarget(err, INSERT_NOTIFICATION)
-			return err
+			utils.SQLiteErrorTarget(err, "failed to insert notificationI")
 		}
-
 		isPublic, err := isPublic(followedId)
 		if err != nil {
 			utils.SQLiteErrorTarget(err, INSERT_NOTIFICATION)
@@ -165,7 +172,7 @@ func createConversation(followerId, followedId int64) error {
 				utils.SQLiteErrorTarget(err, UPDATE_CHAT_ACTIVE)
 				return err
 			}
-			
+			fmt.Println("update")
 			socket.WSManger.AddChatUser(chatId, followerId)
 			socket.WSManger.AddChatUser(chatId, followedId)
 			return nil
@@ -199,6 +206,7 @@ func createConversation(followerId, followedId int64) error {
 			utils.SQLiteErrorTarget(err, ADD_CHAT_PARTICIPANT)
 			return err
 		}
+		fmt.Println("creation")
 		socket.WSManger.AddChatUser(chatId, followerId)
 		socket.WSManger.AddChatUser(chatId, followedId)
 
@@ -306,6 +314,12 @@ func unfollowUser(followerId, followedId int64) error {
 
 		if status != "accepted" {
 			return nil
+		}
+
+		n := followNotification(followerId, followedId, status, "suspended")
+		err = socket.InsertNotification(n)
+		if err != nil {
+			utils.SQLiteErrorTarget(err, "failed to insert notificationI")
 		}
 
 		// Update followers count for the followed user
@@ -509,6 +523,12 @@ func acceptFollowRequest(followerId, followedId int64) error {
 			return err
 		}
 
+		n := followNotification(followerId, followedId, "accepted", "active")
+		err = socket.InsertNotification(n)
+		if err != nil {
+			utils.SQLiteErrorTarget(err, "failed to insert notificationI")
+		}
+
 		// Update followers count for the followed user
 		counter := followUnfollowUpdateCounterStruct(database.USER_ENTITY_TYPE, followedId, database.FOLLOWERS_ENTITY_NAME, "increment")
 		err = database.UpdateCounter(tx, counter)
@@ -538,6 +558,13 @@ func declineFollowRequest(followerId, followedId int64) error {
 			utils.SQLiteErrorTarget(err, DECLINE_FOLLOW_REQUEST_QUERY)
 			return err
 		}
+
+		n := followNotification(followerId, followedId, "declined", "active")
+		err = socket.InsertNotification(n)
+		if err != nil {
+			utils.SQLiteErrorTarget(err, "failed to insert notificationI")
+		}
+
 		return nil
 	})
 }

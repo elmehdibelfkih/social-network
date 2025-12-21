@@ -2,6 +2,7 @@ package chat
 
 import (
 	"database/sql"
+	"fmt"
 	socket "social/pkg/app/sockets"
 	"social/pkg/db/database"
 	"social/pkg/utils"
@@ -10,6 +11,7 @@ import (
 func InsertMessage(c *ChatMessage) error {
 	return database.WrapWithTransaction(func(tx *sql.Tx) error {
 		c.SeenState = "sent"
+		fmt.Println(socket.WSManger.ChatOnlineUsers(c.ChatId))
 		if socket.WSManger.ChatOnlineUsers(c.ChatId) > 1 {
 			c.SeenState = "delivered"
 			_, err := tx.Exec(

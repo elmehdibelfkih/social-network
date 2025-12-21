@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"strings"
 
+	socket "social/pkg/app/sockets"
 	"social/pkg/config"
 	"social/pkg/db/database"
 	"social/pkg/utils"
@@ -317,14 +318,15 @@ func InsertNewGroupMember(targetId, groupId int64, status, role, notificationTyp
 				return err
 			}
 		}
-		_, err = tx.Exec(INSERT_NOTIFICATION,
-			utils.GenerateID(),
-			targetId,
-			notificationType,
-			"group",
-			groupId,
-			"you have been invated to group",
-		)
+		socket.InsertNotification(socket.Notification{
+			NotificationId: utils.GenerateID(),
+			UserId:         targetId,
+			Type:           notificationType,
+			RefrenceId:     groupId,
+			RefrenceType:   "group",
+			Content:        "you have been invated to group",
+			Status:         "active",
+		})
 		if err != nil {
 			utils.SQLiteErrorTarget(err, INSERT_NOTIFICATION)
 		}
@@ -377,14 +379,15 @@ func insertNewGroupEvent(userId, groupId int64, e *CreateEventRequestJson, er *C
 			if err != nil {
 				utils.SQLiteErrorTarget(err, INSERT_NOTIFICATION)
 			}
-			_, err = tx.Exec(INSERT_NOTIFICATION,
-				utils.GenerateID(),
-				groupUser,
-				"event_created",
-				"event",
-				er.EventId,
-				"An event has been created",
-			)
+			socket.InsertNotification(socket.Notification{
+				NotificationId: utils.GenerateID(),
+				UserId:         groupUser,
+				Type:           "event_created",
+				RefrenceId:     er.EventId,
+				RefrenceType:   "event",
+				Content:        "An event has been created",
+				Status:         "active",
+			})
 			if err != nil {
 				utils.SQLiteErrorTarget(err, INSERT_NOTIFICATION)
 			}

@@ -1,9 +1,9 @@
 package middleware
 
 import (
-	"log"
 	"net"
 	"net/http"
+	"social/pkg/utils"
 	"sync"
 	"time"
 )
@@ -46,7 +46,7 @@ func RateLimiterMiddleware(next http.Handler, limit float64, burst int64) http.H
 func getIP(r *http.Request) string {
 	host, _, err := net.SplitHostPort(r.RemoteAddr)
 	if err != nil {
-		log.Printf("Error parssing IP :%v", err)
+		utils.BackendErrorTarget(err, "Error parssing IP :%v")
 		return ""
 	}
 	return host

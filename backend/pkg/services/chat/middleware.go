@@ -1,7 +1,6 @@
 package chat
 
 import (
-	"fmt"
 	"net/http"
 	"social/pkg/utils"
 )
@@ -12,7 +11,6 @@ func ChatAccessMiddleware(next http.HandlerFunc) http.HandlerFunc {
 		chatId := utils.GetWildCardValue(w, r, "chat_id")
 
 		// Check if user is participant in the chat
-		fmt.Println(userId, chatId)
 		exist, err := SelectChatById(chatId, userId)
 		if err != nil {
 			utils.BackendErrorTarget(err, "ChatAccessMiddleware")
