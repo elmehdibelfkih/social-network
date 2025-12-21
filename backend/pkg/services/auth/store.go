@@ -106,7 +106,6 @@ func SelectUserRememberMe(session string) (*RememberMeSqlRow, error) {
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println(decoded)
 
 	parts := strings.Split(decoded, ":")
 	if len(parts) != 2 {
@@ -114,7 +113,6 @@ func SelectUserRememberMe(session string) (*RememberMeSqlRow, error) {
 	}
 
 	selector := parts[0]
-	fmt.Println(selector)
 
 	err = config.DB.QueryRow(
 		SELECT_REMEMBER_ME_BY_SELECTOR,
