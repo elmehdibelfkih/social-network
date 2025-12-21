@@ -1,10 +1,11 @@
+'use client'
 import { Notification, notificationsService } from "@/features/notifications"
 import { createContext, useCallback, useContext, useEffect, useState } from "react"
 import { useAuth } from "./authProvider"
+import { useUserStats } from "./userStatsContext"
 
 type NotificationContextType = {
     notifications: Notification[]
-    unreadCount: number
     loading: boolean
     hasMore: boolean
     prependNotifications: (newNotifications: Notification[]) => void
@@ -22,20 +23,16 @@ const MAX_CACHE_SIZE = 100
 export function NotificationProvider({ children }) {
     const { user } = useAuth()
     const [notifications, setNotifications] = useState<Notification[]>([])
-    const [unreadCount, setUnreadCount] = useState(0)
     const [loading, setLoading] = useState(false)
     const [hasMore, setHasMore] = useState(true)
+    const { dispatch: userStatsDispatch } = useUserStats()
 
     const loadNotifications = useCallback(async () => {
         setLoading(true)
         try {
-            const [notificationsResponse, count] = await Promise.all([
-                notificationsService.getNotifications(20),
-                notificationsService.getUnreadCount(),
-            ])
+            const notificationsResponse = await notificationsService.getNotifications(20)
 
             setNotifications(notificationsResponse.notifications)
-            setUnreadCount(count)
             setHasMore(notificationsResponse?.notifications?.length == 20)
         } catch (error) {
             console.error('Failed to load notifications:', error)
@@ -49,7 +46,6 @@ export function NotificationProvider({ children }) {
             loadNotifications()
         } else {
             setNotifications([])
-            setUnreadCount(0)
             setHasMore(true)
         }
     }, [user, loadNotifications])
@@ -83,46 +79,41 @@ export function NotificationProvider({ children }) {
 
     const markAsRead = useCallback(async (notificationId: number) => {
         const previousNotifications = [...notifications]
-        const previousUnreadCount = unreadCount
+        const notification = notifications.find(n => n.notificationId === notificationId)
 
-        setNotifications((prev) =>
-            prev.map((notif) =>
-                notif.notificationId === notificationId && notif.isRead === 0
-                    ? { ...notif, isRead: 1 }
-                    : notif
+        // Only update if the notification is currently unread
+        if (notification?.isRead === 0) {
+            setNotifications((prev) =>
+                prev.map((notif) =>
+                    notif.notificationId === notificationId
+                        ? { ...notif, isRead: 1 }
+                        : notif
+                )
             )
-        )
 
-        setUnreadCount((prev) => {
-            const notification = notifications.find(n => n.notificationId === notificationId)
-            return notification?.isRead === 0 ? Math.max(0, prev - 1) : prev
-        })
+            const success = await notificationsService.markAsRead(notificationId)
 
-        const success = await notificationsService.markAsRead(notificationId)
-
-        if (!success) {
-            setNotifications(previousNotifications)
-            setUnreadCount(previousUnreadCount)
-            console.error('Failed to mark notification as read, reverting changes')
+            if (!success) {
+                setNotifications(previousNotifications)
+                console.error('Failed to mark notification as read, reverting changes')
+            }
         }
-    }, [notifications, unreadCount])
+    }, [notifications])
 
     const markAllAsRead = useCallback(async () => {
         const previousNotifications = [...notifications]
-        const previousUnreadCount = unreadCount
 
         setNotifications((prev) => prev.map((notif) => ({ ...notif, isRead: 1 })))
-        setUnreadCount(0)
+        userStatsDispatch({ type: 'READ_ALL_NOTIFICATIONS' })
 
         const success = await notificationsService.markAllAsRead()
 
         // Revert on failure
         if (!success) {
             setNotifications(previousNotifications)
-            setUnreadCount(previousUnreadCount)
             console.error('Failed to mark all notifications as read, reverting changes')
         }
-    }, [notifications, unreadCount])
+    }, [notifications, userStatsDispatch])
 
     const addNotification = useCallback((notification: Notification) => {
         setNotifications((prev) => {
@@ -133,9 +124,9 @@ export function NotificationProvider({ children }) {
         })
 
         if (notification.isRead === 0) {
-            setUnreadCount((prev) => prev + 1)
+            userStatsDispatch({ type: 'NEW_NOTIFICATION' })
         }
-    }, [])
+    }, [userStatsDispatch])
 
     const prependNotifications = useCallback((newNotifications: Notification[]) => {
         setNotifications((prev) => {
@@ -146,14 +137,13 @@ export function NotificationProvider({ children }) {
         })
 
         const unreadInNew = newNotifications.filter(n => n.isRead === 0).length
-        if (unreadInNew > 0) {
-            setUnreadCount((prev) => prev + unreadInNew)
+        for (let i = 0; i < unreadInNew; i++) {
+            userStatsDispatch({ type: 'NEW_NOTIFICATION' })
         }
-    }, [])
+    }, [userStatsDispatch])
 
     const value: NotificationContextType = {
         notifications,
-        unreadCount,
         loading,
         hasMore,
         prependNotifications,

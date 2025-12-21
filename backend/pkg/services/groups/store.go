@@ -107,6 +107,7 @@ func SelectGroupById(groupId int64, g *GetGroupResponseJson) error {
 		&g.AvatarId,
 		&g.CreatedAt,
 		&g.UpdatedAt,
+		&g.Status,
 	)
 	if err != nil {
 		utils.SQLiteErrorTarget(err, SELECT_GROUP_BY_GROUP_ID)
@@ -120,7 +121,7 @@ func SelectGroupById(groupId int64, g *GetGroupResponseJson) error {
 	)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			g.MemberCount = 0 // No counter row = 0 members
+			g.MemberCount = 0
 		} else {
 			utils.SQLiteErrorTarget(err, SELECT_GROUP_MEMBERS_COUNT)
 			return err

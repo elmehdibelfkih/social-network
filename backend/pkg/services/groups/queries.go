@@ -7,8 +7,10 @@ const (
 		SELECT creator_id FROM groups WHERE id = ?
 	`
 	SELECT_GROUP_BY_GROUP_ID = `
-		SELECT id, creator_id, title, description, avatar_id, created_at, updated_at
-		FROM groups
+		SELECT id, creator_id, title, description, avatar_id, created_at, updated_at, gm.status
+		FROM groups g
+		LEFT JOIN group_members gm
+		ON g.id = gm.group_id
 		WHERE id = ?;
 	`
 	SELECT_FOLLOWS_BY_ID = `

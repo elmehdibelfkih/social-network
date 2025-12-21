@@ -11,6 +11,7 @@ import {
 } from './components/notification-item.client'
 import { BellIcon } from '@/components/ui/icons'
 import { useNotifications } from '@/providers/notifsProvider'
+import { useUserStats } from '@/providers/userStatsContext'
 
 export function NotificationsDropdown() {
   const [isOpen, setIsOpen] = useState(false)
@@ -19,13 +20,15 @@ export function NotificationsDropdown() {
 
   const {
     notifications,
-    unreadCount,
     loading,
     hasMore,
     loadMore,
     markAsRead,
     markAllAsRead,
   } = useNotifications()
+
+  const { state: userStats } = useUserStats()
+  const unreadCount = userStats.unreadNotifications
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {

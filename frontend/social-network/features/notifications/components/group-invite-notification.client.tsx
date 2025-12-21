@@ -10,7 +10,7 @@ import { useRouter } from 'next/navigation'
 
 export function GroupInviteNotification({ notification, onMarkAsRead }: NotificationProps) {
   const [group, setGroup] = useState<GroupType>(null)
-  // const [isDecisionMade, setIsDecisionMade] = useState(!isActive)
+  const [requestHandled, setRequestHandled] = useState(false)
   const [isRead, setIsRead] = useState(notification.isRead == 1)
   const router = useRouter()
 
@@ -18,6 +18,8 @@ export function GroupInviteNotification({ notification, onMarkAsRead }: Notifica
     try {
       const response = await http.get<GroupType>(`/api/v1/groups/${notification.referenceId}`)
       setGroup(response)
+      console.log(response);
+
     } catch (error) {
       console.error('Failed to fetch group:', error)
     }
@@ -42,7 +44,7 @@ export function GroupInviteNotification({ notification, onMarkAsRead }: Notifica
     e.stopPropagation()
     try {
       await http.post(`/api/v1/groups/${notification.referenceId}/accept`)
-      // setIsDecisionMade(true)
+      setRequestHandled(true)
     } catch (error) {
 
     }
@@ -52,7 +54,7 @@ export function GroupInviteNotification({ notification, onMarkAsRead }: Notifica
     e.stopPropagation()
     try {
       await http.post(`/api/v1/groups/${notification.referenceId}/decline`)
-      // setIsDecisionMade(true)
+      setRequestHandled(true)
     } catch (error) {
 
     }
@@ -85,11 +87,11 @@ export function GroupInviteNotification({ notification, onMarkAsRead }: Notifica
         <div className={styles.actionButtons}>
           <button className={styles.acceptButton}
             onClick={acceptInvitation}
-          // disabled={isDecisionMade}
+            disabled={group.status == 'accepted' || requestHandled || group.status == 'pending'}
           >✓ Accept</button>
           <button className={styles.declineButton}
             onClick={declineInvitation}
-          // disabled={isDecisionMade}
+            disabled={group.status == 'accepted' || requestHandled || group.status == 'pending'}
           >× Decline</button>
         </div>
       </div>
