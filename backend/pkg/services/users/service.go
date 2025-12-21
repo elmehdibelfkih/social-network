@@ -143,8 +143,14 @@ func UpdateUserProfile(w http.ResponseWriter, userId int64, req *UpdateProfileRe
 	if req.AboutMe != nil {
 		aboutMe = req.AboutMe
 	}
+	// Handle avatar update explicitly (including null values)
 	if req.AvatarId != nil {
-		avatarId = req.AvatarId
+		if *req.AvatarId == -1 {
+			// Special case: -1 means remove avatar (set to null)
+			avatarId = nil
+		} else {
+			avatarId = req.AvatarId
+		}
 	}
 	if req.DateOfBirth != nil {
 		dateOfBirth = *req.DateOfBirth
@@ -200,6 +206,12 @@ func UpdateUserProfile(w http.ResponseWriter, userId int64, req *UpdateProfileRe
 
 	// Validate password change if requested
 	if req.CurrentPassword != nil && req.Password != nil {
+		// Both current and new password must be provided
+		if *req.CurrentPassword == "" || *req.Password == "" {
+			utils.BadRequest(w, "Both current password and new password are required.", "alert")
+			return response, false
+		}
+		
 		// Verify current password
 		currentPasswordHash, err := SelectUserPasswordHash(userId)
 		if err != nil {
@@ -229,6 +241,10 @@ func UpdateUserProfile(w http.ResponseWriter, userId int64, req *UpdateProfileRe
 			utils.InternalServerError(w)
 			return response, false
 		}
+	} else if req.CurrentPassword != nil || req.Password != nil {
+		// If only one password field is provided, it's an error
+		utils.BadRequest(w, "Both current password and new password must be provided to change password.", "alert")
+		return response, false
 	}
 
 	// Update profile
