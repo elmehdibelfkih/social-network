@@ -21,6 +21,8 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
     http.get<Counts>(`/api/v1/users/${userId}/stats`)
   ]);
 
+  console.log('Layout - notificationsRes:', notificationsRes);
+
   if (!profileRes || !notificationsRes || !counts) {
     return null;
   }
@@ -34,7 +36,7 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
     dateOfBirth: profileRes.dateOfBirth,
     privacy: profileRes.privacy,
     joinedAt: profileRes.joinedAt,
-    email: profileRes.email, 
+    email: profileRes.email,
     unreadNotifications: notificationsRes.unreadNotifications,
     postsCount: counts.postsCount,
     followersCount: counts.followersCount,

@@ -14,7 +14,6 @@ import (
 func GetUserProfile(w http.ResponseWriter, profileUserId, viewerUserId int64, context string) (UserProfileResponseJson, bool) {
 	var response UserProfileResponseJson
 
-	// Check if profile user exists
 	profile, err := SelectUserProfileById(profileUserId)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -26,11 +25,8 @@ func GetUserProfile(w http.ResponseWriter, profileUserId, viewerUserId int64, co
 		return response, false
 	}
 
-	// Get follow status (pending/accepted/declined or null)
-	// Check both directions to handle all follow relationship cases
 	var followStatus *string
 	if viewerUserId > 0 && viewerUserId != profileUserId {
-		// Check viewer -> profile (outgoing)
 		outgoingStatus, err := SelectFollowStatus(viewerUserId, profileUserId)
 		if err != nil {
 			utils.BackendErrorTarget(err, context)
@@ -38,7 +34,6 @@ func GetUserProfile(w http.ResponseWriter, profileUserId, viewerUserId int64, co
 			return response, false
 		}
 
-		// Check profile -> viewer (incoming)
 		incomingStatus, err := SelectFollowStatus(profileUserId, viewerUserId)
 		if err != nil {
 			utils.BackendErrorTarget(err, context)
@@ -46,25 +41,20 @@ func GetUserProfile(w http.ResponseWriter, profileUserId, viewerUserId int64, co
 			return response, false
 		}
 
-		// Priority: incoming pending > outgoing > incoming > null
-		// This ensures follow request notifications work correctly
 		if incomingStatus != nil && *incomingStatus == "pending" {
 			followStatus = incomingStatus
 		} else if outgoingStatus != nil {
 			followStatus = outgoingStatus
-		} else if incomingStatus != nil {
-			followStatus = incomingStatus
 		}
 	}
 
-	// Get stats
 	postsCount, err := SelectPostsCount(profileUserId)
 	if err != nil {
 		utils.BackendErrorTarget(err, context)
 		utils.InternalServerError(w)
 		return response, false
 	}
-	// followes && following COUNT
+
 	followersCount, err := SelectFollowersCount(profileUserId)
 	if err != nil {
 		utils.BackendErrorTarget(err, context)
@@ -79,7 +69,6 @@ func GetUserProfile(w http.ResponseWriter, profileUserId, viewerUserId int64, co
 		return response, false
 	}
 
-	// Get chatId if users are different
 	var chatId *int64
 	if viewerUserId != profileUserId {
 		chatId, err = SelectChatIdBetweenUsers(viewerUserId, profileUserId)
@@ -90,7 +79,6 @@ func GetUserProfile(w http.ResponseWriter, profileUserId, viewerUserId int64, co
 		}
 	}
 
-	// Build response
 	response.UserId = profile.Id
 	if viewerUserId != profileUserId {
 		if followStatus == nil {
