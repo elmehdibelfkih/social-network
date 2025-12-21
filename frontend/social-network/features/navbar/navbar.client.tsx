@@ -4,7 +4,7 @@ import styles from './styles.module.css';
 import AvatarHolder from '@/components/ui/avatar_holder/avatarholder.client';
 import { useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
-import { SettingsIcon, ProfileIcon, LogoutIcon, HomeIcon, GroupsIcon, SearchIcon, BellIcon } from '@/components/ui/icons';
+import { SettingsIcon, ProfileIcon, LogoutIcon, HomeIcon, GroupsIcon, SearchIcon } from '@/components/ui/icons';
 import { http } from '@/libs/apiFetch';
 import { useAuth } from '@/providers/authProvider';
 import { ShowSnackbar } from '@/components/ui/snackbar/snackbar';
@@ -19,11 +19,21 @@ export function NavProfile() {
   const handleLogout = async () => {
     try {
       await http.post('/api/v1/auth/logout');
+
+      localStorage.clear();
+      sessionStorage.clear();
+
       setUser(null);
       ShowSnackbar({ status: true, message: 'Logged out successfully.' });
       router.push('/auth');
     } catch (error) {
       console.error('Logout failed', error);
+
+      // Clear storage even if logout request fails
+      localStorage.clear();
+      sessionStorage.clear();
+      setUser(null);
+      router.push('/auth');
     }
   };
 
@@ -123,15 +133,4 @@ export default function NavbarCenter() {
 
     </div>
   );
-}
-
-export function NotificationClient() {
-  return (
-    <div className={styles.navbarRight}>
-      <button className={styles.notificationBtn} aria-label="Notifications">
-        <BellIcon />
-        {/* <p>Notifications</p> */}
-      </button>
-    </div>
-  )
 }

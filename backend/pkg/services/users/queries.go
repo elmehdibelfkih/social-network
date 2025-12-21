@@ -56,7 +56,7 @@ const (
 
 	// Count following
 	SELECT_FOLLOWING_COUNT = `
-		SELECT COALESCE(followes_count, 0) 
+		SELECT COALESCE(followees_count, 0) 
 		FROM counters 
 		WHERE entity_id = ? AND entity_type = 'user'`
 

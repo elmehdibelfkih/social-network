@@ -27,13 +27,33 @@ func GetUserProfile(w http.ResponseWriter, profileUserId, viewerUserId int64, co
 	}
 
 	// Get follow status (pending/accepted/declined or null)
+	// Check both directions to handle all follow relationship cases
 	var followStatus *string
 	if viewerUserId > 0 && viewerUserId != profileUserId {
-		followStatus, err = SelectFollowStatus(viewerUserId, profileUserId)
+		// Check viewer -> profile (outgoing)
+		outgoingStatus, err := SelectFollowStatus(viewerUserId, profileUserId)
 		if err != nil {
 			utils.BackendErrorTarget(err, context)
 			utils.InternalServerError(w)
 			return response, false
+		}
+
+		// Check profile -> viewer (incoming)
+		incomingStatus, err := SelectFollowStatus(profileUserId, viewerUserId)
+		if err != nil {
+			utils.BackendErrorTarget(err, context)
+			utils.InternalServerError(w)
+			return response, false
+		}
+
+		// Priority: incoming pending > outgoing > incoming > null
+		// This ensures follow request notifications work correctly
+		if incomingStatus != nil && *incomingStatus == "pending" {
+			followStatus = incomingStatus
+		} else if outgoingStatus != nil {
+			followStatus = outgoingStatus
+		} else if incomingStatus != nil {
+			followStatus = incomingStatus
 		}
 	}
 
@@ -97,6 +117,7 @@ func GetUserProfile(w http.ResponseWriter, profileUserId, viewerUserId int64, co
 	response.Stats.FollowersCount = followersCount
 	response.Stats.FollowingCount = followingCount
 	response.JoinedAt = profile.CreatedAt
+	response.Email = &profile.Email
 
 	return response, true
 }
@@ -211,7 +232,7 @@ func UpdateUserProfile(w http.ResponseWriter, userId int64, req *UpdateProfileRe
 			utils.BadRequest(w, "Both current password and new password are required.", "alert")
 			return response, false
 		}
-		
+
 		// Verify current password
 		currentPasswordHash, err := SelectUserPasswordHash(userId)
 		if err != nil {
@@ -219,12 +240,12 @@ func UpdateUserProfile(w http.ResponseWriter, userId int64, req *UpdateProfileRe
 			utils.InternalServerError(w)
 			return response, false
 		}
-		
+
 		if !utils.CheckPasswordHash(*req.CurrentPassword, currentPasswordHash) {
 			utils.BadRequest(w, "Current password is incorrect.", "alert")
 			return response, false
 		}
-		
+
 		// Hash new password
 		newPasswordHash := *req.Password
 		err = utils.GeneratePasswordHash(&newPasswordHash)
@@ -233,7 +254,7 @@ func UpdateUserProfile(w http.ResponseWriter, userId int64, req *UpdateProfileRe
 			utils.InternalServerError(w)
 			return response, false
 		}
-		
+
 		// Update password
 		err = UpdateUserPasswordInDB(userId, newPasswordHash)
 		if err != nil {

@@ -142,7 +142,7 @@ func SelectFollowingCount(userId int64) (int64, error) {
 	err := config.DB.QueryRow(SELECT_FOLLOWING_COUNT, userId).Scan(&count)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return 0, nil // No counter row = 0 following
+			return 0, nil
 		}
 		if strings.Contains(err.Error(), "no such column") {
 			return 0, nil
