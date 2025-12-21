@@ -11,7 +11,7 @@ import (
 var (
 	emailRegex      = regexp.MustCompile(`^[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,4}$`)
 	nameRegex       = regexp.MustCompile(`^[a-zA-Z]+(?:[-'\s][a-zA-Z]+)*$`)
-	passwordLength  = regexp.MustCompile(`^.{8,16}$`)
+	passwordLength  = regexp.MustCompile(`^.{8,64}$`)
 	passwordUpper   = regexp.MustCompile(`[A-Z]`)
 	passwordLower   = regexp.MustCompile(`[a-z]`)
 	passwordDigit   = regexp.MustCompile(`[0-9]`)
@@ -29,7 +29,7 @@ func EmailValidation(mail string) (bool, string) {
 
 func PasswordValidation(password string) (bool, string) {
 	if !passwordLength.MatchString(password) {
-		return false, "Password must be between 8 and 16 characters."
+		return false, "Password must be between 8 and 64 characters."
 	}
 	if !passwordUpper.MatchString(password) {
 		return false, "Password must contain at least one uppercase letter."

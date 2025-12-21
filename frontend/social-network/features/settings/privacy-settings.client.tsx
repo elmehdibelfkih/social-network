@@ -110,7 +110,7 @@ export function PrivacySettings({ profile }: { profile: ProfileAPIResponse }) {
               onChange={(e) => setPasswords({ ...passwords, currentPassword: e.target.value })}
               required
               minLength={8}
-              maxLength={16}
+              maxLength={64}
             />
           </div>
           <div className={styles.field}>
@@ -121,7 +121,7 @@ export function PrivacySettings({ profile }: { profile: ProfileAPIResponse }) {
               onChange={(e) => setPasswords({ ...passwords, newPassword: e.target.value })}
               required
               minLength={8}
-              maxLength={16}            />
+              maxLength={64}            />
           </div>
           <div className={styles.field}>
             <label>Confirm New Password</label>
@@ -131,7 +131,7 @@ export function PrivacySettings({ profile }: { profile: ProfileAPIResponse }) {
               onChange={(e) => setPasswords({ ...passwords, confirmPassword: e.target.value })}
               required
               minLength={8}
-              maxLength={16}
+              maxLength={64}
             />
           </div>
           <button type="submit" className={styles.updateBtn} disabled={isLoading}>

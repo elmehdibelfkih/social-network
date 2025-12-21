@@ -33,6 +33,11 @@
   margin: 0 0 2px 0;
   cursor: pointer;
   transition: color 0.2s;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  width: 60%;
+  background-color: red;
 }
 
 .authorName:hover {

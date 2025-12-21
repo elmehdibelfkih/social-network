@@ -34,13 +34,14 @@
   
   .contactGrid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
     gap: 1.25rem;
   }
   
   .contactItem {
     display: flex;
     align-items: center;
+    flex-wrap: nowrap;
     gap: 1rem;
     font-size: 1rem;
     color: #374151;
@@ -48,6 +49,9 @@
     padding: 1rem;
     border-radius: 8px;
     border: 1px solid #e5e7eb;
+    overflow: hidden;
+    background-color: red;
+    
   }
   
   .contactItem svg {
