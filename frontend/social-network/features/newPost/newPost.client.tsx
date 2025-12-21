@@ -114,7 +114,7 @@ export function NewPostClient({ groupId }: { groupId?: number | null }) {
             value={content}
             onChange={(e) => setContent(e.target.value)}
             placeholder="What's on your mind?"
-            maxLength={500}
+            maxLength={1024}
             required
 
           />
@@ -268,7 +268,7 @@ export function TopPart() {
             className={styles.textArea}
             required
 
-            maxLength={500}
+            maxLength={1024}
           />
         </div>
       </div >

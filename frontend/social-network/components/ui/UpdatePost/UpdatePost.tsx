@@ -170,7 +170,7 @@ export function UpdatePost({ postId, initialContent, initialPrivacy, initialMedi
             onChange={(e) => setContent(e.target.value)}
             placeholder="What's on your mind?"
             rows={6}
-            maxLength={500}
+            maxLength={1024}
             required
           />
 

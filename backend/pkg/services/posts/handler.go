@@ -16,6 +16,17 @@ func HandleCreatePost(w http.ResponseWriter, r *http.Request) {
 		utils.BadRequest(w, "Invalid request body", utils.ErrorTypeAlert)
 		return
 	}
+
+	if len(req.Content) > 1024 {
+		utils.BadRequest(w, "Post content exceeds 1024 characters", utils.ErrorTypeAlert)
+		return
+	}
+
+	if len(req.MediaIDs) > 10 {
+		utils.BadRequest(w, "Maximum 10 files allowed per post", utils.ErrorTypeAlert)
+		return
+	}
+
 	// Validate privacy
 	if !validatePrivacy(req.Privacy) {
 		utils.BadRequest(w, "Invalid privacy setting", utils.ErrorTypeAlert)
@@ -116,6 +127,17 @@ func HandleUpdatePost(w http.ResponseWriter, r *http.Request) {
 	var req UpdatePostRequest
 	if err := utils.JsonStaticDecode(r, &req); err != nil {
 		utils.BadRequest(w, "Invalid request body", utils.ErrorTypeAlert)
+		return
+	}
+
+	// Validate content length
+	if len(req.Content) > 1024 {
+		utils.BadRequest(w, "Post content exceeds 1024 characters", utils.ErrorTypeAlert)
+		return
+	}
+	// Validate media count
+	if len(req.MediaIDs) > 10 {
+		utils.BadRequest(w, "Maximum 10 files allowed per post", utils.ErrorTypeAlert)
 		return
 	}
 
