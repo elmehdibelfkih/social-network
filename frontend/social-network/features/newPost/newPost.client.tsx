@@ -17,25 +17,36 @@ export const privacyOptions = [
   { value: 'restricted', label: 'Restricted', description: 'Only share with...', icon: 'users' }
 ] as const;
 
-export function NewPostClient() {
+export function NewPostClient({ groupId }: { groupId?: number | null }) {
   const { user } = useAuth();
-  const { dispatch } = useUserStats();
+  const { state, dispatch } = useUserStats();
   const [content, setContent] = useState('');
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
-  const [privacy, setPrivacy] = useState<PrivacyLevel>('public');
+  const [privacy, setPrivacy] = useState<PrivacyLevel>(groupId ? 'group' : 'public');
   const [showPrivacyDropdown, setShowPrivacyDropdown] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showAddFriends, setShowAddFriends] = useState(false);
   const [selectedFollowers, setSelectedFollowers] = useState<number[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-
   const [isMounted, setIsMounted] = useState(false);
   useEffect(() => setIsMounted(true), []);
   if (!isMounted || !user) return null;
 
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) =>
-    setSelectedFiles(Array.from(e.target.files || []));
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    const MAX_SIZE = 10 * 1024 * 1024; // 10MB
+
+    const validFiles = files.filter(file => {
+      if (file.size > MAX_SIZE) {
+        alert(`File ${file.name} is too large. Maximum size is 10MB.`);
+        return false;
+      }
+      return true;
+    });
+
+    setSelectedFiles(validFiles.slice(0, 10));
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -51,19 +62,29 @@ export function NewPostClient() {
         mediaIds = uploaded.map(r => r.mediaId);
       }
 
-      await postsService.createPost({
+      const newPost = await postsService.createPost({
         content: content.trim(),
         privacy,
         mediaIds: mediaIds.length ? mediaIds : undefined,
         allowedList:
-          privacy === 'restricted' && selectedFollowers.length ? selectedFollowers : undefined
+          privacy === 'restricted' && selectedFollowers.length ? selectedFollowers : undefined,
+        groupId: groupId || undefined 
       });
 
       setContent('');
       setSelectedFiles([]);
-      setPrivacy('public');
+      setPrivacy(groupId ? 'group' : 'public'); 
       setSelectedFollowers([]);
       dispatch({ type: 'INCREMENT_POSTS' })
+      
+      const completePost = {
+        ...newPost,
+        authorFirstName: newPost.authorFirstName || user.firstName,
+        authorLastName: newPost.authorLastName || user.lastName,
+        content: newPost.content || content.trim()
+      }
+
+      window.dispatchEvent(new CustomEvent('newPost', { detail: completePost }))
     } finally {
       setIsSubmitting(false);
     }
@@ -78,26 +99,27 @@ export function NewPostClient() {
   return (
     <form onSubmit={handleSubmit} className={styles.form}>
       <div className={styles.leftPart}>
-        <AvatarHolder avatarId={user?.avatarId ?? null} size={60} />
+        <AvatarHolder avatarId={state.avatarId ?? user?.avatarId ?? null} size={60} />
       </div>
 
       <div className={styles.rightPart}>
         <div className={styles.userInfo}>
           <div className={styles.miniHandle}>{user.firstName + ' ' + user.lastName}</div>
-          <h4 className={styles.miniName}>{'@' + user.nickname}</h4>
+          <h4 className={styles.miniName}> {user.nickname ? `@${user.nickname}` : '@' + user.firstName +  user.lastName} </h4>
         </div>
 
-        {/* Textarea */}
         <div className={styles.topPart}>
           <textarea
             className={styles.textArea}
             value={content}
             onChange={(e) => setContent(e.target.value)}
             placeholder="What's on your mind?"
+            maxLength={500}
+            required
+
           />
         </div>
 
-        {/* File list */}
         {selectedFiles.length > 0 && (
           <div className={styles.selectedFiles}>
             {selectedFiles.map((file, i) => (
@@ -122,14 +144,13 @@ export function NewPostClient() {
           </div>
         )}
 
-        {/* Bottom controls */}
         <div className={styles.bottomPart}>
-
-          {/* Upload button */}
           <button
             type="button"
             className={styles.uploadImageButton}
             onClick={() => fileInputRef.current?.click()}
+            disabled={selectedFiles.length >= 10}
+            title={selectedFiles.length >= 10 ? "Maximum 10 photos allowed" : "Add photos"}
           >
             <ImageIcon /> Photo
           </button>
@@ -143,56 +164,58 @@ export function NewPostClient() {
             onChange={handleFileSelect}
           />
 
-          {/* PRIVACY */}
-          <div className={styles.privacyContainer}>
-            <button
-              type="button"
-              className={styles.privacyButton}
-              onClick={() => setShowPrivacyDropdown(!showPrivacyDropdown)}
-            >
-              {getPrivacyIcon(privacyOptions.find(p => p.value === privacy)?.icon || '')}
-              {privacyOptions.find(p => p.value === privacy)?.label}
-              <DropdownIcon />
-            </button>
 
-            {showPrivacyDropdown && (
-              <>
-                {/* Backdrop */}
-                <div
-                  className={styles.dropdownBackdrop}
-                  onClick={() => setShowPrivacyDropdown(false)}
-                />
+          {!groupId && (
+            <div className={styles.privacyContainer}>
+              <button
+                type="button"
+                className={styles.privacyButton}
+                onClick={() => setShowPrivacyDropdown(!showPrivacyDropdown)}
+              >
+                {getPrivacyIcon(privacyOptions.find(p => p.value === privacy)?.icon || '')}
+                {privacyOptions.find(p => p.value === privacy)?.label}
+                <DropdownIcon />
+              </button>
 
-                <div className={styles.privacyDropdown}>
-                  {privacyOptions.map(opt => (
-                    <button
-                      key={opt.value}
-                      type="button"
-                      className={`${styles.privacyOption} ${privacy === opt.value ? styles.active : ''}`}
-                      onClick={() => {
-                        setPrivacy(opt.value);
-                        setShowPrivacyDropdown(false);
-                        if (opt.value === 'restricted') setShowAddFriends(true);
-                      }}
-                    >
-                      <div className={styles.privacyOptionIcon}>
-                        {getPrivacyIcon(opt.icon)}
-                      </div>
+              {showPrivacyDropdown && (
+                <>
+                  {/* Backdrop */}
+                  <div
+                    className={styles.dropdownBackdrop}
+                    onClick={() => setShowPrivacyDropdown(false)}
+                  />
 
-                      <div className={styles.privacyOptionContent}>
-                        <div className={styles.privacyOptionLabel}>{opt.label}</div>
-                        <div className={styles.privacyOptionDesc}>{opt.description}</div>
-                      </div>
+                  <div className={styles.privacyDropdown}>
+                    {privacyOptions.map(opt => (
+                      <button
+                        key={opt.value}
+                        type="button"
+                        className={`${styles.privacyOption} ${privacy === opt.value ? styles.active : ''}`}
+                        onClick={() => {
+                          setPrivacy(opt.value);
+                          setShowPrivacyDropdown(false);
+                          if (opt.value === 'restricted') setShowAddFriends(true);
+                        }}
+                      >
+                        <div className={styles.privacyOptionIcon}>
+                          {getPrivacyIcon(opt.icon)}
+                        </div>
 
-                      {privacy === opt.value && (
-                        <div className={styles.privacyOptionCheck}>✓</div>
-                      )}
-                    </button>
-                  ))}
-                </div>
-              </>
-            )}
-          </div>
+                        <div className={styles.privacyOptionContent}>
+                          <div className={styles.privacyOptionLabel}>{opt.label}</div>
+                          <div className={styles.privacyOptionDesc}>{opt.description}</div>
+                        </div>
+
+                        {privacy === opt.value && (
+                          <div className={styles.privacyOptionCheck}>✓</div>
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                </>
+              )}
+            </div>
+          )}
 
           {/* Add friends (restricted mode) */}
           {showAddFriends && (
@@ -244,11 +267,11 @@ export function TopPart() {
             placeholder="What's on your mind?"
             className={styles.textArea}
             required
-            minLength={1}
+
+            maxLength={500}
           />
         </div>
       </div >
     </>
   )
-
 }

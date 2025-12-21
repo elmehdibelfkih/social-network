@@ -1,4 +1,4 @@
-export type PrivacyLevel = 'public' | 'private' | 'followers' | 'restricted';
+export type PrivacyLevel = 'public' | 'private' | 'followers' | 'restricted' | 'group';
 
 export interface Post {
   postId: number;
@@ -23,6 +23,7 @@ export interface CreatePostInput {
   privacy: PrivacyLevel;
   mediaIds?: number[];
   allowedList?: number[];
+  groupId?: number;
 }
 
 export interface MediaUploadResponse {

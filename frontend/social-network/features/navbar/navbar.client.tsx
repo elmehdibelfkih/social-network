@@ -19,11 +19,21 @@ export function NavProfile() {
   const handleLogout = async () => {
     try {
       await http.post('/api/v1/auth/logout');
+
+      localStorage.clear();
+      sessionStorage.clear();
+
       setUser(null);
       ShowSnackbar({ status: true, message: 'Logged out successfully.' });
       router.push('/auth');
     } catch (error) {
       console.error('Logout failed', error);
+
+      // Clear storage even if logout request fails
+      localStorage.clear();
+      sessionStorage.clear();
+      setUser(null);
+      router.push('/auth');
     }
   };
 
@@ -49,7 +59,7 @@ export function NavProfile() {
             className={styles.menuItem}
             type="button"
             onClick={() => {
-              router.push(`/profile/${state?.userId}`);
+              router.push(`/profile/`);
               setOpen(false);
             }}
           >

@@ -96,8 +96,10 @@
 
 /* Stats area: three blocks horizontally */
 .statsContainer {
+  background-color: red;
   width: 100%;
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-around;
   gap: var(--spacing-md);
   padding: 0;

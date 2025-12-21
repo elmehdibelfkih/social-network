@@ -36,7 +36,7 @@ export function NotificationProvider({ children }) {
 
             setNotifications(notificationsResponse.notifications)
             setUnreadCount(count)
-            setHasMore(notificationsResponse.notifications.length == 20)
+            setHasMore(notificationsResponse?.notifications?.length == 20)
         } catch (error) {
             console.error('Failed to load notifications:', error)
         } finally {

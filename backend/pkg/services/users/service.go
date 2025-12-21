@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"errors"
 	"net/http"
+	"strings"
 
 	// "social/pkg/services/chat"
 	"social/pkg/utils"
@@ -58,9 +59,9 @@ func GetUserProfile(w http.ResponseWriter, profileUserId, viewerUserId int64, co
 		return response, false
 	}
 
-	// Get chatId if users can chat (status is "accepted")
+	// Get chatId if users are different
 	var chatId *int64
-	if viewerUserId != profileUserId && followStatus != nil && *followStatus == "accepted" {
+	if viewerUserId != profileUserId {
 		chatId, err = SelectChatIdBetweenUsers(viewerUserId, profileUserId)
 		if err != nil {
 			utils.BackendErrorTarget(err, context)
@@ -71,11 +72,19 @@ func GetUserProfile(w http.ResponseWriter, profileUserId, viewerUserId int64, co
 
 	// Build response
 	response.UserId = profile.Id
-	if viewerUserId == profileUserId || followStatus == nil {
-		response.Status = nil
-	} else {
-		response.Status = followStatus
+	if viewerUserId != profileUserId {
+		if followStatus == nil {
+			status := "follow"
+			response.Status = &status
+		} else {
+			response.Status = followStatus
+		}
 	}
+
+	if viewerUserId == profileUserId {
+		response.Email = &profile.Email
+	}
+
 	response.Nickname = profile.Nickname
 	response.FirstName = profile.FirstName
 	response.LastName = profile.LastName
@@ -124,7 +133,12 @@ func UpdateUserProfile(w http.ResponseWriter, userId int64, req *UpdateProfileRe
 		lastName = *req.LastName
 	}
 	if req.Nickname != nil {
-		nickname = req.Nickname
+		// Normalize empty or whitespace-only nicknames to nil (no nickname)
+		if strings.TrimSpace(*req.Nickname) == "" {
+			nickname = nil
+		} else {
+			nickname = req.Nickname
+		}
 	}
 	if req.AboutMe != nil {
 		aboutMe = req.AboutMe
@@ -168,6 +182,52 @@ func UpdateUserProfile(w http.ResponseWriter, userId int64, req *UpdateProfileRe
 					return response, false
 				}
 			}
+		}
+	}
+
+	// Handle account deletion if requested
+	if req.DeleteAccount != nil && *req.DeleteAccount {
+		utils.BackendErrorTarget(nil, "Account deletion requested for user: "+string(rune(userId)))
+		err := DeleteUserAccount(userId)
+		if err != nil {
+			utils.BackendErrorTarget(err, context+" - DeleteUserAccount failed")
+			utils.InternalServerError(w)
+			return response, false
+		}
+		response.Message = "Account deleted successfully."
+		return response, true
+	}
+
+	// Validate password change if requested
+	if req.CurrentPassword != nil && req.Password != nil {
+		// Verify current password
+		currentPasswordHash, err := SelectUserPasswordHash(userId)
+		if err != nil {
+			utils.BackendErrorTarget(err, context)
+			utils.InternalServerError(w)
+			return response, false
+		}
+
+		if !utils.CheckPasswordHash(*req.CurrentPassword, currentPasswordHash) {
+			utils.BadRequest(w, "Current password is incorrect.", "alert")
+			return response, false
+		}
+
+		// Hash new password
+		newPasswordHash := *req.Password
+		err = utils.GeneratePasswordHash(&newPasswordHash)
+		if err != nil {
+			utils.BackendErrorTarget(err, context)
+			utils.InternalServerError(w)
+			return response, false
+		}
+
+		// Update password
+		err = UpdateUserPasswordInDB(userId, newPasswordHash)
+		if err != nil {
+			utils.BackendErrorTarget(err, context)
+			utils.InternalServerError(w)
+			return response, false
 		}
 	}
 

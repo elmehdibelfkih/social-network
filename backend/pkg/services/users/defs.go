@@ -2,13 +2,16 @@ package users
 
 // Request structs
 type UpdateProfileRequestJson struct {
-	FirstName   *string `json:"firstName"`
-	LastName    *string `json:"lastName"`
-	Nickname    *string `json:"nickname"`
-	AboutMe     *string `json:"aboutMe"`
-	AvatarId    *int64  `json:"avatarId"`
-	DateOfBirth *string `json:"dateOfBirth"`
-	Email       *string `json:"email"`
+	FirstName       *string `json:"firstName"`
+	LastName        *string `json:"lastName"`
+	Nickname        *string `json:"nickname"`
+	AboutMe         *string `json:"aboutMe"`
+	AvatarId        *int64  `json:"avatarId"`
+	DateOfBirth     *string `json:"dateOfBirth"`
+	Email           *string `json:"email"`
+	CurrentPassword *string `json:"currentPassword"`
+	Password        *string `json:"password"`
+	DeleteAccount   *bool   `json:"deleteAccount"`
 }
 
 type UpdatePrivacyRequestJson struct {
@@ -19,6 +22,7 @@ type UpdatePrivacyRequestJson struct {
 type UserProfileResponseJson struct {
 	UserId      int64                `json:"userId"`
 	Status      *string              `json:"status"` // pending/accepted/declined or NULL
+	Email       *string              `json:"email"`
 	Nickname    *string              `json:"nickname"`
 	FirstName   string               `json:"firstName"`
 	LastName    string               `json:"lastName"`

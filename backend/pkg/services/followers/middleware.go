@@ -2,13 +2,13 @@ package follow
 
 import (
 	"net/http"
+
 	"social/pkg/utils"
 )
 
 // POST /api/v1/users/:user_id/follow => send follow request or follow immediately if target is public
 func FollowRequestMiddleWare(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-
 		userId := utils.GetUserIdFromContext(r)
 		targetUserId := utils.GetWildCardValue(w, r, "user_id")
 
@@ -113,7 +113,7 @@ func FollowersFolloweesListMiddleWare(next http.HandlerFunc) http.HandlerFunc {
 }
 
 // GET /api/v1/follow-requests => list received follow requests for current user
-//FIXME: mayby we dont need that function
+// FIXME: mayby we dont need that function
 
 // POST /api/v1/follow-requests/:user_id/accept => accept request
 func AcceptFollowRequestMiddleWare(next http.HandlerFunc) http.HandlerFunc {
@@ -143,7 +143,7 @@ func AcceptFollowRequestMiddleWare(next http.HandlerFunc) http.HandlerFunc {
 		}
 
 		if status != "pending" {
-			utils.BadRequest(w, "You cannot accept an invitation dose not exist.", "alert")
+			utils.BadRequest(w, "You cannot accept an invitation that doesn't exist.", "alert")
 			return
 		}
 		next(w, r)

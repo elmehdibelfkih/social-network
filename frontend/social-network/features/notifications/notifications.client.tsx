@@ -93,13 +93,13 @@ export function NotificationsDropdown() {
           <div className={styles.dropdownBody} ref={scrollContainerRef}>
             {loading && notifications.length === 0 ? (
               <div className={styles.loading}>Loading...</div>
-            ) : notifications.length === 0 ? (
+            ) : notifications == undefined || notifications.length === 0 ? (
               <div className={styles.empty}>
                 <p>No notifications</p>
               </div>
             ) : (
               <>
-                {notifications.map((notification) => {
+                {notifications?.map((notification) => {
                   const props = {
                     notification,
                     onMarkAsRead: markAsRead,

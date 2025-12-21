@@ -6,8 +6,8 @@ CREATE TABLE
     title TEXT NOT NULL,
     description TEXT,
     location TEXT NOT NULL,
-    event_start_date TEXT NOT NULL,
-    event_end_date TEXT NOT NULL,
+    start_at TEXT NOT NULL,
+    end_at TEXT NOT NULL,
     created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (group_id) REFERENCES groups (id) ON DELETE CASCADE,
@@ -18,6 +18,6 @@ CREATE INDEX IF NOT EXISTS idx_group_events_group_id ON group_events (group_id);
 
 CREATE INDEX IF NOT EXISTS idx_group_events_creator_id ON group_events (creator_id);
 
-CREATE INDEX IF NOT EXISTS idx_group_events_event_start_date ON group_events (event_start_date);
+CREATE INDEX IF NOT EXISTS idx_group_events_start_at ON group_events (start_at);
 
-CREATE INDEX IF NOT EXISTS idx_group_events_event_end_date ON group_events (event_end_date);
+CREATE INDEX IF NOT EXISTS idx_group_events_end_at ON group_events (end_at);

@@ -1,0 +1,77 @@
+.rsvpContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.statusDisplay {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  font-size: 0.875rem;
+}
+
+.statusGoing {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #16a34a;
+}
+
+.statusNotGoing {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #6b7280;
+}
+
+.icon {
+  width: 1rem;
+  height: 1rem;
+}
+
+.buttonContainer {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  font-weight: 500;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+}
+
+.buttonInactive {
+  background-color: #ffffff;
+  color: #374151;
+  border: 1px solid #d1d5db;
+}
+
+.buttonInactive:hover {
+  background-color: #f9fafb;
+}
+
+.buttonGoingActive {
+  background-color: #16a34a;
+  color: #ffffff;
+}
+
+.buttonGoingActive:hover {
+  background-color: #15803d;
+}
+
+.buttonNotGoingActive {
+  background-color: #4b5563;
+  color: #ffffff;
+}
+
+.buttonNotGoingActive:hover {
+  background-color: #374151;
+}

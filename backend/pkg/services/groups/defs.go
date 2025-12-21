@@ -130,8 +130,8 @@ type PaginationJson struct {
 type CreateEventRequestJson struct {
 	Title       string `json:"title"`
 	Description string `json:"description"`
-	StartAt     string `json:"start_at"`
-	EndAt       string `json:"end_at"`
+	StartAt     string `json:"startAt"`
+	EndAt       string `json:"endAt"`
 	Location    string `json:"location"`
 }
 
@@ -140,8 +140,8 @@ type CreateEventResponseJson struct {
 	GroupId     int64  `json:"group_id"`
 	Title       string `json:"title"`
 	Description string `json:"description"`
-	StartAt     string `json:"start_at"`
-	EndAt       string `json:"end_at"`
+	StartAt     string `json:"startAt"`
+	EndAt       string `json:"endAt"`
 	Location    string `json:"location"`
 	CreatedBy   int64  `json:"created_by"`
 	CreatedAt   string `json:"created_at"`
@@ -157,8 +157,8 @@ type EventItemJson struct {
 	EventId     int64  `json:"event_id"`
 	Title       string `json:"title"`
 	Description string `json:"description"`
-	StartAt     string `json:"start_at"`
-	EndAt       string `json:"end_at"`
+	StartAt     string `json:"startAt" db:"startAt"`
+	EndAt       string `json:"endAt" db:"endAt"`
 	Location    string `json:"location"`
 	CreatedBy   int64  `json:"created_by"`
 	CreatedAt   string `json:"created_at"`
@@ -170,8 +170,8 @@ type GetEventResponseJson struct {
 	GroupId     int64            `json:"group_id"`
 	Title       string           `json:"title"`
 	Description string           `json:"description"`
-	StartAt     string           `json:"start_at"`
-	EndAt       string           `json:"end_at"`
+	StartAt     string           `json:"startAt" db:"startAt"`
+	EndAt       string           `json:"endAt" db:"endAt"`
 	Location    string           `json:"location"`
 	CreatedBy   EventCreatorJson `json:"created_by"`
 	CreatedAt   string           `json:"created_at"`
@@ -191,6 +191,12 @@ type RSVPResponseJson struct {
 	Message string `json:"message"`
 }
 
+type GetRSVPResponseJson struct{
+	Countgoing int32      `json:"going_count"`
+	CountNotgoing int32   `json:"notgoing_count"`
+	Amigoing bool		  `json:"ami_going"`
+}
+
 // validators
 
 func (v *CreateGroupRequestJson) Validate() (bool, string) {
@@ -204,10 +210,10 @@ func (v *CreateGroupRequestJson) Validate() (bool, string) {
 }
 
 func (v *UpdateGroupRequestJson) Validate() (bool, string) {
-	if ok, str := utils.TextContentValidationEscape(&v.Title, 32, 5); !ok {
+	if ok, str := utils.TextContentValidationEscape(&v.Title, 5, 32); !ok {
 		return false, str
 	}
-	if ok, str := utils.TextContentValidationEscape(&v.Description, 4096, 5); !ok {
+	if ok, str := utils.TextContentValidationEscape(&v.Description, 5, 4096); !ok {
 		return false, str
 	}
 
@@ -215,10 +221,10 @@ func (v *UpdateGroupRequestJson) Validate() (bool, string) {
 }
 
 func (v *CreateEventRequestJson) Validate() (bool, string) {
-	if ok, str := utils.TextContentValidationEscape(&v.Title, 32, 5); !ok {
+	if ok, str := utils.TextContentValidationEscape(&v.Title, 5, 32); !ok {
 		return false, str
 	}
-	if ok, str := utils.TextContentValidationEscape(&v.Description, 4096, 5); !ok {
+	if ok, str := utils.TextContentValidationEscape(&v.Description, 5, 4096); !ok {
 		return false, str
 	}
 	if !utils.DateValidation(v.StartAt) {
@@ -227,7 +233,7 @@ func (v *CreateEventRequestJson) Validate() (bool, string) {
 	if !utils.DateValidation(v.EndAt) {
 		return false, "invalid Date"
 	}
-	if ok, str := utils.TextContentValidationEscape(&v.Location, 32, 5); !ok {
+	if ok, str := utils.TextContentValidationEscape(&v.Location, 5, 32); !ok {
 		return false, str
 	}
 	return true, "OK"

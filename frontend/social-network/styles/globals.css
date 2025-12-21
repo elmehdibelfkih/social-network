@@ -1,7 +1,9 @@
 @import './variables.css'; /* only if not already imported */
 
 /* ensure the page is full-height so background fills viewport */
-html, body, #__next {
+html,
+body,
+#__next {
   height: 100%;
 }
 
@@ -21,4 +23,18 @@ body {
 .app-root {
   min-height: 100vh;
   background-color: var(--background-cream);
+  display: flex;
+  flex-direction: column;
+}
+
+.main-content {
+  flex-grow: 1;
+  margin-bottom: 5rem;
+}
+
+
+.g_layout{
+      max-width: 1240px;
+    min-height: 100vh;
+    margin: 0 auto;
 }

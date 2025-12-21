@@ -206,4 +206,11 @@ const (
 	QUERY_GET_POST_AUTHORID = `
 		SELECT author_id FROM posts WHERE id = ?;
 	`
+
+	// Post stats queries
+	QUERY_COUNT_POST_REACTIONS = `
+		SELECT COUNT(*)
+		FROM post_reactions
+		WHERE post_id = ?;
+	`
 )

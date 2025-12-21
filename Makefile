@@ -79,9 +79,9 @@ confirm:
 	@echo -n "$(MAGENTA)Are you absolutely sure you want to run $(MAKECMDGOALS)?$(RESET) [$(RED)yes$(RESET)/$(GREEN)no$(RESET)]: " && \
 	read REPLY; \
 	if echo "$$REPLY" | grep -iq "^yes"; then \
-		echo "✅ Confirmation received. Continuing..."; \
+		echo "✔️ $(RED)Confirmation received. Continuing...$(RESET)"; \
 	else \
-		echo "❌ Operation cancelled by user."; \
+		echo "❌ $(GREEN)Operation cancelled by user.$(RESET)"; \
 		exit 1; \
 	fi
 #=============================================================

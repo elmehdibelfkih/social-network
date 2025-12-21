@@ -1,13 +1,16 @@
 'use client'
-import { useEffect, useState } from 'react'
+import { Suspense, useState, useEffect } from 'react'
 import type { Post } from '@/libs/globalTypes'
-import { PostsClient } from './posts.client'
+import { PostActions } from './PostActions'
 import { AvatarHolder } from '@/components/ui/avatar_holder/avatarholder.client'
 import styles from './styles.module.css'
-import { fetchMediaClient, http } from '@/libs/apiFetch'
+import { http, fetchMediaClient } from '@/libs/apiFetch'
 import { UpdatePost } from '@/components/ui/UpdatePost/UpdatePost'
 import { ConfirmDelete } from '@/components/ui/ConfirmDelete/ConfirmDelete'
 import { useAuth } from '@/providers/authProvider'
+import { GlobeIcon, LockIcon, UsersIcon } from '@/components/ui/icons'
+import { timeAgo } from '@/libs/helpers'
+import { useUserStats } from '@/providers/userStatsContext'
 
 function MediaCarousel({ mediaDataList }: { mediaDataList: string[] }) {
   const [currentIndex, setCurrentIndex] = useState(0)
@@ -52,6 +55,15 @@ function MediaCarousel({ mediaDataList }: { mediaDataList: string[] }) {
   )
 }
 
+async function getAvatarId(userId: number): Promise<number | null> {
+  try {
+    const profile = await http.get(`/api/v1/users/${userId}/profile`) as any
+    return profile?.avatarId || null
+  } catch {
+    return null
+  }
+}
+
 async function getMediaData(mediaId: number): Promise<string | null> {
   try {
     const media = await fetchMediaClient(String(mediaId))
@@ -64,66 +76,107 @@ async function getMediaData(mediaId: number): Promise<string | null> {
   }
 }
 
-export function PostCard({ post, avatarId }: { post: Post, avatarId: number}) {
+const CONTENT_PREVIEW_LENGTH = 300
+
+export default function PostCard({ post: initialPost }: { post: Post }) {
   const { user } = useAuth()
+  const [post, setPost] = useState(initialPost)
+  const [avatarId, setAvatarId] = useState<number | null>(null)
   const [mediaDataList, setMediaDataList] = useState<(string | null)[]>([])
-  const [isLoadingMedia, setIsLoadingMedia] = useState(true)
   const [showMenu, setShowMenu] = useState(false)
   const [showUpdateModal, setShowUpdateModal] = useState(false)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const [mounted, setMounted] = useState(false)
-  const [stats, setStats] = useState({ 
-    reactionCount: post.stats?.reactionCount || 0, 
-    commentCount: post.stats?.commentCount || 0 
+  const [isExpanded, setIsExpanded] = useState(false)
+  const [stats, setStats] = useState({
+    reactionCount: post.stats?.reactionCount || 0,
+    commentCount: post.stats?.commentCount || 0
   })
+  const { dispatch } = useUserStats()
   const isAuthor = mounted && user && Number(user.userId) === post.authorId
+  const isLongContent = post.content.length > CONTENT_PREVIEW_LENGTH
 
   useEffect(() => setMounted(true), [])
 
   useEffect(() => {
-    const loadData = async () => {
-      if (post.mediaIds && post.mediaIds.length > 0) {
-        const mediaData = await Promise.all(
-          post.mediaIds.map(mediaId => getMediaData(mediaId))
-        )
-        setMediaDataList(mediaData)
-        setIsLoadingMedia(false)
-      } else {
-        setIsLoadingMedia(false)
-      }
+    getAvatarId(post.authorId).then(setAvatarId)
+    if (post.mediaIds && post.mediaIds.length > 0) {
+      Promise.all(post.mediaIds.map(getMediaData)).then(setMediaDataList)
+    }
+  }, [post.authorId, post.mediaIds])
+
+  useEffect(() => {
+    if (!post.stats) {
+      http.get<any>(`/api/v1/posts/${post.postId}/comments?page=1&limit=1`)
+        .then(data => setStats(prev => ({ ...prev, commentCount: data?.totalComments || 0 })))
+        .catch(() => { })
+    }
+  }, [post.postId, post.stats])
+
+  const authorName = `${post.authorFirstName} ${post.authorLastName}`
+  
+  const getPrivacyIcon = (privacy: string) => {
+    switch (privacy) {
+      case 'public': return <GlobeIcon fillColor="currentColor" />
+      case 'followers': return <UsersIcon />
+      case 'private': return <LockIcon />
+      case 'restricted': return <UsersIcon />
+      default: return <GlobeIcon fillColor="currentColor" />
+    }
+  }
+
+  const handleUpdate = (updatedPost: any) => {
+    // Update local state immediately
+    setPost(prev => ({
+      ...prev,
+      content: updatedPost.content || prev.content,
+      privacy: updatedPost.privacy || prev.privacy,
+      mediaIds: updatedPost.mediaIds || prev.mediaIds
+    }))
+
+    // Reload media if changed
+    if (updatedPost.mediaIds) {
+      Promise.all(updatedPost.mediaIds.map(getMediaData)).then(setMediaDataList)
     }
 
-    loadData()
-  }, [post.mediaIds])
+    // Dispatch event for other components
+    window.dispatchEvent(new CustomEvent('updatePost', { 
+      detail: { 
+        postId: post.postId,
+        ...updatedPost
+      } 
+    }))
+    
+    setShowUpdateModal(false)
+  }
 
-  // useEffect(() => {
-  //   const fetchStats = async () => {
-  //     try {
-  //       const commentsData = await http.get<any>(`/api/v1/posts/${post.postId}/comments?page=1&limit=1`)
-  //       setStats(prev => ({
-  //         ...prev,
-  //         commentCount: commentsData?.totalComments || 0
-  //       }))
-  //     } catch (error) {
-  //       console.error('Failed to fetch stats:', error)
-  //     }
-  //   }
-  //   fetchStats()
-  // }, [post.postId])
-  const authorName = `${post.authorFirstName} ${post.authorLastName}`
-  const timeAgo = new Date(post.createdAt).toLocaleDateString()
-  
+  const handleDelete = async () => {
+    try {
+      const res = await http.delete(`/api/v1/posts/${post.postId}`)
+      if (!res) return
+      dispatch({ type: 'DECREMENT_POSTS' })
+      // Dispatch event for feed to remove this post
+      window.dispatchEvent(new CustomEvent('deletePost', { 
+        detail: { postId: post.postId } 
+      }))
+      setShowDeleteConfirm(false)
+    } catch (error) {
+      console.error('Failed to delete post:', error)
+    }
+  }
 
   return (
-    
     <article className={styles.post}>
       <div className={styles.header}>
         <AvatarHolder avatarId={avatarId} size={40} />
         <div className={styles.authorInfo}>
           <h3 className={styles.authorName} onClick={() => window.location.href = `/profile/${post.authorId}`}>{authorName}</h3>
           <div className={styles.postMeta}>
-            <span className={styles.timeAgo}>{timeAgo}</span>
-            <span className={styles.privacy}>🌐 {post.privacy}</span>
+            <span className={styles.timeAgo}>{timeAgo(post.createdAt)}</span>
+            <span className={styles.privacy}>
+              {getPrivacyIcon(post.privacy)}
+              {post.privacy}
+            </span>
           </div>
         </div>
         {isAuthor && (
@@ -147,24 +200,33 @@ export function PostCard({ post, avatarId }: { post: Post, avatarId: number}) {
       </div>
 
       <div className={styles.content}>
-        <p>{post.content}</p>
+        <p>
+          {isLongContent && !isExpanded
+            ? `${post.content.substring(0, CONTENT_PREVIEW_LENGTH)}...`
+            : post.content}
+        </p>
+        {isLongContent && (
+          <button
+            className={styles.readMoreButton}
+            onClick={() => setIsExpanded(!isExpanded)}
+          >
+            {isExpanded ? 'Show less' : 'Read more'}
+          </button>
+        )}
       </div>
 
-      {post?.mediaIds && post.mediaIds.length > 0 && (
-        isLoadingMedia ? (
-          <div style={{ padding: '40px', textAlign: 'center', color: '#6b7280' }}>
-            Loading media...
-          </div>
-        ) : (
-          <MediaCarousel mediaDataList={mediaDataList.filter(Boolean) as string[]} />
-        )
+      {post.mediaIds && post.mediaIds.length > 0 && (
+        <MediaCarousel mediaDataList={mediaDataList.filter(Boolean) as string[]} />
       )}
 
       <div className={styles.stats}>
-        <span>{stats.reactionCount} likes</span>
+        <span>{stats.reactionCount} like{stats.reactionCount !== 1 ? 's' : ''}</span>
         <span>{stats.commentCount} comment{stats.commentCount !== 1 ? 's' : ''}</span>
       </div>
-      <PostsClient post={{ ...post, stats }} onStatsUpdate={setStats} />
+
+      <Suspense fallback={<div className={styles.actionsLoading}>Loading...</div>}>
+        <PostActions post={{ ...post, stats }} onStatsUpdate={setStats} />
+      </Suspense>
 
       {showUpdateModal && (
         <UpdatePost
@@ -173,21 +235,16 @@ export function PostCard({ post, avatarId }: { post: Post, avatarId: number}) {
           initialPrivacy={post.privacy}
           initialMediaIds={post.mediaIds || []}
           onClose={() => setShowUpdateModal(false)}
-          onUpdate={() => window.location.reload()}
+          onUpdate={handleUpdate}
         />
       )}
 
       {showDeleteConfirm && (
         <ConfirmDelete
-          onConfirm={async () => {
-            await http.delete(`/api/v1/posts/${post.postId}`);
-            window.location.reload();
-          }}
+          onConfirm={handleDelete}
           onCancel={() => setShowDeleteConfirm(false)}
         />
       )}
     </article>
-    
   )
-
 }

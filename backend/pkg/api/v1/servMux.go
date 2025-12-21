@@ -49,6 +49,7 @@ func SocialMux() *router.Router {
 	// events
 	socialMux.HandleFunc("POST", "/api/v1/groups/{group_id}/events", utils.MiddlewareChain(groups.PostCreateEvent, middleware.AuthMiddleware, groups.IsMemeber))
 	socialMux.HandleFunc("POST", "/api/v1/groups/{group_id}/events/{event_id}/rsvp", utils.MiddlewareChain(groups.PostEventRSVP, middleware.AuthMiddleware, groups.IsMemeber))
+	socialMux.HandleFunc("GET", "/api/v1/groups/{group_id}/events/{event_id}/rsvp", utils.MiddlewareChain(groups.GetEventRSVP, middleware.AuthMiddleware, groups.IsMemeber))
 	socialMux.HandleFunc("GET", "/api/v1/groups/{group_id}/events/{event_id}", utils.MiddlewareChain(groups.GetEventInfo, middleware.AuthMiddleware, groups.IsMemeber))
 	socialMux.HandleFunc("GET", "/api/v1/groups/{group_id}/events", utils.MiddlewareChain(groups.GetGroupEvents, middleware.AuthMiddleware, groups.IsMemeber))
 
@@ -113,7 +114,7 @@ func SocialMux() *router.Router {
 	// Feed   ( personal && Specific user feed && Group feed )
 	socialMux.HandleFunc("GET", "/api/v1/feed", utils.MiddlewareChain(feed.GetFeed, middleware.AuthMiddleware))
 	socialMux.HandleFunc("GET", "/api/v1/users/{user_id}/feed", utils.MiddlewareChain(feed.GetFeedUser, middleware.AuthMiddleware))
-	socialMux.HandleFunc("GET", "/api/v1/groups/{group_id}/feed", utils.MiddlewareChain(feed.GetFeedGroup, feed.IsGroupMember, middleware.AuthMiddleware))
+	socialMux.HandleFunc("GET", "/api/v1/groups/{group_id}/feed", utils.MiddlewareChain(feed.GetFeedGroup, middleware.AuthMiddleware, feed.IsGroupMember))
 
 	socialMux.HandleFunc("GET", "/api/v1/users/id", utils.MiddlewareChain(GetId, middleware.AuthMiddleware))
 

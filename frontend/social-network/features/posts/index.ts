@@ -1,4 +1,4 @@
 export { postsService } from './postsService'
-export { default as Posts } from './posts.server'
-export { PostsClient } from './posts.client'
-export { PostCard } from './post-card.client'
+export { default as PostCard } from './PostCard'
+export { PostActions } from './PostActions'
+export { Feed } from './Feed'

@@ -18,6 +18,7 @@ export function FollowNotification({ notification, onMarkAsRead }: NotificationP
     try {
       const response = await http.get<ProfileAPIResponse>(`/api/v1/users/${notification.referenceId}/profile`)
       setProfile(response)
+      console.log("ccccc", response)
     } catch (error) {
       console.error('Failed to fetch profile:', error)
     }
@@ -85,11 +86,11 @@ export function FollowNotification({ notification, onMarkAsRead }: NotificationP
         <div className={styles.actionButtons}>
           <button className={styles.acceptButton}
             onClick={acceptInvitation}
-          // disabled={isDecisionMade}
+            disabled={profile.status === 'accepted'}
           >✓ Accept</button>
           <button className={styles.declineButton}
             onClick={declineInvitation}
-          // disabled={isDecisionMade}
+            disabled={profile.status === 'accepted'}
           >× Decline</button>
         </div>
       </div>

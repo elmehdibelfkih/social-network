@@ -2,12 +2,14 @@ package groups
 
 import (
 	"net/http"
+
 	"social/pkg/db/database"
 	"social/pkg/utils"
 )
 
 func CreateGroup(w http.ResponseWriter, r *http.Request,
-	body *CreateGroupRequestJson, response *CreateGroupResponseJson, context string) bool {
+	body *CreateGroupRequestJson, response *CreateGroupResponseJson, context string,
+) bool {
 	userId := utils.GetUserIdFromContext(r)
 	err := InsertNewGroup(body, response, userId)
 	if err != nil {
@@ -31,7 +33,8 @@ func CreateGroup(w http.ResponseWriter, r *http.Request,
 }
 
 func CreateGroupHttp(w http.ResponseWriter,
-	response CreateGroupResponseJson) {
+	response CreateGroupResponseJson,
+) {
 	utils.JsonResponseEncode(w, http.StatusOK, map[string]any{
 		"success": true,
 		"payload": response,
@@ -40,7 +43,8 @@ func CreateGroupHttp(w http.ResponseWriter,
 }
 
 func InviteMember(w http.ResponseWriter, r *http.Request,
-	response *InviteUserResponseJson, context string) bool {
+	response *InviteUserResponseJson, context string,
+) bool {
 	targetId := utils.GetWildCardValue(w, r, "user_id")
 	groupId := utils.GetWildCardValue(w, r, "group_id")
 	if !ValidRelationship(w, r, targetId, context) {
@@ -57,7 +61,8 @@ func InviteMember(w http.ResponseWriter, r *http.Request,
 }
 
 func InviteMemberHttp(w http.ResponseWriter,
-	response InviteUserResponseJson) {
+	response InviteUserResponseJson,
+) {
 	utils.JsonResponseEncode(w, http.StatusOK, map[string]any{
 		"success": true,
 		"payload": response,
@@ -66,7 +71,8 @@ func InviteMemberHttp(w http.ResponseWriter,
 }
 
 func JoinGroup(w http.ResponseWriter, r *http.Request,
-	groupId, userId int64, response *JoinGroupResponseJson, context string) bool {
+	groupId, userId int64, response *JoinGroupResponseJson, context string,
+) bool {
 	var placeHolder InviteUserResponseJson
 	err := InsertNewGroupMember(userId, groupId, "pending", "member", "group_join", &placeHolder)
 	if err != nil {
@@ -81,7 +87,8 @@ func JoinGroup(w http.ResponseWriter, r *http.Request,
 }
 
 func JoinGroupHttp(w http.ResponseWriter,
-	response JoinGroupResponseJson) {
+	response JoinGroupResponseJson,
+) {
 	utils.JsonResponseEncode(w, http.StatusOK, map[string]any{
 		"success": true,
 		"payload": response,
@@ -90,7 +97,8 @@ func JoinGroupHttp(w http.ResponseWriter,
 }
 
 func MemberStatusAccepted(w http.ResponseWriter, r *http.Request,
-	groupId, userId int64, status string, response *AcceptMemberResponseJson, context string) bool {
+	groupId, userId int64, status string, response *AcceptMemberResponseJson, context string,
+) bool {
 	err := UpdateMemberStatusAccepted(groupId, userId, response)
 	if err != nil {
 		utils.BackendErrorTarget(err, context)
@@ -109,7 +117,8 @@ func MemberStatusAccepted(w http.ResponseWriter, r *http.Request,
 }
 
 func MemberStatusDeclined(w http.ResponseWriter, r *http.Request,
-	groupId, userId int64, status string, response *DeclineMemberResponseJson, context string) bool {
+	groupId, userId int64, status string, response *DeclineMemberResponseJson, context string,
+) bool {
 	err := UpdateMemberStatusDeclined(groupId, userId, response)
 	if err != nil {
 		utils.BackendErrorTarget(err, context)
@@ -128,7 +137,8 @@ func MemberStatusDeclined(w http.ResponseWriter, r *http.Request,
 }
 
 func AcceptInviteHttp(w http.ResponseWriter,
-	response AcceptMemberResponseJson) {
+	response AcceptMemberResponseJson,
+) {
 	utils.JsonResponseEncode(w, http.StatusOK, map[string]any{
 		"success": true,
 		"payload": response,
@@ -137,7 +147,8 @@ func AcceptInviteHttp(w http.ResponseWriter,
 }
 
 func DeclineInviteHttp(w http.ResponseWriter,
-	response DeclineMemberResponseJson) {
+	response DeclineMemberResponseJson,
+) {
 	utils.JsonResponseEncode(w, http.StatusOK, map[string]any{
 		"success": true,
 		"payload": response,
@@ -146,7 +157,8 @@ func DeclineInviteHttp(w http.ResponseWriter,
 }
 
 func GroupUpdate(w http.ResponseWriter, r *http.Request,
-	body *UpdateGroupRequestJson, response *UpdateGroupResponseJson, context string) bool {
+	body *UpdateGroupRequestJson, response *UpdateGroupResponseJson, context string,
+) bool {
 	userId := utils.GetUserIdFromContext(r)
 	groupId := utils.GetWildCardValue(w, r, "group_id")
 	err := UpdateGroup(groupId, userId, body, response)
@@ -159,7 +171,8 @@ func GroupUpdate(w http.ResponseWriter, r *http.Request,
 }
 
 func GroupUpdateHttp(w http.ResponseWriter,
-	response UpdateGroupResponseJson) {
+	response UpdateGroupResponseJson,
+) {
 	utils.JsonResponseEncode(w, http.StatusOK, map[string]any{
 		"success": true,
 		"payload": response,
@@ -168,7 +181,8 @@ func GroupUpdateHttp(w http.ResponseWriter,
 }
 
 func GroupInfo(w http.ResponseWriter, r *http.Request,
-	response *GetGroupResponseJson, context string) bool {
+	response *GetGroupResponseJson, context string,
+) bool {
 	groupId := utils.GetWildCardValue(w, r, "group_id")
 	err := SelectGroupById(groupId, response)
 	if err != nil {
@@ -180,7 +194,8 @@ func GroupInfo(w http.ResponseWriter, r *http.Request,
 }
 
 func GetGroupInfoHttp(w http.ResponseWriter,
-	response GetGroupResponseJson) {
+	response GetGroupResponseJson,
+) {
 	utils.JsonResponseEncode(w, http.StatusOK, map[string]any{
 		"success": true,
 		"payload": response,
@@ -189,7 +204,8 @@ func GetGroupInfoHttp(w http.ResponseWriter,
 }
 
 func GroupsInfo(w http.ResponseWriter, r *http.Request,
-	response *BrowseGroupsResponseJson, context string) bool {
+	response *BrowseGroupsResponseJson, context string,
+) bool {
 	limit := utils.GetQuerryPramInt(r, "limit")
 	lastItemId := utils.GetQuerryPramInt(r, "lastItemId")
 
@@ -203,7 +219,8 @@ func GroupsInfo(w http.ResponseWriter, r *http.Request,
 }
 
 func GetGroupsInfoHttp(w http.ResponseWriter,
-	response BrowseGroupsResponseJson) {
+	response BrowseGroupsResponseJson,
+) {
 	utils.JsonResponseEncode(w, http.StatusOK, map[string]any{
 		"success": true,
 		"payload": response,
@@ -212,7 +229,8 @@ func GetGroupsInfoHttp(w http.ResponseWriter,
 }
 
 func GroupMembers(w http.ResponseWriter, r *http.Request,
-	response *ListGroupMembersResponseJson, context string) bool {
+	response *ListGroupMembersResponseJson, context string,
+) bool {
 	groupId := utils.GetWildCardValue(w, r, "group_id")
 	limit := utils.GetQuerryPramInt(r, "limit")
 	lastItemId := utils.GetQuerryPramInt(r, "lastItemId")
@@ -226,7 +244,8 @@ func GroupMembers(w http.ResponseWriter, r *http.Request,
 }
 
 func GetGroupMembersHttp(w http.ResponseWriter,
-	response ListGroupMembersResponseJson) {
+	response ListGroupMembersResponseJson,
+) {
 	utils.JsonResponseEncode(w, http.StatusOK, map[string]any{
 		"success": true,
 		"payload": response,
@@ -235,7 +254,8 @@ func GetGroupMembersHttp(w http.ResponseWriter,
 }
 
 func DeleteGroupService(w http.ResponseWriter, r *http.Request,
-	response *DeleteGroupResponseJson, context string) bool {
+	response *DeleteGroupResponseJson, context string,
+) bool {
 	groupId := utils.GetWildCardValue(w, r, "group_id")
 	userId := utils.GetUserIdFromContext(r)
 	err := DeleteGroupFromGroups(groupId, userId)
@@ -248,7 +268,8 @@ func DeleteGroupService(w http.ResponseWriter, r *http.Request,
 }
 
 func DeleteGroupHttp(w http.ResponseWriter,
-	response DeleteGroupResponseJson) {
+	response DeleteGroupResponseJson,
+) {
 	utils.JsonResponseEncode(w, http.StatusOK, map[string]any{
 		"success": true,
 		"payload": response,
@@ -259,7 +280,8 @@ func DeleteGroupHttp(w http.ResponseWriter,
 // events
 
 func CreateEvent(w http.ResponseWriter, r *http.Request,
-	body *CreateEventRequestJson, response *CreateEventResponseJson, context string) bool {
+	body *CreateEventRequestJson, response *CreateEventResponseJson, context string,
+) bool {
 	userId := utils.GetUserIdFromContext(r)
 	groupId := utils.GetWildCardValue(w, r, "group_id")
 	err := insertNewGroupEvent(userId, groupId, body, response)
@@ -272,7 +294,8 @@ func CreateEvent(w http.ResponseWriter, r *http.Request,
 }
 
 func PostCreateEventHttp(w http.ResponseWriter,
-	response CreateEventResponseJson) {
+	response CreateEventResponseJson,
+) {
 	utils.JsonResponseEncode(w, http.StatusOK, map[string]any{
 		"success": true,
 		"payload": response,
@@ -281,7 +304,8 @@ func PostCreateEventHttp(w http.ResponseWriter,
 }
 
 func EventRSVP(w http.ResponseWriter, r *http.Request,
-	body *RSVPRequestJson, response *RSVPResponseJson, context string) bool {
+	body *RSVPRequestJson, response *RSVPResponseJson, context string,
+) bool {
 	userId := utils.GetUserIdFromContext(r)
 	eventId := utils.GetWildCardValue(w, r, "event_id")
 	err := UpdateRsvp(eventId, userId, body, response)
@@ -293,8 +317,32 @@ func EventRSVP(w http.ResponseWriter, r *http.Request,
 	return true
 }
 
+func SelectEventRSVP(w http.ResponseWriter, r *http.Request, response *GetRSVPResponseJson, context string,
+) bool {
+	userId := utils.GetUserIdFromContext(r)
+	eventId := utils.GetWildCardValue(w, r, "event_id")
+	err := SelectRsvp(eventId, userId, response)
+	if err != nil {
+		utils.BackendErrorTarget(err, context)
+		utils.IdentifySqlError(w, err)
+		return false
+	}
+	return true
+}
+
+func CountEventRSVPHttp(w http.ResponseWriter,
+	response GetRSVPResponseJson,
+) {
+	utils.JsonResponseEncode(w, http.StatusOK, map[string]any{
+		"success": true,
+		"payload": response,
+		"error":   map[string]any{},
+	})
+}
+
 func PostEventRSVPHttp(w http.ResponseWriter,
-	response RSVPResponseJson) {
+	response RSVPResponseJson,
+) {
 	utils.JsonResponseEncode(w, http.StatusOK, map[string]any{
 		"success": true,
 		"payload": response,
@@ -303,7 +351,8 @@ func PostEventRSVPHttp(w http.ResponseWriter,
 }
 
 func EventInfo(w http.ResponseWriter, r *http.Request,
-	response *GetEventResponseJson, context string) bool {
+	response *GetEventResponseJson, context string,
+) bool {
 	userId := utils.GetUserIdFromContext(r)
 	groupId := utils.GetWildCardValue(w, r, "group_id")
 	eventId := utils.GetWildCardValue(w, r, "event_id")
@@ -317,7 +366,8 @@ func EventInfo(w http.ResponseWriter, r *http.Request,
 }
 
 func GetEventInfoHttp(w http.ResponseWriter,
-	response GetEventResponseJson) {
+	response GetEventResponseJson,
+) {
 	utils.JsonResponseEncode(w, http.StatusOK, map[string]any{
 		"success": true,
 		"payload": response,
@@ -326,7 +376,8 @@ func GetEventInfoHttp(w http.ResponseWriter,
 }
 
 func EventsInfo(w http.ResponseWriter, r *http.Request,
-	response *ListEventsResponseJson, context string) bool {
+	response *ListEventsResponseJson, context string,
+) bool {
 	groupId := utils.GetWildCardValue(w, r, "group_id")
 	err := SelectAllGoupEvent(groupId, response)
 	if err != nil {
@@ -338,7 +389,8 @@ func EventsInfo(w http.ResponseWriter, r *http.Request,
 }
 
 func GetEventsInfoHttp(w http.ResponseWriter,
-	response ListEventsResponseJson) {
+	response ListEventsResponseJson,
+) {
 	utils.JsonResponseEncode(w, http.StatusOK, map[string]any{
 		"success": true,
 		"payload": response,
@@ -349,7 +401,8 @@ func GetEventsInfoHttp(w http.ResponseWriter,
 // helpers
 
 func ValidRelationship(w http.ResponseWriter, r *http.Request,
-	targetId int64, context string) bool {
+	targetId int64, context string,
+) bool {
 	userId := utils.GetUserIdFromContext(r)
 	following, err := IsFollowing(userId, targetId)
 	if err != nil {

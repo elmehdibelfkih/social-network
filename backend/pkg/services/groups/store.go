@@ -2,6 +2,7 @@ package groups
 
 import (
 	"database/sql"
+	"math"
 	"strings"
 
 	"social/pkg/config"
@@ -11,7 +12,11 @@ import (
 
 // read
 func SelectGroupMembers(groupId, limit, lastItemId int64, l *ListGroupMembersResponseJson) error {
+	if lastItemId == 0 {
+		lastItemId = math.MaxInt64
+	}
 	rows, err := config.DB.Query(SELECT_GROUP_MEMBERS_BY_GROUP_ID,
+		groupId,
 		lastItemId,
 		limit,
 	)
@@ -43,6 +48,9 @@ func SelectGroupMembers(groupId, limit, lastItemId int64, l *ListGroupMembersRes
 }
 
 func SelectGroupsById(limit, lastItemId int64, l *BrowseGroupsResponseJson) error {
+	if lastItemId == 0 {
+		lastItemId = math.MaxInt64
+	}
 	rows, err := config.DB.Query(SELECT_BROWSE_GROUPS,
 		lastItemId,
 		limit,
@@ -122,10 +130,10 @@ func SelectGroupById(groupId int64, g *GetGroupResponseJson) error {
 
 func SelectGroupMember(groupId, userId int64) (bool, error) {
 	var exist bool
-	_, err := config.DB.Query(SELECT_GROUP_MEMBER_BY_ID,
+	err := config.DB.QueryRow(SELECT_GROUP_MEMBER_BY_ID,
 		groupId,
 		userId,
-	)
+	).Scan(&exist)
 	if err != nil {
 		utils.SQLiteErrorTarget(err, SELECT_GROUP_MEMBER_BY_ID)
 	}
@@ -134,10 +142,10 @@ func SelectGroupMember(groupId, userId int64) (bool, error) {
 
 func SelectGroupAcceptedMember(groupId, userId int64) (bool, error) {
 	var exist bool
-	_, err := config.DB.Query(SELECT_GROUP_MEMBER_ACCEPTED,
+	err := config.DB.QueryRow(SELECT_GROUP_MEMBER_ACCEPTED,
 		groupId,
 		userId,
-	)
+	).Scan(&exist)
 	if err != nil {
 		utils.SQLiteErrorTarget(err, SELECT_GROUP_MEMBER_ACCEPTED)
 	}
@@ -487,6 +495,22 @@ func UpdateRsvp(eventId, userId int64, r *RSVPRequestJson, rs *RSVPResponseJson)
 		if err != nil {
 			utils.SQLiteErrorTarget(err, INSERT_EVENT_RSVP)
 		}
+		return err
+	})
+}
+
+func SelectRsvp(eventId, userId int64, rs *GetRSVPResponseJson) error {
+	return database.WrapWithTransaction(func(tx *sql.Tx) error {
+		err := tx.QueryRow(COUNT_EVENT_RSVP_COUNTS, eventId).Scan(&rs.Countgoing, &rs.CountNotgoing)
+		if err != nil {
+			utils.SQLiteErrorTarget(err, COUNT_EVENT_RSVP_COUNTS)
+		}
+		var userResponse sql.NullString
+		err = tx.QueryRow(GET_USER_RSVP, eventId, userId).Scan(&userResponse)
+		if err != nil && err != sql.ErrNoRows {
+			utils.SQLiteErrorTarget(err, GET_USER_RSVP)
+		}
+		rs.Amigoing = userResponse.Valid && userResponse.String == "going"
 		return err
 	})
 }

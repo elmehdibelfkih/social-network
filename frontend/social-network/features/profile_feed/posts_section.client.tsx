@@ -5,7 +5,7 @@ import { useEffect, useState, useRef } from "react"
 import { Post } from "@/libs/globalTypes"
 
 import styles from "./styles.module.css"
-import { PostCard } from "../posts"
+import PostCard from "@/features/posts/PostCard";
 
 export function PostsSection({ userId, avatarId }: { userId: string, avatarId: number }) {
     const [page, setPage] = useState(1)
@@ -29,7 +29,7 @@ export function PostsSection({ userId, avatarId }: { userId: string, avatarId: n
                 initialLoadDone.current = true
             }
         } catch (error) {
-            console.log("Erorr loading posts: ", error)
+            console.log("Error loading posts: ", error)
         } finally {
             setIsLoading(false)
         }
@@ -49,7 +49,6 @@ export function PostsSection({ userId, avatarId }: { userId: string, avatarId: n
                 setPage(prev => {
                     const nextPage = prev + 1
                     loadPosts(nextPage)
-
                     return nextPage
                 })
             }
@@ -59,14 +58,56 @@ export function PostsSection({ userId, avatarId }: { userId: string, avatarId: n
         return () => window.removeEventListener("scroll", handleScroll);
     }, [hasMore, page])
 
+    // Handle real-time updates
+    useEffect(() => {
+        const handleNewPost = (event: CustomEvent) => {
+            const newPost = event.detail as Post
+            // Only add if it's from this user
+            if (String(newPost.authorId) === userId) {
+                setPosts(prev => [newPost, ...prev])
+            }
+        }
+
+        const handleUpdatePost = (event: CustomEvent) => {
+            const updatedData = event.detail
+            if (!updatedData?.postId) return
+            
+            setPosts(prev => prev.map(post => 
+                post.postId === updatedData.postId 
+                    ? { 
+                        ...post, 
+                        content: updatedData.content ?? post.content,
+                        privacy: updatedData.privacy ?? post.privacy,
+                        mediaIds: updatedData.mediaIds ?? post.mediaIds
+                      }
+                    : post
+            ))
+        }
+
+        const handleDeletePost = (event: CustomEvent) => {
+            const { postId } = event.detail
+            setPosts(prev => prev.filter(post => post.postId !== postId))
+        }
+
+        window.addEventListener('newPost', handleNewPost as EventListener)
+        window.addEventListener('updatePost', handleUpdatePost as EventListener)
+        window.addEventListener('deletePost', handleDeletePost as EventListener)
+        
+        return () => {
+            window.removeEventListener('newPost', handleNewPost as EventListener)
+            window.removeEventListener('updatePost', handleUpdatePost as EventListener)
+            window.removeEventListener('deletePost', handleDeletePost as EventListener)
+        }
+    }, [userId])
+
     return (
         <div className={styles.postsContainer}>
             {
                 (posts.length === 0 && !isLoading) ?
                     <EmptyContent />
                     :
-                    posts.map((post, i) => (
-                        <PostCard key={i} post={post} avatarId={avatarId} />
+                    posts.map((post) => (
+                        <PostCard key={post.postId} post={post} />
                     ))
             }
             {isLoading && <div>Loading...</div>}

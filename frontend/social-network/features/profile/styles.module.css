@@ -138,6 +138,10 @@
     color: #333;
     line-height: 1.5;
     margin: 0 0 16px 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 300px;
 }
 
 .stats {
@@ -146,6 +150,7 @@
     margin-bottom: 16px;
     font-size: 14px;
     color: #666;
+
 }
 
 .stats span b {

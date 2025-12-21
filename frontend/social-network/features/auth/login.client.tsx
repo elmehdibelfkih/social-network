@@ -26,7 +26,7 @@ export function LoginForm({ onAuthSuccess }: { onAuthSuccess?: () => void }) {
         try {
             const resp = await authService.login(formData);
             const User = {
-                userId: String(resp.userId),
+                userId: String(resp?.userId),
                 avatarId: resp.avatarId,
                 nickname: resp.nickname,
                 firstName: resp.firstName,
@@ -61,6 +61,8 @@ export function LoginForm({ onAuthSuccess }: { onAuthSuccess?: () => void }) {
                     onChange={(e) => setFormData({ ...formData, identifier: e.target.value })}
                     required
                     disabled={isLoading}
+                    maxLength={256}
+                    minLength={10}
                 />
             </div>
 
@@ -75,6 +77,9 @@ export function LoginForm({ onAuthSuccess }: { onAuthSuccess?: () => void }) {
                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                     required
                     disabled={isLoading}
+                    maxLength={16}
+                    minLength={8}
+                    
                 />
             </div>
 

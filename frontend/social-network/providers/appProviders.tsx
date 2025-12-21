@@ -1,5 +1,4 @@
 'use client';
-
 import { ReactNode } from 'react';
 import { AuthProvider } from './authProvider';
 import { NotificationProvider } from './notifsProvider';
