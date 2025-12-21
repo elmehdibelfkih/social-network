@@ -175,42 +175,32 @@ func UpdateMessagesStatus(chatId, senderId int64, status string) error {
 	})
 }
 
-func InsertNotification(n Notification) error {
-	err := database.WrapWithTransaction(func(tx *sql.Tx) error {
-		var id int64
-		err := tx.QueryRow(SELECT_NOTIFCATION, n.UserId, n.Type, n.RefrenceType, n.RefrenceId).Scan(&id)
-		if id != 0 {
-			n.NotificationId = id
-		}
-		err = tx.QueryRow(UPSERT_NOTIFICATION,
-			n.NotificationId,
-			n.UserId,
-			n.Type,
-			n.RefrenceType,
-			n.RefrenceId,
-			n.Content,
-			n.Status,
-			n.IsRead,
-			n.CreatedAt,
-			n.ReadAt,
-		).Scan(
-			&n.NotificationId,
-			&n.UserId,
-			&n.Type,
-			&n.RefrenceType,
-			&n.RefrenceId,
-			&n.Content,
-			&n.Status,
-			&n.IsRead,
-			&n.CreatedAt,
-			&n.ReadAt,
-		)
-		if err != nil {
-			utils.SQLiteErrorTarget(err, UPSERT_NOTIFICATION)
-			return err
-		}
-		return err
-	})
+func InsertNotification(n Notification, tx *sql.Tx) error {
+	var id int64
+	err := tx.QueryRow(SELECT_NOTIFCATION, n.UserId, n.Type, n.RefrenceType, n.RefrenceId).Scan(&id)
+	if id != 0 {
+		n.NotificationId = id
+	}
+	err = tx.QueryRow(UPSERT_NOTIFICATION,
+		n.NotificationId,
+		n.UserId,
+		n.Type,
+		n.RefrenceType,
+		n.RefrenceId,
+		n.Content,
+		n.Status,
+	).Scan(
+		&n.NotificationId,
+		&n.UserId,
+		&n.Type,
+		&n.RefrenceType,
+		&n.RefrenceId,
+		&n.Content,
+		&n.Status,
+		&n.IsRead,
+		&n.CreatedAt,
+		&n.ReadAt,
+	)
 	if err != nil {
 		utils.SQLiteErrorTarget(err, UPSERT_NOTIFICATION)
 		return err

@@ -47,8 +47,8 @@ const (
 	`
 	// insert
 	UPSERT_NOTIFICATION = `
-	INSERT INTO notifications (id, user_id, type, reference_type, reference_id, content, status, is_read, created_at, read_at)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+	INSERT INTO notifications (id, user_id, type, reference_type, reference_id, content, status)
+	VALUES (?, ?, ?, ?, ?, ?, ?)
 	ON CONFLICT (id)
 	DO UPDATE SET status = excluded.status
 	RETURNING id, user_id, type, reference_type, reference_id, content, status, is_read, created_at, read_at;

@@ -334,7 +334,7 @@ func InsertNewGroupMember(targetId, groupId int64, status, role, notificationTyp
 			RefrenceType:   "group",
 			Content:        "you have been invated to group",
 			Status:         "active",
-		})
+		}, tx)
 		if err != nil {
 			utils.SQLiteErrorTarget(err, INSERT_NOTIFICATION)
 		}
@@ -395,7 +395,7 @@ func insertNewGroupEvent(userId, groupId int64, e *CreateEventRequestJson, er *C
 				RefrenceType:   "event",
 				Content:        "An event has been created",
 				Status:         "active",
-			})
+			}, tx)
 			if err != nil {
 				utils.SQLiteErrorTarget(err, INSERT_NOTIFICATION)
 			}

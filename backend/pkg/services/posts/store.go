@@ -314,7 +314,7 @@ func CreateComment(comment *Comment) error {
 			RefrenceType:   "post",
 			Content:        "new Comment",
 			Status:         "active",
-		})
+		}, tx)
 		if err != nil {
 			utils.SQLiteErrorTarget(err, "failed to insert notification")
 		}
@@ -530,7 +530,7 @@ func CreatePostReaction(postID, userID int64, reaction string) error {
 			RefrenceType:   "post",
 			Content:        "new reaction",
 			Status:         status,
-		})
+		}, tx)
 		if err != nil {
 			utils.SQLiteErrorTarget(err, "failed to insert notification")
 		}

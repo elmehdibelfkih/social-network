@@ -109,7 +109,7 @@ func followUser(followerId, followedId int64) error {
 		}
 
 		n := followNotification(followerId, followedId, status, "active")
-		err = socket.InsertNotification(n)
+		err = socket.InsertNotification(n, tx)
 		if err != nil {
 			utils.SQLiteErrorTarget(err, "failed to insert notificationI")
 		}
@@ -317,9 +317,9 @@ func unfollowUser(followerId, followedId int64) error {
 		}
 
 		n := followNotification(followerId, followedId, status, "suspended")
-		err = socket.InsertNotification(n)
+		err = socket.InsertNotification(n, tx)
 		if err != nil {
-			utils.SQLiteErrorTarget(err, "failed to insert notificationI")
+			utils.SQLiteErrorTarget(err, "failed to insert notification")
 		}
 
 		// Update followers count for the followed user
@@ -524,7 +524,7 @@ func acceptFollowRequest(followerId, followedId int64) error {
 		}
 
 		n := followNotification(followerId, followedId, "accepted", "active")
-		err = socket.InsertNotification(n)
+		err = socket.InsertNotification(n, tx)
 		if err != nil {
 			utils.SQLiteErrorTarget(err, "failed to insert notificationI")
 		}
@@ -560,7 +560,8 @@ func declineFollowRequest(followerId, followedId int64) error {
 		}
 
 		n := followNotification(followerId, followedId, "declined", "active")
-		err = socket.InsertNotification(n)
+
+		err = socket.InsertNotification(n, tx)
 		if err != nil {
 			utils.SQLiteErrorTarget(err, "failed to insert notificationI")
 		}

@@ -50,16 +50,16 @@ type MarkSeen struct {
 }
 
 type Notification struct {
-	NotificationId int64  `json:"notificationId"`
-	UserId         int64  `json:"userId"`
-	Type           string `json:"type"`
-	RefrenceId     int64  `json:"refrenceId"`
-	RefrenceType   string `json:"refrenceType"`
-	Content        string `json:"content"`
-	Status         string `json:"status"`
-	IsRead         string `json:"isRead"`
-	CreatedAt      string `json:"createdAt"`
-	ReadAt         string `json:"readAt"`
+	NotificationId int64   `json:"notificationId"`
+	UserId         int64   `json:"userId"`
+	Type           string  `json:"type"`
+	RefrenceId     int64   `json:"refrenceId"`
+	RefrenceType   string  `json:"refrenceType"`
+	Content        string  `json:"content"`
+	Status         string  `json:"status"`
+	IsRead         string  `json:"isRead"`
+	CreatedAt      string  `json:"createdAt"`
+	ReadAt         *string `json:"readAt"`
 }
 
 type OnlineStatus struct {
