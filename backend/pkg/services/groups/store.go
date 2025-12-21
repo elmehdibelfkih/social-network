@@ -251,8 +251,8 @@ func InsertNewGroup(cg *CreateGroupRequestJson, g *CreateGroupResponseJson, user
 		err := tx.QueryRow(INSERT_GROUP_BY_USER_ID,
 			utils.GenerateID(),
 			userId,
-			cg.Title,
-			cg.Description,
+			strings.TrimSpace(cg.Title),
+			strings.TrimSpace(cg.Description),
 			cg.AvatarId,
 		).Scan(
 			&g.GroupId,
@@ -452,8 +452,8 @@ func UpdateGroup(groupId, userId int64, u *UpdateGroupRequestJson, ur *UpdateGro
 	return database.WrapWithTransaction(func(tx *sql.Tx) error {
 		avatarId := utils.OptionalJsonFields(u.AvatarId)
 		err := tx.QueryRow(UPDATE_GROUP_BY_ID,
-			u.Title,
-			u.Description,
+			strings.TrimSpace(u.Title),
+			strings.TrimSpace(u.Description),
 			avatarId,
 			groupId,
 		).Scan(

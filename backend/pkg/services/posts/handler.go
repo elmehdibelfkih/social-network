@@ -3,6 +3,7 @@ package posts
 import (
 	"database/sql"
 	"net/http"
+	"strings"
 	"time"
 
 	"social/pkg/config"
@@ -16,6 +17,9 @@ func HandleCreatePost(w http.ResponseWriter, r *http.Request) {
 		utils.BadRequest(w, "Invalid request body", utils.ErrorTypeAlert)
 		return
 	}
+
+	// Sanitize input
+	req.Content = strings.TrimSpace(req.Content)
 
 	if len(req.Content) > 1024 {
 		utils.BadRequest(w, "Post content exceeds 1024 characters", utils.ErrorTypeAlert)
@@ -129,6 +133,9 @@ func HandleUpdatePost(w http.ResponseWriter, r *http.Request) {
 		utils.BadRequest(w, "Invalid request body", utils.ErrorTypeAlert)
 		return
 	}
+
+	// Sanitize input
+	req.Content = strings.TrimSpace(req.Content)
 
 	// Validate content length
 	if len(req.Content) > 1024 {
@@ -290,6 +297,9 @@ func HandleCreateComment(w http.ResponseWriter, r *http.Request) {
 		utils.BadRequest(w, "Invalid request body", utils.ErrorTypeAlert)
 		return
 	}
+
+	// Sanitize input
+	req.Content = strings.TrimSpace(req.Content)
 
 	// Verify post exists and user can view it
 	if !canViewPost(userID, postID) {

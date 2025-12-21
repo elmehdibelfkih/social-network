@@ -161,3 +161,10 @@ func CheckSession(name string, r *http.Request) (string, error) {
 	}
 	return session.Value, err
 }
+
+func TrimAny(v any) any {
+	if s, ok := v.(string); ok {
+		return strings.TrimSpace(s)
+	}
+	return v
+}
