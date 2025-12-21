@@ -38,7 +38,7 @@ export type GroupsResponse = {
 export type CreateGroupPayload = {
   title: string;
   description: string;
-  avatarId: number;
+  avatarId: number | null;
 };
 
 export type JoinGroupResponse = {

@@ -1,23 +1,8 @@
-import GroupCardServer from "@/features/group_card/group_card.server"
 import { GroupService } from "@/features/group_card/group_card.services";
-import { Group } from "@/features/group_card/types"
-import { log } from "console";
-import GroupsUI from '@/features/group_card/groups.ui'
-
+import GroupsPageClient from "@/features/group_card/groups_page.client";
 
 export default async function GroupsPage() {
-  const groups: Group[] = await GroupService.getGroups(10, 0);
-  console.log("jjj",groups);
+  const initialGroups = await GroupService.getGroups(10, 0);
   
-  return (
-    <div>
-      <GroupsUI/>
-      <GroupCardServer groups={groups} />
-    </div>
-  );
+  return <GroupsPageClient initialGroups={initialGroups} />;
 }
-
-
-
-
-
