@@ -124,7 +124,7 @@
     -webkit-text-fill-color: transparent;
     background-clip: text;
     cursor: pointer;
-    transition: all var(--transition-base) ease;
+    transition: all var(--transition-base) ease; 
   }
 
   .commentAuthor:hover {
