@@ -32,7 +32,7 @@ func InvitationAvailable(next http.HandlerFunc) http.HandlerFunc {
 			return
 		}
 		groupId := utils.GetWildCardValue(w, r, "group_id")
-		check, err := SelectGroupMember(groupId, userId)
+		check, err := SelectGroupMember(groupId, targetId)
 		if err != nil {
 			utils.BackendErrorTarget(err, "is group member")
 			utils.IdentifySqlError(w, err)
