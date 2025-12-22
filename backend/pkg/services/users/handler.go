@@ -153,7 +153,6 @@ func PatchPassword(w http.ResponseWriter, r *http.Request) {
 	// Call service layer
 	response, ok := ChangeUserPassword(w, profileUserId, &req, "PatchPassword handler")
 	if !ok {
-		println("hani joj")
 		return
 	}
 

@@ -299,8 +299,6 @@ func ChangeUserPassword(w http.ResponseWriter, userId int64, req *ChangePassword
 	}
 
 	if !utils.CheckPasswordHash(req.CurrentPassword, currentPasswordHash) {
-		println("HANI GNA ")
-
 		utils.BadRequest(w, "Current password is incorrect.", "alert")
 		return response, false
 	}
