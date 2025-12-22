@@ -67,6 +67,7 @@ function buildErrorTarget(
 
 function performRedirect(target: string, clientNavigate?: (path: string) => void): never {
   if (isServer) {
+    console.log(target)
     nextRedirect(target);
   } else {
     if (typeof clientNavigate === 'function') {
