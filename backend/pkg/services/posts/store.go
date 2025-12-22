@@ -314,7 +314,7 @@ func CreateComment(comment *Comment) error {
 			RefrenceType:   "post",
 			Content:        "new Comment",
 			Status:         "active",
-		}, tx)
+		}, comment.AuthorID, tx)
 		if err != nil {
 			utils.SQLiteErrorTarget(err, "failed to insert notification")
 		}
@@ -519,7 +519,7 @@ func CreatePostReaction(postID, userID int64, reaction string) error {
 			return fmt.Errorf("failed to create reaction: %w", err)
 		}
 		var status = "suspended"
-		if status == "like" {
+		if reaction == "like" {
 			status = "active"
 		}
 		err = socket.InsertNotification(socket.Notification{
@@ -530,7 +530,7 @@ func CreatePostReaction(postID, userID int64, reaction string) error {
 			RefrenceType:   "post",
 			Content:        "new reaction",
 			Status:         status,
-		}, tx)
+		}, userID, tx)
 		if err != nil {
 			utils.SQLiteErrorTarget(err, "failed to insert notification")
 		}

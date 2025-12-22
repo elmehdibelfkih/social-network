@@ -45,12 +45,13 @@ func CreateGroupHttp(w http.ResponseWriter,
 func InviteMember(w http.ResponseWriter, r *http.Request,
 	response *InviteUserResponseJson, context string,
 ) bool {
+	sourceId := utils.GetUserIdFromContext(r)
 	targetId := utils.GetWildCardValue(w, r, "user_id")
 	groupId := utils.GetWildCardValue(w, r, "group_id")
 	if !ValidRelationship(w, r, targetId, context) {
 		return false
 	}
-	err := InsertNewGroupMember(targetId, groupId, "pending", "member", "group_invite", response)
+	err := InsertNewGroupMember(sourceId, targetId, groupId, "pending", "member", "group_invite", response)
 	if err != nil {
 		utils.BackendErrorTarget(err, context)
 		utils.IdentifySqlError(w, err)
@@ -74,7 +75,7 @@ func JoinGroup(w http.ResponseWriter, r *http.Request,
 	groupId, userId int64, response *JoinGroupResponseJson, context string,
 ) bool {
 	var placeHolder InviteUserResponseJson
-	err := InsertNewGroupMember(userId, groupId, "pending", "member", "group_join", &placeHolder)
+	err := InsertNewGroupMember(userId, userId, groupId, "pending", "member", "group_join", &placeHolder)
 	if err != nil {
 		utils.BackendErrorTarget(err, context)
 		utils.IdentifySqlError(w, err)

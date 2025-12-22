@@ -15,7 +15,7 @@ interface ChatConversationProps {
     onClose: () => void;
 }
 
-export default function ChatConversation({ chatId, user, onClose }: ChatConversationProps) {
+export default function GroupChatConversation({ chatId, user, onClose }: ChatConversationProps) {
     const emojis = [
         "😀", "😂", "😍", "🥰", "😎", "🤔", "😢", "😭", "👍", "👎", "👏", "🙏", "🔥", "❤️", "💔", "✨", "🎉", "🚀", "😡", "😴"
     ];

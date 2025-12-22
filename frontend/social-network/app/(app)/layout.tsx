@@ -6,7 +6,6 @@ import { http } from "@/libs/apiFetch";
 import { NotificationCount } from "@/libs/globalTypes";
 import { ProfileAPIResponse } from "@/libs/globalTypes";
 import { AuthProvider } from "@/providers/authProvider";
-import { NotificationProvider } from "@/providers/notifsProvider";
 import SharedWorekerClient from "@/components/ui/worker";
 import { UserStatsState } from "@/libs/globalTypes";
 import { Counts } from "@/libs/globalTypes";
