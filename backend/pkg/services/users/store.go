@@ -77,7 +77,7 @@ func SelectFollowStatus(followerId, followedId int64) (*string, error) {
 	return &status, nil
 }
 
-//  finds a private chat between two users and return the chat ID if found || nil
+// finds a private chat between two users and return the chat ID if found || nil
 func SelectChatIdBetweenUsers(userId1, userId2 int64) (*int64, error) {
 	var chatId int64
 	err := config.DB.QueryRow(SELECT_CHAT_ID_BETWEEN_USERS, userId1, userId2).Scan(&chatId)
@@ -142,7 +142,7 @@ func SelectFollowingCount(userId int64) (int64, error) {
 	err := config.DB.QueryRow(SELECT_FOLLOWING_COUNT, userId).Scan(&count)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return 0, nil // No counter row = 0 following
+			return 0, nil
 		}
 		if strings.Contains(err.Error(), "no such column") {
 			return 0, nil
@@ -248,10 +248,14 @@ func UpdateUserProfileInDB(userId int64, firstName, lastName string, nickname, a
 
 // UpdateUserPrivacyInDB updates a user's privacy value.
 func UpdateUserPrivacyInDB(userId int64, privacy string) error {
+
 	result, err := config.DB.Exec(UPDATE_USER_PRIVACY, privacy, userId)
 	if err != nil {
 		utils.SQLiteErrorTarget(err, UPDATE_USER_PRIVACY)
 		return err
+	}
+	if privacy == "public" {
+		config.DB.Exec(UPDATE_FOLLOWS, userId)
 	}
 	rowsAffected, err := result.RowsAffected()
 	if err != nil {
@@ -290,14 +294,14 @@ func DeleteUserAccount(userId int64) error {
 		utils.SQLiteErrorTarget(err, "DELETE FROM posts WHERE author_id = ?")
 		return err
 	}
-	
+
 	// Delete user sessions
 	_, err = config.DB.Exec("DELETE FROM sessions WHERE user_id = ?", userId)
 	if err != nil {
 		utils.SQLiteErrorTarget(err, "DELETE FROM sessions WHERE user_id = ?")
 		return err
 	}
-	
+
 	// Delete user account
 	_, err = config.DB.Exec("DELETE FROM users WHERE id = ?", userId)
 	if err != nil {

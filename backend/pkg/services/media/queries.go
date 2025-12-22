@@ -85,6 +85,15 @@ const (
 		LIMIT 1;
 	`
 
+	QUERY_GET_POST_VISIBILITY_FROM_COMMENT_MEDIA = `
+		SELECT p.id, p.privacy, p.author_id 
+		FROM posts p 
+		JOIN comments c ON c.post_id = p.id
+		JOIN comment_media cm ON c.id = cm.comment_id 
+		WHERE cm.media_id = ?
+		LIMIT 1;
+	`
+
 	QUERY_CHECK_POST_ALLOWED_VIEWERS = `
 		SELECT 1 FROM post_allowed_viewers WHERE post_id = ? AND user_id = ? LIMIT 1
 	`

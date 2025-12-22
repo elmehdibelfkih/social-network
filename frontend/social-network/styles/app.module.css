@@ -1,0 +1,26 @@
+.main {
+    display: flex;
+    flex-direction: row;
+    height: inherit;
+}
+
+.firstSection {
+    background-color: red;
+    height: 90%;
+    width: 30%;
+    margin: auto;
+}
+
+.secondSection {
+    background-color: blue;
+    height: 90%;
+    width: 30%;
+    margin: auto;
+}
+
+.thirdSection {
+    background-color: green;
+    height: 90%;
+    width: 30%;
+    margin: auto;
+}

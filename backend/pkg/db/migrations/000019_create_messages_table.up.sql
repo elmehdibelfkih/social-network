@@ -3,6 +3,7 @@ CREATE TABLE IF NOT EXISTS messages (
   chat_id INTEGER NOT NULL,
   sender_id INTEGER,
   content TEXT,
+  seen_status TEXT NOT NULL DEFAULT 'sent' CHECK(seen_status IN ('sent', 'delivered', 'read')),
   created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (chat_id) REFERENCES chats(id) ON DELETE CASCADE,

@@ -11,7 +11,9 @@ export default async function ProfilePage({ params, searchParams }: PageProps) {
   const { user_id } = await params;
   const { tab } = await searchParams;
 
+  
   const profile = await getProfileData(user_id)
+  console.log("xxxx", profile)
 
   return (
     <>

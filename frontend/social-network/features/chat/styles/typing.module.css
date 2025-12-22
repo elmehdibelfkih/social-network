@@ -1,0 +1,77 @@
+.typingIndicator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+}
+
+.typingIndicator span {
+    display: block;
+    width: 6px;
+    height: 6px;
+    background-color: #555;
+    border-radius: 50%;
+    animation: typingIndicatorAnimation 1s infinite;
+}
+
+.typingIndicator span:nth-child(1) {
+    animation-delay: 0s;
+}
+
+.typingIndicator span:nth-child(2) {
+    animation-delay: 0.3s;
+}
+
+.typingIndicator span:nth-child(3) {
+    animation-delay: 0.6s;
+}
+
+.typingData {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 5px;
+}
+
+.typingData .username {
+    font-family: sans-serif;
+    margin-left: 8px;
+    color: #555;
+    font-weight: bold;
+}
+
+.typing {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    font-family: sans-serif;
+    text-decoration: italic;
+    color: #555;
+    font-size: small;
+}
+
+@keyframes typingIndicatorAnimation {
+    0% {
+        transform: scale(1);
+        opacity: 0.3;
+    }
+
+    50% {
+        transform: scale(1.5);
+        opacity: 1;
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 0.3;
+    }
+}
+
+.hide {
+    display: none;
+}
+
+.typingData p {
+    margin: 0;
+    color: grey;
+}

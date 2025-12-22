@@ -39,7 +39,7 @@ export function FollowersList({ userId, type }: FollowersListProps) {
 
     return (
         <div className={styles.followersGrid}>
-            {followers.length === 0 && !isLoading ?
+            {followers?.length === 0 && !isLoading ?
                 <EmptyContent type={type} />
                 : followers.map((follower) => (
                     <MiniProfile key={follower.userId} data={follower} />
