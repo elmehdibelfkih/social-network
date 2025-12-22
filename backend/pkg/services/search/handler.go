@@ -12,10 +12,6 @@ func HandleSearch(w http.ResponseWriter, r *http.Request) {
 
 	q := r.URL.Query().Get("q")
 	q = strings.Trim(q, " ")
-	if q == "" {
-		utils.BadRequest(w, "Search query 'q' is required.", utils.ErrorTypeAlert)
-		return
-	}
 
 	searchType := r.URL.Query().Get("type")
 	if searchType != "users" && searchType != "groups" && searchType != "posts" {
