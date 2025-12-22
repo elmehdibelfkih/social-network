@@ -513,9 +513,11 @@ func SelectRsvp(eventId, userId int64, rs *GetRSVPResponseJson) error {
 		err = tx.QueryRow(GET_USER_RSVP, eventId, userId).Scan(&userResponse)
 		if err != nil && err != sql.ErrNoRows {
 			utils.SQLiteErrorTarget(err, GET_USER_RSVP)
+			return err
 		}
 		rs.Amigoing = userResponse.Valid && userResponse.String == "going"
-		return err
+		return nil
+		
 	})
 }
 

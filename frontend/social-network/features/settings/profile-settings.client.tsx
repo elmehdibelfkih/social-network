@@ -63,30 +63,32 @@ export function ProfileSettings({ profile }: { profile: ProfileAPIResponse }) {
         updateData.password = formData.newPassword;
       }
 
-      await http.put(`/api/v1/users/${profile.userId}/profile`, updateData);
-      
-      dispatch({ type: 'SET_FIRST_NAME', payload: formData.firstName });
-      dispatch({ type: 'SET_LAST_NAME', payload: formData.lastName });
-      dispatch({ type: 'SET_NICKNAME', payload: formData.nickname });
-      dispatch({ type: 'SET_ABOUT_ME', payload: formData.aboutMe });
-      dispatch({ type: 'SET_DATE_OF_BIRTH', payload: formData.dateOfBirth });
-      dispatch({ type: 'SET_AVATAR_ID', payload: formData.avatarId });
-      
-      // Clear password fields after successful update
-      setFormData(prev => ({
-        ...prev,
-        currentPassword: '',
-        newPassword: '',
-        confirmPassword: ''
-      }));
-      
-      // Update auth provider with new email
-      if (user) {
-        const updatedUser = { ...user, email: formData.email, nickname: formData.nickname };
-        setUser(updatedUser);
-      }
-      
-      ShowSnackbar({ status: true, message: 'Profile updated successfully' });
+      const res = await http.put(`/api/v1/users/${profile.userId}/profile`, updateData);
+
+      if (res) {
+        dispatch({ type: 'SET_FIRST_NAME', payload: formData.firstName });
+        dispatch({ type: 'SET_LAST_NAME', payload: formData.lastName });
+        dispatch({ type: 'SET_NICKNAME', payload: formData.nickname });
+        dispatch({ type: 'SET_ABOUT_ME', payload: formData.aboutMe });
+        dispatch({ type: 'SET_DATE_OF_BIRTH', payload: formData.dateOfBirth });
+        dispatch({ type: 'SET_AVATAR_ID', payload: formData.avatarId });
+  
+        // Clear password fields after successful update
+        setFormData(prev => ({
+          ...prev,
+          currentPassword: '',
+          newPassword: '',
+          confirmPassword: ''
+        }));
+  
+        // Update auth provider with new email
+        if (user) {
+          const updatedUser = { ...user, email: formData.email, nickname: formData.nickname };
+          setUser(updatedUser);
+        }
+  
+        ShowSnackbar({ status: true, message: 'Profile updated successfully' });
+      } 
     } catch (error: any) {
       console.error('Failed to update profile:', error);
       // Show error message to user via Snackbar
@@ -111,11 +113,11 @@ export function ProfileSettings({ profile }: { profile: ProfileAPIResponse }) {
     try {
       const response = await authService.uploadAvatar(pendingAvatarFile);
       setFormData(prev => ({ ...prev, avatarId: response.mediaId }));
-      
+
       // Save avatar immediately to backend
       await http.put(`/api/v1/users/${profile.userId}/profile`, { avatarId: response.mediaId });
       dispatch({ type: 'SET_AVATAR_ID', payload: response.mediaId });
-      
+
       // Update auth provider with fresh data including avatarId
       if (user) {
         const updatedUser = { ...user, avatarId: response.mediaId };
@@ -148,10 +150,10 @@ export function ProfileSettings({ profile }: { profile: ProfileAPIResponse }) {
         avatarId: -1 // Special value to indicate removal
       };
       await http.put(`/api/v1/users/${profile.userId}/profile`, updateData);
-      
+
       setFormData(prev => ({ ...prev, avatarId: null }));
       dispatch({ type: 'SET_AVATAR_ID', payload: null });
-      
+
       // Update auth provider with null avatarId
       if (user) {
         const updatedUser = { ...user, avatarId: null };
@@ -255,7 +257,7 @@ export function ProfileSettings({ profile }: { profile: ProfileAPIResponse }) {
         <div className={styles.passwordSection}>
           <h3>Change Password</h3>
           <p>Leave blank to keep current password</p>
-          
+
           <div className={styles.field}>
             <label>Current Password</label>
             <input

@@ -17,6 +17,7 @@ export default function GroupsUI() {
 
   return (
     <>
+
       <button  className={styles.btn_creat_group} onClick={() => setIsOpen(true)}>
         Create Group
       </button>

@@ -2,6 +2,7 @@ package groups
 
 import (
 	"net/http"
+
 	"social/pkg/utils"
 )
 
@@ -39,7 +40,7 @@ func InvitationAvailable(next http.HandlerFunc) http.HandlerFunc {
 			return
 		}
 		if check {
-			utils.BackendErrorTarget(err, "you cant invite a member of the group")
+			utils.BackendErrorTarget(err, "Invite already sent or is already a member")
 			utils.ForbiddenError(w, "you cant invite a member of the group")
 			return
 		}

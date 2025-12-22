@@ -23,12 +23,7 @@ func CreateGroup(w http.ResponseWriter, r *http.Request,
 		utils.IdentifySqlError(w, err)
 		return false
 	}
-	err = UpdateMetaData("group", response.GroupId, 1)
-	if err != nil {
-		utils.BackendErrorTarget(err, context)
-		utils.IdentifySqlError(w, err)
-		return false
-	}
+
 	return true
 }
 

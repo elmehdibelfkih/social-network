@@ -7,7 +7,7 @@ const (
 		SELECT creator_id FROM groups WHERE id = ?
 	`
 	SELECT_GROUP_BY_GROUP_ID = `
-		SELECT id, creator_id, title, description, avatar_id, created_at, updated_at, gm.status
+		SELECT g.id, g.creator_id, g.title, g.description, g.avatar_id, g.created_at, g.updated_at, gm.status
 		FROM groups g
 		LEFT JOIN group_members gm
 		ON g.id = gm.group_id
@@ -164,7 +164,7 @@ const (
 	ON CONFLICT(entity_type, entity_id)
 	DO UPDATE SET
   	followers_count = counters.followers_count + excluded.followers_count,
-	updated_at = CURRENT_TIMESTAMP;	
+	updated_at = CURRENT_TIMESTAMP;
 	`
 )
 
