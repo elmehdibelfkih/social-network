@@ -29,7 +29,7 @@ func GetProfile(w http.ResponseWriter, r *http.Request) {
 }
 
 // updates the owner's profile fields
-func PutProfile(w http.ResponseWriter, r *http.Request) {
+func PatchProfile(w http.ResponseWriter, r *http.Request) {
 	// Extract user_id from URL path
 	profileUserId := utils.GetWildCardValue(w, r, "user_id")
 	if profileUserId == 0 {
@@ -67,7 +67,7 @@ func PutProfile(w http.ResponseWriter, r *http.Request) {
 }
 
 // toggles the profile privacy between "public" and "private".
-func PatchProfile(w http.ResponseWriter, r *http.Request) {
+func PatchPrivacy(w http.ResponseWriter, r *http.Request) {
 	// Extract user_id from URL path
 	profileUserId := utils.GetWildCardValue(w, r, "user_id")
 	if profileUserId == 0 {
@@ -114,6 +114,44 @@ func GetStats(w http.ResponseWriter, r *http.Request) {
 
 	// Call service layer
 	response, ok := GetUserStats(w, userId, "Get Stats handler")
+	if !ok {
+		return
+	}
+
+	// Return success response
+	utils.WriteSuccess(w, http.StatusOK, response)
+}
+
+// PatchPassword changes user password
+func PatchPassword(w http.ResponseWriter, r *http.Request) {
+	// Extract user_id from URL path
+	profileUserId := utils.GetWildCardValue(w, r, "user_id")
+	if profileUserId == 0 {
+		utils.BadRequest(w, "Invalid user ID.", "redirect")
+		return
+	}
+
+	// Get current user from context
+	currentUserId := utils.GetUserIdFromContext(r)
+	if currentUserId == 0 {
+		utils.Unauthorized(w, "You must be logged in to change your password.")
+		return
+	}
+
+	// Validate user owns the profile
+	if currentUserId != profileUserId {
+		utils.Unauthorized(w, "You can only change your own password.")
+		return
+	}
+
+	// Validate and parse JSON request body
+	var req ChangePasswordRequestJson
+	if !utils.ValidateJsonRequest(w, r, &req, "PatchPassword handler") {
+		return
+	}
+
+	// Call service layer
+	response, ok := ChangeUserPassword(w, profileUserId, &req, "PatchPassword handler")
 	if !ok {
 		return
 	}

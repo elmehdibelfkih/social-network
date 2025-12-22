@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import styles from './styles.module.css';
 import { ProfileSettings } from './profile-settings.client';
+import { PasswordSettings } from './password-settings.client';
 import { PrivacySettings } from './privacy-settings.client';
 import { DeviceSettings } from './device-settings.client';
 import { SettingsTab, ProfileAPIResponse } from './types';
@@ -25,6 +26,12 @@ export function SettingsClient({ profile }: { profile: GlobalProfileAPIResponse 
             Profile Settings
           </button>
           <button
+            className={`${styles.navItem} ${activeTab === 'password' ? styles.active : ''}`}
+            onClick={() => setActiveTab('password')}
+          >
+            Password
+          </button>
+          <button
             className={`${styles.navItem} ${activeTab === 'privacy' ? styles.active : ''}`}
             onClick={() => setActiveTab('privacy')}
           >
@@ -41,6 +48,7 @@ export function SettingsClient({ profile }: { profile: GlobalProfileAPIResponse 
 
       <div className={styles.content}>
         {activeTab === 'profile' && <ProfileSettings profile={profile} />}
+        {activeTab === 'password' && <PasswordSettings profile={profile} />}
         {activeTab === 'privacy' && <PrivacySettings profile={profile} />}
         {activeTab === 'devices' && <DeviceSettings />}
       </div>
