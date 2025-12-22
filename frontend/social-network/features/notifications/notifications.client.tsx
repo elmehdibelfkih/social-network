@@ -30,6 +30,9 @@ export function NotificationsDropdown() {
   const { state: userStats } = useUserStats()
   const unreadCount = userStats.unreadNotifications
 
+  console.log('NotificationsDropdown - userStats:', userStats)
+  console.log('NotificationsDropdown - unreadCount:', unreadCount)
+
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
@@ -118,8 +121,8 @@ export function NotificationsDropdown() {
                       return <EventNotification key={notification.notificationId} {...props} />
                     case 'post_liked':
                       return <PostLikedNotification key={notification.notificationId} {...props} />
-                    case 'post_commented':
-                      return <PostCommentedNotification key={notification.notificationId} {...props} />
+                    // case 'post_commented':
+                    //   return <PostCommentedNotification key={notification.notificationId} {...props} />
                     case 'custom':
                       return <CustomNotification key={notification.notificationId} {...props} />
                     default:

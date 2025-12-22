@@ -90,18 +90,21 @@ export function NotificationProvider({ children }) {
                         : notif
                 )
             )
+            userStatsDispatch({ type: 'READ_NOTIFICATION' })
 
             const success = await notificationsService.markAsRead(notificationId)
 
             if (!success) {
                 setNotifications(previousNotifications)
+                userStatsDispatch({ type: 'NEW_NOTIFICATION' })
                 console.error('Failed to mark notification as read, reverting changes')
             }
         }
-    }, [notifications])
+    }, [notifications, userStatsDispatch])
 
     const markAllAsRead = useCallback(async () => {
         const previousNotifications = [...notifications]
+        const unreadCount = notifications.filter(n => n.isRead === 0).length
 
         setNotifications((prev) => prev.map((notif) => ({ ...notif, isRead: 1 })))
         userStatsDispatch({ type: 'READ_ALL_NOTIFICATIONS' })
@@ -111,6 +114,10 @@ export function NotificationProvider({ children }) {
         // Revert on failure
         if (!success) {
             setNotifications(previousNotifications)
+            // Revert the unread count by adding back the number of unread notifications
+            for (let i = 0; i < unreadCount; i++) {
+                userStatsDispatch({ type: 'NEW_NOTIFICATION' })
+            }
             console.error('Failed to mark all notifications as read, reverting changes')
         }
     }, [notifications, userStatsDispatch])
