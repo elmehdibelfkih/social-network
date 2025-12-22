@@ -1,7 +1,7 @@
 'use client'
 import React, { useState, useEffect } from "react"
 import { GroupService } from "./group_page.services"
-import styles from "./createvent.module.css"
+import styles from "./Rsvpevent.module.css"
 
 type RsvpOption = 'going' | 'not_going' 
 
