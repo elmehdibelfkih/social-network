@@ -9,12 +9,12 @@ export default async function GroupLayout({ children, params }: { children: Reac
     const { id } = await params;
     const groupId = Number(id)
     const group: Group = await GroupService.getGroup(groupId);
-   // console.log("jjj", group);
+   console.log("jjj", group);
     return (
         <main className="g_layout min-h-screen bg-gray-50">
                        
             <GroupPageServer group={group} /> 
-             <TabbedNavigation id={id}/>
+             <TabbedNavigation id={id} eventCount={group.events.length} memberscount={group.memberCount}/>
 
             {children}
         </main>
