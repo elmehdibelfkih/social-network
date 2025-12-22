@@ -63,7 +63,13 @@ export function ProfileSettings({ profile }: { profile: ProfileAPIResponse }) {
         updateData.password = formData.newPassword;
       }
 
-      await http.put(`/api/v1/users/${profile.userId}/profile`, updateData);
+      const result = await http.patch(`/api/v1/users/${profile.userId}/profile`, updateData);
+      
+      // Only proceed if the request was successful (not null)
+      if (result === null) {
+        setIsLoading(false);
+        return;
+      }
       
       dispatch({ type: 'SET_FIRST_NAME', payload: formData.firstName });
       dispatch({ type: 'SET_LAST_NAME', payload: formData.lastName });
@@ -89,9 +95,8 @@ export function ProfileSettings({ profile }: { profile: ProfileAPIResponse }) {
       ShowSnackbar({ status: true, message: 'Profile updated successfully' });
     } catch (error: any) {
       console.error('Failed to update profile:', error);
-      // Show error message to user via Snackbar
-      const errorMsg = error?.response?.data?.error?.errorMessage || 'Failed to update profile';
-      ShowSnackbar({ status: false, message: errorMsg });
+      // The apiFetch function already shows snackbar for errors with errorType: 'alert'
+      // No need to show additional snackbar here as backend returns 'alert' type for password errors
     } finally {
       setIsLoading(false);
     }
@@ -113,7 +118,7 @@ export function ProfileSettings({ profile }: { profile: ProfileAPIResponse }) {
       setFormData(prev => ({ ...prev, avatarId: response.mediaId }));
       
       // Save avatar immediately to backend
-      await http.put(`/api/v1/users/${profile.userId}/profile`, { avatarId: response.mediaId });
+      await http.patch(`/api/v1/users/${profile.userId}/profile`, { avatarId: response.mediaId });
       dispatch({ type: 'SET_AVATAR_ID', payload: response.mediaId });
       
       // Update auth provider with fresh data including avatarId
@@ -147,7 +152,7 @@ export function ProfileSettings({ profile }: { profile: ProfileAPIResponse }) {
         dateOfBirth: formData.dateOfBirth,
         avatarId: -1 // Special value to indicate removal
       };
-      await http.put(`/api/v1/users/${profile.userId}/profile`, updateData);
+      await http.patch(`/api/v1/users/${profile.userId}/profile`, updateData);
       
       setFormData(prev => ({ ...prev, avatarId: null }));
       dispatch({ type: 'SET_AVATAR_ID', payload: null });

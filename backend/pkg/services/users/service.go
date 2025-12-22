@@ -213,7 +213,7 @@ func UpdateUserProfile(w http.ResponseWriter, userId int64, req *UpdateProfileRe
 		return response, true
 	}
 
-	// Validate password change if requested
+	// Validate password change if requested - DO THIS BEFORE UPDATING PROFILE
 	if req.CurrentPassword != nil && req.Password != nil {
 		// Both current and new password must be provided
 		if *req.CurrentPassword == "" || *req.Password == "" {
@@ -256,7 +256,7 @@ func UpdateUserProfile(w http.ResponseWriter, userId int64, req *UpdateProfileRe
 		return response, false
 	}
 
-	// Update profile
+	// Update profile AFTER password validation
 	err = UpdateUserProfileInDB(userId, firstName, lastName, nickname, aboutMe, avatarId, dateOfBirth, email)
 	if err != nil {
 		utils.BackendErrorTarget(err, context)
