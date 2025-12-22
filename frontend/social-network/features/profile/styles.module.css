@@ -124,6 +124,11 @@
     font-weight: 700;
     color: #1a1a1a;
     margin: 0 0 4px 0;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    max-width: 300px;
+    background-color: red;
 }
 
 .nickname {

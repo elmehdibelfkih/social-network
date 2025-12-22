@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from 'react';
-import { MessageSquare } from 'lucide-react';
+import { MessageSquare } from 'react';
 import styles from './TabbedNavigation.module.css';
 import {useRouter} from "next/navigation"
 

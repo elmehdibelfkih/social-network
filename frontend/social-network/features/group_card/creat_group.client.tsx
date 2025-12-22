@@ -191,6 +191,8 @@ const CreateGroupModal: React.FC<CreateGroupModalProps> = ({
               placeholder="What is this group about?"
               rows={4}
               className={styles.textarea}
+              maxLength={1024}
+              required
             />
           </div>
 

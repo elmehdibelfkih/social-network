@@ -151,16 +151,16 @@ func InsertUserAccount(u RegisterRequestJson) (RegisterResponseJson, error) {
 	userId := utils.GenerateID()
 	var user RegisterResponseJson
 	err := database.WrapWithTransaction(func(tx *sql.Tx) error {
-		nickname := utils.OptionalJsonFields(u.Nickname)
-		aboutMe := utils.OptionalJsonFields(u.AboutMe)
-		avatarId := utils.OptionalJsonFields(u.AvatarId)
+		nickname := utils.TrimAny(utils.OptionalJsonFields(u.Nickname))
+		aboutMe := utils.TrimAny(utils.OptionalJsonFields(u.AboutMe))
+		avatarId := utils.TrimAny(utils.OptionalJsonFields(u.AvatarId))
 		_, err := tx.Exec(
 			INSERT_USER_ACCOUNT,
 			userId,
-			u.Email,
+			strings.TrimSpace(u.Email),
 			u.Password,
-			u.FirstName,
-			u.LastName,
+			strings.TrimSpace(u.FirstName),
+			strings.TrimSpace(u.LastName),
 			u.DateOfBirth,
 			nickname,
 			aboutMe,

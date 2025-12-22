@@ -77,8 +77,9 @@ func SocialMux() *router.Router {
 
 	// Users_Profiles
 	socialMux.HandleFunc("GET", "/api/v1/users/{user_id}/profile", utils.MiddlewareChain(users.GetProfile, middleware.AuthMiddleware))
-	socialMux.HandleFunc("PUT", "/api/v1/users/{user_id}/profile", utils.MiddlewareChain(users.PutProfile, middleware.AuthMiddleware))
-	socialMux.HandleFunc("PATCH", "/api/v1/users/{user_id}/privacy", utils.MiddlewareChain(users.PatchProfile, middleware.AuthMiddleware))
+	socialMux.HandleFunc("PATCH", "/api/v1/users/{user_id}/profile", utils.MiddlewareChain(users.PatchProfile, middleware.AuthMiddleware))
+	socialMux.HandleFunc("PATCH", "/api/v1/users/{user_id}/password", utils.MiddlewareChain(users.PatchPassword, middleware.AuthMiddleware))
+	socialMux.HandleFunc("PATCH", "/api/v1/users/{user_id}/privacy", utils.MiddlewareChain(users.PatchPrivacy, middleware.AuthMiddleware))
 	socialMux.HandleFunc("GET", "/api/v1/users/{user_id}/stats", utils.MiddlewareChain(users.GetStats, middleware.AuthMiddleware))
 	socialMux.HandleFunc("DELETE", "/api/v1/media/{media_id} ", utils.MiddlewareChain(media.HandleDeleteMedia, media.MediaMiddleware, middleware.AuthMiddleware))
 

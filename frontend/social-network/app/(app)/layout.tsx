@@ -1,12 +1,12 @@
 import { ReactNode } from "react";
 import { Navbar } from "@/features/navbar";
-import { AppProviders } from "@/providers/appProviders";
 import { UserStatsProvider } from "@/providers/userStatsContext";
 import { getUserId } from "@/libs/helpers";
 import { http } from "@/libs/apiFetch";
 import { NotificationCount } from "@/libs/globalTypes";
 import { ProfileAPIResponse } from "@/libs/globalTypes";
 import { AuthProvider } from "@/providers/authProvider";
+import { NotificationProvider } from "@/providers/notifsProvider";
 import SharedWorekerClient from "@/components/ui/worker";
 import { UserStatsState } from "@/libs/globalTypes";
 import { Counts } from "@/libs/globalTypes";
@@ -22,6 +22,8 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
     http.get<Counts>(`/api/v1/users/${userId}/stats`)
   ]);
 
+  console.log('Layout - notificationsRes:', notificationsRes);
+
   if (!profileRes || !notificationsRes || !counts) {
     return null;
   }
@@ -36,6 +38,7 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
     privacy: profileRes.privacy,
     joinedAt: profileRes.joinedAt,
     email: profileRes.email,
+    email: profileRes.email,
     unreadNotifications: notificationsRes.unreadNotifications,
     postsCount: counts.postsCount,
     followersCount: counts.followersCount,
@@ -47,12 +50,12 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
   console.log("stats :>", stats);
 
   return (
-    <AppProviders>
+    <AuthProvider>
       <UserStatsProvider initialState={stats}>
         <SharedWorekerClient />
           <Navbar />
           {children}
       </UserStatsProvider>
-    </AppProviders>
+    </AuthProvider>
   );
 }

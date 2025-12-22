@@ -18,6 +18,11 @@ type UpdatePrivacyRequestJson struct {
 	Privacy string `json:"privacy"`
 }
 
+type ChangePasswordRequestJson struct {
+	CurrentPassword string `json:"currentPassword"`
+	NewPassword     string `json:"newPassword"`
+}
+
 // Response structs
 type UserProfileResponseJson struct {
 	UserId      int64                `json:"userId"`
@@ -57,6 +62,10 @@ type UpdateProfileResponseJson struct {
 type UpdatePrivacyResponseJson struct {
 	Message string `json:"message"`
 	Privacy string `json:"privacy"`
+}
+
+type ChangePasswordResponseJson struct {
+	Message string `json:"message"`
 }
 
 // Internal structs for database operations

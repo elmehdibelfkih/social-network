@@ -22,9 +22,6 @@ export function ProfileSettings({ profile }: { profile: ProfileAPIResponse }) {
     aboutMe: profile.aboutMe || '',
     dateOfBirth: profile.dateOfBirth || '',
     avatarId: profile.avatarId || null,
-    currentPassword: '',
-    newPassword: '',
-    confirmPassword: '',
   });
   const [isLoading, setIsLoading] = useState(false);
   const [showConfirmation, setShowConfirmation] = useState(false);
@@ -52,18 +49,7 @@ export function ProfileSettings({ profile }: { profile: ProfileAPIResponse }) {
         avatarId: formData.avatarId,
       };
 
-      // Add password fields if changing password
-      if (formData.currentPassword.trim() && formData.newPassword.trim()) {
-        if (formData.newPassword !== formData.confirmPassword) {
-          ShowSnackbar({ status: false, message: 'New passwords do not match' });
-          setIsLoading(false);
-          return;
-        }
-        updateData.currentPassword = formData.currentPassword;
-        updateData.password = formData.newPassword;
-      }
-
-      await http.put(`/api/v1/users/${profile.userId}/profile`, updateData);
+      await http.patch(`/api/v1/users/${profile.userId}/profile`, updateData);
       
       dispatch({ type: 'SET_FIRST_NAME', payload: formData.firstName });
       dispatch({ type: 'SET_LAST_NAME', payload: formData.lastName });
@@ -71,14 +57,6 @@ export function ProfileSettings({ profile }: { profile: ProfileAPIResponse }) {
       dispatch({ type: 'SET_ABOUT_ME', payload: formData.aboutMe });
       dispatch({ type: 'SET_DATE_OF_BIRTH', payload: formData.dateOfBirth });
       dispatch({ type: 'SET_AVATAR_ID', payload: formData.avatarId });
-      
-      // Clear password fields after successful update
-      setFormData(prev => ({
-        ...prev,
-        currentPassword: '',
-        newPassword: '',
-        confirmPassword: ''
-      }));
       
       // Update auth provider with new email
       if (user) {
@@ -89,9 +67,8 @@ export function ProfileSettings({ profile }: { profile: ProfileAPIResponse }) {
       ShowSnackbar({ status: true, message: 'Profile updated successfully' });
     } catch (error: any) {
       console.error('Failed to update profile:', error);
-      // Show error message to user via Snackbar
-      const errorMsg = error?.response?.data?.error?.errorMessage || 'Failed to update profile';
-      ShowSnackbar({ status: false, message: errorMsg });
+      // The apiFetch function already shows snackbar for errors with errorType: 'alert'
+      // No need to show additional snackbar here as backend returns 'alert' type for password errors
     } finally {
       setIsLoading(false);
     }
@@ -113,7 +90,7 @@ export function ProfileSettings({ profile }: { profile: ProfileAPIResponse }) {
       setFormData(prev => ({ ...prev, avatarId: response.mediaId }));
       
       // Save avatar immediately to backend
-      await http.put(`/api/v1/users/${profile.userId}/profile`, { avatarId: response.mediaId });
+      await http.patch(`/api/v1/users/${profile.userId}/profile`, { avatarId: response.mediaId });
       dispatch({ type: 'SET_AVATAR_ID', payload: response.mediaId });
       
       // Update auth provider with fresh data including avatarId
@@ -147,7 +124,7 @@ export function ProfileSettings({ profile }: { profile: ProfileAPIResponse }) {
         dateOfBirth: formData.dateOfBirth,
         avatarId: -1 // Special value to indicate removal
       };
-      await http.put(`/api/v1/users/${profile.userId}/profile`, updateData);
+      await http.patch(`/api/v1/users/${profile.userId}/profile`, updateData);
       
       setFormData(prev => ({ ...prev, avatarId: null }));
       dispatch({ type: 'SET_AVATAR_ID', payload: null });
@@ -250,41 +227,6 @@ export function ProfileSettings({ profile }: { profile: ProfileAPIResponse }) {
             value={formData.dateOfBirth}
             onChange={(e) => setFormData({ ...formData, dateOfBirth: e.target.value })}
           />
-        </div>
-
-        <div className={styles.passwordSection}>
-          <h3>Change Password</h3>
-          <p>Leave blank to keep current password</p>
-          
-          <div className={styles.field}>
-            <label>Current Password</label>
-            <input
-              type="password"
-              value={formData.currentPassword}
-              onChange={(e) => setFormData({ ...formData, currentPassword: e.target.value })}
-              placeholder="Enter current password"
-            />
-          </div>
-
-          <div className={styles.field}>
-            <label>New Password</label>
-            <input
-              type="password"
-              value={formData.newPassword}
-              onChange={(e) => setFormData({ ...formData, newPassword: e.target.value })}
-              placeholder="Enter new password"
-            />
-          </div>
-
-          <div className={styles.field}>
-            <label>Confirm New Password</label>
-            <input
-              type="password"
-              value={formData.confirmPassword}
-              onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-              placeholder="Confirm new password"
-            />
-          </div>
         </div>
 
         <div className={styles.actions}>

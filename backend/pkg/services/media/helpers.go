@@ -44,13 +44,22 @@ func canGetMedia(userID, mediaID int64) bool {
 	}
 
 	// Post images from public posts are accessible
-	if purpose == "post" {
+	if purpose == "post" || purpose == "comment" {
 		var postID, authorID int64
 		var privacy string
-		err := config.DB.QueryRow(QUERY_GET_POST_VISIBILITY_FROM_POST_MEDIA, mediaID).Scan(&postID, &privacy, &authorID)
-		if err != nil {
-			utils.SQLiteErrorTarget(err, QUERY_GET_POST_VISIBILITY_FROM_POST_MEDIA)
-			return false
+		if purpose == "post" {
+			err := config.DB.QueryRow(QUERY_GET_POST_VISIBILITY_FROM_POST_MEDIA, mediaID).Scan(&postID, &privacy, &authorID)
+			if err != nil {
+				utils.SQLiteErrorTarget(err, QUERY_GET_POST_VISIBILITY_FROM_POST_MEDIA)
+				return false
+			}
+		}
+		if purpose == "comment" {
+			err := config.DB.QueryRow(QUERY_GET_POST_VISIBILITY_FROM_COMMENT_MEDIA, mediaID).Scan(&postID, &privacy, &authorID)
+			if err != nil {
+				utils.SQLiteErrorTarget(err, QUERY_GET_POST_VISIBILITY_FROM_POST_MEDIA)
+				return false
+			}
 		}
 		if privacy == "public" {
 			return true

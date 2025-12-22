@@ -20,7 +20,7 @@ func CreatePost(post *Post) error {
 			post.ID,
 			post.AuthorID,
 			post.GroupID,
-			post.Content,
+			utils.TrimAny(post.Content),
 			post.Privacy,
 			post.CreatedAt,
 			post.UpdatedAt,
@@ -78,7 +78,7 @@ func GetPostByID(postID int64) (*Post, error) {
 
 // UpdatePost updates an existing post
 func UpdatePost(postID, authorID int64, content, privacy string, updatedAt string) error {
-	result, err := config.DB.Exec(QUERY_UPDATE_POST, content, privacy, updatedAt, postID, authorID)
+	result, err := config.DB.Exec(QUERY_UPDATE_POST, utils.TrimAny(content), privacy, updatedAt, postID, authorID)
 	if err != nil {
 		utils.SQLiteErrorTarget(err, "UpdatePost")
 		return fmt.Errorf("failed to update post: %w", err)

@@ -11,6 +11,7 @@ import {
 } from './components/notification-item.client'
 import { BellIcon } from '@/components/ui/icons'
 import { useNotifications } from '@/providers/notifsProvider'
+import { useUserStats } from '@/providers/userStatsContext'
 
 export function NotificationsDropdown() {
   const [isOpen, setIsOpen] = useState(false)
@@ -19,13 +20,18 @@ export function NotificationsDropdown() {
 
   const {
     notifications,
-    unreadCount,
     loading,
     hasMore,
     loadMore,
     markAsRead,
     markAllAsRead,
   } = useNotifications()
+
+  const { state: userStats } = useUserStats()
+  const unreadCount = userStats.unreadNotifications
+
+  console.log('NotificationsDropdown - userStats:', userStats)
+  console.log('NotificationsDropdown - unreadCount:', unreadCount)
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -115,8 +121,8 @@ export function NotificationsDropdown() {
                       return <EventNotification key={notification.notificationId} {...props} />
                     case 'post_liked':
                       return <PostLikedNotification key={notification.notificationId} {...props} />
-                    case 'post_commented':
-                      return <PostCommentedNotification key={notification.notificationId} {...props} />
+                    // case 'post_commented':
+                    //   return <PostCommentedNotification key={notification.notificationId} {...props} />
                     case 'custom':
                       return <CustomNotification key={notification.notificationId} {...props} />
                     default:

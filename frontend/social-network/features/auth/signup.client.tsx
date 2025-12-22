@@ -128,7 +128,7 @@ export function RegisterForm({ onAuthSuccess }: { onAuthSuccess?: () => void }) 
                     className={styles.input}
                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                     required
-                    maxLength={16}
+                    maxLength={64}
                     minLength={8}
 
                 />

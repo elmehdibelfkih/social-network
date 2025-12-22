@@ -107,6 +107,7 @@ func SelectGroupById(groupId int64, g *GetGroupResponseJson) error {
 		&g.AvatarId,
 		&g.CreatedAt,
 		&g.UpdatedAt,
+		&g.Status,
 	)
 	if err != nil {
 		utils.SQLiteErrorTarget(err, SELECT_GROUP_BY_GROUP_ID)
@@ -120,7 +121,7 @@ func SelectGroupById(groupId int64, g *GetGroupResponseJson) error {
 	)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			g.MemberCount = 0 // No counter row = 0 members
+			g.MemberCount = 0
 		} else {
 			utils.SQLiteErrorTarget(err, SELECT_GROUP_MEMBERS_COUNT)
 			return err
@@ -252,8 +253,8 @@ func InsertNewGroup(cg *CreateGroupRequestJson, g *CreateGroupResponseJson, user
 		err := tx.QueryRow(INSERT_GROUP_BY_USER_ID,
 			utils.GenerateID(),
 			userId,
-			cg.Title,
-			cg.Description,
+			strings.TrimSpace(cg.Title),
+			strings.TrimSpace(cg.Description),
 			cg.AvatarId,
 		).Scan(
 			&g.GroupId,
@@ -455,8 +456,8 @@ func UpdateGroup(groupId, userId int64, u *UpdateGroupRequestJson, ur *UpdateGro
 	return database.WrapWithTransaction(func(tx *sql.Tx) error {
 		avatarId := utils.OptionalJsonFields(u.AvatarId)
 		err := tx.QueryRow(UPDATE_GROUP_BY_ID,
-			u.Title,
-			u.Description,
+			strings.TrimSpace(u.Title),
+			strings.TrimSpace(u.Description),
 			avatarId,
 			groupId,
 		).Scan(
