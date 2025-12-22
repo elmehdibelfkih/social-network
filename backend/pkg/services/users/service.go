@@ -205,7 +205,7 @@ func UpdateUserProfile(w http.ResponseWriter, userId int64, req *UpdateProfileRe
 			utils.BadRequest(w, "Both current password and new password are required.", "alert")
 			return response, false
 		}
-		
+
 		// Verify current password
 		currentPasswordHash, err := SelectUserPasswordHash(userId)
 		if err != nil {
@@ -213,12 +213,12 @@ func UpdateUserProfile(w http.ResponseWriter, userId int64, req *UpdateProfileRe
 			utils.InternalServerError(w)
 			return response, false
 		}
-		
+
 		if !utils.CheckPasswordHash(*req.CurrentPassword, currentPasswordHash) {
 			utils.BadRequest(w, "Current password is incorrect.", "alert")
 			return response, false
 		}
-		
+
 		// Hash new password
 		newPasswordHash := *req.Password
 		err = utils.GeneratePasswordHash(&newPasswordHash)
@@ -227,7 +227,7 @@ func UpdateUserProfile(w http.ResponseWriter, userId int64, req *UpdateProfileRe
 			utils.InternalServerError(w)
 			return response, false
 		}
-		
+
 		// Update password
 		err = UpdateUserPasswordInDB(userId, newPasswordHash)
 		if err != nil {
@@ -299,6 +299,8 @@ func ChangeUserPassword(w http.ResponseWriter, userId int64, req *ChangePassword
 	}
 
 	if !utils.CheckPasswordHash(req.CurrentPassword, currentPasswordHash) {
+		println("HANI GNA ")
+
 		utils.BadRequest(w, "Current password is incorrect.", "alert")
 		return response, false
 	}

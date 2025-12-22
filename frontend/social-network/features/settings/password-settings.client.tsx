@@ -38,18 +38,19 @@ export function PasswordSettings({ profile }: { profile: ProfileAPIResponse }) {
         return;
       }
 
-      await http.patch(`/api/v1/users/${profile.userId}/password`, {
+      const res = await http.patch(`/api/v1/users/${profile.userId}/password`, {
         currentPassword: formData.currentPassword,
         newPassword: formData.newPassword
       });
-
-      setFormData({
-        currentPassword: '',
-        newPassword: '',
-        confirmPassword: ''
-      });
-
-      ShowSnackbar({ status: true, message: 'Password updated successfully' });
+      if (res) {
+        setFormData({
+          currentPassword: '',
+          newPassword: '',
+          confirmPassword: ''
+        });
+        ShowSnackbar({ status: true, message: 'Password updated successfully' });
+      }
+      
     } catch (error: any) {
       console.error('Failed to update password:', error);
       const errorMsg = error?.error?.errorMessage || 'Failed to update password';
