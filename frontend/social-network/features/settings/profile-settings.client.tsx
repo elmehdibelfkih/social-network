@@ -22,9 +22,6 @@ export function ProfileSettings({ profile }: { profile: ProfileAPIResponse }) {
     aboutMe: profile.aboutMe || '',
     dateOfBirth: profile.dateOfBirth || '',
     avatarId: profile.avatarId || null,
-    currentPassword: '',
-    newPassword: '',
-    confirmPassword: '',
   });
   const [isLoading, setIsLoading] = useState(false);
   const [showConfirmation, setShowConfirmation] = useState(false);
@@ -52,24 +49,7 @@ export function ProfileSettings({ profile }: { profile: ProfileAPIResponse }) {
         avatarId: formData.avatarId,
       };
 
-      // Add password fields if changing password
-      if (formData.currentPassword.trim() && formData.newPassword.trim()) {
-        if (formData.newPassword !== formData.confirmPassword) {
-          ShowSnackbar({ status: false, message: 'New passwords do not match' });
-          setIsLoading(false);
-          return;
-        }
-        updateData.currentPassword = formData.currentPassword;
-        updateData.password = formData.newPassword;
-      }
-
-      const result = await http.patch(`/api/v1/users/${profile.userId}/profile`, updateData);
-      
-      // Only proceed if the request was successful (not null)
-      if (result === null) {
-        setIsLoading(false);
-        return;
-      }
+      await http.patch(`/api/v1/users/${profile.userId}/profile`, updateData);
       
       dispatch({ type: 'SET_FIRST_NAME', payload: formData.firstName });
       dispatch({ type: 'SET_LAST_NAME', payload: formData.lastName });
@@ -77,14 +57,6 @@ export function ProfileSettings({ profile }: { profile: ProfileAPIResponse }) {
       dispatch({ type: 'SET_ABOUT_ME', payload: formData.aboutMe });
       dispatch({ type: 'SET_DATE_OF_BIRTH', payload: formData.dateOfBirth });
       dispatch({ type: 'SET_AVATAR_ID', payload: formData.avatarId });
-      
-      // Clear password fields after successful update
-      setFormData(prev => ({
-        ...prev,
-        currentPassword: '',
-        newPassword: '',
-        confirmPassword: ''
-      }));
       
       // Update auth provider with new email
       if (user) {
@@ -255,41 +227,6 @@ export function ProfileSettings({ profile }: { profile: ProfileAPIResponse }) {
             value={formData.dateOfBirth}
             onChange={(e) => setFormData({ ...formData, dateOfBirth: e.target.value })}
           />
-        </div>
-
-        <div className={styles.passwordSection}>
-          <h3>Change Password</h3>
-          <p>Leave blank to keep current password</p>
-          
-          <div className={styles.field}>
-            <label>Current Password</label>
-            <input
-              type="password"
-              value={formData.currentPassword}
-              onChange={(e) => setFormData({ ...formData, currentPassword: e.target.value })}
-              placeholder="Enter current password"
-            />
-          </div>
-
-          <div className={styles.field}>
-            <label>New Password</label>
-            <input
-              type="password"
-              value={formData.newPassword}
-              onChange={(e) => setFormData({ ...formData, newPassword: e.target.value })}
-              placeholder="Enter new password"
-            />
-          </div>
-
-          <div className={styles.field}>
-            <label>Confirm New Password</label>
-            <input
-              type="password"
-              value={formData.confirmPassword}
-              onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-              placeholder="Confirm new password"
-            />
-          </div>
         </div>
 
         <div className={styles.actions}>

@@ -157,6 +157,7 @@ func UpdateUserProfile(w http.ResponseWriter, userId int64, req *UpdateProfileRe
 			return response, false
 		}
 
+		// Verify current password
 		currentPasswordHash, err := SelectUserPasswordHash(userId)
 		if err != nil {
 			utils.BackendErrorTarget(err, context)
@@ -169,6 +170,7 @@ func UpdateUserProfile(w http.ResponseWriter, userId int64, req *UpdateProfileRe
 			return response, false
 		}
 
+		// Hash new password
 		newPasswordHash := *req.Password
 		err = utils.GeneratePasswordHash(&newPasswordHash)
 		if err != nil {
@@ -177,6 +179,7 @@ func UpdateUserProfile(w http.ResponseWriter, userId int64, req *UpdateProfileRe
 			return response, false
 		}
 
+		// Update password
 		err = UpdateUserPasswordInDB(userId, newPasswordHash)
 		if err != nil {
 			utils.BackendErrorTarget(err, context)
@@ -196,6 +199,137 @@ func UpdateUserProfile(w http.ResponseWriter, userId int64, req *UpdateProfileRe
 		return response, false
 	}
 
-	response.Message = "Updated successfully."
+	response.Message = "Updated successful."
+	return response, true
+}
+
+// UpdateUserPrivacy updates a user's privacy setting
+func UpdateUserPrivacy(w http.ResponseWriter, userId int64, req *UpdatePrivacyRequestJson, context string) (UpdatePrivacyResponseJson, bool) {
+	var response UpdatePrivacyResponseJson
+
+	// Validate privacy value
+	if req.Privacy != "public" && req.Privacy != "private" {
+		utils.BadRequest(w, "Privacy must be 'public' or 'private'.", "alert")
+		return response, false
+	}
+
+	// Update privacy
+	err := UpdateUserPrivacyInDB(userId, req.Privacy)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			utils.NotFoundError(w, "User profile not found.")
+			return response, false
+		}
+		utils.BackendErrorTarget(err, context)
+		utils.InternalServerError(w)
+		return response, false
+	}
+
+	response.Message = "Profile privacy updated successfully."
+	response.Privacy = req.Privacy
+	return response, true
+}
+
+// ChangeUserPassword updates a user's password
+func ChangeUserPassword(w http.ResponseWriter, userId int64, req *ChangePasswordRequestJson, context string) (ChangePasswordResponseJson, bool) {
+	var response ChangePasswordResponseJson
+
+	// Validate required fields
+	if req.CurrentPassword == "" || req.NewPassword == "" {
+		utils.BadRequest(w, "Both current password and new password are required.", "alert")
+		return response, false
+	}
+
+	// Verify current password
+	currentPasswordHash, err := SelectUserPasswordHash(userId)
+	if err != nil {
+		utils.BackendErrorTarget(err, context)
+		utils.InternalServerError(w)
+		return response, false
+	}
+
+	if !utils.CheckPasswordHash(req.CurrentPassword, currentPasswordHash) {
+		utils.BadRequest(w, "Current password is incorrect.", "alert")
+		return response, false
+	}
+
+	// Hash new password
+	newPasswordHash := req.NewPassword
+	err = utils.GeneratePasswordHash(&newPasswordHash)
+	if err != nil {
+		utils.BackendErrorTarget(err, context)
+		utils.InternalServerError(w)
+		return response, false
+	}
+
+	// Update password
+	err = UpdateUserPasswordInDB(userId, newPasswordHash)
+	if err != nil {
+		utils.BackendErrorTarget(err, context)
+		utils.InternalServerError(w)
+		return response, false
+	}
+
+	response.Message = "Password updated successfully."
+	return response, true
+}
+func GetUserStats(w http.ResponseWriter, userId int64, context string) (UserStatsResponseJson, bool) {
+	var response UserStatsResponseJson
+
+	// Check if user exists
+	_, err := SelectUserProfileById(userId)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			utils.NotFoundError(w, "User profile not found.")
+			return response, false
+		}
+		utils.BackendErrorTarget(err, context)
+		utils.InternalServerError(w)
+		return response, false
+	}
+
+	// Get all stats
+	postsCount, err := SelectPostsCount(userId)
+	if err != nil {
+		utils.BackendErrorTarget(err, context)
+		utils.InternalServerError(w)
+		return response, false
+	}
+
+	followersCount, err := SelectFollowersCount(userId)
+	if err != nil {
+		utils.BackendErrorTarget(err, context)
+		utils.InternalServerError(w)
+		return response, false
+	}
+
+	followingCount, err := SelectFollowingCount(userId)
+	if err != nil {
+		utils.BackendErrorTarget(err, context)
+		utils.InternalServerError(w)
+		return response, false
+	}
+
+	likesReceived, err := SelectLikesReceived(userId)
+	if err != nil {
+		utils.BackendErrorTarget(err, context)
+		utils.InternalServerError(w)
+		return response, false
+	}
+
+	commentsReceived, err := SelectCommentsReceived(userId)
+	if err != nil {
+		utils.BackendErrorTarget(err, context)
+		utils.InternalServerError(w)
+		return response, false
+	}
+
+	response.UserId = userId
+	response.PostsCount = postsCount
+	response.FollowersCount = followersCount
+	response.FollowingCount = followingCount
+	response.LikesReceived = likesReceived
+	response.CommentsReceived = commentsReceived
+
 	return response, true
 }

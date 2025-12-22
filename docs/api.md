@@ -256,6 +256,29 @@ No need for a request body.
 
 ---
 
+### PATCH `/api/v1/users/:user_id/password` => change password
+
+***status code in success: 200***
+
+- request
+
+```json
+{
+  "currentPassword": "oldPassword123",
+  "newPassword": "newPassword456"
+}
+```
+
+- response payload
+
+``` json
+{
+  "message": "Password updated successfully."
+}
+```
+
+---
+
 ### PATCH `/api/v1/users/:user_id/privacy` => toggle public/private profile
 
 ***status code in success: 200***
