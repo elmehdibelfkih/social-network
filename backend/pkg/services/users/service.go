@@ -333,3 +333,93 @@ func GetUserStats(w http.ResponseWriter, userId int64, context string) (UserStat
 
 	return response, true
 }
+
+func GetUserProfile(w http.ResponseWriter, profileUserId, viewerUserId int64, context string) (UserProfileResponseJson, bool) {
+	var response UserProfileResponseJson
+
+	// Check if profile user exists
+	profile, err := SelectUserProfileById(profileUserId)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			utils.NotFoundError(w, "User profile not found.")
+			return response, false
+		}
+		utils.BackendErrorTarget(err, context)
+		utils.InternalServerError(w)
+		return response, false
+	}
+
+	// Get follow status (pending/accepted/declined or null)
+	var followStatus *string
+	if viewerUserId > 0 && viewerUserId != profileUserId {
+		followStatus, err = SelectFollowStatus(viewerUserId, profileUserId)
+		if err != nil {
+			utils.BackendErrorTarget(err, context)
+			utils.InternalServerError(w)
+			return response, false
+		}
+	}
+
+	// Get stats
+	postsCount, err := SelectPostsCount(profileUserId)
+	if err != nil {
+		utils.BackendErrorTarget(err, context)
+		utils.InternalServerError(w)
+		return response, false
+	}
+	// followes && following COUNT
+	followersCount, err := SelectFollowersCount(profileUserId)
+	if err != nil {
+		utils.BackendErrorTarget(err, context)
+		utils.InternalServerError(w)
+		return response, false
+	}
+
+	followingCount, err := SelectFollowingCount(profileUserId)
+	if err != nil {
+		utils.BackendErrorTarget(err, context)
+		utils.InternalServerError(w)
+		return response, false
+	}
+
+	// Get chatId if users are different
+	var chatId *int64
+	if viewerUserId != profileUserId {
+		chatId, err = SelectChatIdBetweenUsers(viewerUserId, profileUserId)
+		if err != nil {
+			utils.BackendErrorTarget(err, context)
+			utils.InternalServerError(w)
+			return response, false
+		}
+	}
+
+	// Build response
+	response.UserId = profile.Id
+	if viewerUserId != profileUserId {
+		if followStatus == nil {
+			status := "follow"
+			response.Status = &status
+		} else {
+			response.Status = followStatus
+		}
+	}
+
+	if viewerUserId == profileUserId {
+		response.Email = &profile.Email
+	}
+
+	response.Nickname = profile.Nickname
+	response.FirstName = profile.FirstName
+	response.LastName = profile.LastName
+	response.AvatarId = profile.AvatarId
+	response.AboutMe = profile.AboutMe
+	response.DateOfBirth = profile.DateOfBirth
+	response.Privacy = profile.Privacy
+	response.ChatId = chatId // null if no chat exists or users can't chat
+	response.Stats.PostsCount = postsCount
+	response.Stats.FollowersCount = followersCount
+	response.Stats.FollowingCount = followingCount
+	response.JoinedAt = profile.CreatedAt
+
+	return response, true
+}
