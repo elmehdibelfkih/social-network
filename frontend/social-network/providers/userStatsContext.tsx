@@ -105,9 +105,6 @@ export const UserStatsProvider = ({ children, initialState }: UserStatsProviderP
     joinedAt: null,
   };
 
-  console.log('UserStatsProvider - initialState:', initialState);
-  console.log('UserStatsProvider - merged state:', { ...defaultState, ...initialState });
-
   const [state, dispatch] = useReducer(userStatsReducer, {
     ...defaultState,
     ...initialState,

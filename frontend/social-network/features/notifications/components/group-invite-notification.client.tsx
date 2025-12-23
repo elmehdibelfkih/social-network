@@ -77,23 +77,33 @@ export function GroupInviteNotification({ notification, onMarkAsRead }: Notifica
       <div className={styles.contentSection}>
         <div className={styles.contentContainer}>
           <p>
-            <span>{notification.content}</span>
+            {notification.type === 'group_invite' ? (
+              <>
+                <strong>{notification.actorName || 'Someone'}</strong> invited you to join <strong>{group.title}</strong>
+              </>
+            ) : (
+              <>
+                <strong>{notification.actorName || 'Someone'}</strong> wants to join <strong>{group.title}</strong>
+              </>
+            )}
           </p>
           {!isRead && <div className={styles.unreadDot} />}
         </div>
 
         <p className={styles.timeAgo}>{formatTimeAgo(notification.createdAt)}</p>
 
-        <div className={styles.actionButtons}>
-          <button className={styles.acceptButton}
-            onClick={acceptInvitation}
-            disabled={group.status == 'accepted' || requestHandled || group.status == 'pending'}
-          >✓ Accept</button>
-          <button className={styles.declineButton}
-            onClick={declineInvitation}
-            disabled={group.status == 'accepted' || requestHandled || group.status == 'pending'}
-          >× Decline</button>
-        </div>
+        {notification.type === 'group_invite' && (
+          <div className={styles.actionButtons}>
+            <button className={styles.acceptButton}
+              onClick={acceptInvitation}
+              disabled={group.status == 'accepted' || requestHandled || group.status == 'pending'}
+            >✓ Accept</button>
+            <button className={styles.declineButton}
+              onClick={declineInvitation}
+              disabled={group.status == 'accepted' || requestHandled || group.status == 'pending'}
+            >× Decline</button>
+          </div>
+        )}
       </div>
     </div>
   )

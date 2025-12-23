@@ -34,9 +34,8 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
     avatarId: profileRes.avatarId,
     aboutMe: profileRes.aboutMe,
     dateOfBirth: profileRes.dateOfBirth,
-    privacy: profileRes.privacy,
+    privacy: profileRes.privacy as 'public' | 'private',
     joinedAt: profileRes.joinedAt,
-    email: profileRes.email,
     email: profileRes.email,
     unreadNotifications: notificationsRes.unreadNotifications,
     postsCount: counts.postsCount,
@@ -51,9 +50,11 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
   return (
     <AuthProvider>
       <UserStatsProvider initialState={stats}>
-        <SharedWorekerClient />
+        <NotificationProvider>
+          <SharedWorekerClient />
           <Navbar />
           {children}
+        </NotificationProvider>
       </UserStatsProvider>
     </AuthProvider>
   );

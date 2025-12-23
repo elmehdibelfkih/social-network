@@ -8,12 +8,11 @@ type NotificationContextType = {
     notifications: Notification[]
     loading: boolean
     hasMore: boolean
-    prependNotifications: (newNotifications: Notification[]) => void
+    prependNotifications: (newNotifications: Notification) => void
     loadNotifications: () => Promise<void>
     loadMore: () => Promise<void>
     markAsRead: (notificationId: number) => Promise<void>
     markAllAsRead: () => Promise<void>
-    addNotification: (notification: Notification) => void
 }
 
 export const NotificationContext = createContext<NotificationContextType | null>(null)
@@ -32,7 +31,10 @@ export function NotificationProvider({ children }) {
         try {
             const notificationsResponse = await notificationsService.getNotifications(20)
 
-            setNotifications(notificationsResponse.notifications)
+            const activeNotifications = notificationsResponse.notifications.filter(
+                (notif) => notif.status === 'active'
+            )
+            setNotifications(activeNotifications)
             setHasMore(notificationsResponse?.notifications?.length == 20)
         } catch (error) {
             console.error('Failed to load notifications:', error)
@@ -62,8 +64,11 @@ export function NotificationProvider({ children }) {
             const response = await notificationsService.getNotifications(20, lastId)
 
             if (response.notifications.length > 0) {
+                const activeNotifications = response.notifications.filter(
+                    (notif) => notif.status === 'active'
+                )
                 setNotifications((prev) => {
-                    const combined = [...prev, ...response.notifications]
+                    const combined = [...prev, ...activeNotifications]
                     return combined.length > MAX_CACHE_SIZE ? combined.slice(0, MAX_CACHE_SIZE) : combined
                 })
                 setHasMore(response.notifications.length == 20)
@@ -81,7 +86,6 @@ export function NotificationProvider({ children }) {
         const previousNotifications = [...notifications]
         const notification = notifications.find(n => n.notificationId === notificationId)
 
-        // Only update if the notification is currently unread
         if (notification?.isRead === 0) {
             setNotifications((prev) =>
                 prev.map((notif) =>
@@ -114,37 +118,43 @@ export function NotificationProvider({ children }) {
         // Revert on failure
         if (!success) {
             setNotifications(previousNotifications)
-            // Revert the unread count by adding back the number of unread notifications
             for (let i = 0; i < unreadCount; i++) {
                 userStatsDispatch({ type: 'NEW_NOTIFICATION' })
             }
-            console.error('Failed to mark all notifications as read, reverting changes')
         }
     }, [notifications, userStatsDispatch])
 
-    const addNotification = useCallback((notification: Notification) => {
-        setNotifications((prev) => {
-            const updated = [notification, ...prev]
-            return updated.length > MAX_CACHE_SIZE
-                ? updated.slice(0, MAX_CACHE_SIZE)
-                : updated
-        })
+    const prependNotifications = useCallback((newNotification: Notification) => {
+        if (newNotification.status === 'suspended') {
+            let shouldDecrementUnread = false
 
-        if (notification.isRead === 0) {
-            userStatsDispatch({ type: 'NEW_NOTIFICATION' })
+            setNotifications((prev) => {
+                const suspended = prev.find(n => n.notificationId === newNotification.notificationId)
+                if (suspended && suspended.isRead === 0) {
+                    shouldDecrementUnread = true
+                }
+                return prev.filter(n => n.notificationId !== newNotification.notificationId)
+            })
+
+            if (shouldDecrementUnread) {
+                userStatsDispatch({ type: 'READ_NOTIFICATION' })
+            }
+            return
         }
-    }, [userStatsDispatch])
 
-    const prependNotifications = useCallback((newNotifications: Notification[]) => {
         setNotifications((prev) => {
-            const combined = [...newNotifications, ...prev]
+            const exists = prev.some(n => n.notificationId === newNotification.notificationId)
+            if (exists) {
+                return prev
+            }
+
+            const combined = [newNotification, ...prev]
             return combined.length > MAX_CACHE_SIZE
                 ? combined.slice(0, MAX_CACHE_SIZE)
                 : combined
         })
 
-        const unreadInNew = newNotifications.filter(n => n.isRead === 0).length
-        for (let i = 0; i < unreadInNew; i++) {
+        if (newNotification.isRead === 0) {
             userStatsDispatch({ type: 'NEW_NOTIFICATION' })
         }
     }, [userStatsDispatch])
@@ -158,7 +168,6 @@ export function NotificationProvider({ children }) {
         loadMore,
         markAsRead,
         markAllAsRead,
-        addNotification,
     }
 
     return (

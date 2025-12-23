@@ -1,7 +1,7 @@
 import { SocialIcon } from '@/components/ui/icons';
 import NavbarCenter, { NavProfile } from './navbar.client';
 import styles from './styles.module.css';
-import { NotificationsDropdown } from '../notifications';
+import { Notifications } from '../notifications';
 
 export function Navbar() {
   return (
@@ -24,7 +24,7 @@ export function Navbar() {
 export function NotificationClient() {
   return (
     <div className={styles.navbarRight}>
-      {/* <NotificationsDropdown /> */}
+      <Notifications />
     </div>
   )
 }

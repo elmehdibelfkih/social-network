@@ -96,7 +96,7 @@ func SelectGroupsById(limit, lastItemId int64, l *BrowseGroupsResponseJson) erro
 	return err
 }
 
-func SelectOtherGroupsByUserId(limit, userId int64, offset int64,l *BrowseGroupsResponseJson) error {
+func SelectOtherGroupsByUserId(limit, userId int64, offset int64, l *BrowseGroupsResponseJson) error {
 	rows, err := config.DB.Query(SELECT_BROWSE_OTHER_GROUPS_BY_USER,
 		userId,
 		limit,
@@ -142,8 +142,7 @@ func SelectOtherGroupsByUserId(limit, userId int64, offset int64,l *BrowseGroups
 	return err
 }
 
-
-func SelectGroupsByUserId(limit, userId int64, offset int64,l *BrowseGroupsResponseJson) error {
+func SelectGroupsByUserId(limit, userId int64, offset int64, l *BrowseGroupsResponseJson) error {
 	rows, err := config.DB.Query(SELECT_BROWSE_GROUPS_BY_USER,
 		userId,
 		limit,
@@ -189,9 +188,6 @@ func SelectGroupsByUserId(limit, userId int64, offset int64,l *BrowseGroupsRespo
 	return err
 }
 
-
-
-
 func SelectGroupById(groupId int64, g *GetGroupResponseJson) error {
 	err := config.DB.QueryRow(SELECT_GROUP_BY_GROUP_ID,
 		groupId,
@@ -234,6 +230,7 @@ func SelectGroupMember(groupId, userId int64) (bool, error) {
 	).Scan(&exist)
 	if err != nil {
 		utils.SQLiteErrorTarget(err, SELECT_GROUP_MEMBER_BY_ID)
+		return false, err
 	}
 	return exist, err
 }
@@ -246,6 +243,7 @@ func SelectGroupAcceptedMember(groupId, userId int64) (bool, error) {
 	).Scan(&exist)
 	if err != nil {
 		utils.SQLiteErrorTarget(err, SELECT_GROUP_MEMBER_ACCEPTED)
+		return false, err
 	}
 	return exist, err
 }
@@ -260,6 +258,7 @@ func SelectGroupOwner(groupId, userId int64) (bool, error) {
 	)
 	if err != nil {
 		utils.SQLiteErrorTarget(err, SELECT_GROUP_BY_OWNER)
+		return false, err
 	}
 	return exist, err
 }
@@ -274,6 +273,7 @@ func SelectGoupMemberPending(groupId, userId int64) (bool, error) {
 	)
 	if err != nil {
 		utils.SQLiteErrorTarget(err, SELECT_GROUP_MEMBER_PENDING)
+		return false, err
 	}
 	return exist, err
 }
@@ -288,6 +288,7 @@ func SelectFollows(follower, followed int64) (bool, error) {
 	)
 	if err != nil {
 		utils.SQLiteErrorTarget(err, SELECT_FOLLOWS_BY_ID)
+		return false, err
 	}
 	return exist, err
 }
@@ -311,6 +312,7 @@ func SelectGoupEvent(groupId, eventId, userId int64, e *GetEventResponseJson) er
 	)
 	if err != nil {
 		utils.SQLiteErrorTarget(err, SELECT_EVENT_BY_ID)
+		return err
 	}
 	return err
 }
@@ -319,6 +321,7 @@ func SelectAllGoupEvent(groupId int64, l *ListEventsResponseJson) error {
 	rows, err := config.DB.Query(SELECT_EVENTS_BY_GROUP_ID, groupId)
 	if err != nil {
 		utils.SQLiteErrorTarget(err, SELECT_EVENTS_BY_GROUP_ID)
+		return err
 	}
 	defer rows.Close()
 	l.GroupId = groupId
@@ -363,6 +366,7 @@ func InsertNewGroup(cg *CreateGroupRequestJson, g *CreateGroupResponseJson, user
 		)
 		if err != nil {
 			utils.SQLiteErrorTarget(err, INSERT_GROUP_BY_USER_ID)
+			return err
 		}
 		return err
 	})
@@ -423,7 +427,7 @@ func InsertNewGroupMember(sourceId, targetId, groupId int64, status, role, notif
 				return err
 			}
 		}
-		socket.InsertNotification(socket.Notification{
+		err = socket.InsertNotification(socket.Notification{
 			NotificationId: utils.GenerateID(),
 			UserId:         targetId,
 			Type:           notificationType,
@@ -482,9 +486,10 @@ func insertNewGroupEvent(userId, groupId int64, e *CreateEventRequestJson, er *C
 				&groupUser,
 			)
 			if err != nil {
-				utils.SQLiteErrorTarget(err, INSERT_NOTIFICATION)
+				utils.SQLiteErrorTarget(err, SELECT_GROUP_MEMBERS_BY_GROUP)
+				return err
 			}
-			socket.InsertNotification(socket.Notification{
+			err = socket.InsertNotification(socket.Notification{
 				NotificationId: utils.GenerateID(),
 				UserId:         groupUser,
 				Type:           "event_created",
@@ -495,6 +500,7 @@ func insertNewGroupEvent(userId, groupId int64, e *CreateEventRequestJson, er *C
 			}, userId, tx)
 			if err != nil {
 				utils.SQLiteErrorTarget(err, INSERT_NOTIFICATION)
+				return err
 			}
 		}
 		return err
@@ -543,6 +549,7 @@ func UpdateMemberStatusDeclined(groupId, userId int64, d *DeclineMemberResponseJ
 		)
 		if err != nil {
 			utils.SQLiteErrorTarget(err, UPDATE_GROUP_MEMBER_STATUS)
+			return err
 		}
 		return err
 	})
@@ -565,6 +572,7 @@ func UpdateGroup(groupId, userId int64, u *UpdateGroupRequestJson, ur *UpdateGro
 		)
 		if err != nil {
 			utils.SQLiteErrorTarget(err, UPDATE_GROUP_BY_ID)
+			return err
 		}
 		return err
 	})
@@ -579,6 +587,7 @@ func UpdateMetaData(entityType string, entityId int64, value int64) error {
 		)
 		if err != nil {
 			utils.SQLiteErrorTarget(err, UPDATE_GROUP_FOLLOWERS_COUNT)
+			return err
 		}
 		return err
 	})
@@ -594,6 +603,7 @@ func UpdateRsvp(eventId, userId int64, r *RSVPRequestJson, rs *RSVPResponseJson)
 		rs.Message = "RSVP updated successfully."
 		if err != nil {
 			utils.SQLiteErrorTarget(err, INSERT_EVENT_RSVP)
+			return err
 		}
 		return err
 	})
@@ -604,6 +614,7 @@ func SelectRsvp(eventId, userId int64, rs *GetRSVPResponseJson) error {
 		err := tx.QueryRow(COUNT_EVENT_RSVP_COUNTS, eventId).Scan(&rs.Countgoing, &rs.CountNotgoing)
 		if err != nil {
 			utils.SQLiteErrorTarget(err, COUNT_EVENT_RSVP_COUNTS)
+			return err
 		}
 		var userResponse sql.NullString
 		err = tx.QueryRow(GET_USER_RSVP, eventId, userId).Scan(&userResponse)
@@ -613,7 +624,6 @@ func SelectRsvp(eventId, userId int64, rs *GetRSVPResponseJson) error {
 		}
 		rs.Amigoing = userResponse.Valid && userResponse.String == "going"
 		return nil
-		
 	})
 }
 
@@ -655,6 +665,7 @@ func DeleteGroupFromGroups(groupId, userId int64) error {
 		)
 		if err != nil {
 			utils.SQLiteErrorTarget(err, DELETE_GROUP_BY_ID_AND_CREATOR)
+			return err
 		}
 		return err
 	})
