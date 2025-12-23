@@ -26,6 +26,7 @@ export type Group = {
   creatorId: number;
   memberCount: number;
   createdAt: string;
+  status: 'declined' | 'accepted' | 'pending'; // membership status
   events: Event[];
 };
 

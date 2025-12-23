@@ -115,12 +115,9 @@ export default function GroupsPageClient({
     }
   }, [isLoadingDiscover, hasMoreDiscover, lastDiscoverGroupId]);
 
-  // Handle joining a group
   async function handleJoinGroup(groupId: number) {
     try {
       await GroupService.joinGroup(groupId);
-      
-      // Remove from discover and add to my groups
       const joinedGroup = discoverGroups.find(g => g.groupId === groupId);
       if (joinedGroup) {
         setDiscoverGroups(prev => prev.filter(g => g.groupId !== groupId));
