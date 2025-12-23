@@ -6,9 +6,9 @@ import { ChatMessage } from "./types";
 import { formatMessageDate } from "@/libs/helpers";
 import { SeenStatus } from "@/components/ui/chats/seen"
 import { useDebounceCbf } from "@/libs/debounce";
-import TypingIndicator from "./typing.indicator";
 import AvatarHolder from "@/components/ui/avatar_holder/avatarholder.client";
 import { Group } from "../group_card";
+import { EmojiIcon, SendIcon, UserPlusIcon } from "@/components/ui/icons";
 
 interface GroupChatConversationProps {
     chatId: number;
@@ -26,13 +26,18 @@ export default function GroupChatConversation({ chatId, group }: GroupChatConver
     const [hasMore, setHasMore] = useState(true);
     const [isLoading, setIsLoading] = useState(false)
     const [input, setInput] = useState("");
-    const [userData, setUserData] = useState(JSON.parse(localStorage.getItem("social_network-user")))
+    const [userData, setUserData] = useState(null)
     const [isTyping, setIsTyping] = useState(false)
     const scrollRef = useRef<HTMLDivElement>(null);
     const [emojiOpen, setEmojiOpen] = useState(false);
     const inputRef = useRef<HTMLInputElement>(null);
     const emojiBtnRef = useRef<HTMLButtonElement>(null);
     const emojiRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        const data = localStorage.getItem("social_network-user");
+        if (data) setUserData(JSON.parse(data));
+    }, []);
 
     useEffect(() => {
         function onClickOutside(e: MouseEvent) {
@@ -90,7 +95,7 @@ export default function GroupChatConversation({ chatId, group }: GroupChatConver
         })
 
         return onUnMount;
-    }, [])
+    }, [userData])
 
     async function loadOlderMessages() {
         console.log(oldestMessage)
@@ -319,9 +324,17 @@ export default function GroupChatConversation({ chatId, group }: GroupChatConver
                             key={msg.messageId}
                             className={`${styles.message} ${msg.senderId == userData.userId ? styles.myMessage : styles.otherMessage}`}
                         >
-                            {msg.content}
-                            <div className={styles.timestamp}>
-                                <SeenStatus state={msg.seenState} time={formatMessageDate(msg.updatedAt)}></SeenStatus>
+                            <AvatarHolder avatarId={userData.avatarId} size={30} />
+                            <div>
+                                <div className={styles.messageOwner}>
+                                    {userData.nickname ? userData.nickname : userData.firstName + " " + userData.lastName}
+                                </div>
+                                <div className={styles.messageContent}>
+                                    {msg.content}
+                                </div>
+                                <div className={styles.timestamp}>
+                                    {formatMessageDate(msg.updatedAt)}
+                                </div>
                             </div>
                         </div>
                     );
@@ -340,10 +353,10 @@ export default function GroupChatConversation({ chatId, group }: GroupChatConver
                     ref={inputRef}
                 />
                 <button ref={emojiBtnRef} type="button" className={styles.emojiBtn} onClick={handleEmojiPallete}>
-                    <img src="/svg/smile.svg" alt="" />
+                    <EmojiIcon />
                 </button>
                 <button type="submit" disabled={isLoading} className={styles.sendBtn}>
-                    <img src="/svg/send-horizontal.svg" alt="" />
+                    <SendIcon />
                 </button>
             </form>
 

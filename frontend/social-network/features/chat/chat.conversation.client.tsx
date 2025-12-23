@@ -26,13 +26,18 @@ export default function ChatConversation({ chatId, user, onClose }: ChatConversa
     const [hasMore, setHasMore] = useState(true);
     const [isLoading, setIsLoading] = useState(false)
     const [input, setInput] = useState("");
-    const [userData, setUserData] = useState(JSON.parse(localStorage.getItem("social_network-user")))
+    const [userData, setUserData] = useState(null)
     const [isTyping, setIsTyping] = useState(false)
-    const scrollRef = useRef<HTMLDivElement>(null);
     const [emojiOpen, setEmojiOpen] = useState(false);
+    const scrollRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
     const emojiBtnRef = useRef<HTMLButtonElement>(null);
     const emojiRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        const data = localStorage.getItem("social_network-user");
+        if (data) setUserData(JSON.parse(data));
+    }, []);
 
     useEffect(() => {
         function onClickOutside(e: MouseEvent) {
@@ -90,7 +95,7 @@ export default function ChatConversation({ chatId, user, onClose }: ChatConversa
         })
 
         return onUnMount;
-    }, [])
+    }, [userData])
 
     async function loadOlderMessages() {
         console.log(oldestMessage)
