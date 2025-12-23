@@ -213,6 +213,36 @@ func GroupsInfo(w http.ResponseWriter, r *http.Request,
 	return true
 }
 
+func GroupsInfoByuser(w http.ResponseWriter, r *http.Request,
+	response *BrowseGroupsResponseJson, context string,
+) bool {
+	userId := utils.GetUserIdFromContext(r)
+	limit := utils.GetQuerryPramInt(r, "limit")
+	offset := utils.GetQuerryPramInt(r, "offset")
+	err := SelectGroupsByUserId(limit, userId, offset, response)
+	if err != nil {
+		utils.BackendErrorTarget(err, context)
+		utils.IdentifySqlError(w, err)
+		return false
+	}
+	return true
+}
+
+func OtherGroupsInfoByuser(w http.ResponseWriter, r *http.Request,
+	response *BrowseGroupsResponseJson, context string,
+) bool {
+	userId := utils.GetUserIdFromContext(r)
+	limit := utils.GetQuerryPramInt(r, "limit")
+	offset := utils.GetQuerryPramInt(r, "offset")
+	err := SelectOtherGroupsByUserId(limit, userId, offset, response)
+	if err != nil {
+		utils.BackendErrorTarget(err, context)
+		utils.IdentifySqlError(w, err)
+		return false
+	}
+	return true
+}
+
 func GetGroupsInfoHttp(w http.ResponseWriter,
 	response BrowseGroupsResponseJson,
 ) {

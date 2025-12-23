@@ -10,10 +10,13 @@ import { useState } from 'react';
 
 interface GroupCardClientProps {
   groups: Group[];
+  isMyGroups: boolean;
+  onJoinGroup: (groupId: number) => void;
 }
 
-export default function GroupCardClient({ groups }: GroupCardClientProps) {
+export default function GroupCardClient({ groups, isMyGroups, onJoinGroup }: GroupCardClientProps) {
   const [selectedGroupId, setSelectedGroupId] = useState<string | null>(null);
+  const [joiningGroupId, setJoiningGroupId] = useState<number | null>(null);
 
   const handleInviteClick = (groupId: string) => {
     setSelectedGroupId(groupId);
@@ -26,6 +29,15 @@ export default function GroupCardClient({ groups }: GroupCardClientProps) {
   const handleComplete = (selectedUserIds: number[]) => {
     console.log('Invited users:', selectedUserIds);
     setSelectedGroupId(null);
+  };
+
+  const handleJoinClick = async (groupId: number) => {
+    setJoiningGroupId(groupId);
+    try {
+      await onJoinGroup(groupId);
+    } finally {
+      setJoiningGroupId(null);
+    }
   };
 
   // Helper function to get the next upcoming or live event
@@ -95,19 +107,33 @@ export default function GroupCardClient({ groups }: GroupCardClientProps) {
                   </div>
                 )}
                 <div className={styles.group_actions}>
-                  <Link
-                    href={`/groups/${group.groupId}/posts`}
-                    className={styles.btn_view_group}
-                  >
-                    View Group
-                  </Link>
-                  <button 
-                    className={styles.btn_invite}
-                    onClick={() => handleInviteClick(group.groupId.toString())}
-                  >
-                    <UserPlusIcon />
-                    Invite Users
-                  </button>
+                  {isMyGroups ? (
+                    // My Groups: Show View Group + Invite Users
+                    <>
+                      <Link
+                        href={`/groups/${group.groupId}/posts`}
+                        className={styles.btn_view_group}
+                      >
+                        View Group
+                      </Link>
+                      <button 
+                        className={styles.btn_invite}
+                        onClick={() => handleInviteClick(group.groupId.toString())}
+                      >
+                        <UserPlusIcon />
+                        Invite Users
+                      </button>
+                    </>
+                  ) : (
+                    // Discover: Show only Join Group button
+                    <button 
+                      className={styles.btn_join_group}
+                      onClick={() => handleJoinClick(group.groupId)}
+                      disabled={joiningGroupId === group.groupId}
+                    >
+                      {joiningGroupId === group.groupId ? 'Joining...' : 'Join Group'}
+                    </button>
+                  )}
                 </div>
               </div>
             </div>

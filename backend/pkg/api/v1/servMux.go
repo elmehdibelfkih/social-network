@@ -2,6 +2,7 @@ package v1
 
 import (
 	"net/http"
+
 	"social/pkg/app/dependencies/middleware"
 	"social/pkg/app/dependencies/router"
 	socket "social/pkg/app/sockets"
@@ -43,10 +44,12 @@ func SocialMux() *router.Router {
 	socialMux.HandleFunc("PUT", "/api/v1/groups/{group_id}", utils.MiddlewareChain(groups.PutUpdateGroup, middleware.AuthMiddleware, groups.IsGroupOwner))
 	socialMux.HandleFunc("GET", "/api/v1/groups/{group_id}", utils.MiddlewareChain(groups.GetGroupInfo, middleware.AuthMiddleware))
 	socialMux.HandleFunc("GET", "/api/v1/groups", utils.MiddlewareChain(groups.GetGroupsInfo, middleware.AuthMiddleware))
+	socialMux.HandleFunc("GET", "/api/v1/my_groups", utils.MiddlewareChain(groups.GetGroupsInfoByuserId, middleware.AuthMiddleware))
+	socialMux.HandleFunc("GET", "/api/v1/others_groups", utils.MiddlewareChain(groups.GetOtherGroupsInfoByuserId, middleware.AuthMiddleware))
 	socialMux.HandleFunc("GET", "/api/v1/groups/{group_id}/members", utils.MiddlewareChain(groups.GetGroupMembers, middleware.AuthMiddleware))
 	socialMux.HandleFunc("DELETE", "/api/v1/groups/{group_id}", utils.MiddlewareChain(groups.DeleteGroup, middleware.AuthMiddleware, groups.IsGroupOwner))
 
-	// events
+	// events   
 	socialMux.HandleFunc("POST", "/api/v1/groups/{group_id}/events", utils.MiddlewareChain(groups.PostCreateEvent, middleware.AuthMiddleware, groups.IsMemeber))
 	socialMux.HandleFunc("POST", "/api/v1/groups/{group_id}/events/{event_id}/rsvp", utils.MiddlewareChain(groups.PostEventRSVP, middleware.AuthMiddleware, groups.IsMemeber))
 	socialMux.HandleFunc("GET", "/api/v1/groups/{group_id}/events/{event_id}/rsvp", utils.MiddlewareChain(groups.GetEventRSVP, middleware.AuthMiddleware, groups.IsMemeber))
@@ -60,7 +63,7 @@ func SocialMux() *router.Router {
 	socialMux.HandleFunc("DELETE", "/api/v1/chats/{chat_id}/messages/{message_id}", utils.MiddlewareChain(chat.DeleteMessageHandler, middleware.AuthMiddleware, chat.ChatAccessMiddleware))
 	// socialMux.HandleFunc("GET", "/api/v1/chats", utils.MiddlewareChain(chat.GetUserChats, middleware.AuthMiddleware))
 	// socialMux.HandleFunc("GET", "/api/v1/chats/{chat_id}/participants", utils.MiddlewareChain(chat.GetParticipantsHandler, middleware.AuthMiddleware, chat.ChatAccessMiddleware))
-	
+
 	// media
 	socialMux.HandleFunc("POST", "/api/v1/media/upload", utils.MiddlewareChain(media.HandleUploadMedia, middleware.UserContext))
 	socialMux.HandleFunc("GET", "/api/v1/media/{media_id}", utils.MiddlewareChain(media.HandleGetMedia, middleware.AuthMiddleware, media.MediaMiddleware))
