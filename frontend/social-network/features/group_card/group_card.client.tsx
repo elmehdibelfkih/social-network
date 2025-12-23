@@ -18,6 +18,9 @@ export default function GroupCardClient({ groups, isMyGroups, onJoinGroup }: Gro
   const [selectedGroupId, setSelectedGroupId] = useState<string | null>(null);
   const [joiningGroupId, setJoiningGroupId] = useState<number | null>(null);
 
+  // Debug: Check what status we're getting
+  console.log('GroupCardClient - groups:', groups.map(g => ({ id: g.groupId, title: g.title, status: g.status })));
+
   const handleInviteClick = (groupId: string) => {
     setSelectedGroupId(groupId);
   };

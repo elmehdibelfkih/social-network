@@ -46,7 +46,7 @@ export type CreateGroupPayload = {
 export type JoinGroupResponse = {
   message: string;
   groupId: number;
-  status: 'pending' | 'approved'; // Add other statuses if needed
+  status: 'pending' | 'accepted'; // Add other statuses if needed
 };
 
 
