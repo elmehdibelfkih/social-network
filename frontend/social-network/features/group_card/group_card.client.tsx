@@ -43,13 +43,11 @@ export default function GroupCardClient({ groups, isMyGroups, onJoinGroup }: Gro
     }
   };
 
-  // Helper function to get the next upcoming or live event
   const getNextEvent = (events: Group['events']) => {
     if (!events || events.length === 0) return null;
 
     const now = new Date();
     
-    // Filter events that haven't ended yet
     const activeEvents = events.filter(event => {
       const endDate = new Date(event.endAt);
       return endDate >= now;
@@ -57,13 +55,11 @@ export default function GroupCardClient({ groups, isMyGroups, onJoinGroup }: Gro
 
     if (activeEvents.length === 0) return null;
 
-    // Sort by start date and return the first one (earliest)
     return activeEvents.sort((a, b) => 
       new Date(a.startAt).getTime() - new Date(b.startAt).getTime()
     )[0];
   };
 
-  // Helper function to check if event is live
   const isEventLive = (startAt: string, endAt: string) => {
     const now = new Date();
     const start = new Date(startAt);
@@ -111,7 +107,6 @@ export default function GroupCardClient({ groups, isMyGroups, onJoinGroup }: Gro
                 )}
                 <div className={styles.group_actions}>
                   {isMyGroups ? (
-                    // My Groups: Show View Group + Invite Users
                     <>
                       <Link
                         href={`/groups/${group.groupId}/posts`}
@@ -128,14 +123,23 @@ export default function GroupCardClient({ groups, isMyGroups, onJoinGroup }: Gro
                       </button>
                     </>
                   ) : (
-                    // Discover: Show only Join Group button
-                    <button 
-                      className={styles.btn_join_group}
-                      onClick={() => handleJoinClick(group.groupId)}
-                      disabled={joiningGroupId === group.groupId}
-                    >
-                      {joiningGroupId === group.groupId ? 'Joining...' : 'Join Group'}
-                    </button>
+                    group.status === 'pending' ? (
+                      <button className={styles.btn_pending} disabled>
+                        Request Sent
+                      </button>
+                    ) : group.status === 'declined' ? (
+                      <button className={styles.btn_declined} disabled>
+                        Request Declined
+                      </button>
+                    ) : (
+                      <button 
+                        className={styles.btn_join_group}
+                        onClick={() => handleJoinClick(group.groupId)}
+                        disabled={joiningGroupId === group.groupId}
+                      >
+                        {joiningGroupId === group.groupId ? 'Joining...' : 'Join Group'}
+                      </button>
+                    )
                   )}
                 </div>
               </div>
