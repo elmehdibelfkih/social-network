@@ -12,7 +12,7 @@ export default function TabbedNavigation({ id, eventCount, memberscount }: { id:
     { id: 'posts', label: 'Posts', route: `/groups/${id}/posts` },
     { id: 'events', label: 'Events', count: eventCount, route: `/groups/${id}/events` },
     { id: 'members', label: 'Members', count: memberscount, route: `/groups/${id}/members` },
-    { id: 'chat', label: 'Chat', count: memberscount, route: `/groups/${id}/chat` }
+    { id: 'chat', label: 'Chat', route: `/groups/${id}/chat` }
   ];
 
   const redirect = (route: string) => {
