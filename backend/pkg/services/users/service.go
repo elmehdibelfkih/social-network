@@ -101,7 +101,6 @@ func GetUserProfile(w http.ResponseWriter, profileUserId, viewerUserId int64, co
 	return response, true
 }
 
-
 // GetUserStats retrieves user statistics
 func GetUserStats(w http.ResponseWriter, userId int64, context string) (UserStatsResponseJson, bool) {
 	var response UserStatsResponseJson
@@ -164,11 +163,39 @@ func GetUserStats(w http.ResponseWriter, userId int64, context string) (UserStat
 	return response, true
 }
 
+
+// UpdateUserPrivacy updates a user's privacy setting
+func UpdateUserPrivacy(w http.ResponseWriter, userId int64, req *UpdatePrivacyRequestJson, context string) (UpdatePrivacyResponseJson, bool) {
+	var response UpdatePrivacyResponseJson
+
+	// Validate privacy value
+	if req.Privacy != "public" && req.Privacy != "private" {
+		utils.BadRequest(w, "Privacy must be 'public' or 'private'.", "alert")
+		return response, false
+	}
+
+	// Update privacy
+	err := UpdateUserPrivacyInDB(userId, req.Privacy)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			utils.NotFoundError(w, "User profile not found.")
+			return response, false
+		}
+		utils.BackendErrorTarget(err, context)
+		utils.InternalServerError(w)
+		return response, false
+	}
+
+	response.Message = "Profile privacy updated successfully."
+	response.Privacy = req.Privacy
+	return response, true
+}
+
 // updates a user's profile
 func UpdateUserProfile(w http.ResponseWriter, userId int64, req *UpdateProfileRequestJson, context string) (UpdateProfileResponseJson, bool) {
 	var response UpdateProfileResponseJson
 
-	// Get current user profile
+	// Get current user profile to merge with updates
 	currentProfile, err := SelectUserProfileById(userId)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -212,17 +239,17 @@ func UpdateUserProfile(w http.ResponseWriter, userId int64, req *UpdateProfileRe
 	// Nickname
 	if req.Nickname != nil {
 		cleanNick := strings.TrimSpace(*req.Nickname)
-		if cleanNick == "" {
-			nickname = nil
+		if cleanNick == "" { nickname = nil
 		} else {
-			ok, clean := utils.FirstNameLastName(cleanNick)
-			if !ok {
-				utils.BadRequest(w, cleanNick, "alert")
+
+			if len(cleanNick) < 3 || len(cleanNick) > 50 {
+				utils.BadRequest(w, "Nickname length must be between 3 and 50 characters.", "alert")
 				return response, false
 			}
+		
 			// Check uniqueness only if changed
-			if currentProfile.Nickname == nil || clean != *currentProfile.Nickname {
-				nicknameExists, err := SelectNicknameExists(clean, userId)
+			if currentProfile.Nickname == nil || cleanNick != *currentProfile.Nickname {
+				nicknameExists, err := SelectNicknameExists(cleanNick, userId)
 				if err != nil {
 					utils.BackendErrorTarget(err, context)
 					utils.InternalServerError(w)
@@ -233,7 +260,7 @@ func UpdateUserProfile(w http.ResponseWriter, userId int64, req *UpdateProfileRe
 					return response, false
 				}
 			}
-			nickname = &clean
+			nickname = &cleanNick
 		}
 	}
 
@@ -291,7 +318,7 @@ func UpdateUserProfile(w http.ResponseWriter, userId int64, req *UpdateProfileRe
 		email = cleanEmail
 	}
 
-	// Account deletion
+	// Handle account deletion if requested
 	if req.DeleteAccount != nil && *req.DeleteAccount {
 		utils.BackendErrorTarget(nil, "Account deletion requested for user: "+string(rune(userId)))
 		err := DeleteUserAccount(userId)
@@ -304,13 +331,15 @@ func UpdateUserProfile(w http.ResponseWriter, userId int64, req *UpdateProfileRe
 		return response, true
 	}
 
-	// Password change
+	// Validate password change if requested
 	if req.CurrentPassword != nil && req.Password != nil {
+		// Both current and new password must be provided
 		if *req.CurrentPassword == "" || *req.Password == "" {
-			utils.BadRequest(w, "Both current and new password are required.", "alert")
+			utils.BadRequest(w, "Both current password and new password are required.", "alert")
 			return response, false
 		}
 
+		// Verify current password
 		currentPasswordHash, err := SelectUserPasswordHash(userId)
 		if err != nil {
 			utils.BackendErrorTarget(err, context)
@@ -323,6 +352,7 @@ func UpdateUserProfile(w http.ResponseWriter, userId int64, req *UpdateProfileRe
 			return response, false
 		}
 
+		// Hash new password
 		newPasswordHash := *req.Password
 		err = utils.GeneratePasswordHash(&newPasswordHash)
 		if err != nil {
@@ -331,6 +361,7 @@ func UpdateUserProfile(w http.ResponseWriter, userId int64, req *UpdateProfileRe
 			return response, false
 		}
 
+		// Update password
 		err = UpdateUserPasswordInDB(userId, newPasswordHash)
 		if err != nil {
 			utils.BackendErrorTarget(err, context)
@@ -338,11 +369,12 @@ func UpdateUserProfile(w http.ResponseWriter, userId int64, req *UpdateProfileRe
 			return response, false
 		}
 	} else if req.CurrentPassword != nil || req.Password != nil {
-		utils.BadRequest(w, "Both current and new password must be provided to change password.", "alert")
+		// If only one password field is provided, it's an error
+		utils.BadRequest(w, "Both current password and new password must be provided to change password.", "alert")
 		return response, false
 	}
 
-	// Update profile in DB
+	// Update profile
 	err = UpdateUserProfileInDB(userId, firstName, lastName, nickname, aboutMe, avatarId, dateOfBirth, email)
 	if err != nil {
 		utils.BackendErrorTarget(err, context)
@@ -350,191 +382,6 @@ func UpdateUserProfile(w http.ResponseWriter, userId int64, req *UpdateProfileRe
 		return response, false
 	}
 
-	response.Message = "Updated successfully."
+	response.Message = "Updated successful."
 	return response, true
 }
-
-// // updates a user's profile
-// func UpdateUserProfile(w http.ResponseWriter, userId int64, req *UpdateProfileRequestJson, context string) (UpdateProfileResponseJson, bool) {
-// 	var response UpdateProfileResponseJson
-
-// 	// Get current user profile to merge with updates
-// 	currentProfile, err := SelectUserProfileById(userId)
-// 	if err != nil {
-// 		if errors.Is(err, sql.ErrNoRows) {
-// 			utils.NotFoundError(w, "User profile not found.")
-// 			return response, false
-// 		}
-// 		utils.BackendErrorTarget(err, context)
-// 		utils.InternalServerError(w)
-// 		return response, false
-// 	}
-
-// 	// Prepare update values
-// 	firstName := currentProfile.FirstName
-// 	lastName := currentProfile.LastName
-// 	nickname := currentProfile.Nickname
-// 	aboutMe := currentProfile.AboutMe
-// 	avatarId := currentProfile.AvatarId
-// 	dateOfBirth := currentProfile.DateOfBirth
-// 	email := currentProfile.Email
-
-// 	if req.FirstName != nil {
-// 		firstName = *req.FirstName
-// 	}
-// 	if req.LastName != nil {
-// 		lastName = *req.LastName
-// 	}
-// 	if req.Nickname != nil {
-// 		// Normalize empty or whitespace-only nicknames to nil (no nickname)
-// 		if strings.TrimSpace(*req.Nickname) == "" {
-// 			nickname = nil
-// 		} else {
-// 			nickname = req.Nickname
-// 		}
-// 	}
-// 	if req.AboutMe != nil {
-// 		aboutMe = req.AboutMe
-// 	}
-// 	// Handle avatar update explicitly (including null values)
-// 	if req.AvatarId != nil {
-// 		if *req.AvatarId == -1 {
-// 			// Special case: -1 means remove avatar (set to null)
-// 			avatarId = nil
-// 		} else {
-// 			avatarId = req.AvatarId
-// 		}
-// 	}
-// 	if req.DateOfBirth != nil {
-// 		dateOfBirth = *req.DateOfBirth
-// 	}
-// 	if req.Email != nil {
-// 		email = *req.Email
-// 	}
-
-// 	// Validate email uniqueness if changed
-// 	if req.Email != nil && *req.Email != currentProfile.Email {
-// 		emailExists, err := SelectEmailExists(email, userId)
-// 		if err != nil {
-// 			utils.BackendErrorTarget(err, context)
-// 			utils.InternalServerError(w)
-// 			return response, false
-// 		}
-// 		if emailExists {
-// 			utils.BadRequest(w, "Email already exists.", "alert")
-// 			return response, false
-// 		}
-// 	}
-
-// 	// Validate nickname uniqueness if changed
-// 	if req.Nickname != nil {
-// 		if *req.Nickname != "" {
-// 			if currentProfile.Nickname == nil || *req.Nickname != *currentProfile.Nickname {
-// 				nicknameExists, err := SelectNicknameExists(*req.Nickname, userId)
-// 				if err != nil {
-// 					utils.BackendErrorTarget(err, context)
-// 					utils.InternalServerError(w)
-// 					return response, false
-// 				}
-// 				if nicknameExists {
-// 					utils.BadRequest(w, "Nickname already exists.", "alert")
-// 					return response, false
-// 				}
-// 			}
-// 		}
-// 	}
-
-// 	// Handle account deletion if requested
-// 	if req.DeleteAccount != nil && *req.DeleteAccount {
-// 		utils.BackendErrorTarget(nil, "Account deletion requested for user: "+string(rune(userId)))
-// 		err := DeleteUserAccount(userId)
-// 		if err != nil {
-// 			utils.BackendErrorTarget(err, context+" - DeleteUserAccount failed")
-// 			utils.InternalServerError(w)
-// 			return response, false
-// 		}
-// 		response.Message = "Account deleted successfully."
-// 		return response, true
-// 	}
-
-// 	// Validate password change if requested
-// 	if req.CurrentPassword != nil && req.Password != nil {
-// 		// Both current and new password must be provided
-// 		if *req.CurrentPassword == "" || *req.Password == "" {
-// 			utils.BadRequest(w, "Both current password and new password are required.", "alert")
-// 			return response, false
-// 		}
-		
-// 		// Verify current password
-// 		currentPasswordHash, err := SelectUserPasswordHash(userId)
-// 		if err != nil {
-// 			utils.BackendErrorTarget(err, context)
-// 			utils.InternalServerError(w)
-// 			return response, false
-// 		}
-		
-// 		if !utils.CheckPasswordHash(*req.CurrentPassword, currentPasswordHash) {
-// 			utils.BadRequest(w, "Current password is incorrect.", "alert")
-// 			return response, false
-// 		}
-		
-// 		// Hash new password
-// 		newPasswordHash := *req.Password
-// 		err = utils.GeneratePasswordHash(&newPasswordHash)
-// 		if err != nil {
-// 			utils.BackendErrorTarget(err, context)
-// 			utils.InternalServerError(w)
-// 			return response, false
-// 		}
-		
-// 		// Update password
-// 		err = UpdateUserPasswordInDB(userId, newPasswordHash)
-// 		if err != nil {
-// 			utils.BackendErrorTarget(err, context)
-// 			utils.InternalServerError(w)
-// 			return response, false
-// 		}
-// 	} else if req.CurrentPassword != nil || req.Password != nil {
-// 		// If only one password field is provided, it's an error
-// 		utils.BadRequest(w, "Both current password and new password must be provided to change password.", "alert")
-// 		return response, false
-// 	}
-
-// 	// Update profile
-// 	err = UpdateUserProfileInDB(userId, firstName, lastName, nickname, aboutMe, avatarId, dateOfBirth, email)
-// 	if err != nil {
-// 		utils.BackendErrorTarget(err, context)
-// 		utils.InternalServerError(w)
-// 		return response, false
-// 	}
-
-// 	response.Message = "Updated successful."
-// 	return response, true
-// }
-
-// // UpdateUserPrivacy updates a user's privacy setting
-// func UpdateUserPrivacy(w http.ResponseWriter, userId int64, req *UpdatePrivacyRequestJson, context string) (UpdatePrivacyResponseJson, bool) {
-// 	var response UpdatePrivacyResponseJson
-
-// 	// Validate privacy value
-// 	if req.Privacy != "public" && req.Privacy != "private" {
-// 		utils.BadRequest(w, "Privacy must be 'public' or 'private'.", "alert")
-// 		return response, false
-// 	}
-
-// 	// Update privacy
-// 	err := UpdateUserPrivacyInDB(userId, req.Privacy)
-// 	if err != nil {
-// 		if errors.Is(err, sql.ErrNoRows) {
-// 			utils.NotFoundError(w, "User profile not found.")
-// 			return response, false
-// 		}
-// 		utils.BackendErrorTarget(err, context)
-// 		utils.InternalServerError(w)
-// 		return response, false
-// 	}
-
-// 	response.Message = "Profile privacy updated successfully."
-// 	response.Privacy = req.Privacy
-// 	return response, true
-// }
