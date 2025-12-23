@@ -2,6 +2,7 @@ package socket
 
 import (
 	"database/sql"
+	"fmt"
 
 	"social/pkg/db/database"
 	"social/pkg/utils"
@@ -189,6 +190,7 @@ func InsertNotification(n Notification, actorId int64, tx *sql.Tx) error {
 		utils.SQLiteErrorTarget(err, SELECT_ACTOR_BY_ID)
 		return err
 	}
+
 	n.ActorName = first + " " + last
 	n.ActorAvatarId = avatarId
 	err = tx.QueryRow(SELECT_NOTIFCATION, n.UserId, n.Type, n.RefrenceType, n.RefrenceId).Scan(&id)
@@ -227,6 +229,7 @@ func InsertNotification(n Notification, actorId int64, tx *sql.Tx) error {
 		utils.SQLiteErrorTarget(err, UPSERT_NOTIFICATION)
 		return err
 	}
+	fmt.Println("notificatin struct", n)
 
 	WSManger.Notify(n)
 	return nil
