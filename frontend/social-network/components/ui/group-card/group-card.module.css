@@ -8,18 +8,18 @@
 }
 
 /* Purple Header */
-.group-card-header {
+.groupCardHeader {
   height: 8rem;
   background: linear-gradient(to bottom right, #9333ea, #a855f7, #9333ea);
 }
 
 /* Content Container */
-.group-card-content {
+.groupCardContent {
   padding: 1.5rem;
 }
 
 /* Title */
-.group-card-title {
+.groupCardTitle {
   font-size: 1.25rem;
   font-weight: 700;
   color: #111827;
@@ -27,7 +27,7 @@
 }
 
 /* Description */
-.group-card-description {
+.groupCardDescription {
   color: #4b5563;
   font-size: 0.875rem;
   margin-bottom: 1rem;
@@ -35,25 +35,25 @@
 }
 
 /* Member Count Container */
-.group-card-members {
+.groupCardMembers {
   display: flex;
   align-items: center;
   color: #6b7280;
   margin-bottom: 1rem;
 }
 
-.group-card-members-icon {
+.groupCardMembersIcon {
   width: 1rem;
   height: 1rem;
   margin-right: 0.5rem;
 }
 
-.group-card-members-text {
+.groupCardMembersText {
   font-size: 0.875rem;
 }
 
 /* Event Card */
-.group-card-event {
+.groupCardEvent {
   background-color: #fff7ed;
   border-radius: 0.5rem;
   padding: 0.875rem;
@@ -61,12 +61,12 @@
   border: 1px solid #fed7aa;
 }
 
-.group-card-event-content {
+.groupCardEventContent {
   display: flex;
   align-items: flex-start;
 }
 
-.group-card-event-icon {
+.groupCardEventIcon {
   width: 1.25rem;
   height: 1.25rem;
   color: #9333ea;
@@ -75,27 +75,27 @@
   flex-shrink: 0;
 }
 
-.group-card-event-title {
+.groupCardEventTitle {
   font-weight: 600;
   color: #111827;
   font-size: 0.875rem;
   margin-bottom: 0.125rem;
 }
 
-.group-card-event-date {
+.groupCardEventDate {
   font-size: 0.75rem;
   color: #4b5563;
 }
 
 /* Buttons Container */
-.group-card-buttons {
+.groupCardButtons {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
 }
 
 /* Base Button Styles */
-.group-card-btn {
+.groupCardBtn {
   width: 100%;
   font-weight: 600;
   padding: 0.75rem;
@@ -107,17 +107,17 @@
 }
 
 /* Primary Button (View Group) */
-.group-card-btn-primary {
+.groupCardBtnPrimary {
   background-color: #9333ea;
   color: white;
 }
 
-.group-card-btn-primary:hover {
+.groupCardBtnPrimary:hover {
   background-color: #7e22ce;
 }
 
 /* Secondary Button (Invite Users) */
-.group-card-btn-secondary {
+.groupCardBtnSecondary {
   background-color: white;
   color: #9333ea;
   border: 1px solid #d1d5db;
@@ -126,36 +126,36 @@
   justify-content: center;
 }
 
-.group-card-btn-secondary:hover {
+.groupCardBtnSecondary:hover {
   background-color: #f9fafb;
 }
 
 /* Join Button */
-.group-card-btn-join {
+.groupCardBtnJoin {
   background-color: white;
   color: #111827;
   border: 1px solid #d1d5db;
 }
 
-.group-card-btn-join:hover {
+.groupCardBtnJoin:hover {
   background-color: #f9fafb;
 }
 
 /* Grid Container */
-.group-cards-grid {
+.groupCardsGrid {
   display: grid;
   grid-template-columns: 1fr;
   gap: 1.5rem;
 }
 
 @media (min-width: 768px) {
-  .group-cards-grid {
+  .groupCardsGrid {
     grid-template-columns: repeat(2, 1fr);
   }
 }
 
 /* Icon inside button */
-.btn-icon {
+.btnIcon {
   width: 1rem;
   height: 1rem;
   margin-right: 0.5rem;
