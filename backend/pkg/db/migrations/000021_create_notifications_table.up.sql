@@ -2,7 +2,7 @@ CREATE TABLE
   IF NOT EXISTS notifications (
     id INTEGER PRIMARY KEY,
     actor_name TEXT NOT NULL,
-    actor_avatar_id INTEGER NOT NULL, 
+    actor_avatar_id INTEGER , 
     user_id INTEGER NOT NULL,
     type TEXT NOT NULL CHECK (
       type IN (

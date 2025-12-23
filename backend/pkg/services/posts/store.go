@@ -518,10 +518,6 @@ func CreatePostReaction(postID, userID int64, reaction string) error {
 			utils.SQLiteErrorTarget(err, "CreatePostReaction")
 			return fmt.Errorf("failed to create reaction: %w", err)
 		}
-		var status = "suspended"
-		if reaction == "like" {
-			status = "active"
-		}
 		err = socket.InsertNotification(socket.Notification{
 			NotificationId: utils.GenerateID(),
 			UserId:         authorID,
@@ -529,7 +525,7 @@ func CreatePostReaction(postID, userID int64, reaction string) error {
 			RefrenceId:     postID,
 			RefrenceType:   "post",
 			Content:        "new reaction",
-			Status:         status,
+			Status:         "active",
 		}, userID, tx)
 		if err != nil {
 			utils.SQLiteErrorTarget(err, "failed to insert notification")
@@ -580,6 +576,19 @@ func DeletePostReaction(postID, userID int64) error {
 
 		if rowsAffected == 0 {
 			return sql.ErrNoRows
+		}
+
+		err = socket.InsertNotification(socket.Notification{
+			NotificationId: utils.GenerateID(),
+			UserId:         authorID,
+			Type:           "post_liked",
+			RefrenceId:     postID,
+			RefrenceType:   "post",
+			Content:        "new reaction",
+			Status:         "suspended",
+		}, userID, tx)
+		if err != nil {
+			utils.SQLiteErrorTarget(err, "failed to insert notification")
 		}
 
 		// Decrement post's reactions_count

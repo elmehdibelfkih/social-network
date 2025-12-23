@@ -181,19 +181,19 @@ func UpdateMessagesStatus(chatId, senderId int64, status string) error {
 
 func InsertNotification(n Notification, actorId int64, tx *sql.Tx) error {
 	var id int64
-	var avatarId int64
+	var avatarId *int64
 	var first string
 	var last string
 	err := tx.QueryRow(SELECT_ACTOR_BY_ID, actorId).Scan(&first, &last, &avatarId)
 	if err != nil {
-		utils.SQLiteErrorTarget(err, UPSERT_NOTIFICATION)
+		utils.SQLiteErrorTarget(err, SELECT_ACTOR_BY_ID)
 		return err
 	}
 	n.ActorName = first + " " + last
 	n.ActorAvatarId = avatarId
 	err = tx.QueryRow(SELECT_NOTIFCATION, n.UserId, n.Type, n.RefrenceType, n.RefrenceId).Scan(&id)
-	if err != nil {
-		utils.SQLiteErrorTarget(err, UPSERT_NOTIFICATION)
+	if err != nil && err != sql.ErrNoRows {
+		utils.SQLiteErrorTarget(err, SELECT_NOTIFCATION)
 		return err
 	}
 	if id != 0 {

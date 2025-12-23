@@ -101,6 +101,10 @@ func SocialMux() *router.Router {
 	// Reactions
 	socialMux.HandleFunc("POST", "/api/v1/posts/{post_id}/like", utils.MiddlewareChain(posts.HandleLikePost, middleware.UserContext, middleware.AuthMiddleware, posts.PostViewMiddleware))
 	socialMux.HandleFunc("DELETE", "/api/v1/posts/{post_id}/like", utils.MiddlewareChain(posts.HandleUnlikePost, middleware.UserContext, middleware.AuthMiddleware, posts.PostViewMiddleware))
+
+
+
+	
 	socialMux.HandleFunc("POST", "/api/v1/comments/{comment_id}/like", utils.MiddlewareChain(posts.HandleLikeComment, middleware.UserContext, middleware.AuthMiddleware))
 	socialMux.HandleFunc("DELETE", "/api/v1/comments/{comment_id}/like", utils.MiddlewareChain(posts.HandleUnlikeComment, middleware.UserContext, middleware.AuthMiddleware))
 
