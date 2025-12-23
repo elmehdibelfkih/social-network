@@ -9,6 +9,7 @@ import { useDebounceCbf } from "@/libs/debounce";
 import TypingIndicator from "./typing.indicator";
 import AvatarHolder from "@/components/ui/avatar_holder/avatarholder.client";
 import { Group } from "../group_card";
+import { EmojiIcon, UserPlusIcon } from "@/components/ui/icons";
 
 interface GroupChatConversationProps {
     chatId: number;
@@ -340,7 +341,7 @@ export default function GroupChatConversation({ chatId, group }: GroupChatConver
                     ref={inputRef}
                 />
                 <button ref={emojiBtnRef} type="button" className={styles.emojiBtn} onClick={handleEmojiPallete}>
-                    <img src="/svg/smile.svg" alt="" />
+                    <EmojiIcon />
                 </button>
                 <button type="submit" disabled={isLoading} className={styles.sendBtn}>
                     <img src="/svg/send-horizontal.svg" alt="" />
