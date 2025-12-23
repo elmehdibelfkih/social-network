@@ -31,7 +31,7 @@ export function NotificationProvider({ children }) {
         try {
             const notificationsResponse = await notificationsService.getNotifications(20)
 
-            const activeNotifications = notificationsResponse.notifications.filter(
+            const activeNotifications = notificationsResponse.notifications?.filter(
                 (notif) => notif.status === 'active'
             )
             setNotifications(activeNotifications)
