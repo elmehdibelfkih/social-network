@@ -67,6 +67,7 @@ type BrowseGroupsResponseJson struct {
 
 type GroupItemJson struct {
 	GroupId     int64  `json:"groupId"`
+	Status	  	string `json:"status"`
 	Title       string `json:"title"`
 	Description string `json:"description"`
 	AvatarId    *int64 `json:"avatarId"` // optional

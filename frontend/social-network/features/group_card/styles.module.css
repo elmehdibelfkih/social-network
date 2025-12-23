@@ -426,3 +426,16 @@
   color: #666;
   font-size: 14px;
 }
+
+
+.btn_pending {
+  width: 100%;
+  padding: 12px 24px;
+  background-color: #f3f4f6;
+  color: #6b7280;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: not-allowed;
+}

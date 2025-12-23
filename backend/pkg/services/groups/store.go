@@ -136,6 +136,15 @@ func SelectOtherGroupsByUserId(limit, userId int64, offset int64, l *BrowseGroup
 				return err
 			}
 		}
+		var exist bool
+		err := config.DB.QueryRow(SELECT_GROUP_MEMBER_PENDING,item.GroupId,userId,).Scan(&exist)
+		if err != nil {
+			utils.SQLiteErrorTarget(err, SELECT_BROWSE_OTHER_GROUPS_BY_USER)
+			return err
+		}
+		if (exist) {
+			item.Status = "pending"
+		} 
 		l.TotalGroups++
 		l.Groups = append(l.Groups, item)
 	}
@@ -552,7 +561,7 @@ func UpdateMemberStatusAccepted(chatId, groupId, userId int64, a *AcceptMemberRe
 			utils.SQLiteErrorTarget(err, database.GROUP_ENTITY_TYPE)
 			return err
 		}
-			_, err = tx.Exec(INSERT_GROUP_CHAT_MEMBER, chatId, userId)
+		_, err = tx.Exec(INSERT_GROUP_CHAT_MEMBER, chatId, userId)
 		if err != nil {
 			utils.SQLiteErrorTarget(err, INSERT_GROUP_CHAT_MEMBER)
 			return err
