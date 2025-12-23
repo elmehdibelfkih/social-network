@@ -5,7 +5,6 @@ import type { NotificationProps } from './shared-types'
 import styles from './styles.module.css'
 import AvatarHolder from '@/components/ui/avatar_holder/avatarholder.client'
 import { http } from '@/libs/apiFetch'
-import { ProfileAPIResponse } from '@/libs/globalTypes'
 import { formatTimeAgo } from '@/libs/helpers'
 import { useRouter } from 'next/navigation'
 
@@ -20,7 +19,6 @@ function EventCard({ title, date }: { title: string, date: string }) {
 
 export function EventNotification({ notification, onMarkAsRead }: NotificationProps) {
   const [event, setEvent] = useState<EventType>(null)
-  const [creatorProfile, setCreatorProfile] = useState<ProfileAPIResponse>(null)
   const [isRead, setIsRead] = useState(notification.isRead == 1)
   const router = useRouter()
 
@@ -34,12 +32,8 @@ export function EventNotification({ notification, onMarkAsRead }: NotificationPr
       const eventResponse = await http.get<EventType>(`/api/v1/events/${notification.referenceId}`)
       console.log('Event response:', eventResponse)
       setEvent(eventResponse)
-
-      const profileResponse = await http.get<ProfileAPIResponse>(`/api/v1/users/${eventResponse.createdBy}/profile`)
-      console.log('Creator profile response:', profileResponse)
-      setCreatorProfile(profileResponse)
     } catch (error) {
-      console.error('Failed to fetch event or creator profile:', error)
+      console.error('Failed to fetch event:', error)
     }
   }
 
@@ -58,7 +52,7 @@ export function EventNotification({ notification, onMarkAsRead }: NotificationPr
     }
   }
 
-  if (!event || !creatorProfile) {
+  if (!event) {
     return (
       <div className={styles.notifContainer}>
         <div>Loading...</div>
@@ -69,7 +63,7 @@ export function EventNotification({ notification, onMarkAsRead }: NotificationPr
   return (
     <div className={isRead ? styles.readNotif : styles.notifContainer} onClick={handleClick}>
       <div className={styles.avatar}>
-        <AvatarHolder avatarId={creatorProfile.avatarId} />
+        <AvatarHolder avatarId={notification.actorAvatarId} />
       </div>
 
       <div className={styles.contentSection}>

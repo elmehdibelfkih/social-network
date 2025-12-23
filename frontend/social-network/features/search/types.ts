@@ -42,5 +42,11 @@ export interface Group {
   avatarId?: number | null; // Optional field (might be undefined)
   creatorId: number;
   memberCount: number;
+  status: 'accepted' | 'pending' | 'declined' | null;
+  chatId?: number;
   createdAt?: string;
+  upcomingEvent?: {
+    title: string;
+    date: string;
+  };
 }

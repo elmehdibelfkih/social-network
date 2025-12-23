@@ -39,8 +39,7 @@ export function ChatSection() {
     useEffect(() => {
 
         const onUnMount = chatService.addListener((data) => {
-            console.log("received from sharedworker:", data);
-            console.log(data.type);
+            console.log("received from sharedworker:", data.type, data);
             switch (data.type) {
                 case 'online_status':
                     setUsers(data?.payload?.onlineStatus.onlineUsers)

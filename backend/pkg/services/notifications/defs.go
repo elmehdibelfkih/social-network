@@ -18,6 +18,8 @@ type Notification struct {
 	ID            int64   `json:"notificationId" db:"id"`
 	UserID        int64   `json:"-" db:"user_id"`
 	Type          string  `json:"type" db:"type"`
+	ActorName     string  `json:"actorName"`
+	ActorAvatarId *int64  `json:"actorAvatarId"`
 	ReferenceType string  `json:"referenceType" db:"reference_type"`
 	ReferenceID   *int64  `json:"referenceId" db:"reference_id"`
 	Content       *string `json:"content" db:"content"`

@@ -51,6 +51,7 @@ func InviteMember(w http.ResponseWriter, r *http.Request,
 	targetId := utils.GetWildCardValue(w, r, "user_id")
 	groupId := utils.GetWildCardValue(w, r, "group_id")
 	if !ValidRelationship(w, r, targetId, context) {
+		utils.Unauthorized(w, "You must be following or followed by this user to invite them")
 		return false
 	}
 	err := InsertNewGroupMember(sourceId, targetId, groupId, "pending", "member", "group_invite", response)

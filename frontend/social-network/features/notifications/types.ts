@@ -25,6 +25,8 @@ export type Notification = {
     isRead: number
     createdAt: string
     readAt?: string
+    actorName?: string
+    actorAvatarId?: number
 }
 
 export type GroupType = {

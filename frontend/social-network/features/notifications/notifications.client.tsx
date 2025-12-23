@@ -12,8 +12,9 @@ import {
 import { BellIcon } from '@/components/ui/icons'
 import { useNotifications } from '@/providers/notifsProvider'
 import { useUserStats } from '@/providers/userStatsContext'
+import { chatService } from '../chat'
 
-export function NotificationsDropdown() {
+export function Notifications() {
   const [isOpen, setIsOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
   const scrollContainerRef = useRef<HTMLDivElement>(null)
@@ -25,13 +26,20 @@ export function NotificationsDropdown() {
     loadMore,
     markAsRead,
     markAllAsRead,
+    prependNotifications
   } = useNotifications()
 
   const { state: userStats } = useUserStats()
   const unreadCount = userStats.unreadNotifications
 
-  console.log('NotificationsDropdown - userStats:', userStats)
-  console.log('NotificationsDropdown - unreadCount:', unreadCount)
+  useEffect(() => {
+    const onUnMount = chatService.addListener((data) => {
+      if (data.type == 'notification') {
+        prependNotifications(data.payload.notification)
+      }
+    })
+    return onUnMount
+  }, [prependNotifications])
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -121,8 +129,8 @@ export function NotificationsDropdown() {
                       return <EventNotification key={notification.notificationId} {...props} />
                     case 'post_liked':
                       return <PostLikedNotification key={notification.notificationId} {...props} />
-                    // case 'post_commented':
-                    //   return <PostCommentedNotification key={notification.notificationId} {...props} />
+                    case 'post_commented':
+                      return <PostCommentedNotification key={notification.notificationId} {...props} />
                     case 'custom':
                       return <CustomNotification key={notification.notificationId} {...props} />
                     default:

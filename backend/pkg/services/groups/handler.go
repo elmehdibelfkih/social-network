@@ -1,6 +1,7 @@
 package groups
 
 import (
+	"fmt"
 	"net/http"
 
 	"social/pkg/utils"
@@ -29,7 +30,9 @@ func PostInviteMember(w http.ResponseWriter, r *http.Request) {
 	if !InviteMember(w, r, &response, "InviteMember handler") {
 		return
 	}
-	InviteMemberHttp(w, response)
+	fmt.Println("xxxxxx", response)
+	utils.WriteSuccess(w, http.StatusOK, response)
+	// InviteMemberHttp(w, response)
 }
 
 func PostJoinGroup(w http.ResponseWriter, r *http.Request) {
@@ -104,7 +107,6 @@ func GetGroupsInfoByuserId(w http.ResponseWriter, r *http.Request) {
 	GetGroupsInfoHttp(w, response)
 }
 
-
 func GetOtherGroupsInfoByuserId(w http.ResponseWriter, r *http.Request) {
 	var response BrowseGroupsResponseJson
 	if !OtherGroupsInfoByuser(w, r, &response, "GroupsInfoByuser handler") {
@@ -112,8 +114,6 @@ func GetOtherGroupsInfoByuserId(w http.ResponseWriter, r *http.Request) {
 	}
 	GetGroupsInfoHttp(w, response)
 }
-
-
 
 func GetGroupMembers(w http.ResponseWriter, r *http.Request) {
 	var response ListGroupMembersResponseJson

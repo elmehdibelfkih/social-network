@@ -1,24 +1,8 @@
 import React from 'react';
-import { Users, Calendar, UserPlus } from 'lucide-react';
 import styles from '@/components/ui/group-card/group-card.module.css'
-import { CalendarIcon, ProfileIcon, GroupsIcon } from '@/components/ui/icons';
-
-// Types
-interface Group {
-  groupId: number;
-  title: string;
-  description: string;
-  avatarId?: number;
-  creatorId: number;
-  memberCount: number;
-  status: 'accepted' | 'pending' | 'declined' | null;
-  chatId?: number;
-  createdAt: string;
-  upcomingEvent?: {
-    title: string;
-    date: string;
-  };
-}
+import { CalendarIcon, ProfileIcon, GroupsIcon, UserPlusIcon } from '@/components/ui/icons';
+import AvatarHolder from '../avatar_holder/avatarholder.client';
+import { Group } from '@/features/search/types';
 
 interface GroupCardProps {
   group: Group;
@@ -27,12 +11,7 @@ interface GroupCardProps {
   onInviteUsers: (groupId: number) => void;
 }
 
-const GroupCard: React.FC<GroupCardProps> = ({
-  group,
-  onJoinGroup,
-  onViewGroup,
-  onInviteUsers
-}) => {
+export function GroupCard({ group, onJoinGroup, onViewGroup, onInviteUsers }: GroupCardProps) {
   const isJoined = group.status === 'accepted';
 
   const formatEventDate = (dateString: string) => {
@@ -54,39 +33,33 @@ const GroupCard: React.FC<GroupCardProps> = ({
 
   return (
     <div className={styles.groupcard}>
-      {/* Purple Header */}
-      <div className="group-card-header"></div>
+      <div className={styles.groupCardHeader}></div>
 
-      {/* Content */}
-      <div className="group-card-content">
-        {/* Title */}
-        <h3 className="group-card-title">{group.title}</h3>
+      <div className={styles.groupCardContent}>
+        <AvatarHolder avatarId={group.avatarId} />
+        <h3 className={styles.groupCardTitle}>{group.title}</h3>
 
-        {/* Description */}
-        <p className="group-card-description">
+        <p className={styles.groupCardDescription}>
           {group.description}
         </p>
 
-        {/* Member Count */}
-        <div className="group-card-members">
+        <div className={styles.groupCardMembers}>
           <GroupsIcon />
-          <span className="group-card-members-text">
+          <span className={styles.groupCardMembersText}>
             {group.memberCount}{' '}
             {group.memberCount === 1 ? 'member' : 'members'}
           </span>
         </div>
 
-        {/* Upcoming Event */}
         {group.upcomingEvent && (
-          <div className="group-card-event">
-            <div className="group-card-event-content">
-              {/* <Calendar className="group-card-event-icon" /> */}
+          <div className={styles.groupCardEvent}>
+            <div className={styles.groupCardEventContent}>
               <CalendarIcon />
               <div>
-                <h4 className="group-card-event-title">
+                <h4 className={styles.groupCardEventTitle}>
                   {group.upcomingEvent.title}
                 </h4>
-                <p className="group-card-event-date">
+                <p className={styles.groupCardEventDate}>
                   {formatEventDate(group.upcomingEvent.date)}
                 </p>
               </div>
@@ -94,30 +67,28 @@ const GroupCard: React.FC<GroupCardProps> = ({
           </div>
         )}
 
-        {/* Buttons */}
         {isJoined ? (
-          <div className="group-card-buttons">
+          <div className={styles.groupCardButtons}>
             {/* View Group */}
             <button
               onClick={() => onViewGroup(group.groupId)}
-              className="group-card-btn group-card-btn-primary"
+              className={`${styles.groupCardBtn} ${styles.groupCardBtnPrimary}`}
             >
               View Group
             </button>
 
-            {/* Invite Users */}
             <button
               onClick={() => onInviteUsers(group.groupId)}
-              className="group-card-btn group-card-btn-secondary"
+              className={`${styles.groupCardBtn} ${styles.groupCardBtnSecondary}`}
             >
-              <UserPlus className="btn-icon" />
+              <UserPlusIcon />
               Invite Users
             </button>
           </div>
         ) : (
           <button
             onClick={() => onJoinGroup(group.groupId)}
-            className="group-card-btn group-card-btn-join"
+            className={`${styles.groupCardBtn} ${styles.groupCardBtnJoin}`}
           >
             Join Group
           </button>
@@ -126,34 +97,3 @@ const GroupCard: React.FC<GroupCardProps> = ({
     </div>
   );
 };
-
-// Main Component - Grid of Group Cards
-interface GroupCardsProps {
-  groups: Group[];
-  onJoinGroup: (groupId: number) => void;
-  onViewGroup: (groupId: number) => void;
-  onInviteUsers: (groupId: number) => void;
-}
-
-export const GroupCards: React.FC<GroupCardsProps> = ({
-  groups,
-  onJoinGroup,
-  onViewGroup,
-  onInviteUsers
-}) => {
-  return (
-    <div className="group-cards-grid">
-      {groups.map(group => (
-        <GroupCard
-          key={group.groupId}
-          group={group}
-          onJoinGroup={onJoinGroup}
-          onViewGroup={onViewGroup}
-          onInviteUsers={onInviteUsers}
-        />
-      ))}
-    </div>
-  );
-};
-
-export { GroupCard };

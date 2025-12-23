@@ -312,14 +312,14 @@ func unfollowUser(followerId, followedId int64) error {
 			return err
 		}
 
-		if status != "accepted" {
-			return nil
-		}
-
 		n := followNotification(followerId, followedId, status, "suspended")
 		err = socket.InsertNotification(n, followerId, tx)
 		if err != nil {
 			utils.SQLiteErrorTarget(err, "failed to insert notification")
+		}
+
+		if status != "accepted" {
+			return nil
 		}
 
 		// Update followers count for the followed user

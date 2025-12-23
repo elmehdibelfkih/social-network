@@ -7,7 +7,6 @@ import { ProfileAPIResponse } from "@/libs/globalTypes";
 import { NewPost } from "@/features/newPost";
 import { postsService } from "@/features/posts";
 import { Feed } from "@/features/posts/Feed";
-import { useUserStats } from "@/providers/userStatsContext";
 import { ChatSection } from "@/features/chat";
 import styles from "@/styles/app.module.css"
 

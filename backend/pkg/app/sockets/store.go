@@ -2,7 +2,6 @@ package socket
 
 import (
 	"database/sql"
-	"fmt"
 
 	"social/pkg/db/database"
 	"social/pkg/utils"
@@ -229,7 +228,6 @@ func InsertNotification(n Notification, actorId int64, tx *sql.Tx) error {
 		utils.SQLiteErrorTarget(err, UPSERT_NOTIFICATION)
 		return err
 	}
-	fmt.Println("notificatin struct", n)
 
 	WSManger.Notify(n)
 	return nil

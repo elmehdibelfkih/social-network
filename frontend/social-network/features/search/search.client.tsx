@@ -8,8 +8,9 @@ import { http } from '@/libs/apiFetch'
 import * as types from './types'
 import type { Post } from '@/libs/globalTypes'
 import PostCard from '../posts/PostCard'
-import { AvatarHolder } from '@/components/ui/avatar_holder/avatarholder.client'
 import { useAuth } from '@/providers/authProvider'
+import { useRouter } from 'next/navigation'
+import { GroupCard } from '@/components/ui/group-card/group-card'
 
 export function Search() {
   const { user } = useAuth()
@@ -19,14 +20,33 @@ export function Search() {
   const [searchQuery, setSearchQuery] = useState('')
   const [activeTab, setActiveTab] = useState<'users' | 'groups' | 'posts'>('users')
   const debouncedQuery = useDebounce(searchQuery, 200)
+  const router = useRouter();
 
-  // Load all data on mount
+  const handleJoinGroup = async (groupId: number) => {
+    try {
+      await http.post(`/api/v1/groups/${groupId}/join`, {})
+      setAllGroups(prev => prev.map(group =>
+        group.groupId === groupId ? { ...group, status: 'pending' } : group
+      ))
+    } catch (error) {
+      console.error('Failed to join group:', error)
+    }
+  }
+
+  const handleViewGroup = (groupId: number) => {
+    router.push(`/groups/${groupId}`)
+  }
+
+  const handleInviteUsers = (groupId: number) => {
+    router.push(`/groups/${groupId}/invite`)
+  }
+
   useEffect(() => {
     const loadAllData = async () => {
       try {
         const [usersRes, groupsRes, postsRes] = await Promise.all([
           http.get<types.User[]>('/api/v1/search?q=&type=users'),
-          http.get<types.Group[]>('/api/v1/search?q=&type=groups'), 
+          http.get<types.Group[]>('/api/v1/search?q=&type=groups'),
           http.get<Post[]>('/api/v1/search?q=&type=posts')
         ])
         setAllUsers(usersRes || [])
@@ -38,10 +58,9 @@ export function Search() {
     }
     loadAllData()
 
-    // Listen for post updates and deletions
     const handleUpdatePost = (event: CustomEvent) => {
       const { postId, ...updates } = event.detail
-      setAllPosts(prev => prev.map(post => 
+      setAllPosts(prev => prev.map(post =>
         post.postId === postId ? { ...post, ...updates } : post
       ))
     }
@@ -64,7 +83,7 @@ export function Search() {
   const filteredUsers = allUsers.filter(searchUser => {
     // Exclude current user
     if (user && searchUser.userId === Number(user.userId)) return false
-    
+
     if (!debouncedQuery) return true
     const query = debouncedQuery.toLowerCase()
     return (
@@ -108,19 +127,19 @@ export function Search() {
           required
         />
         <div className={styles.buttonsContainer}>
-          <button 
+          <button
             className={`${styles.filterButton} ${activeTab === 'users' ? styles.active : ''}`}
             onClick={() => setActiveTab('users')}
           >
             Users ({filteredUsers.length})
           </button>
-          <button 
+          <button
             className={`${styles.filterButton} ${activeTab === 'groups' ? styles.active : ''}`}
             onClick={() => setActiveTab('groups')}
           >
             Groups ({filteredGroups.length})
           </button>
-          <button 
+          <button
             className={`${styles.filterButton} ${activeTab === 'posts' ? styles.active : ''}`}
             onClick={() => setActiveTab('posts')}
           >
@@ -140,7 +159,13 @@ export function Search() {
         {activeTab === 'groups' && (
           <div className={styles.resultsGrid}>
             {filteredGroups.map(group => (
-              <GroupCard key={group.groupId} group={group} />
+              <GroupCard
+                key={group.groupId}
+                group={group}
+                onJoinGroup={handleJoinGroup}
+                onViewGroup={handleViewGroup}
+                onInviteUsers={handleInviteUsers}
+              />
             ))}
           </div>
         )}
@@ -173,18 +198,5 @@ function UserCard({ user }: { user: types.User }) {
       chatId: null,
       email: null
     }} />
-  )
-}
-
-function GroupCard({ group }: { group: types.Group }) {
-  return (
-    <div className={styles.groupCard}>
-      <AvatarHolder avatarId={group.avatarId} size={60} />
-      <div className={styles.groupInfo}>
-        <h3>{group.title}</h3>
-        <p>{group.description}</p>
-        <span>{group.memberCount} members</span>
-      </div>
-    </div>
   )
 }
