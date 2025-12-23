@@ -363,3 +363,66 @@
   font-weight: 700;
   font-size: 11px;
 }
+
+
+
+/* Add these styles to your styles.module.css */
+
+/* Infinite scroll sentinel */
+.observer_sentinel {
+  min-height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+/* No more groups message */
+.no_more_groups {
+  text-align: center;
+  padding: 30px;
+  color: #666;
+  font-size: 14px;
+  font-style: italic;
+}
+
+/* Empty state */
+.empty_state {
+  text-align: center;
+  padding: 60px 20px;
+  color: #999;
+  font-size: 16px;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+/* Join Group button */
+.btn_join_group {
+  width: 100%;
+  padding: 12px 24px;
+  background-color: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.btn_join_group:hover:not(:disabled) {
+  background-color: #1d4ed8;
+}
+
+.btn_join_group:disabled {
+  background-color: #93c5fd;
+  cursor: not-allowed;
+}
+
+/* Loading indicator */
+.loading {
+  text-align: center;
+  padding: 20px;
+  color: #666;
+  font-size: 14px;
+}

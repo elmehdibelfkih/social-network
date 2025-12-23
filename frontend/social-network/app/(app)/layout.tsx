@@ -6,10 +6,10 @@ import { http } from "@/libs/apiFetch";
 import { NotificationCount } from "@/libs/globalTypes";
 import { ProfileAPIResponse } from "@/libs/globalTypes";
 import { AuthProvider } from "@/providers/authProvider";
-import { NotificationProvider } from "@/providers/notifsProvider";
 import SharedWorekerClient from "@/components/ui/worker";
 import { UserStatsState } from "@/libs/globalTypes";
 import { Counts } from "@/libs/globalTypes";
+import { NotificationProvider } from "@/providers/notifsProvider";
 
 
 export default async function AppLayout({ children }: { children: ReactNode }) {
@@ -28,7 +28,7 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
   }
   const stats: UserStatsState = {
     userId: profileRes.userId,
-    nickname: profileRes.nickname ,
+    nickname: profileRes.nickname,
     firstName: profileRes.firstName,
     lastName: profileRes.lastName,
     avatarId: profileRes.avatarId,
@@ -36,6 +36,7 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
     dateOfBirth: profileRes.dateOfBirth,
     privacy: profileRes.privacy,
     joinedAt: profileRes.joinedAt,
+    email: profileRes.email,
     email: profileRes.email,
     unreadNotifications: notificationsRes.unreadNotifications,
     postsCount: counts.postsCount,
@@ -50,11 +51,9 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
   return (
     <AuthProvider>
       <UserStatsProvider initialState={stats}>
-        <NotificationProvider>
-          <SharedWorekerClient />
+        <SharedWorekerClient />
           <Navbar />
           {children}
-        </NotificationProvider>
       </UserStatsProvider>
     </AuthProvider>
   );

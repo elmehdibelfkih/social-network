@@ -96,6 +96,102 @@ func SelectGroupsById(limit, lastItemId int64, l *BrowseGroupsResponseJson) erro
 	return err
 }
 
+func SelectOtherGroupsByUserId(limit, userId int64, offset int64,l *BrowseGroupsResponseJson) error {
+	rows, err := config.DB.Query(SELECT_BROWSE_OTHER_GROUPS_BY_USER,
+		userId,
+		limit,
+		offset,
+	)
+	if err != nil {
+		utils.SQLiteErrorTarget(err, SELECT_BROWSE_OTHER_GROUPS_BY_USER)
+		return err
+	}
+	defer rows.Close()
+	l.Limit = limit
+	var item GroupItemJson
+	for rows.Next() {
+		err = rows.Scan(
+			&item.GroupId,
+			&item.Title,
+			&item.Description,
+			&item.AvatarId,
+			&item.CreatorId,
+			&item.CreatedAt,
+		)
+		if err != nil {
+			utils.SQLiteErrorTarget(err, SELECT_BROWSE_OTHER_GROUPS_BY_USER)
+			return err
+		}
+		err = config.DB.QueryRow(SELECT_GROUP_MEMBERS_COUNT,
+			"group",
+			item.GroupId,
+		).Scan(
+			&item.MemberCount,
+		)
+		if err != nil {
+			if err == sql.ErrNoRows {
+				item.MemberCount = 0
+			} else {
+				utils.SQLiteErrorTarget(err, SELECT_GROUP_MEMBERS_COUNT)
+				return err
+			}
+		}
+		l.TotalGroups++
+		l.Groups = append(l.Groups, item)
+	}
+	return err
+}
+
+
+func SelectGroupsByUserId(limit, userId int64, offset int64,l *BrowseGroupsResponseJson) error {
+	rows, err := config.DB.Query(SELECT_BROWSE_GROUPS_BY_USER,
+		userId,
+		limit,
+		offset,
+	)
+	if err != nil {
+		utils.SQLiteErrorTarget(err, SELECT_BROWSE_GROUPS_BY_USER)
+		return err
+	}
+	defer rows.Close()
+	l.Limit = limit
+	var item GroupItemJson
+	for rows.Next() {
+		err = rows.Scan(
+			&item.GroupId,
+			&item.Title,
+			&item.Description,
+			&item.AvatarId,
+			&item.CreatorId,
+			&item.CreatedAt,
+		)
+		if err != nil {
+			utils.SQLiteErrorTarget(err, SELECT_BROWSE_GROUPS_BY_USER)
+			return err
+		}
+		err = config.DB.QueryRow(SELECT_GROUP_MEMBERS_COUNT,
+			"group",
+			item.GroupId,
+		).Scan(
+			&item.MemberCount,
+		)
+		if err != nil {
+			if err == sql.ErrNoRows {
+				item.MemberCount = 0
+			} else {
+				utils.SQLiteErrorTarget(err, SELECT_GROUP_MEMBERS_COUNT)
+				return err
+			}
+		}
+		l.TotalGroups++
+		l.Groups = append(l.Groups, item)
+	}
+	return err
+}
+
+
+
+
 func SelectGroupById(groupId int64, g *GetGroupResponseJson) error {
 	err := config.DB.QueryRow(SELECT_GROUP_BY_GROUP_ID,
 		groupId,
@@ -298,7 +394,7 @@ func InsertNewGroupOwner(groupId, userId int64, status, role string) error {
 	})
 }
 
-func InsertNewGroupMember(targetId, groupId int64, status, role, notificationType string, m *InviteUserResponseJson) error {
+func InsertNewGroupMember(sourceId, targetId, groupId int64, status, role, notificationType string, m *InviteUserResponseJson) error {
 	return database.WrapWithTransaction(func(tx *sql.Tx) error {
 		err := tx.QueryRow(INSERT_GROUP_MEMBER_BY_GROUP_ID,
 			groupId,
@@ -333,11 +429,11 @@ func InsertNewGroupMember(targetId, groupId int64, status, role, notificationTyp
 			Type:           notificationType,
 			RefrenceId:     groupId,
 			RefrenceType:   "group",
-			Content:        "you have been invated to group",
+			Content:        "you have been invated to a group",
 			Status:         "active",
-		}, tx)
+		}, sourceId, tx)
 		if err != nil {
-			utils.SQLiteErrorTarget(err, INSERT_NOTIFICATION)
+			utils.SQLiteErrorTarget(err, "failed to insert notification")
 		}
 		return err
 	})
@@ -396,7 +492,7 @@ func insertNewGroupEvent(userId, groupId int64, e *CreateEventRequestJson, er *C
 				RefrenceType:   "event",
 				Content:        "An event has been created",
 				Status:         "active",
-			}, tx)
+			}, userId, tx)
 			if err != nil {
 				utils.SQLiteErrorTarget(err, INSERT_NOTIFICATION)
 			}

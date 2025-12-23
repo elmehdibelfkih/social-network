@@ -96,6 +96,25 @@ func GetGroupsInfo(w http.ResponseWriter, r *http.Request) {
 	GetGroupsInfoHttp(w, response)
 }
 
+func GetGroupsInfoByuserId(w http.ResponseWriter, r *http.Request) {
+	var response BrowseGroupsResponseJson
+	if !GroupsInfoByuser(w, r, &response, "GroupsInfoByuser handler") {
+		return
+	}
+	GetGroupsInfoHttp(w, response)
+}
+
+
+func GetOtherGroupsInfoByuserId(w http.ResponseWriter, r *http.Request) {
+	var response BrowseGroupsResponseJson
+	if !OtherGroupsInfoByuser(w, r, &response, "GroupsInfoByuser handler") {
+		return
+	}
+	GetGroupsInfoHttp(w, response)
+}
+
+
+
 func GetGroupMembers(w http.ResponseWriter, r *http.Request) {
 	var response ListGroupMembersResponseJson
 	if !GroupMembers(w, r, &response, "GetGroupMembers handler") {

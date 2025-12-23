@@ -1,7 +1,6 @@
 package socket
 
 import (
-	"fmt"
 	"sync"
 )
 
@@ -11,7 +10,7 @@ type Hub struct {
 	clients   map[int64][]*Client
 	add       chan *Client
 	remove    chan *Client
-	chatUsers map[int64]map[int64][]*Client //chatId an its users *Client
+	chatUsers map[int64]map[int64][]*Client // chatId an its users *Client
 	mu        sync.RWMutex
 }
 
@@ -43,15 +42,15 @@ func (h *Hub) Run() {
 func (h *Hub) AddChatUser(chatId, userId int64) {
 	h.mu.Lock()
 	defer h.mu.Unlock()
-	fmt.Println("add Chat user", h.clients)
+
 	if len(h.clients[userId]) > 0 {
 		src := h.clients[userId]
 		if src == nil {
 			return
 		}
-		dst := append([]*Client(nil), src...)
+		dst := append([]*Client{}, src...)
 		if h.chatUsers[chatId] == nil {
-			return
+			h.chatUsers[chatId] = make(map[int64][]*Client)
 		}
 		h.chatUsers[chatId][userId] = dst
 		for _, c := range h.chatUsers[chatId][userId] {
@@ -99,7 +98,7 @@ func (h *Hub) removeClient(c *Client) {
 		h.clients[c.userId] = clients
 		return
 	}
-	go c.handleEvent(Event{Source: "server", Type: "offlineUser"}) //might cause a panic
+	go c.handleEvent(Event{Source: "server", Type: "offlineUser"}) // might cause a panic
 	delete(h.clients, c.userId)
 	for _, chat := range h.chatUsers {
 		delete(chat, c.userId)
@@ -135,6 +134,8 @@ func (h *Hub) Notify(n Notification) {
 			Payload: &ClientMessage{
 				Notification: &Notification{
 					NotificationId: n.NotificationId,
+					ActorName:      n.ActorName,
+					ActorAvatarId:  n.ActorAvatarId,
 					UserId:         n.UserId,
 					Type:           n.Type,
 					RefrenceId:     n.RefrenceId,
