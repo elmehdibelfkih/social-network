@@ -20,6 +20,7 @@ export type GroupEventsResponse = {
 export type Group = {
   groupId: number;
   title: string;
+  chatId: number;
   description: string;
   avatarId: number;
   creatorId: number;

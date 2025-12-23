@@ -1,21 +1,21 @@
 'use client';
 import { useEffect, useState, useRef, FormEvent } from "react";
-import styles from "./styles/chat.conversation.module.css";
+import styles from "./styles/chat.group.conversation.module.css";
 import { chatService } from "@/features/chat/services/chat";
-import { ChatMessage, User } from "./types";
+import { ChatMessage } from "./types";
 import { formatMessageDate } from "@/libs/helpers";
 import { SeenStatus } from "@/components/ui/chats/seen"
 import { useDebounceCbf } from "@/libs/debounce";
 import TypingIndicator from "./typing.indicator";
 import AvatarHolder from "@/components/ui/avatar_holder/avatarholder.client";
+import { Group } from "../group_card";
 
-interface ChatConversationProps {
+interface GroupChatConversationProps {
     chatId: number;
-    user: User;
-    onClose: () => void;
+    group: Group;
 }
 
-export default function GroupChatConversation({ chatId, user, onClose }: ChatConversationProps) {
+export default function GroupChatConversation({ chatId, group }: GroupChatConversationProps) {
     const emojis = [
         "😀", "😂", "😍", "🥰", "😎", "🤔", "😢", "😭", "👍", "👎", "👏", "🙏", "🔥", "❤️", "💔", "✨", "🎉", "🚀", "😡", "😴"
     ];
@@ -217,16 +217,16 @@ export default function GroupChatConversation({ chatId, user, onClose }: ChatCon
 
         setInput(next);
         //send typing
-        chatService.sendToWorker({
-            source: "client", type: "chat_typing", payload: {
-                typingIndicator: {
-                    firstName: user.firstName,
-                    lastName: user.lastName,
-                    nickName: user.nickname || "",
-                    chatId: chatId
-                }
-            }
-        })
+        // chatService.sendToWorker({
+        //     source: "client", type: "chat_typing", payload: {
+        //         typingIndicator: {
+        //             firstName: user.firstName,
+        //             lastName: user.lastName,
+        //             nickName: user.nickname || "",
+        //             chatId: chatId
+        //         }
+        //     }
+        // })
 
         requestAnimationFrame(() => {
             el.focus();
@@ -287,16 +287,16 @@ export default function GroupChatConversation({ chatId, user, onClose }: ChatCon
     const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
         setInput(e.target.value);
         //send typing
-        chatService.sendToWorker({
-            source: "client", type: "chat_typing", payload: {
-                typingIndicator: {
-                    firstName: user.firstName,
-                    lastName: user.lastName,
-                    nickName: user.nickname || "",
-                    chatId: chatId
-                }
-            }
-        })
+        // chatService.sendToWorker({
+        //     source: "client", type: "chat_typing", payload: {
+        //         typingIndicator: {
+        //             firstName: user.firstName,
+        //             lastName: user.lastName,
+        //             nickName: user.nickname || "",
+        //             chatId: chatId
+        //         }
+        //     }
+        // })
     };
 
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
@@ -308,14 +308,8 @@ export default function GroupChatConversation({ chatId, user, onClose }: ChatCon
         <div className={styles.chatContainer}>
 
             <div className={styles.chatHeader}>
-                {/* <ChatImage mediaId={user.avatarId} /> */}
-                <AvatarHolder avatarId={user.avatarId} size={48} />
-
-                {/* <span>Chat {chatId}</span> */}
-                <span>{`${user.firstName} ${user.lastName}`}</span>
-                <button className={styles.closeBtn} onClick={onClose}>
-                    <img src="/svg/x_white.svg" alt="" />
-                </button>
+                <AvatarHolder avatarId={group.avatarId} size={48} />
+                <span>{`${group.title}`}</span>
             </div>
 
             <div className={styles.chatMessages} ref={scrollRef}>
@@ -334,7 +328,7 @@ export default function GroupChatConversation({ chatId, user, onClose }: ChatCon
                 })}
             </div>
             <div className={styles.typingContainer}>
-                <TypingIndicator isTyping={isTyping} user={user} />
+                {/* <TypingIndicator isTyping={isTyping} user={user} /> */}
             </div>
             <form className={styles.chatInputContainer} onSubmit={handleSubmit}>
                 <input

@@ -17,7 +17,14 @@ func CreateGroup(w http.ResponseWriter, r *http.Request,
 		utils.IdentifySqlError(w, err)
 		return false
 	}
-	err = InsertNewGroupOwner(response.GroupId, response.CreatorId, "accepted", "owner")
+
+	err = InsertGroupChatId(response)
+	if err != nil {
+		utils.BackendErrorTarget(err, context)
+		utils.IdentifySqlError(w, err)
+		return false
+	}
+	err = InsertNewGroupOwner(response.ChatId, response.GroupId, response.CreatorId, "accepted", "owner")
 	if err != nil {
 		utils.BackendErrorTarget(err, context)
 		utils.IdentifySqlError(w, err)
@@ -95,7 +102,14 @@ func JoinGroupHttp(w http.ResponseWriter,
 func MemberStatusAccepted(w http.ResponseWriter, r *http.Request,
 	groupId, userId int64, status string, response *AcceptMemberResponseJson, context string,
 ) bool {
-	err := UpdateMemberStatusAccepted(groupId, userId, response)
+	group := &GetGroupResponseJson{}
+	err := SelectGroupById(groupId, group)
+	if err != nil {
+		utils.BackendErrorTarget(err, context)
+		utils.IdentifySqlError(w, err)
+		return false
+	}
+	err = UpdateMemberStatusAccepted(group.ChatId, groupId, userId, response)
 	if err != nil {
 		utils.BackendErrorTarget(err, context)
 		utils.IdentifySqlError(w, err)
