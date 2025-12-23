@@ -20,11 +20,13 @@ export type GroupEventsResponse = {
 export type Group = {
   groupId: number;
   title: string;
+  chatId: number;
   description: string;
   avatarId: number;
   creatorId: number;
   memberCount: number;
   createdAt: string;
+  status: 'declined' | 'accepted' | 'pending'; // membership status
   events: Event[];
 };
 
