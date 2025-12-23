@@ -127,6 +127,10 @@ func SelectUserFollowers(userId int64) (*OnlineStatus, error) {
 	return &users, err
 }
 
+// func SelectChatParticipants(chatId int64) int64 {
+
+// }
+
 func UpdateMessagesStatus(chatId, senderId int64, status string) error {
 	return database.WrapWithTransaction(func(tx *sql.Tx) error {
 		rows, err := tx.Query(UPDATE_MESSAGE_STATUS,
@@ -175,14 +179,30 @@ func UpdateMessagesStatus(chatId, senderId int64, status string) error {
 	})
 }
 
-func InsertNotification(n Notification, tx *sql.Tx) error {
+func InsertNotification(n Notification, actorId int64, tx *sql.Tx) error {
 	var id int64
-	err := tx.QueryRow(SELECT_NOTIFCATION, n.UserId, n.Type, n.RefrenceType, n.RefrenceId).Scan(&id)
+	var avatarId int64
+	var first string
+	var last string
+	err := tx.QueryRow(SELECT_ACTOR_BY_ID, actorId).Scan(&first, &last, &avatarId)
+	if err != nil {
+		utils.SQLiteErrorTarget(err, UPSERT_NOTIFICATION)
+		return err
+	}
+	n.ActorName = first + " " + last
+	n.ActorAvatarId = avatarId
+	err = tx.QueryRow(SELECT_NOTIFCATION, n.UserId, n.Type, n.RefrenceType, n.RefrenceId).Scan(&id)
+	if err != nil {
+		utils.SQLiteErrorTarget(err, UPSERT_NOTIFICATION)
+		return err
+	}
 	if id != 0 {
 		n.NotificationId = id
 	}
 	err = tx.QueryRow(UPSERT_NOTIFICATION,
 		n.NotificationId,
+		n.ActorName,
+		n.ActorAvatarId,
 		n.UserId,
 		n.Type,
 		n.RefrenceType,
@@ -191,6 +211,8 @@ func InsertNotification(n Notification, tx *sql.Tx) error {
 		n.Status,
 	).Scan(
 		&n.NotificationId,
+		&n.ActorName,
+		&n.ActorAvatarId,
 		&n.UserId,
 		&n.Type,
 		&n.RefrenceType,

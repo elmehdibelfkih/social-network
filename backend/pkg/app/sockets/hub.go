@@ -1,7 +1,6 @@
 package socket
 
 import (
-	"fmt"
 	"sync"
 )
 
@@ -43,21 +42,22 @@ func (h *Hub) Run() {
 func (h *Hub) AddChatUser(chatId, userId int64) {
 	h.mu.Lock()
 	defer h.mu.Unlock()
-	fmt.Println("add Chat user", h.clients)
+
 	if len(h.clients[userId]) > 0 {
 		src := h.clients[userId]
 		if src == nil {
 			return
 		}
-		dst := append([]*Client(nil), src...)
+		dst := append([]*Client{}, src...)
 		if h.chatUsers[chatId] == nil {
-			return
+			h.chatUsers[chatId] = make(map[int64][]*Client)
 		}
 		h.chatUsers[chatId][userId] = dst
 		for _, c := range h.chatUsers[chatId][userId] {
 			c.userChats[chatId] = struct{}{}
 		}
 	}
+
 }
 
 func (h *Hub) addClient(c *Client) {

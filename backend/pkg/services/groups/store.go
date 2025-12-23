@@ -394,7 +394,7 @@ func InsertNewGroupOwner(groupId, userId int64, status, role string) error {
 	})
 }
 
-func InsertNewGroupMember(targetId, groupId int64, status, role, notificationType string, m *InviteUserResponseJson) error {
+func InsertNewGroupMember(sourceId, targetId, groupId int64, status, role, notificationType string, m *InviteUserResponseJson) error {
 	return database.WrapWithTransaction(func(tx *sql.Tx) error {
 		err := tx.QueryRow(INSERT_GROUP_MEMBER_BY_GROUP_ID,
 			groupId,
@@ -429,11 +429,11 @@ func InsertNewGroupMember(targetId, groupId int64, status, role, notificationTyp
 			Type:           notificationType,
 			RefrenceId:     groupId,
 			RefrenceType:   "group",
-			Content:        "you have been invated to group",
+			Content:        "you have been invated to a group",
 			Status:         "active",
-		}, tx)
+		}, sourceId, tx)
 		if err != nil {
-			utils.SQLiteErrorTarget(err, INSERT_NOTIFICATION)
+			utils.SQLiteErrorTarget(err, "failed to insert notification")
 		}
 		return err
 	})
@@ -492,7 +492,7 @@ func insertNewGroupEvent(userId, groupId int64, e *CreateEventRequestJson, er *C
 				RefrenceType:   "event",
 				Content:        "An event has been created",
 				Status:         "active",
-			}, tx)
+			}, userId, tx)
 			if err != nil {
 				utils.SQLiteErrorTarget(err, INSERT_NOTIFICATION)
 			}

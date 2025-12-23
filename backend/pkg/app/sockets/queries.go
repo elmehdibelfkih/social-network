@@ -45,13 +45,17 @@ const (
 		SELECT id FROM notifications 
 		WHERE user_id = ? AND type = ? AND reference_type = ? AND reference_id = ?
 	`
+	SELECT_ACTOR_BY_ID = `
+		SELECT first_name, last_name ,avatar_id FROM users WHERE id = ?
+	`
+
 	// insert
 	UPSERT_NOTIFICATION = `
-	INSERT INTO notifications (id, user_id, type, reference_type, reference_id, content, status)
-	VALUES (?, ?, ?, ?, ?, ?, ?)
+	INSERT INTO notifications (id, actor_name, actor_avatar_id, user_id, type, reference_type, reference_id, content, status)
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
 	ON CONFLICT (id)
 	DO UPDATE SET status = excluded.status
-	RETURNING id, user_id, type, reference_type, reference_id, content, status, is_read, created_at, read_at;
+	RETURNING id, actor_name, actor_avatar_id, user_id, type, reference_type, reference_id, content, status, is_read, created_at, read_at;
 	`
 
 	// update

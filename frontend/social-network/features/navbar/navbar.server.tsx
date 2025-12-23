@@ -24,7 +24,7 @@ export function Navbar() {
 export function NotificationClient() {
   return (
     <div className={styles.navbarRight}>
-      <NotificationsDropdown />
+      {/* <NotificationsDropdown /> */}
     </div>
   )
 }
