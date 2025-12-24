@@ -1,26 +1,70 @@
 .main {
     display: flex;
-    flex-direction: row;
-    height: inherit;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    gap: 20px;
+    min-height: 100vh;
 }
 
 .firstSection {
-    background-color: red;
-    height: 90%;
-    width: 30%;
-    margin: auto;
+    flex: 0 0 280px;
+    background-color: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    height: fit-content;
+    position: sticky;
+    top: 20px;
 }
 
 .secondSection {
-    background-color: blue;
-    height: 90%;
-    width: 30%;
-    margin: auto;
+    flex: 1;
+    max-width: 600px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
 }
 
 .thirdSection {
-    background-color: green;
-    height: 90%;
-    width: 30%;
-    margin: auto;
+    flex: 0 0 280px;
+    background-color: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    height: fit-content;
+    position: sticky;
+    top: 20px;
+}
+
+@media (max-width: 1024px) {
+    .main {
+        padding: 15px;
+        gap: 15px;
+    }
+    
+    .firstSection,
+    .thirdSection {
+        flex: 0 0 250px;
+    }
+}
+
+@media (max-width: 768px) {
+    .main {
+        flex-direction: column;
+        padding: 10px;
+        gap: 15px;
+    }
+    
+    .firstSection,
+    .thirdSection {
+        flex: none;
+        position: static;
+        order: 2;
+    }
+    
+    .secondSection {
+        order: 1;
+        max-width: none;
+    }
 }
