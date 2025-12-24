@@ -51,6 +51,7 @@ type MarkSeen struct {
 
 type Notification struct {
 	NotificationId int64   `json:"notificationId"`
+	ActorId        int64   `json:"actorId"`
 	ActorName      string  `json:"actorName"`
 	ActorAvatarId  *int64  `json:"actorAvatarId"`
 	UserId         int64   `json:"userId"`

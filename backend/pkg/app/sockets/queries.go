@@ -51,11 +51,11 @@ const (
 
 	// insert
 	UPSERT_NOTIFICATION = `
-	INSERT INTO notifications (id, actor_name, actor_avatar_id, user_id, type, reference_type, reference_id, content, status)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+	INSERT INTO notifications (id, actor_id, actor_name, actor_avatar_id, user_id, type, reference_type, reference_id, content, status)
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 	ON CONFLICT (id)
 	DO UPDATE SET status = excluded.status
-	RETURNING id, actor_name, actor_avatar_id, user_id, type, reference_type, reference_id, content, status, is_read, created_at, read_at;
+	RETURNING id, actor_id, actor_name, actor_avatar_id, user_id, type, reference_type, reference_id, content, status, is_read, created_at, read_at;
 	`
 
 	// update

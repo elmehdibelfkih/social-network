@@ -14,36 +14,41 @@ export function GroupInviteNotification({ notification, onMarkAsRead }: Notifica
   const [isRead, setIsRead] = useState(notification.isRead == 1)
   const router = useRouter()
 
+  console.log(notification);
+  
+  
+  
   const getReferenceGroup = async () => {
     try {
       const response = await http.get<GroupType>(`/api/v1/groups/${notification.referenceId}`)
       setGroup(response)
-      console.log(response);
-
+      
     } catch (error) {
       console.error('Failed to fetch group:', error)
     }
   }
-
+  
   useEffect(() => {
     getReferenceGroup()
   }, [notification.notificationId])
-
+  
   const handleClick = () => {
     if (!isRead && onMarkAsRead) {
       setIsRead(true)
       onMarkAsRead(notification.notificationId)
     }
-
+    
     if (notification.referenceId) {
-      router.push(`/groups/${notification.referenceId}`)
+      router.push(`/groups/${notification.referenceId}/posts`)
     }
   }
-
+  
   const acceptInvitation = async (e: React.MouseEvent) => {
     e.stopPropagation()
     try {
-      await http.post(`/api/v1/groups/${notification.referenceId}/accept`)
+      notification.type == 'group_invite'
+      ? await http.post(`/api/v1/groups/${notification.referenceId}/accept`)
+      : await http.post(`/api/v1/groups/${notification.referenceId}/members/${notification.actorId}/accept`)
       setRequestHandled(true)
     } catch (error) {
 
@@ -53,7 +58,9 @@ export function GroupInviteNotification({ notification, onMarkAsRead }: Notifica
   const declineInvitation = async (e: React.MouseEvent) => {
     e.stopPropagation()
     try {
-      await http.post(`/api/v1/groups/${notification.referenceId}/decline`)
+      notification.type == 'group_invite'
+        ? await http.post(`/api/v1/groups/${notification.referenceId}/decline`)
+        : await http.post(`/api/v1/groups/${notification.referenceId}/members/${notification.actorId}/decline`)
       setRequestHandled(true)
     } catch (error) {
 
@@ -92,18 +99,16 @@ export function GroupInviteNotification({ notification, onMarkAsRead }: Notifica
 
         <p className={styles.timeAgo}>{formatTimeAgo(notification.createdAt)}</p>
 
-        {notification.type === 'group_invite' && (
-          <div className={styles.actionButtons}>
-            <button className={styles.acceptButton}
-              onClick={acceptInvitation}
-              disabled={group.status == 'accepted' || requestHandled || group.status == 'pending'}
-            >✓ Accept</button>
-            <button className={styles.declineButton}
-              onClick={declineInvitation}
-              disabled={group.status == 'accepted' || requestHandled || group.status == 'pending'}
-            >× Decline</button>
-          </div>
-        )}
+        <div className={styles.actionButtons}>
+          <button className={styles.acceptButton}
+            onClick={acceptInvitation}
+            disabled={group.status == 'pending' || requestHandled}
+          >✓ Accept</button>
+          <button className={styles.declineButton}
+            onClick={declineInvitation}
+            disabled={group.status == 'pending' || requestHandled}
+          >× Decline</button>
+        </div>
       </div>
     </div>
   )

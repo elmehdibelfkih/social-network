@@ -137,14 +137,14 @@ func SelectOtherGroupsByUserId(limit, userId int64, offset int64, l *BrowseGroup
 			}
 		}
 		var exist bool
-		err := config.DB.QueryRow(SELECT_GROUP_MEMBER_PENDING,item.GroupId,userId,).Scan(&exist)
+		err := config.DB.QueryRow(SELECT_GROUP_MEMBER_PENDING, item.GroupId, userId).Scan(&exist)
 		if err != nil {
 			utils.SQLiteErrorTarget(err, SELECT_BROWSE_OTHER_GROUPS_BY_USER)
 			return err
 		}
-		if (exist) {
+		if exist {
 			item.Status = "pending"
-		} 
+		}
 		l.TotalGroups++
 		l.Groups = append(l.Groups, item)
 	}
@@ -430,9 +430,12 @@ func InsertNewGroupOwner(chatId, groupId, userId int64, status, role string) err
 
 func InsertNewGroupMember(sourceId, targetId, groupId int64, status, role, notificationType string, m *InviteUserResponseJson) error {
 	return database.WrapWithTransaction(func(tx *sql.Tx) error {
+		memberId := targetId
+		notificationReceiverId := targetId
+
 		err := tx.QueryRow(INSERT_GROUP_MEMBER_BY_GROUP_ID,
 			groupId,
-			targetId,
+			memberId,
 			status,
 			role,
 		).Scan(
@@ -445,29 +448,42 @@ func InsertNewGroupMember(sourceId, targetId, groupId int64, status, role, notif
 			utils.SQLiteErrorTarget(err, INSERT_GROUP_MEMBER_BY_GROUP_ID)
 			return err
 		}
+
 		if notificationType == "group_join" {
+			var ownerId int64
 			err = tx.QueryRow(
 				SELECT_GROUP_OWNER,
 				groupId,
 			).Scan(
-				&targetId,
+				&ownerId,
 			)
 			if err != nil {
-				utils.SQLiteErrorTarget(err, INSERT_GROUP_MEMBER_BY_GROUP_ID)
+				utils.SQLiteErrorTarget(err, SELECT_GROUP_OWNER)
 				return err
 			}
+			notificationReceiverId = ownerId
 		}
+
+		// Set notification content based on type
+		var content string
+		if notificationType == "group_invite" {
+			content = "You have been invited to join a group"
+		} else if notificationType == "group_join" {
+			content = "Someone wants to join your group"
+		}
+
 		err = socket.InsertNotification(socket.Notification{
 			NotificationId: utils.GenerateID(),
-			UserId:         targetId,
+			UserId:         notificationReceiverId,
 			Type:           notificationType,
 			RefrenceId:     groupId,
 			RefrenceType:   "group",
-			Content:        "you have been invated to a group",
+			Content:        content,
 			Status:         "active",
 		}, sourceId, tx)
 		if err != nil {
 			utils.SQLiteErrorTarget(err, "failed to insert notification")
+			return err
 		}
 		return err
 	})

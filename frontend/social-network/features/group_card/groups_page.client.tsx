@@ -166,7 +166,6 @@ export default function GroupsPageClient({
         </button>
       </div>
 
-      {/* Tabs */}
       <div className={styles.tabs_container}>
         <button
           className={`${styles.tab} ${activeTab === 'my-groups' ? styles.tab_active : ''}`}

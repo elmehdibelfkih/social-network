@@ -1,7 +1,6 @@
 package groups
 
 import (
-	"fmt"
 	"net/http"
 
 	"social/pkg/utils"
@@ -30,7 +29,6 @@ func PostInviteMember(w http.ResponseWriter, r *http.Request) {
 	if !InviteMember(w, r, &response, "InviteMember handler") {
 		return
 	}
-	fmt.Println("xxxxxx", response)
 	utils.WriteSuccess(w, http.StatusOK, response)
 	// InviteMemberHttp(w, response)
 }
