@@ -1,6 +1,7 @@
 package groups
 
 import (
+	"fmt"
 	"net/http"
 
 	"social/pkg/db/database"
@@ -117,13 +118,6 @@ func MemberStatusAccepted(w http.ResponseWriter, r *http.Request,
 		return false
 	}
 
-	err = UpdateMetaData("group", response.GroupId, 1)
-	if err != nil {
-		utils.BackendErrorTarget(err, context)
-		utils.IdentifySqlError(w, err)
-		return false
-	}
-
 	return true
 }
 
@@ -131,13 +125,6 @@ func MemberStatusDeclined(w http.ResponseWriter, r *http.Request,
 	groupId, userId int64, status string, response *DeclineMemberResponseJson, context string,
 ) bool {
 	err := UpdateMemberStatusDeclined(groupId, userId, response)
-	if err != nil {
-		utils.BackendErrorTarget(err, context)
-		utils.IdentifySqlError(w, err)
-		return false
-	}
-
-	err = UpdateMetaData("group", response.GroupId, 1)
 	if err != nil {
 		utils.BackendErrorTarget(err, context)
 		utils.IdentifySqlError(w, err)
@@ -194,6 +181,7 @@ func GroupUpdateHttp(w http.ResponseWriter,
 func GroupInfo(w http.ResponseWriter, r *http.Request,
 	response *GetGroupResponseJson, context string,
 ) bool {
+	fmt.Println("GROUPINFO1")
 	groupId := utils.GetWildCardValue(w, r, "group_id")
 	userId := utils.GetUserIdFromContext(r)
 	checkUserId := utils.GetQuerryPramInt(r, "checkUserId")

@@ -30,7 +30,6 @@ func PostInviteMember(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	utils.WriteSuccess(w, http.StatusOK, response)
-	// InviteMemberHttp(w, response)
 }
 
 func PostJoinGroup(w http.ResponseWriter, r *http.Request) {
@@ -51,7 +50,7 @@ func PostAcceptInvite(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	response.Message = "User has been added to the group."
-	AcceptInviteHttp(w, response)
+	utils.WriteSuccess(w, http.StatusOK, response)
 }
 
 func PostDeclineInvite(w http.ResponseWriter, r *http.Request) {

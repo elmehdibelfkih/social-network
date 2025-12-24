@@ -37,6 +37,8 @@ export function NotificationProvider({ children }) {
             setNotifications(activeNotifications)
             setHasMore(notificationsResponse?.notifications?.length == 20)
 
+
+
             const unreadCount = activeNotifications?.filter(n => n.isRead === 0).length || 0
             userStatsDispatch({ type: 'SET_STATS', payload: { unreadNotifications: unreadCount } })
         } catch (error) {

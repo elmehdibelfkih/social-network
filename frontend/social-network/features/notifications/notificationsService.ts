@@ -6,7 +6,7 @@ export const notificationsService = {
     limit: number = 20,
     lastId?: number
   ): Promise<NotificationsResponse> {
-    
+
     try {
       const url = lastId
         ? `/api/v1/notifications?limit=${limit}&last_id=${lastId}`

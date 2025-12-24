@@ -56,8 +56,8 @@ type Notification struct {
 	ActorAvatarId  *int64  `json:"actorAvatarId"`
 	UserId         int64   `json:"userId"`
 	Type           string  `json:"type"`
-	RefrenceId     int64   `json:"refrenceId"`
-	RefrenceType   string  `json:"refrenceType"`
+	ReferenceId    int64   `json:"referenceId"`
+	ReferenceType  string  `json:"referenceType"`
 	Content        string  `json:"content"`
 	Status         string  `json:"status"`
 	IsRead         int     `json:"isRead"`

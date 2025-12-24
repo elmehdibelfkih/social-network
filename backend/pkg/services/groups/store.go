@@ -2,6 +2,7 @@ package groups
 
 import (
 	"database/sql"
+	"fmt"
 	"math"
 	"strings"
 
@@ -198,6 +199,7 @@ func SelectGroupsByUserId(limit, userId int64, offset int64, l *BrowseGroupsResp
 }
 
 func SelectGroupById(groupId, userId int64, g *GetGroupResponseJson) error {
+	fmt.Println("USERID:", userId)
 	err := config.DB.QueryRow(SELECT_GROUP_BY_GROUP_ID,
 		groupId,
 	).Scan(
@@ -233,6 +235,8 @@ func SelectGroupById(groupId, userId int64, g *GetGroupResponseJson) error {
 		utils.SQLiteErrorTarget(err, SELECT_GROUP_CHAT_ID)
 		return err
 	}
+
+	fmt.Println("xxx", userId)
 
 	// Get member status for the requesting user
 	var memberStatus string
@@ -482,9 +486,10 @@ func InsertNewGroupMember(sourceId, targetId, groupId int64, status, role, notif
 
 		// Set notification content based on type
 		var content string
-		if notificationType == "group_invite" {
+		switch notificationType {
+		case "group_invite":
 			content = "You have been invited to join a group"
-		} else if notificationType == "group_join" {
+		case "group_join":
 			content = "Someone wants to join your group"
 		}
 
@@ -492,8 +497,8 @@ func InsertNewGroupMember(sourceId, targetId, groupId int64, status, role, notif
 			NotificationId: utils.GenerateID(),
 			UserId:         notificationReceiverId,
 			Type:           notificationType,
-			RefrenceId:     groupId,
-			RefrenceType:   "group",
+			ReferenceId:     groupId,
+			ReferenceType:   "group",
 			Content:        content,
 			Status:         "active",
 		}, sourceId, tx)
@@ -555,8 +560,8 @@ func insertNewGroupEvent(userId, groupId int64, e *CreateEventRequestJson, er *C
 				NotificationId: utils.GenerateID(),
 				UserId:         groupUser,
 				Type:           "event_created",
-				RefrenceId:     er.EventId,
-				RefrenceType:   "event",
+				ReferenceId:     er.EventId,
+				ReferenceType:   "event",
 				Content:        "An event has been created",
 				Status:         "active",
 			}, userId, tx)

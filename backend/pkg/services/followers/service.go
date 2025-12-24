@@ -13,8 +13,8 @@ func followNotification(followerId, followedId int64, status string, notifStatus
 	notification.NotificationId = utils.GenerateID()
 	notification.UserId = followedId
 	notification.Type = "follow_request"
-	notification.RefrenceType = "user"
-	notification.RefrenceId = followerId
+	notification.ReferenceType = "user"
+	notification.ReferenceId = followerId
 	if status == "pending" {
 		notification.Content = "New follow request received."
 	} else {

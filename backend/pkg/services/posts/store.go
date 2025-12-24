@@ -310,8 +310,8 @@ func CreateComment(comment *Comment) error {
 			NotificationId: utils.GenerateID(),
 			UserId:         postAuthorID,
 			Type:           "post_commented",
-			RefrenceId:     comment.PostID,
-			RefrenceType:   "post",
+			ReferenceId:     comment.PostID,
+			ReferenceType:   "post",
 			Content:        "new Comment",
 			Status:         "active",
 		}, comment.AuthorID, tx)
@@ -522,8 +522,8 @@ func CreatePostReaction(postID, userID int64, reaction string) error {
 			NotificationId: utils.GenerateID(),
 			UserId:         authorID,
 			Type:           "post_liked",
-			RefrenceId:     postID,
-			RefrenceType:   "post",
+			ReferenceId:     postID,
+			ReferenceType:   "post",
 			Content:        "new reaction",
 			Status:         "active",
 		}, userID, tx)
@@ -582,8 +582,8 @@ func DeletePostReaction(postID, userID int64) error {
 			NotificationId: utils.GenerateID(),
 			UserId:         authorID,
 			Type:           "post_liked",
-			RefrenceId:     postID,
-			RefrenceType:   "post",
+			ReferenceId:     postID,
+			ReferenceType:   "post",
 			Content:        "new reaction",
 			Status:         "suspended",
 		}, userID, tx)

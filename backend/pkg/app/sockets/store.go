@@ -2,6 +2,7 @@ package socket
 
 import (
 	"database/sql"
+	"fmt"
 
 	"social/pkg/db/database"
 	"social/pkg/utils"
@@ -193,7 +194,7 @@ func InsertNotification(n Notification, actorId int64, tx *sql.Tx) error {
 	n.ActorId = actorId
 	n.ActorName = first + " " + last
 	n.ActorAvatarId = avatarId
-	err = tx.QueryRow(SELECT_NOTIFCATION, n.UserId, n.Type, n.RefrenceType, n.RefrenceId).Scan(&id)
+	err = tx.QueryRow(SELECT_NOTIFCATION, n.UserId, n.Type, n.ReferenceType, n.ReferenceId).Scan(&id)
 	if err != nil && err != sql.ErrNoRows {
 		utils.SQLiteErrorTarget(err, SELECT_NOTIFCATION)
 		return err
@@ -208,8 +209,8 @@ func InsertNotification(n Notification, actorId int64, tx *sql.Tx) error {
 		n.ActorAvatarId,
 		n.UserId,
 		n.Type,
-		n.RefrenceType,
-		n.RefrenceId,
+		n.ReferenceType,
+		n.ReferenceId,
 		n.Content,
 		n.Status,
 	).Scan(
@@ -219,8 +220,8 @@ func InsertNotification(n Notification, actorId int64, tx *sql.Tx) error {
 		&n.ActorAvatarId,
 		&n.UserId,
 		&n.Type,
-		&n.RefrenceType,
-		&n.RefrenceId,
+		&n.ReferenceType,
+		&n.ReferenceId,
 		&n.Content,
 		&n.Status,
 		&n.IsRead,
@@ -231,6 +232,8 @@ func InsertNotification(n Notification, actorId int64, tx *sql.Tx) error {
 		utils.SQLiteErrorTarget(err, UPSERT_NOTIFICATION)
 		return err
 	}
+
+	fmt.Println("x:", n)
 
 	WSManger.Notify(n)
 	return nil
