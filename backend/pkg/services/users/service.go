@@ -163,7 +163,6 @@ func GetUserStats(w http.ResponseWriter, userId int64, context string) (UserStat
 	return response, true
 }
 
-
 // UpdateUserPrivacy updates a user's privacy setting
 func UpdateUserPrivacy(w http.ResponseWriter, userId int64, req *UpdatePrivacyRequestJson, context string) (UpdatePrivacyResponseJson, bool) {
 	var response UpdatePrivacyResponseJson
@@ -239,14 +238,15 @@ func UpdateUserProfile(w http.ResponseWriter, userId int64, req *UpdateProfileRe
 	// Nickname
 	if req.Nickname != nil {
 		cleanNick := strings.TrimSpace(*req.Nickname)
-		if cleanNick == "" { nickname = nil
+		if cleanNick == "" {
+			nickname = nil
 		} else {
 
 			if len(cleanNick) < 3 || len(cleanNick) > 50 {
 				utils.BadRequest(w, "Nickname length must be between 3 and 50 characters.", "alert")
 				return response, false
 			}
-		
+
 			// Check uniqueness only if changed
 			if currentProfile.Nickname == nil || cleanNick != *currentProfile.Nickname {
 				nicknameExists, err := SelectNicknameExists(cleanNick, userId)

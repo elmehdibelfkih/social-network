@@ -202,10 +202,9 @@ export function ProfileSettings({ profile }: { profile: ProfileAPIResponse }) {
             type="text"
             value={formData.nickname}
             onChange={(e) => setFormData({ ...formData, nickname: e.target.value })}
-            placeholder="Your username"
-            required
+            placeholder="Your nickname"
             maxLength={50}
-
+            // minLength={3}
           />
         </div>
 
