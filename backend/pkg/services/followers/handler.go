@@ -7,7 +7,6 @@ import (
 )
 
 // POST /api/v1/users/:user_id/follow => send follow request or follow immediately if target is public
-// todo: creat chat table if not exist
 func FollowHandler(w http.ResponseWriter, r *http.Request) {
 	userId := utils.GetUserIdFromContext(r)
 	targetUserId := utils.GetWildCardValue(w, r, "user_id")

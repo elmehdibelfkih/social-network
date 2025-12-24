@@ -3,6 +3,7 @@ package groups
 import "social/pkg/utils"
 
 // groups
+// groups
 
 // /api/v1/groups (POST) => create group
 type CreateGroupRequestJson struct {
@@ -129,6 +130,7 @@ type PaginationJson struct {
 	Total int64 `json:"total"`
 }
 
+// group_events
 // group_events
 
 // /api/v1/groups/:group_id/events (POST)

@@ -200,7 +200,6 @@ func GroupInfo(w http.ResponseWriter, r *http.Request,
 	if checkUserId != 0 {
 		userId = checkUserId
 	}
-
 	err := SelectGroupById(groupId, userId, response)
 	if err != nil {
 		utils.BackendErrorTarget(err, context)
