@@ -38,6 +38,7 @@ export type GroupType = {
     memberCount: number
     avatarId: number
     status: string
+    memberStatus?: string
     chatId: number
     createdAt: string
     updatedAt: string

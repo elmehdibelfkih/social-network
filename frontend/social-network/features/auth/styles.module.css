@@ -1,168 +1,193 @@
 .authCard {
-    width: 100%;
-    max-width: 550px;
-    margin: 3rem auto;
-    background-color: #fff;
-    border-radius: 16px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-    overflow: hidden;
+    display: flex;
+    min-height: 100vh;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+}
+
+.leftPanel {
+    flex: 1;
+    background: linear-gradient(135deg, var(--primary-purple) 0%, var(--primary-purple-light) 50%, var(--primary-purple-dark) 100%);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem;
+    color: white;
+    min-height: 100vh;
+}
+
+.leftPanel h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    text-align: center;
+}
+
+.leftPanel p {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    text-align: center;
+    max-width: 400px;
+    line-height: 1.6;
+}
+
+.rightPanel {
+    flex: 1;
+    background-color: #f8f9fa;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    min-height: 100vh;
+    overflow-y: auto;
+}
+
+.loginContainer {
+    width: 100%;
+    max-width: 400px;
+    background-color: white;
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    margin: auto;
+}
+
+.navButtons {
+    display: flex;
+    background-color: #f1f3f4;
+    padding: 4px;
+    border-radius: 12px;
+    margin-bottom: 2rem;
+}
+
+.tabButton {
+    flex: 1;
+    padding: 12px 16px;
+    border: none;
+    background-color: transparent;
+    cursor: pointer;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #6b7280;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.activeTab {
+    background-color: white;
+    color: #374151;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .formContainer {
     display: flex;
     flex-direction: column;
-    gap: 20px;
-    padding: 30px;
+    gap: 1.5rem;
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 1rem;
 }
 
 .title {
-    font-size: 2.2rem;
+    font-size: 1.75rem;
     font-weight: 700;
-    color: #7a3fbc;
-    text-align: center;
-    margin: 0;
+    color: var(--primary-purple);
+    margin: 0 0 0.5rem 0;
 }
 
 .welcomeMsg {
-    font-size: 1rem;
-    color: #888;
-    text-align: center;
-    margin-top: 15px;
-    margin-bottom: 10px;
+    font-size: 0.95rem;
+    color: #6b7280;
+    margin: 0;
 }
 
 .inputGroup {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 6px;
 }
 
 .inputGroup label {
-    font-size: 0.95rem;
-    font-weight: 600;
-    color: #2b124c;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #374151;
 }
 
 .input {
-    padding: 14px 16px;
-    border: 1px solid #e0e0e0;
-    border-radius: 10px;
+    padding: 12px 16px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
     font-size: 1rem;
-    color: #333;
-    background-color: #fafafa;
+    color: #374151;
+    background-color: white;
     transition: all 0.2s ease;
 }
 
 .input:focus {
     outline: none;
-    border-color: #7a3fbc;
-    background-color: #fff;
-    box-shadow: 0 0 0 3px rgba(122, 63, 188, 0.1);
+    border-color: var(--primary-purple);
+    box-shadow: 0 0 0 3px rgba(107, 45, 143, 0.1);
 }
 
 .input::placeholder {
-    color: #bbb;
+    color: #9ca3af;
 }
 
-.textarea {
-    resize: none;
-    min-height: 80px;
-}
-
-.fileInput {
-    padding: 12px 16px;
-    cursor: pointer;
-}
-
-.row {
+.checkboxGroup {
     display: flex;
-    gap: 15px;
-}
-
-.row>div {
-    flex: 1;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+    color: #6b7280;
 }
 
 .submitButton {
     width: 100%;
-    padding: 14px 20px;
+    padding: 12px 20px;
     border: none;
-    border-radius: 10px;
-    background-color: #7a3fbc;
-    color: #ffffff;
-    font-size: 1.1rem;
+    border-radius: 8px;
+    background-color: var(--primary-purple);
+    color: white;
+    font-size: 1rem;
     font-weight: 600;
     cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.1s;
-    margin-top: 10px;
+    transition: background-color 0.2s ease;
 }
 
 .submitButton:hover {
-    background-color: #6a35a7;
-}
-
-.submitButton:active {
-    transform: scale(0.98);
+    background-color: var(--primary-purple-dark);
 }
 
 .submitButton:disabled {
-    background-color: #ccc;
+    background-color: #d1d5db;
     cursor: not-allowed;
 }
 
-.errorAlert {
-    color: #d32f2f;
-    background-color: #ffebee;
-    padding: 10px;
-    border-radius: 8px;
-    text-align: center;
-    font-size: 0.9rem;
-    border: 1px solid #ffcdd2;
-}
-
-.navButtons {
-    display: flex;
-    justify-content: space-around;
-    background-color: #E6E7EB;
-    padding: 6px;
-    margin: 20px 20px 0;
-    border-radius: 14px;
-}
-
-.tabButton {
-    flex: 1;
-    padding: 10px;
-    border: none;
-    background-color: transparent;
-    cursor: pointer;
-    font-size: 1rem;
-    font-weight: 600;
-    color: #888;
-    border-radius: 10px;
-    transition: all 0.2s ease;
-}
-
-.activeTab {
-    background-color: #fff;
-    color: #333;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-}
-
-@media (max-width: 600px) {
+@media (max-width: 768px) {
     .authCard {
-        margin: 0;
-        border-radius: 0;
-        height: 100vh;
-        box-shadow: none;
-    }
-
-    .title {
-        font-size: 1.8rem;
-    }
-
-    .row {
         flex-direction: column;
-        gap: 16px;
+        min-height: 100vh;
+    }
+    
+    .leftPanel {
+        min-height: 30vh;
+        padding: 1.5rem;
+    }
+    
+    .leftPanel h1 {
+        font-size: 2rem;
+    }
+    
+    .rightPanel {
+        padding: 1.5rem;
+        min-height: 70vh;
+    }
+    
+    .loginContainer {
+        max-width: none;
+        box-shadow: none;
+        border-radius: 0;
     }
 }

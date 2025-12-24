@@ -197,7 +197,7 @@ func SelectGroupsByUserId(limit, userId int64, offset int64, l *BrowseGroupsResp
 	return err
 }
 
-func SelectGroupById(groupId int64, g *GetGroupResponseJson) error {
+func SelectGroupById(groupId, userId int64, g *GetGroupResponseJson) error {
 	err := config.DB.QueryRow(SELECT_GROUP_BY_GROUP_ID,
 		groupId,
 	).Scan(
@@ -233,7 +233,23 @@ func SelectGroupById(groupId int64, g *GetGroupResponseJson) error {
 		utils.SQLiteErrorTarget(err, SELECT_GROUP_CHAT_ID)
 		return err
 	}
-	return err
+
+	// Get member status for the requesting user
+	var memberStatus string
+	err = config.DB.QueryRow(SELECT_MEMBER_STATUS_BY_USER, groupId, userId).Scan(&memberStatus)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			// User is not a member
+			g.MemberStatus = nil
+		} else {
+			utils.SQLiteErrorTarget(err, SELECT_MEMBER_STATUS_BY_USER)
+			return err
+		}
+	} else {
+		g.MemberStatus = &memberStatus
+	}
+
+	return nil
 }
 
 func SelectGroupMember(groupId, userId int64) (bool, error) {

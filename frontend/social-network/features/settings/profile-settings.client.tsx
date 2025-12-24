@@ -49,19 +49,8 @@ export function ProfileSettings({ profile }: { profile: ProfileAPIResponse }) {
         avatarId: formData.avatarId,
       };
 
-      // Add password fields if changing password
-      if (formData.currentPassword.trim() && formData.newPassword.trim()) {
-        if (formData.newPassword !== formData.confirmPassword) {
-          ShowSnackbar({ status: false, message: 'New passwords do not match' });
-          setIsLoading(false);
-          return;
-        }
-        updateData.currentPassword = formData.currentPassword;
-        updateData.password = formData.newPassword;
-      }
 
-      const res = await http.put(`/api/v1/users/${profile.userId}/profile`, updateData);
-
+      const res = await http.patch(`/api/v1/users/${profile.userId}/profile`, updateData);
       if (res) {
         dispatch({ type: 'SET_FIRST_NAME', payload: formData.firstName });
         dispatch({ type: 'SET_LAST_NAME', payload: formData.lastName });
@@ -69,7 +58,7 @@ export function ProfileSettings({ profile }: { profile: ProfileAPIResponse }) {
         dispatch({ type: 'SET_ABOUT_ME', payload: formData.aboutMe });
         dispatch({ type: 'SET_DATE_OF_BIRTH', payload: formData.dateOfBirth });
         dispatch({ type: 'SET_AVATAR_ID', payload: formData.avatarId });
-  
+
         // Clear password fields after successful update
         setFormData(prev => ({
           ...prev,
@@ -77,15 +66,15 @@ export function ProfileSettings({ profile }: { profile: ProfileAPIResponse }) {
           newPassword: '',
           confirmPassword: ''
         }));
-  
+
         // Update auth provider with new email
         if (user) {
           const updatedUser = { ...user, email: formData.email, nickname: formData.nickname };
           setUser(updatedUser);
         }
-  
+
         ShowSnackbar({ status: true, message: 'Profile updated successfully' });
-      } 
+      }
     } catch (error: any) {
       console.error('Failed to update profile:', error);
       // The apiFetch function already shows snackbar for errors with errorType: 'alert'
@@ -108,6 +97,7 @@ export function ProfileSettings({ profile }: { profile: ProfileAPIResponse }) {
 
     try {
       const response = await authService.uploadAvatar(pendingAvatarFile);
+      if (!response) return
       setFormData(prev => ({ ...prev, avatarId: response.mediaId }));
 
       // Save avatar immediately to backend
@@ -145,7 +135,7 @@ export function ProfileSettings({ profile }: { profile: ProfileAPIResponse }) {
         dateOfBirth: formData.dateOfBirth,
         avatarId: -1 // Special value to indicate removal
       };
-      await http.put(`/api/v1/users/${profile.userId}/profile`, updateData);
+      await http.patch(`/api/v1/users/${profile.userId}/profile`, updateData);
 
       setFormData(prev => ({ ...prev, avatarId: null }));
       dispatch({ type: 'SET_AVATAR_ID', payload: null });
@@ -212,10 +202,9 @@ export function ProfileSettings({ profile }: { profile: ProfileAPIResponse }) {
             type="text"
             value={formData.nickname}
             onChange={(e) => setFormData({ ...formData, nickname: e.target.value })}
-            placeholder="Your username"
-            required
+            placeholder="Your nickname"
             maxLength={50}
-
+          // minLength={3}
           />
         </div>
 
@@ -250,40 +239,6 @@ export function ProfileSettings({ profile }: { profile: ProfileAPIResponse }) {
           />
         </div>
 
-        <div className={styles.passwordSection}>
-          <h3>Change Password</h3>
-          <p>Leave blank to keep current password</p>
-
-          <div className={styles.field}>
-            <label>Current Password</label>
-            <input
-              type="password"
-              value={formData.currentPassword}
-              onChange={(e) => setFormData({ ...formData, currentPassword: e.target.value })}
-              placeholder="Enter current password"
-            />
-          </div>
-
-          <div className={styles.field}>
-            <label>New Password</label>
-            <input
-              type="password"
-              value={formData.newPassword}
-              onChange={(e) => setFormData({ ...formData, newPassword: e.target.value })}
-              placeholder="Enter new password"
-            />
-          </div>
-
-          <div className={styles.field}>
-            <label>Confirm New Password</label>
-            <input
-              type="password"
-              value={formData.confirmPassword}
-              onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-              placeholder="Confirm new password"
-            />
-          </div>
-        </div>
 
         <div className={styles.actions}>
           <button type="button" className={styles.cancelBtn}>Cancel</button>

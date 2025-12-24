@@ -235,7 +235,6 @@
 .userName {
   font-size: 15px;
   font-weight: 500;
-  background-color: red;
   color: var(--gray-700);
   text-overflow: ellipsis;
   white-space: nowrap;

@@ -47,11 +47,11 @@ export function LoginForm({ onAuthSuccess }: { onAuthSuccess?: () => void }) {
         <form onSubmit={handleSubmit} className={styles.formContainer}>
             <div className={styles.header}>
                 <h2 className={styles.title}>Log In</h2>
-                <p className={styles.welcomeMsg}>Wacha sahbi, dkhl dkhl rah bdina</p>
+                <p className={styles.welcomeMsg}>Welcome back! Please enter your details.</p>
             </div>
 
             <div className={styles.inputGroup}>
-                <label htmlFor='identifier'>Email or Nickname</label>
+                <label htmlFor='identifier'>Email</label>
                 <input
                     id="identifier"
                     type="text"
@@ -81,17 +81,6 @@ export function LoginForm({ onAuthSuccess }: { onAuthSuccess?: () => void }) {
                     minLength={8}
                     
                 />
-            </div>
-
-            <div className={styles.checkboxGroup}>
-                <input
-                    type="checkbox"
-                    id="remember"
-                    checked={formData.rememberMe}
-                    onChange={(e) => setFormData({ ...formData, rememberMe: e.target.checked })}
-                    disabled={isLoading}
-                />
-                <label htmlFor="remember">Remember Me</label>
             </div>
 
             <button

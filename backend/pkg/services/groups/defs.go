@@ -3,6 +3,7 @@ package groups
 import "social/pkg/utils"
 
 // groups
+// groups
 
 // /api/v1/groups (POST) => create group
 type CreateGroupRequestJson struct {
@@ -24,16 +25,17 @@ type CreateGroupResponseJson struct {
 
 // /api/v1/groups/:group_id (GET) => get group info
 type GetGroupResponseJson struct {
-	GroupId     int64  `json:"groupId"`
-	CreatorId   int64  `json:"creatorId"`
-	ChatId      int64  `json:"chatId"`
-	Title       string `json:"title"`
-	Description string `json:"description"`
-	MemberCount int64  `json:"memberCount"`
-	AvatarId    *int64 `json:"avatarId"` // optional
-	Status      string `json:"status"`
-	CreatedAt   string `json:"createdAt"`
-	UpdatedAt   string `json:"updatedAt"`
+	GroupId      int64   `json:"groupId"`
+	CreatorId    int64   `json:"creatorId"`
+	ChatId       int64   `json:"chatId"`
+	Title        string  `json:"title"`
+	Description  string  `json:"description"`
+	MemberCount  int64   `json:"memberCount"`
+	AvatarId     *int64  `json:"avatarId"` // optional
+	Status       string  `json:"status"`
+	MemberStatus *string `json:"memberStatus"` // nullable - status of the requesting user's membership
+	CreatedAt    string  `json:"createdAt"`
+	UpdatedAt    string  `json:"updatedAt"`
 }
 
 // /api/v1/groups/:group_id (PUT) => update group
@@ -128,6 +130,7 @@ type PaginationJson struct {
 	Total int64 `json:"total"`
 }
 
+// group_events
 // group_events
 
 // /api/v1/groups/:group_id/events (POST)

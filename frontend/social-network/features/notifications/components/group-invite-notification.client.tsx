@@ -14,41 +14,40 @@ export function GroupInviteNotification({ notification, onMarkAsRead }: Notifica
   const [isRead, setIsRead] = useState(notification.isRead == 1)
   const router = useRouter()
 
-  console.log(notification);
-  
-  
-  
   const getReferenceGroup = async () => {
     try {
-      const response = await http.get<GroupType>(`/api/v1/groups/${notification.referenceId}`)
+      const response = await http.get<GroupType>(
+        `/api/v1/groups/${notification.referenceId}?checkUserId=${notification.actorId}`
+      )
       setGroup(response)
-      
+      console.log(response);
+
     } catch (error) {
       console.error('Failed to fetch group:', error)
     }
   }
-  
+
   useEffect(() => {
     getReferenceGroup()
   }, [notification.notificationId])
-  
+
   const handleClick = () => {
     if (!isRead && onMarkAsRead) {
       setIsRead(true)
       onMarkAsRead(notification.notificationId)
     }
-    
+
     if (notification.referenceId) {
       router.push(`/groups/${notification.referenceId}/posts`)
     }
   }
-  
+
   const acceptInvitation = async (e: React.MouseEvent) => {
     e.stopPropagation()
     try {
       notification.type == 'group_invite'
-      ? await http.post(`/api/v1/groups/${notification.referenceId}/accept`)
-      : await http.post(`/api/v1/groups/${notification.referenceId}/members/${notification.actorId}/accept`)
+        ? await http.post(`/api/v1/groups/${notification.referenceId}/accept`)
+        : await http.post(`/api/v1/groups/${notification.referenceId}/members/${notification.actorId}/accept`)
       setRequestHandled(true)
     } catch (error) {
 
@@ -102,11 +101,11 @@ export function GroupInviteNotification({ notification, onMarkAsRead }: Notifica
         <div className={styles.actionButtons}>
           <button className={styles.acceptButton}
             onClick={acceptInvitation}
-            disabled={group.status == 'pending' || requestHandled}
+            disabled={group.memberStatus !== 'pending' || requestHandled}
           >✓ Accept</button>
           <button className={styles.declineButton}
             onClick={declineInvitation}
-            disabled={group.status == 'pending' || requestHandled}
+            disabled={group.memberStatus !== 'pending' || requestHandled}
           >× Decline</button>
         </div>
       </div>
