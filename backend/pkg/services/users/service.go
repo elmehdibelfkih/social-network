@@ -219,7 +219,7 @@ func UpdateUserProfile(w http.ResponseWriter, userId int64, req *UpdateProfileRe
 	if req.FirstName != nil {
 		ok, clean := utils.FirstNameLastName(*req.FirstName)
 		if !ok {
-			utils.BadRequest(w, *req.FirstName, "alert")
+			utils.BadRequest(w, "Invalid first name should be between 1 and 50 characters." + *req.FirstName, "alert")
 			return response, false
 		}
 		firstName = clean
@@ -229,7 +229,7 @@ func UpdateUserProfile(w http.ResponseWriter, userId int64, req *UpdateProfileRe
 	if req.LastName != nil {
 		ok, clean := utils.FirstNameLastName(*req.LastName)
 		if !ok {
-			utils.BadRequest(w, *req.LastName, "alert")
+			utils.BadRequest(w, "Invalid last name should be between 1 and 50 characters." + *req.LastName, "alert")
 			return response, false
 		}
 		lastName = clean
