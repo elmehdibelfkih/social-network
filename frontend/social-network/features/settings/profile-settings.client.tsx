@@ -252,40 +252,6 @@ export function ProfileSettings({ profile }: { profile: ProfileAPIResponse }) {
           />
         </div>
 
-        <div className={styles.passwordSection}>
-          <h3>Change Password</h3>
-          <p>Leave blank to keep current password</p>
-          
-          <div className={styles.field}>
-            <label>Current Password</label>
-            <input
-              type="password"
-              value={formData.currentPassword}
-              onChange={(e) => setFormData({ ...formData, currentPassword: e.target.value })}
-              placeholder="Enter current password"
-            />
-          </div>
-
-          <div className={styles.field}>
-            <label>New Password</label>
-            <input
-              type="password"
-              value={formData.newPassword}
-              onChange={(e) => setFormData({ ...formData, newPassword: e.target.value })}
-              placeholder="Enter new password"
-            />
-          </div>
-
-          <div className={styles.field}>
-            <label>Confirm New Password</label>
-            <input
-              type="password"
-              value={formData.confirmPassword}
-              onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-              placeholder="Confirm new password"
-            />
-          </div>
-        </div>
 
         <div className={styles.actions}>
           <button type="button" className={styles.cancelBtn}>Cancel</button>
