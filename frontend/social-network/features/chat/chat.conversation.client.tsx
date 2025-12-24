@@ -152,31 +152,31 @@ export default function ChatConversation({ chatId, user, onClose }: ChatConversa
     }, [messages, hasMore, loadingOld]);
 
     async function updateSeen(last: ChatMessage) {
-        last.seenState = "read"
-        const resp = await chatService.sendChatSeen(last, chatId);
-        const chatSeenResponse = {
-            messageId: resp.messageId,
-            chatId: resp.chatId,
-            senderId: last.senderId,
-            content: resp.content,
-            seenState: resp.seenState,
-            createdAt: resp.createdAt,
-            updatedAt: resp.updatedAt,
+        const updatedLast = {
+            ...last,
+            seenState: "delivered",
         };
+        const resp = await chatService.sendChatSeen(updatedLast, chatId);
         setMessages(prev => {
             const next = new Map(prev);
-            next.set(chatSeenResponse.messageId, chatSeenResponse);
+            const existing = next.get(resp.messageId);
+            if (!existing) return prev;
+            next.set(resp.messageId, {
+                ...existing,
+                seenState: resp.seenState,
+                updatedAt: resp.updatedAt,
+            });
             return next;
         })
     }
 
     useEffect(() => {
-        if (!lastMessage) return
-        console.log(lastMessage.senderId != userData.userId)
-        if (lastMessage.senderId != userData.userId) {
-            updateSeen(lastMessage)
+        if (!lastMessage || !userData) return;
+        if (lastMessage.senderId !== userData.userId) {
+            updateSeen(lastMessage);
         }
-    }, [lastMessage])
+    }, [lastMessage, userData]);
+
 
     useEffect(() => {
         loadMessages();
@@ -244,7 +244,6 @@ export default function ChatConversation({ chatId, user, onClose }: ChatConversa
 
     const handleSubmitMessage = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault()
-        console.log("onsubmit")
         if (!input) return
         setIsLoading(true);
         try {
@@ -257,6 +256,7 @@ export default function ChatConversation({ chatId, user, onClose }: ChatConversa
                 seenState: 'sent',
                 createdAt: Date.now().toString(),
                 updatedAt: Date.now().toString(),
+                senderData: null
             }
             const resp = await chatService.sendChatMessage(chatMessage, chatId);
             const chatMessageResponse = {
@@ -267,6 +267,7 @@ export default function ChatConversation({ chatId, user, onClose }: ChatConversa
                 seenState: resp.seenState,
                 createdAt: resp.createdAt,
                 updatedAt: resp.updatedAt,
+                senderData: resp.senderData,
             };
             setLastMessage(chatMessageResponse)
             setMessages(prev => {

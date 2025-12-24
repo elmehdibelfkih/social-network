@@ -27,7 +27,7 @@ export default function GroupChatConversation({ chatId, group }: GroupChatConver
     const [isLoading, setIsLoading] = useState(false)
     const [input, setInput] = useState("");
     const [userData, setUserData] = useState(null)
-    const [isTyping, setIsTyping] = useState(false)
+    // const [isTyping, setIsTyping] = useState(false)
     const scrollRef = useRef<HTMLDivElement>(null);
     const [emojiOpen, setEmojiOpen] = useState(false);
     const inputRef = useRef<HTMLInputElement>(null);
@@ -59,8 +59,9 @@ export default function GroupChatConversation({ chatId, group }: GroupChatConver
             switch (data.type) {
                 case 'chat_message':
                     if (chatId !== data.payload.chatMessage.chatId) return
-                    if (data.payload.chatMessage.senderId != userData.userId) setIsTyping(false)
+                    // if (data.payload.chatMessage.senderId != userData.userId) setIsTyping(false)
                     setLastMessage(data.payload.chatMessage)
+                    console.log("message", data.payload.chatMessage)
                     setMessages(prev => {
                         const next = new Map(prev);
                         next.set(data.payload.chatMessage.messageId, data.payload.chatMessage);
@@ -74,7 +75,6 @@ export default function GroupChatConversation({ chatId, group }: GroupChatConver
                         const msgId = data.payload.markSeen.messageId;
                         const oldMsg = next.get(msgId);
                         if (!oldMsg) return prev;
-
                         const updated = {
                             ...oldMsg,
                             seenState: data.payload.markSeen.seenState
@@ -84,10 +84,10 @@ export default function GroupChatConversation({ chatId, group }: GroupChatConver
                     });
                     break;
                 case 'chat_typing':
-                    setIsTyping(true)
+                    // setIsTyping(true)
                     break;
                 case 'chat_afk':
-                    setIsTyping(false)
+                    // setIsTyping(false)
                     break;
                 default:
                     break;
@@ -152,35 +152,34 @@ export default function GroupChatConversation({ chatId, group }: GroupChatConver
     }, [messages, hasMore, loadingOld]);
 
     async function updateSeen(last: ChatMessage) {
-        last.seenState = "read"
-        const resp = await chatService.sendChatSeen(last, chatId);
-        const chatSeenResponse = {
-            messageId: resp.messageId,
-            chatId: resp.chatId,
-            senderId: last.senderId,
-            content: resp.content,
-            seenState: resp.seenState,
-            createdAt: resp.createdAt,
-            updatedAt: resp.updatedAt,
+        const updatedLast = {
+            ...last,
+            seenState: "read",
         };
+        const resp = await chatService.sendChatSeen(updatedLast, chatId);
         setMessages(prev => {
             const next = new Map(prev);
-            next.set(chatSeenResponse.messageId, chatSeenResponse);
+            const existing = next.get(resp.messageId);
+            if (!existing) return prev;
+            next.set(resp.messageId, {
+                ...existing,
+                seenState: resp.seenState,
+                updatedAt: resp.updatedAt,
+            });
             return next;
         })
     }
 
     useEffect(() => {
-        if (!lastMessage) return
-        console.log(lastMessage.senderId != userData.userId)
-        if (lastMessage.senderId != userData.userId) {
-            updateSeen(lastMessage)
+        if (!lastMessage || !userData) return;
+        if (lastMessage.senderId !== userData.userId) {
+            updateSeen(lastMessage);
         }
-    }, [lastMessage])
+    }, [lastMessage, userData]);
 
     useEffect(() => {
         loadMessages();
-    }, [chatId])
+    }, [])
 
     async function loadMessages() {
         try {
@@ -221,18 +220,6 @@ export default function GroupChatConversation({ chatId, group }: GroupChatConver
             input.slice(end);
 
         setInput(next);
-        //send typing
-        // chatService.sendToWorker({
-        //     source: "client", type: "chat_typing", payload: {
-        //         typingIndicator: {
-        //             firstName: user.firstName,
-        //             lastName: user.lastName,
-        //             nickName: user.nickname || "",
-        //             chatId: chatId
-        //         }
-        //     }
-        // })
-
         requestAnimationFrame(() => {
             el.focus();
             el.setSelectionRange(
@@ -244,7 +231,6 @@ export default function GroupChatConversation({ chatId, group }: GroupChatConver
 
     const handleSubmitMessage = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault()
-        console.log("onsubmit")
         if (!input) return
         setIsLoading(true);
         try {
@@ -257,6 +243,7 @@ export default function GroupChatConversation({ chatId, group }: GroupChatConver
                 seenState: 'sent',
                 createdAt: Date.now().toString(),
                 updatedAt: Date.now().toString(),
+                senderData: null
             }
             const resp = await chatService.sendChatMessage(chatMessage, chatId);
             const chatMessageResponse = {
@@ -267,6 +254,7 @@ export default function GroupChatConversation({ chatId, group }: GroupChatConver
                 seenState: resp.seenState,
                 createdAt: resp.createdAt,
                 updatedAt: resp.updatedAt,
+                senderData: resp.senderData,
             };
             setLastMessage(chatMessageResponse)
             setMessages(prev => {
@@ -287,21 +275,10 @@ export default function GroupChatConversation({ chatId, group }: GroupChatConver
         }
     };
 
-    const handleSubmitDebounced = useDebounceCbf(handleSubmitMessage, 200)
+    const handleSubmitDebounced = useDebounceCbf(handleSubmitMessage, 100)
 
     const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
         setInput(e.target.value);
-        //send typing
-        // chatService.sendToWorker({
-        //     source: "client", type: "chat_typing", payload: {
-        //         typingIndicator: {
-        //             firstName: user.firstName,
-        //             lastName: user.lastName,
-        //             nickName: user.nickname || "",
-        //             chatId: chatId
-        //         }
-        //     }
-        // })
     };
 
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
@@ -324,10 +301,15 @@ export default function GroupChatConversation({ chatId, group }: GroupChatConver
                             key={msg.messageId}
                             className={`${styles.message} ${msg.senderId == userData.userId ? styles.myMessage : styles.otherMessage}`}
                         >
-                            <AvatarHolder avatarId={userData.avatarId} size={30} />
+                            {msg.senderId == userData?.userId ?
+                                <AvatarHolder avatarId={userData.avatarId} size={30} /> : <AvatarHolder avatarId={msg.senderData?.avatarId} size={30} />
+                            }
                             <div>
                                 <div className={styles.messageOwner}>
-                                    {userData.nickname ? userData.nickname : userData.firstName + " " + userData.lastName}
+                                    {msg.senderId == userData?.userId ?
+                                        userData?.nickname ?? `${userData?.firstName ?? ""} ${userData?.lastName ?? ""}`.trim()
+                                        : msg.senderData?.nickname ?? `${msg.senderData?.firstName ?? ""} ${msg.senderData?.lastName ?? ""}`.trim()
+                                    }
                                 </div>
                                 <div className={styles.messageContent}>
                                     {msg.content}
