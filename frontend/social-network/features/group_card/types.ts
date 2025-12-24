@@ -20,11 +20,13 @@ export type GroupEventsResponse = {
 export type Group = {
   groupId: number;
   title: string;
+  chatId: number;
   description: string;
   avatarId: number;
   creatorId: number;
   memberCount: number;
   createdAt: string;
+  status: 'declined' | 'accepted' | 'pending'; // membership status
   events: Event[];
 };
 
@@ -44,7 +46,7 @@ export type CreateGroupPayload = {
 export type JoinGroupResponse = {
   message: string;
   groupId: number;
-  status: 'pending' | 'approved'; // Add other statuses if needed
+  status: 'pending' | 'accepted'; // Add other statuses if needed
 };
 
 

@@ -28,11 +28,7 @@ export default function GroupsPageClient({
   
   // Discover Groups state
   const [discoverGroups, setDiscoverGroups] = useState<Group[]>(initialDiscoverGroups);
-  const [lastDiscoverGroupId, setLastDiscoverGroupId] = useState<number | undefined>(
-    initialDiscoverGroups.length > 0 
-      ? initialDiscoverGroups[initialDiscoverGroups.length - 1].groupId 
-      : undefined
-  );
+  const [discoverGroupsOffset, setDiscoverGroupsOffset] = useState(initialDiscoverGroups.length);
   const [isLoadingDiscover, setIsLoadingDiscover] = useState(false);
   const [hasMoreDiscover, setHasMoreDiscover] = useState(initialDiscoverGroups.length === 10);
 
@@ -58,11 +54,7 @@ export default function GroupsPageClient({
       setHasMoreMyGroups(updatedMyGroups.length === 10);
       
       setDiscoverGroups(updatedDiscoverGroups);
-      setLastDiscoverGroupId(
-        updatedDiscoverGroups.length > 0 
-          ? updatedDiscoverGroups[updatedDiscoverGroups.length - 1].groupId 
-          : undefined
-      );
+      setDiscoverGroupsOffset(updatedDiscoverGroups.length);
       setHasMoreDiscover(updatedDiscoverGroups.length === 10);
       
       setIsOpen(false);
@@ -95,17 +87,17 @@ export default function GroupsPageClient({
   }, [isLoadingMyGroups, hasMoreMyGroups, myGroupsOffset]);
 
   const loadMoreDiscoverGroups = useCallback(async () => {
-    if (isLoadingDiscover || !hasMoreDiscover || !lastDiscoverGroupId) return;
+    if (isLoadingDiscover || !hasMoreDiscover) return;
     
     setIsLoadingDiscover(true);
     try {
-      const moreGroups = await GroupService.getOthersGroups(10, lastDiscoverGroupId);
+      const moreGroups = await GroupService.getOthersGroups(10, discoverGroupsOffset);
       
       if (moreGroups.length === 0) {
         setHasMoreDiscover(false);
       } else {
         setDiscoverGroups(prev => [...prev, ...moreGroups]);
-        setLastDiscoverGroupId(moreGroups[moreGroups.length - 1].groupId);
+        setDiscoverGroupsOffset(prev => prev + moreGroups.length);
         setHasMoreDiscover(moreGroups.length === 10);
       }
     } catch (error) {
@@ -113,19 +105,22 @@ export default function GroupsPageClient({
     } finally {
       setIsLoadingDiscover(false);
     }
-  }, [isLoadingDiscover, hasMoreDiscover, lastDiscoverGroupId]);
+  }, [isLoadingDiscover, hasMoreDiscover, discoverGroupsOffset]);
 
   // Handle joining a group
   async function handleJoinGroup(groupId: number) {
     try {
       await GroupService.joinGroup(groupId);
       
-      // Remove from discover and add to my groups
-      const joinedGroup = discoverGroups.find(g => g.groupId === groupId);
-      if (joinedGroup) {
-        setDiscoverGroups(prev => prev.filter(g => g.groupId !== groupId));
-        setMyGroups(prev => [joinedGroup, ...prev]);
-      }
+      // Update the group status to 'pending' in discover list
+      // Don't move it to My Groups yet - it's still pending approval
+      setDiscoverGroups(prev => 
+        prev.map(g => 
+          g.groupId === groupId 
+            ? { ...g, status: 'pending' as const }
+            : g
+        )
+      );
     } catch (error) {
       console.error("Failed to join group:", error);
     }
@@ -171,7 +166,6 @@ export default function GroupsPageClient({
         </button>
       </div>
 
-      {/* Tabs */}
       <div className={styles.tabs_container}>
         <button
           className={`${styles.tab} ${activeTab === 'my-groups' ? styles.tab_active : ''}`}

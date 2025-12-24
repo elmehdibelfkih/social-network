@@ -31,9 +31,10 @@ export function NotificationProvider({ children }) {
         try {
             const notificationsResponse = await notificationsService.getNotifications(20)
 
-            const activeNotifications = notificationsResponse.notifications.filter(
+            const activeNotifications = notificationsResponse?.notifications?.filter(
                 (notif) => notif.status === 'active'
             )
+            console.log(activeNotifications)
             setNotifications(activeNotifications)
             setHasMore(notificationsResponse?.notifications?.length == 20)
         } catch (error) {
@@ -143,6 +144,7 @@ export function NotificationProvider({ children }) {
         }
 
         setNotifications((prev) => {
+            if (!prev) return
             const exists = prev.some(n => n.notificationId === newNotification.notificationId)
             if (exists) {
                 return prev

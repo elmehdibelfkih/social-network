@@ -13,6 +13,7 @@ type CreateGroupRequestJson struct {
 
 type CreateGroupResponseJson struct {
 	GroupId     int64  `json:"groupId"`
+	ChatId      int64  `json:"chatId"`
 	CreatorId   int64  `json:"creatorId"`
 	Title       string `json:"title"`
 	Description string `json:"description"`
@@ -25,6 +26,7 @@ type CreateGroupResponseJson struct {
 type GetGroupResponseJson struct {
 	GroupId     int64  `json:"groupId"`
 	CreatorId   int64  `json:"creatorId"`
+	ChatId      int64  `json:"chatId"`
 	Title       string `json:"title"`
 	Description string `json:"description"`
 	MemberCount int64  `json:"memberCount"`
@@ -65,6 +67,7 @@ type BrowseGroupsResponseJson struct {
 
 type GroupItemJson struct {
 	GroupId     int64  `json:"groupId"`
+	Status	  	string `json:"status"`
 	Title       string `json:"title"`
 	Description string `json:"description"`
 	AvatarId    *int64 `json:"avatarId"` // optional
@@ -192,10 +195,10 @@ type RSVPResponseJson struct {
 	Message string `json:"message"`
 }
 
-type GetRSVPResponseJson struct{
-	Countgoing *int32      `json:"going_count"`
-	CountNotgoing *int32   `json:"notgoing_count"`
-	Amigoing bool		  `json:"ami_going"`
+type GetRSVPResponseJson struct {
+	Countgoing    *int32 `json:"going_count"`
+	CountNotgoing *int32 `json:"notgoing_count"`
+	Amigoing      bool   `json:"ami_going"`
 }
 
 // validators

@@ -190,6 +190,7 @@ func InsertNotification(n Notification, actorId int64, tx *sql.Tx) error {
 		return err
 	}
 
+	n.ActorId = actorId
 	n.ActorName = first + " " + last
 	n.ActorAvatarId = avatarId
 	err = tx.QueryRow(SELECT_NOTIFCATION, n.UserId, n.Type, n.RefrenceType, n.RefrenceId).Scan(&id)
@@ -202,6 +203,7 @@ func InsertNotification(n Notification, actorId int64, tx *sql.Tx) error {
 	}
 	err = tx.QueryRow(UPSERT_NOTIFICATION,
 		n.NotificationId,
+		n.ActorId,
 		n.ActorName,
 		n.ActorAvatarId,
 		n.UserId,
@@ -212,6 +214,7 @@ func InsertNotification(n Notification, actorId int64, tx *sql.Tx) error {
 		n.Status,
 	).Scan(
 		&n.NotificationId,
+		&n.ActorId,
 		&n.ActorName,
 		&n.ActorAvatarId,
 		&n.UserId,

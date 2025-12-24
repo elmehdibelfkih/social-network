@@ -27,13 +27,16 @@ export default function CreateGroupEvent({ groupId, onComplete, onClose }: Creat
 
         const startDateTime = new Date(`${startDate}T${startTime}`)
         const endDateTime = new Date(`${endDate}T${endTime}`)
+        const now = new Date()
 
-        // Check if end time is after start time
+        if (startDateTime < now) {
+            return 'Start date and time must be in the future'
+        }
+
         if (endDateTime <= startDateTime) {
             return 'End date and time must be after start date and time'
         }
 
-        // Check if there's at least 30 minutes difference
         const diffInMinutes = (endDateTime.getTime() - startDateTime.getTime()) / (1000 * 60)
         if (diffInMinutes < 30) {
             return 'Event must be at least 30 minutes long'
@@ -61,7 +64,6 @@ export default function CreateGroupEvent({ groupId, onComplete, onClose }: Creat
         setIsSubmitting(true)
 
         try {
-            // Combine date and time into ISO format with Z (UTC)
             const startDateTime = `${startDate}T${startTime}:00Z`
             const endDateTime = `${endDate}T${endTime}:00Z`
             
