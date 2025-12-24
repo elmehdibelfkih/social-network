@@ -88,12 +88,7 @@ export function ChatSection() {
 
         return onUnMount;
     }, []);
-    // useEffect(() => {
-    //     console.log("chat changed", openChats)
-    // }, [openChats])
-    // useEffect(() => {
-    //     console.log("users changed", users)
-    // }, [users])
+
     return (
         <div className={styles.wrapper}>
             <div className={styles.header}>

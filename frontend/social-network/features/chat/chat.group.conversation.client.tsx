@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState, useRef, FormEvent } from "react";
+import { useEffect, useState, useRef, FormEvent, useLayoutEffect } from "react";
 import styles from "./styles/chat.group.conversation.module.css";
 import { chatService } from "@/features/chat/services/chat";
 import { ChatMessage } from "./types";
@@ -61,7 +61,6 @@ export default function GroupChatConversation({ chatId, group }: GroupChatConver
                     if (chatId !== data.payload.chatMessage.chatId) return
                     // if (data.payload.chatMessage.senderId != userData.userId) setIsTyping(false)
                     setLastMessage(data.payload.chatMessage)
-                    console.log("message", data.payload.chatMessage)
                     setMessages(prev => {
                         const next = new Map(prev);
                         next.set(data.payload.chatMessage.messageId, data.payload.chatMessage);
@@ -97,6 +96,51 @@ export default function GroupChatConversation({ chatId, group }: GroupChatConver
         return onUnMount;
     }, [userData])
 
+
+    useEffect(() => {
+        const div = scrollRef.current;
+        if (!div) return;
+
+        function onScroll() {
+            if (div.scrollTop <= 0) {
+                loadOlderMessages();
+            }
+        }
+
+        div.addEventListener("scroll", onScroll);
+        return () => div.removeEventListener("scroll", onScroll);
+    }, [messages, hasMore, loadingOld]);
+
+    useEffect(() => {
+        if (!lastMessage || !userData) return;
+        if (lastMessage.senderId !== userData.userId) {
+            updateSeen(lastMessage);
+        }
+    }, [lastMessage, userData]);
+
+    useEffect(() => {
+        loadMessages();
+    }, [])
+
+    async function updateSeen(last: ChatMessage) {
+        const updatedLast = {
+            ...last,
+            seenState: "delivered",
+        };
+        const resp = await chatService.sendChatSeen(updatedLast, chatId);
+        setMessages(prev => {
+            const next = new Map(prev);
+            const existing = next.get(resp?.messageId);
+            if (!existing) return prev;
+            next.set(resp.messageId, {
+                ...existing,
+                seenState: resp.seenState,
+                updatedAt: resp.updatedAt,
+            });
+            return next;
+        })
+    }
+
     async function loadOlderMessages() {
         console.log(oldestMessage)
         console.log(lastMessage)
@@ -105,7 +149,7 @@ export default function GroupChatConversation({ chatId, group }: GroupChatConver
         if (!div) return;
         setLoadingOld(true);
         const prevScrollHeight = div.scrollHeight;
-
+        if (!oldestMessage) return
         const resp = await chatService.chatHistory(chatId, oldestMessage.messageId);
         if (!resp.messagesList) {
             setHasMore(false);
@@ -137,50 +181,6 @@ export default function GroupChatConversation({ chatId, group }: GroupChatConver
         setLoadingOld(false);
     }
 
-    useEffect(() => {
-        const div = scrollRef.current;
-        if (!div) return;
-
-        function onScroll() {
-            if (div.scrollTop <= 0) {
-                loadOlderMessages();
-            }
-        }
-
-        div.addEventListener("scroll", onScroll);
-        return () => div.removeEventListener("scroll", onScroll);
-    }, [messages, hasMore, loadingOld]);
-
-    async function updateSeen(last: ChatMessage) {
-        const updatedLast = {
-            ...last,
-            seenState: "read",
-        };
-        const resp = await chatService.sendChatSeen(updatedLast, chatId);
-        setMessages(prev => {
-            const next = new Map(prev);
-            const existing = next.get(resp.messageId);
-            if (!existing) return prev;
-            next.set(resp.messageId, {
-                ...existing,
-                seenState: resp.seenState,
-                updatedAt: resp.updatedAt,
-            });
-            return next;
-        })
-    }
-
-    useEffect(() => {
-        if (!lastMessage || !userData) return;
-        if (lastMessage.senderId !== userData.userId) {
-            updateSeen(lastMessage);
-        }
-    }, [lastMessage, userData]);
-
-    useEffect(() => {
-        loadMessages();
-    }, [])
-
     async function loadMessages() {
         try {
             const resp = await chatService.chatHistory(chatId);
@@ -206,7 +206,6 @@ export default function GroupChatConversation({ chatId, group }: GroupChatConver
         setEmojiOpen(v => !v);
     }
 
-
     function insertEmoji(emoji: string) {
         const el = inputRef.current;
         if (!el) return;
@@ -229,62 +228,72 @@ export default function GroupChatConversation({ chatId, group }: GroupChatConver
         });
     }
 
-    const handleSubmitMessage = async (e: FormEvent<HTMLFormElement>) => {
-        e.preventDefault()
-        if (!input) return
-        setIsLoading(true);
-        try {
-            setUserData(JSON.parse(localStorage.getItem("social_network-user")))
-            const chatMessage = {
-                messageId: 0,
-                chatId: chatId,
-                senderId: Number(userData.userId),
-                content: input,
-                seenState: 'sent',
-                createdAt: Date.now().toString(),
-                updatedAt: Date.now().toString(),
-                senderData: null
+    const sendMessageDebounced = useDebounceCbf(
+        async (chatMessage) => {
+            try {
+                setIsLoading(true)
+                const resp = await chatService.sendChatMessage(chatMessage, chatId);
+
+                const chatMessageResponse = {
+                    messageId: resp.messageId,
+                    chatId: resp.chatId,
+                    senderId: resp.senderId,
+                    content: resp.content,
+                    seenState: resp.seenState,
+                    createdAt: resp.createdAt,
+                    updatedAt: resp.updatedAt,
+                    senderData: resp.senderData,
+                };
+
+                setLastMessage(chatMessageResponse);
+                setMessages(prev => {
+                    const next = new Map(prev);
+                    next.set(chatMessageResponse.messageId, chatMessageResponse);
+                    return next;
+                });
+                setInput("");
+            } finally {
+                setIsLoading(false);
             }
-            const resp = await chatService.sendChatMessage(chatMessage, chatId);
-            const chatMessageResponse = {
-                messageId: resp.messageId,
-                chatId: resp.chatId,
-                senderId: resp.senderId,
-                content: resp.content,
-                seenState: resp.seenState,
-                createdAt: resp.createdAt,
-                updatedAt: resp.updatedAt,
-                senderData: resp.senderData,
-            };
-            setLastMessage(chatMessageResponse)
-            setMessages(prev => {
-                const next = new Map(prev);
-                next.set(chatMessageResponse.messageId, chatMessageResponse);
-                return next;
-            })
-            setInput("");
-            requestAnimationFrame(() => {
-                requestAnimationFrame(() => {
-                    scrollRef.current.scrollTop = scrollRef.current.scrollHeight; // scoll down after submiting a msg
-                })
-            })
-        } catch (error) {
-            console.error("Failed to send message:", error);
-        } finally {
-            setIsLoading(false);
-        }
+        },
+        150
+    );
+
+    const handleSubmitMessage = async () => {
+        if (!input || isLoading) return;
+        const chatMessage = {
+            messageId: 0,
+            chatId,
+            senderId: Number(userData.userId),
+            content: input,
+            seenState: "sent",
+            createdAt: Date.now().toString(),
+            updatedAt: Date.now().toString(),
+            senderData: null
+        };
+
+        sendMessageDebounced(chatMessage);
     };
 
-    const handleSubmitDebounced = useDebounceCbf(handleSubmitMessage, 100)
-
+    const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        handleSubmitMessage();
+    };
+    
     const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
         setInput(e.target.value);
     };
 
-    const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        handleSubmitDebounced(e);
-    }
+    useLayoutEffect(() => {
+        const el = scrollRef.current;
+        if (!el) return;
+        if (lastMessage?.senderId != userData?.userId) return
+
+        el.scrollTo({
+            top: el.scrollHeight,
+            behavior: "smooth",
+        });
+    }, [lastMessage]);
 
     return (
         <div className={styles.chatContainer}>

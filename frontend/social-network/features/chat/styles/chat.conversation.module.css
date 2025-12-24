@@ -50,7 +50,7 @@
 }
 
 .myMessage {
-    background: var(--primary-purple-light);
+    background: var(--primary-purple-very-light);
     color: white;
     align-self: flex-end;
     display: flex;

@@ -6,6 +6,9 @@ import { http } from '@/libs/apiFetch'
 import { FollowApiResponse } from './types'
 import { useUserStats } from '@/providers/userStatsContext'
 import { MiniProfile } from '@/libs/globalTypes'
+import { User } from '../chat/types'
+import FloatingChat from '../chat/chat.popup.client'
+
 
 type Props = {
   data?: MiniProfile
@@ -17,6 +20,7 @@ export function MiniProfileActions({ data }: Props) {
 
   const [status, setStatus] = useState<string | null>(data?.status ?? null)
   const [followersCount, setFollowersCount] = useState(data?.stats?.followersCount ?? 0)
+  const [currentChat, setCurrentChat] = useState<Map<number, User>>(new Map());
   const [chatId, setChatId] = useState<number | null | undefined>(
     data?.chatId ?? null
   )
@@ -45,6 +49,14 @@ export function MiniProfileActions({ data }: Props) {
     }
   }
 
+  const handleCloseChat = (chatId: number) => {
+    setCurrentChat(prev => {
+      const next = new Map(prev);
+      next.delete(chatId);
+      return next;
+    });
+  };
+
   async function doUnfollow() {
     if (busy || !data?.userId) return
     setBusy(true)
@@ -66,7 +78,26 @@ export function MiniProfileActions({ data }: Props) {
 
   function onMessage() {
     if (!chatId) return
-    window.location.href = `/chat/${chatId}`
+    // window.location.href = `/chat/${chatId}`
+    const user = {
+      chatId: data.chatId,
+      role: "member",
+      unreadCount: 0,
+      userId: data.userId,
+      email: "",
+      firstName: data.firstName,
+      lastName: data.lastName,
+      dateOfBirth: "",
+      nickname: data.nickname,
+      aboutMe: "",
+      avatarId: data.avatarId,
+      online: true,
+    }
+    setCurrentChat(prev => {
+      const next = new Map(prev);
+      next.set(chatId, user);
+      return next;
+    });
   }
 
   if (!data) return null
@@ -171,6 +202,14 @@ export function MiniProfileActions({ data }: Props) {
           )}
         </div>
       </div>
+      {Array.from(currentChat.entries()).map(([chatId, user]) => (
+        <FloatingChat
+          key={chatId}
+          chatId={chatId}
+          user={user}
+          onClose={() => handleCloseChat(chatId)}
+        />
+      ))}
     </>
   )
 }
