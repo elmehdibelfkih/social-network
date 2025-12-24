@@ -34,7 +34,6 @@ export function NotificationProvider({ children }) {
             const activeNotifications = notificationsResponse?.notifications?.filter(
                 (notif) => notif.status === 'active'
             )
-            console.log(activeNotifications)
             setNotifications(activeNotifications)
             setHasMore(notificationsResponse?.notifications?.length == 20)
         } catch (error) {

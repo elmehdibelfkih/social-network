@@ -60,7 +60,7 @@ type Notification struct {
 	RefrenceType   string  `json:"refrenceType"`
 	Content        string  `json:"content"`
 	Status         string  `json:"status"`
-	IsRead         string  `json:"isRead"`
+	IsRead         int     `json:"isRead"`
 	CreatedAt      string  `json:"createdAt"`
 	ReadAt         *string `json:"readAt"`
 }

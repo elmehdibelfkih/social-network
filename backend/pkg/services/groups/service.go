@@ -104,7 +104,7 @@ func MemberStatusAccepted(w http.ResponseWriter, r *http.Request,
 	groupId, userId int64, status string, response *AcceptMemberResponseJson, context string,
 ) bool {
 	group := &GetGroupResponseJson{}
-	err := SelectGroupById(groupId, group)
+	err := SelectGroupById(groupId, userId, group)
 	if err != nil {
 		utils.BackendErrorTarget(err, context)
 		utils.IdentifySqlError(w, err)
@@ -195,7 +195,13 @@ func GroupInfo(w http.ResponseWriter, r *http.Request,
 	response *GetGroupResponseJson, context string,
 ) bool {
 	groupId := utils.GetWildCardValue(w, r, "group_id")
-	err := SelectGroupById(groupId, response)
+	userId := utils.GetUserIdFromContext(r)
+	checkUserId := utils.GetQuerryPramInt(r, "checkUserId")
+	if checkUserId != 0 {
+		userId = checkUserId
+	}
+
+	err := SelectGroupById(groupId, userId, response)
 	if err != nil {
 		utils.BackendErrorTarget(err, context)
 		utils.IdentifySqlError(w, err)
