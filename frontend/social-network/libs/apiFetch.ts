@@ -67,6 +67,7 @@ function buildErrorTarget(
 
 function performRedirect(target: string, clientNavigate?: (path: string) => void): never {
   if (isServer) {
+    console.log(target)
     nextRedirect(target);
   } else {
     if (typeof clientNavigate === 'function') {
@@ -164,7 +165,7 @@ export async function apiFetch<T>(
   }
 
   if (apiError.statusCode === 401) {
-    performRedirect('/auth', clientNavigate);
+    // performRedirect('/auth', clientNavigate);
   }
 
   const message = apiError.errorMessage || 'Request failed';
@@ -174,7 +175,7 @@ export async function apiFetch<T>(
       title: redirectTitle,
       message: errorMessage
     });
-    performRedirect(target, clientNavigate);
+    // performRedirect(target, clientNavigate);
   }
 
   if (apiError.errorType === 'alert') {
@@ -189,7 +190,7 @@ export async function apiFetch<T>(
         title: redirectTitle,
         message: errorMessage
       });
-      performRedirect(target, clientNavigate);
+      // performRedirect(target, clientNavigate);
     }
   }
 

@@ -23,12 +23,7 @@ func CreateGroup(w http.ResponseWriter, r *http.Request,
 		utils.IdentifySqlError(w, err)
 		return false
 	}
-	err = UpdateMetaData("group", response.GroupId, 1)
-	if err != nil {
-		utils.BackendErrorTarget(err, context)
-		utils.IdentifySqlError(w, err)
-		return false
-	}
+
 	return true
 }
 
@@ -45,12 +40,14 @@ func CreateGroupHttp(w http.ResponseWriter,
 func InviteMember(w http.ResponseWriter, r *http.Request,
 	response *InviteUserResponseJson, context string,
 ) bool {
+	sourceId := utils.GetUserIdFromContext(r)
 	targetId := utils.GetWildCardValue(w, r, "user_id")
 	groupId := utils.GetWildCardValue(w, r, "group_id")
 	if !ValidRelationship(w, r, targetId, context) {
+		utils.Unauthorized(w, "You must be following or followed by this user to invite them")
 		return false
 	}
-	err := InsertNewGroupMember(targetId, groupId, "pending", "member", "group_invite", response)
+	err := InsertNewGroupMember(sourceId, targetId, groupId, "pending", "member", "group_invite", response)
 	if err != nil {
 		utils.BackendErrorTarget(err, context)
 		utils.IdentifySqlError(w, err)
@@ -74,7 +71,7 @@ func JoinGroup(w http.ResponseWriter, r *http.Request,
 	groupId, userId int64, response *JoinGroupResponseJson, context string,
 ) bool {
 	var placeHolder InviteUserResponseJson
-	err := InsertNewGroupMember(userId, groupId, "pending", "member", "group_join", &placeHolder)
+	err := InsertNewGroupMember(userId, userId, groupId, "pending", "member", "group_join", &placeHolder)
 	if err != nil {
 		utils.BackendErrorTarget(err, context)
 		utils.IdentifySqlError(w, err)
@@ -210,6 +207,36 @@ func GroupsInfo(w http.ResponseWriter, r *http.Request,
 	lastItemId := utils.GetQuerryPramInt(r, "lastItemId")
 
 	err := SelectGroupsById(limit, lastItemId, response)
+	if err != nil {
+		utils.BackendErrorTarget(err, context)
+		utils.IdentifySqlError(w, err)
+		return false
+	}
+	return true
+}
+
+func GroupsInfoByuser(w http.ResponseWriter, r *http.Request,
+	response *BrowseGroupsResponseJson, context string,
+) bool {
+	userId := utils.GetUserIdFromContext(r)
+	limit := utils.GetQuerryPramInt(r, "limit")
+	offset := utils.GetQuerryPramInt(r, "offset")
+	err := SelectGroupsByUserId(limit, userId, offset, response)
+	if err != nil {
+		utils.BackendErrorTarget(err, context)
+		utils.IdentifySqlError(w, err)
+		return false
+	}
+	return true
+}
+
+func OtherGroupsInfoByuser(w http.ResponseWriter, r *http.Request,
+	response *BrowseGroupsResponseJson, context string,
+) bool {
+	userId := utils.GetUserIdFromContext(r)
+	limit := utils.GetQuerryPramInt(r, "limit")
+	offset := utils.GetQuerryPramInt(r, "offset")
+	err := SelectOtherGroupsByUserId(limit, userId, offset, response)
 	if err != nil {
 		utils.BackendErrorTarget(err, context)
 		utils.IdentifySqlError(w, err)

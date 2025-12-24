@@ -385,3 +385,47 @@ func UpdateUserProfile(w http.ResponseWriter, userId int64, req *UpdateProfileRe
 	response.Message = "Updated successful."
 	return response, true
 }
+
+// ChangeUserPassword updates a user's password
+func ChangeUserPassword(w http.ResponseWriter, userId int64, req *ChangePasswordRequestJson, context string) (ChangePasswordResponseJson, bool) {
+	var response ChangePasswordResponseJson
+
+	// Validate required fields
+	if req.CurrentPassword == "" || req.NewPassword == "" {
+		utils.BadRequest(w, "Both current password and new password are required.", "alert")
+		return response, false
+	}
+
+	// Verify current password
+	currentPasswordHash, err := SelectUserPasswordHash(userId)
+	if err != nil {
+		utils.BackendErrorTarget(err, context)
+		utils.InternalServerError(w)
+		return response, false
+	}
+
+	if !utils.CheckPasswordHash(req.CurrentPassword, currentPasswordHash) {
+		utils.BadRequest(w, "Current password is incorrect.", "alert")
+		return response, false
+	}
+
+	// Hash new password
+	newPasswordHash := req.NewPassword
+	err = utils.GeneratePasswordHash(&newPasswordHash)
+	if err != nil {
+		utils.BackendErrorTarget(err, context)
+		utils.InternalServerError(w)
+		return response, false
+	}
+
+	// Update password
+	err = UpdateUserPasswordInDB(userId, newPasswordHash)
+	if err != nil {
+		utils.BackendErrorTarget(err, context)
+		utils.InternalServerError(w)
+		return response, false
+	}
+
+	response.Message = "Password updated successfully."
+	return response, true
+}

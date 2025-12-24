@@ -7,6 +7,8 @@ import { ProfileAPIResponse } from "@/libs/globalTypes";
 import { NewPost } from "@/features/newPost";
 import { postsService } from "@/features/posts";
 import { Feed } from "@/features/posts/Feed";
+import { ChatSection } from "@/features/chat";
+import styles from "@/styles/app.module.css"
 
 export default async function HomePage(): Promise<JSX.Element> {
 
@@ -18,11 +20,21 @@ export default async function HomePage(): Promise<JSX.Element> {
 
   return (
     <>
-      <ProfileSummary/>
-      <div>
-        <NewPost  isMyprofile={false} />
-      </div>
-      <Feed initialPosts={posts} />
+      <main className={styles.main}>
+        <div className={styles.firstSection}>
+          <ProfileSummary />
+        </div>
+
+        <div className={styles.secondSection}>
+          <NewPost />
+          <Feed initialPosts={posts} />
+        </div>
+
+        <div className={styles.thirdSection}>
+          <ChatSection></ChatSection>
+        </div>
+        <div id="chat-portals"></div>
+      </main>
     </>
   );
 }

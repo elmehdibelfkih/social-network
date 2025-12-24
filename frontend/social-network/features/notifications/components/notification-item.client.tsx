@@ -1,0 +1,6 @@
+export { FollowNotification } from './follow-notification.client'
+export { GroupInviteNotification } from './group-invite-notification.client'
+export { EventNotification } from './event-notification.client'
+export { PostLikedNotification } from './post-liked-notification.client'
+export { PostCommentedNotification } from './post-commented-notification.client'
+export { CustomNotification } from './custom-notification.client'

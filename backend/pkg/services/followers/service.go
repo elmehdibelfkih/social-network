@@ -2,24 +2,25 @@ package follow
 
 import (
 	"net/http"
+	socket "social/pkg/app/sockets"
 	"social/pkg/db/database"
 	"social/pkg/utils"
 )
 
-func followNotification(followerId, followedId int64, status string) Notification {
-	var notification Notification
+func followNotification(followerId, followedId int64, status string, notifStatus string) socket.Notification {
+	var notification socket.Notification
 
-	notification.id = utils.GenerateID()
+	notification.NotificationId = utils.GenerateID()
 	notification.UserId = followedId
 	notification.Type = "follow_request"
-	notification.ReferenceType = "user"
-	notification.ReferenceId = followerId
+	notification.RefrenceType = "user"
+	notification.RefrenceId = followerId
 	if status == "pending" {
 		notification.Content = "New follow request received."
 	} else {
 		notification.Content = "New follower."
 	}
-	notification.status = status
+	notification.Status = notifStatus
 	return notification
 }
 
@@ -39,7 +40,6 @@ func followResponse(w http.ResponseWriter, r *http.Request) {
 	userId := utils.GetUserIdFromContext(r)
 	targetUserId := utils.GetWildCardValue(w, r, "user_id")
 	var response FollowResponseJson
-
 	status, err := selectFollowStatus(userId, targetUserId)
 	if err != nil {
 		utils.InternalServerError(w)

@@ -7,8 +7,10 @@ const (
 		SELECT creator_id FROM groups WHERE id = ?
 	`
 	SELECT_GROUP_BY_GROUP_ID = `
-		SELECT id, creator_id, title, description, avatar_id, created_at, updated_at
-		FROM groups
+		SELECT g.id, g.creator_id, g.title, g.description, g.avatar_id, g.created_at, g.updated_at, gm.status
+		FROM groups g
+		LEFT JOIN group_members gm
+		ON g.id = gm.group_id
 		WHERE id = ?;
 	`
 	SELECT_FOLLOWS_BY_ID = `
@@ -46,6 +48,27 @@ const (
 		WHERE id < ?
 		ORDER BY created_at DESC
 		LIMIT ?
+	`
+	SELECT_BROWSE_GROUPS_BY_USER = `
+		SELECT g.id, g.title, g.description, g.avatar_id, g.creator_id, g.created_at
+		FROM group_members gm
+		JOIN groups g ON g.id = gm.group_id
+		WHERE gm.user_id = ?
+  			AND gm.status = 'accepted'
+		ORDER BY gm.joined_at DESC
+		LIMIT ? OFFSET ?
+	`
+
+	SELECT_BROWSE_OTHER_GROUPS_BY_USER = `
+		SELECT g.id, g.title, g.description, g.avatar_id, g.creator_id, g.created_at
+		FROM groups g
+		LEFT JOIN group_members gm
+  			ON gm.group_id = g.id
+  			AND gm.user_id = ?
+  			AND gm.status = 'accepted'
+			WHERE gm.user_id IS NULL
+		ORDER BY g.created_at DESC
+		LIMIT ? OFFSET ?
 	`
 
 	SELECT_GROUP_MEMBERS_BY_GROUP_ID = `
@@ -162,7 +185,7 @@ const (
 	ON CONFLICT(entity_type, entity_id)
 	DO UPDATE SET
   	followers_count = counters.followers_count + excluded.followers_count,
-	updated_at = CURRENT_TIMESTAMP;	
+	updated_at = CURRENT_TIMESTAMP;
 	`
 )
 

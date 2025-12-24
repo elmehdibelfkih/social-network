@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	socket "social/pkg/app/sockets"
 	"social/pkg/config"
 	"social/pkg/db/database"
 	"social/pkg/utils"
@@ -305,6 +306,19 @@ func CreateComment(comment *Comment) error {
 			return fmt.Errorf("failed to create comment: %w", err)
 		}
 
+		err = socket.InsertNotification(socket.Notification{
+			NotificationId: utils.GenerateID(),
+			UserId:         postAuthorID,
+			Type:           "post_commented",
+			RefrenceId:     comment.PostID,
+			RefrenceType:   "post",
+			Content:        "new Comment",
+			Status:         "active",
+		}, comment.AuthorID, tx)
+		if err != nil {
+			utils.SQLiteErrorTarget(err, "failed to insert notification")
+		}
+
 		// Increment post's comments_count
 		counter := addRemovePostActionsUpdateCounterStruct(database.POST_ENTITY_TYPE, comment.PostID, database.COMMENTS_ENTITY_NAME, database.ACTION_INCREMENT)
 		err = database.UpdateCounter(tx, counter)
@@ -456,6 +470,7 @@ func InsertCommentMedia(commentID int64, mediaIDs []int64) error {
 				utils.SQLiteErrorTarget(err, "InsertCommentMedia")
 				return err
 			}
+
 		}
 		return nil
 	})
@@ -503,6 +518,18 @@ func CreatePostReaction(postID, userID int64, reaction string) error {
 			utils.SQLiteErrorTarget(err, "CreatePostReaction")
 			return fmt.Errorf("failed to create reaction: %w", err)
 		}
+		err = socket.InsertNotification(socket.Notification{
+			NotificationId: utils.GenerateID(),
+			UserId:         authorID,
+			Type:           "post_liked",
+			RefrenceId:     postID,
+			RefrenceType:   "post",
+			Content:        "new reaction",
+			Status:         "active",
+		}, userID, tx)
+		if err != nil {
+			utils.SQLiteErrorTarget(err, "failed to insert notification")
+		}
 
 		// Increment post's reactions_count
 		counter := addRemovePostActionsUpdateCounterStruct(database.POST_ENTITY_TYPE, postID, database.REACTIONS_ENTITY_NAME, database.ACTION_INCREMENT)
@@ -549,6 +576,19 @@ func DeletePostReaction(postID, userID int64) error {
 
 		if rowsAffected == 0 {
 			return sql.ErrNoRows
+		}
+
+		err = socket.InsertNotification(socket.Notification{
+			NotificationId: utils.GenerateID(),
+			UserId:         authorID,
+			Type:           "post_liked",
+			RefrenceId:     postID,
+			RefrenceType:   "post",
+			Content:        "new reaction",
+			Status:         "suspended",
+		}, userID, tx)
+		if err != nil {
+			utils.SQLiteErrorTarget(err, "failed to insert notification")
 		}
 
 		// Decrement post's reactions_count
@@ -684,18 +724,18 @@ func GetCommentLikeCount(commentID int64) int {
 // GetPostStats returns reaction and comment counts for a post
 func GetPostStats(postID int64) (Stats, error) {
 	var stats Stats
-	
+
 	// Get reaction count
 	err := config.DB.QueryRow(QUERY_COUNT_POST_REACTIONS, postID).Scan(&stats.ReactionCount)
 	if err != nil {
 		stats.ReactionCount = 0
 	}
-	
+
 	// Get comment count
 	err = config.DB.QueryRow(QUERY_COUNT_POST_COMMENTS, postID).Scan(&stats.CommentCount)
 	if err != nil {
 		stats.CommentCount = 0
 	}
-	
+
 	return stats, nil
 }

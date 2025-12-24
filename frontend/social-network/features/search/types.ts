@@ -3,22 +3,13 @@ type PrivacyLevel = 'public' | 'followers' | 'private';
 type MembershipStatus = 'pending' | 'accepted' | 'declined' | null;
 
 // 2. User Definition
-interface UserStats {
-  postsCount: number;
-  followersCount: number;
-  followingCount: number;
-}
-
 export interface User {
   userId: number;
-  status: string; // e.g., "accepted"
-  nickname: string;
+  nickname: string | null;
   firstName: string;
   lastName: string;
-  avatarId: number;
+  avatarId: number | null;
   privacy: PrivacyLevel;
-  chatId: number | null; // Nullable
-  stats: UserStats;
 }
 
 // 3. Post Definition
@@ -47,11 +38,15 @@ export interface Post {
 export interface Group {
   groupId: number;
   title: string;
-  description: string;
-  avatarId?: number; // Optional field (might be undefined)
+  description: string | null;
+  avatarId?: number | null; // Optional field (might be undefined)
   creatorId: number;
   memberCount: number;
-  status: MembershipStatus;
-  chatId?: number; // Optional (if user is not a member)
-  createdAt: string;
+  status: 'accepted' | 'pending' | 'declined' | null;
+  chatId?: number;
+  createdAt?: string;
+  upcomingEvent?: {
+    title: string;
+    date: string;
+  };
 }

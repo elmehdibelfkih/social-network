@@ -1,0 +1,40 @@
+.wrapper {
+    border-radius: 20px;
+    background-color: var(--white);
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.banner {
+    display: flex;
+    width: 25%;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.closeAll {
+    align-items: center;
+    background: none;
+    border: none;
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 12px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.icon {
+    width: 20px;
+    height: 20px;
+}
+
+.scrollArea {
+    flex: 1;
+    overflow-y: auto;
+    padding: 8px 0;
+}

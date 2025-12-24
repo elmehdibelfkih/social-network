@@ -2,6 +2,7 @@ package follow
 
 import (
 	"net/http"
+	socket "social/pkg/app/sockets"
 	"social/pkg/utils"
 )
 
@@ -12,9 +13,17 @@ func FollowHandler(w http.ResponseWriter, r *http.Request) {
 	targetUserId := utils.GetWildCardValue(w, r, "user_id")
 	err := followUser(userId, targetUserId)
 	if err != nil {
-		utils.InternalServerError(w)
+		utils.IdentifySqlError(w, err)
 		return
 	}
+	err = createChatId(userId, targetUserId)
+	if err != nil {
+		utils.IdentifySqlError(w, err)
+		return
+	}
+	
+	socket.WSManger.UpdateChats(userId)
+	socket.WSManger.UpdateChats(targetUserId)
 	followResponse(w, r)
 	// todo: check notNound and supper flous error in localhost:8080/api/v1/users/:user_id/follow and similar
 }
@@ -25,9 +34,16 @@ func UnfollowHandler(w http.ResponseWriter, r *http.Request) {
 	targetUserId := utils.GetWildCardValue(w, r, "user_id")
 	err := unfollowUser(userId, targetUserId)
 	if err != nil {
-		utils.InternalServerError(w)
+		utils.IdentifySqlError(w, err)
 		return
 	}
+	err = suspendChatId(userId, targetUserId)
+	if err != nil {
+		utils.IdentifySqlError(w, err)
+		return
+	}
+	socket.WSManger.UpdateChats(userId)
+	socket.WSManger.UpdateChats(targetUserId)
 	unfollowResponse(w, r)
 }
 
@@ -75,6 +91,11 @@ func AcceptFollowHandler(w http.ResponseWriter, r *http.Request) {
 	err := acceptFollowRequest(targetUserId, userId)
 	if err != nil {
 		utils.InternalServerError(w)
+		return
+	}
+	err = createChatId(targetUserId, userId)
+	if err != nil {
+		utils.IdentifySqlError(w, err)
 		return
 	}
 	acceptFollowResponse(w, r)

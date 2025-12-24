@@ -21,6 +21,9 @@ async getGroupEvents(groupId: number): Promise<Event[]> {
   }
 },
 
+
+
+
 async getGroups(limit = 10, lastItemId?: number): Promise<Group[]> {
   try {
     const params = new URLSearchParams();
@@ -36,6 +39,58 @@ async getGroups(limit = 10, lastItemId?: number): Promise<Group[]> {
     );
 
     console.log('groups with events: ', groupsWithEvent);
+
+    return groupsWithEvent; 
+  } catch (error) {
+    console.error("Failed to fetch groups:", error);
+    return [];
+  }
+},
+
+
+
+
+
+async getMyGroups(limit = 10, offset?: number): Promise<Group[]> {
+  try {
+    const params = new URLSearchParams();
+    params.set("limit", String(limit));
+    if (offset) params.set("offset", String(offset));
+    const response = await http.get<GroupsResponse>(`/api/v1/my_groups/?${params.toString()}`);
+    if (!response?.groups) return [];
+    const groupsWithEvent = await Promise.all(
+      response.groups.map(async (grp) => {
+        const events = await this.getGroupEvents(grp.groupId);
+        return { ...grp, events };
+      })
+    );
+
+    console.log('MY MY MY MY MY MY MY groups with events: ', groupsWithEvent);
+
+    return groupsWithEvent; 
+  } catch (error) {
+    console.error("Failed to fetch groups:", error);
+    return [];
+  }
+},
+
+
+
+async getOthersGroups(limit = 10, offset?: number): Promise<Group[]> {
+  try {
+    const params = new URLSearchParams();
+    params.set("limit", String(limit));
+    if (offset) params.set("offset", String(offset));
+    const response = await http.get<GroupsResponse>(`/api/v1/others_groups/?${params.toString()}`);
+    if (!response?.groups) return [];
+    const groupsWithEvent = await Promise.all(
+      response.groups.map(async (grp) => {
+        const events = await this.getGroupEvents(grp.groupId);
+        return { ...grp, events };
+      })
+    );
+
+    console.log('MY MY MY MY MY MY MY groups with events: ', groupsWithEvent);
 
     return groupsWithEvent; 
   } catch (error) {

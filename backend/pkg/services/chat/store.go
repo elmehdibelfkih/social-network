@@ -3,184 +3,180 @@ package chat
 import (
 	"database/sql"
 	"fmt"
-	"time"
+	socket "social/pkg/app/sockets"
+	"social/pkg/db/database"
+	"social/pkg/utils"
 )
 
-func GetUserChatsFromDB(db *sql.DB, userId, lastConversationId int64, limit int) ([]ConversationsList, error) {
-	rows, err := db.Query(GetUserChatsQuery, userId, userId, lastConversationId, lastConversationId, limit)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
-	chats := []ConversationsList{}
-
-	for rows.Next() {
-		var chat ConversationsList
-		var groupId sql.NullInt64
-		var lastMsgId sql.NullInt64
-		var lastMsgText sql.NullString
-		var lastMsgCreated sql.NullString
-		var updatedAt sql.NullString
-
-		err := rows.Scan(
-			&chat.ChatId,
-			&groupId,
-			&chat.Name,
-			&lastMsgId,
-			&lastMsgText,
-			&lastMsgCreated,
-			&chat.UnreadCount,
-			&updatedAt,
-		)
-		if err != nil {
-			return nil, err
-		}
-
-		if groupId.Valid {
-			chat.GroupId = &groupId.Int64
-		}
-
-		if lastMsgId.Valid {
-			chat.LastMessage = &LastMessage{
-				Id:        lastMsgId.Int64,
-				Text:      lastMsgText.String,
-				CreatedAt: lastMsgCreated.String,
+func InsertMessage(c *ChatMessage) error {
+	return database.WrapWithTransaction(func(tx *sql.Tx) error {
+		c.SeenState = "sent"
+		fmt.Println(socket.WSManger.ChatOnlineUsers(c.ChatId))
+		if socket.WSManger.ChatOnlineUsers(c.ChatId) > 1 {
+			c.SeenState = "delivered"
+			_, err := tx.Exec(
+				UPDATE_MESSAGE_STATUS,
+				c.SeenState,
+				c.MessageId,
+				c.ChatId,
+				c.SenderId,
+			)
+			if err != nil {
+				utils.SQLiteErrorTarget(err, UPDATE_MESSAGE_STATUS)
+				return err
 			}
 		}
-
-		if updatedAt.Valid {
-			chat.UpdatedAt = updatedAt.String
-		}
-
-		chats = append(chats, chat)
-	}
-
-	return chats, nil
-}
-
-func GetChatMessagesFromDB(db *sql.DB, chatId, userId, lastMessageId int64, limit int) ([]Message, error) {
-	rows, err := db.Query(GetMessagesQuery, chatId, lastMessageId, lastMessageId, chatId, userId, limit)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
-	messages := []Message{}
-
-	for rows.Next() {
-		var msg Message
-		err := rows.Scan(
-			&msg.MessageID,
-			&msg.SenderID,
-			&msg.Text,
-			&msg.CreatedAt,
+		err := tx.QueryRow(INSERT_MESSAGE,
+			utils.GenerateID(),
+			c.ChatId,
+			c.SenderId,
+			c.Content,
+			c.SeenState,
+		).Scan(
+			&c.MessageId,
+			&c.ChatId,
+			&c.SenderId,
+			&c.Content,
+			&c.SeenState,
+			&c.CreatedAt,
+			&c.UpdatedAt,
 		)
 		if err != nil {
-			return nil, err
+			utils.SQLiteErrorTarget(err, INSERT_MESSAGE)
+			return err
 		}
-		messages = append(messages, msg)
-	}
-
-	return messages, nil
-}
-
-func DeleteMessage(db *sql.DB, messageId, userId, chatId int64) error {
-	var exists bool
-	err := db.QueryRow(checkMessageOwnershipQuery, messageId, userId, chatId).Scan(&exists)
-	if err == sql.ErrNoRows {
-		return fmt.Errorf("message not found or unauthorized")
-	}
-	if err != nil {
-		return fmt.Errorf("failed to check message ownership: %v", err)
-	}
-
-	result, err := db.Exec(deleteMessageQuery, messageId, userId)
-	if err != nil {
-		return fmt.Errorf("failed to delete message: %v", err)
-	}
-
-	affected, err := result.RowsAffected()
-	if err != nil {
-		return fmt.Errorf("error checking affected rows: %v", err)
-	}
-	if affected == 0 {
-		return fmt.Errorf("message not found or already deleted")
-	}
-
-	return nil
-}
-
-func GetChatParticipants(db *sql.DB, chatId, userId int64) ([]ChatParticipant, error) {
-	rows, err := db.Query(getParticipantsQuery, chatId, chatId, userId)
-	if err != nil {
-		return nil, fmt.Errorf("failed to fetch participants: %v", err)
-	}
-	defer rows.Close()
-
-	participants := []ChatParticipant{}
-	for rows.Next() {
-		var p ChatParticipant
-		err := rows.Scan(
-			&p.UserID,
-			&p.Username,
-			&p.Role,
-			&p.LastSeenMessageID,
-			&p.UnreadCount,
+		_, err = tx.Exec(
+			UPDATE_UNREAD_COUNT,
+			c.ChatId,
+			c.SenderId,
 		)
 		if err != nil {
-			return nil, fmt.Errorf("failed to scan participant: %v", err)
+			utils.SQLiteErrorTarget(err, UPDATE_UNREAD_COUNT)
+			return err
 		}
-		participants = append(participants, p)
-	}
-
-	return participants, nil
+		return nil
+	})
 }
 
-func InsertMessage(db *sql.DB, chatId, senderId int64, text string) (*SendMessageResponse, error) {
-	tx, err := db.Begin()
+func SelectChatById(chatId, userId int64) (bool, error) {
+	var exist bool
+	err := database.WrapWithTransaction(func(tx *sql.Tx) error {
+		err := tx.QueryRow(
+			SELECT_CHAT_MEMBER,
+			chatId,
+			userId,
+		).Scan(&exist)
+		return err
+	})
 	if err != nil {
-		return nil, err
+		utils.SQLiteErrorTarget(err, SELECT_CHAT_MEMBER)
+		return exist, err
 	}
-	defer tx.Rollback()
+	return exist, nil
+}
 
-	var exists bool
-	err = tx.QueryRow(checkChatParticipantQuery, chatId, senderId).Scan(&exists)
-	if err == sql.ErrNoRows {
-		return nil, fmt.Errorf("user is not a participant in this chat")
-	}
-	if err != nil {
-		return nil, fmt.Errorf("failed to check chat participation: %v", err)
-	}
+func UpdateMessageStatus(s *MarkSeen) error {
+	return database.WrapWithTransaction(func(tx *sql.Tx) error {
+		s.SeenState = "read"
+		_, err := tx.Exec(
+			UPDATE_MESSAGE_STATUS,
+			s.SeenState,
+			s.MessageId,
+			s.ChatId,
+			s.SenderId,
+		)
+		if err != nil {
+			utils.SQLiteErrorTarget(err, UPDATE_MESSAGE_STATUS)
+			return err
+		}
+		return err
+	})
+}
 
-	_, err = tx.Exec(insertMessageQuery, chatId, senderId, text)
-	if err != nil {
-		return nil, err
-	}
+func SelectChatMessages(userId, chatId, messageId int64, l *MessagesList) error {
+	return database.WrapWithTransaction(func(tx *sql.Tx) error {
+		var count int
+		limit := 20
+		err := tx.QueryRow(SELECT_UNREAD_COUNT, userId).Scan(&count)
+		if err != nil {
+			utils.SQLiteErrorTarget(err, SELECT_UNREAD_COUNT)
+			return err
+		}
+		_, err = tx.Exec(UPDATE_RESET_UNREAD_COUNT, userId)
+		if err != nil {
+			utils.SQLiteErrorTarget(err, UPDATE_RESET_UNREAD_COUNT)
+			return err
+		}
+		if count > limit {
+			limit = count
+		}
+		_, err = tx.Exec(UPDATE_MESSAGE_READ, chatId, userId, messageId, limit)
+		if err != nil {
+			utils.SQLiteErrorTarget(err, UPDATE_MESSAGE_READ)
+			return err
+		}
+		var rows *sql.Rows
+		if messageId > 0 {
+			rows, err = tx.Query(SELECT_CHAT_HISTORY_BEFORE, chatId, messageId, limit)
+			if err != nil {
+				utils.SQLiteErrorTarget(err, SELECT_CHAT_HISTORY_BEFORE)
+				return err
+			}
+		} else {
+			rows, err = tx.Query(SELECT_CHAT_HISTORY, chatId, limit)
+			if err != nil {
+				utils.SQLiteErrorTarget(err, SELECT_CHAT_HISTORY)
+				return err
+			}
+		}
+		defer rows.Close()
+		for rows.Next() {
+			var msg ChatMessage
+			err := rows.Scan(
+				&msg.MessageId,
+				&msg.ChatId,
+				&msg.SenderId,
+				&msg.Content,
+				&msg.SeenState,
+				&msg.CreatedAt,
+				&msg.UpdatedAt,
+			)
+			if err != nil {
+				utils.SQLiteErrorTarget(err, SELECT_CHAT_HISTORY)
+				return err
+			}
+			socket.WSManger.BroadcastToChat(userId, chatId, socket.Event{
+				Source: "server",
+				Type:   "chat_seen",
+				Payload: &socket.ClientMessage{
+					MarkSeen: &socket.MarkSeen{
+						MessageId: msg.MessageId,
+						ChatId:    msg.ChatId,
+						SenderId:  msg.SenderId,
+						Content:   msg.Content,
+						SeenState: msg.SeenState,
+						CreatedAt: msg.CreatedAt,
+						UpdatedAt: msg.UpdatedAt,
+					},
+				},
+			})
+			l.Messages = append(l.Messages, msg)
+		}
+		return nil
+	})
+}
 
-	var messageId int64
-	err = tx.QueryRow(getLastInsertedMessageID).Scan(&messageId)
-	if err != nil {
-		return nil, err
-	}
-
-	_, err = tx.Exec(updateChatTimestampQuery, chatId)
-	if err != nil {
-		return nil, err
-	}
-
-	err = tx.Commit()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &SendMessageResponse{
-		MessageID: messageId,
-		ChatID:    chatId,
-		SenderID:  senderId,
-		Text:      text,
-		CreatedAt: time.Now().UTC().Format("2006-01-02T15:04:05Z"),
-	}
-
-	return response, nil
+func DeleteMessage(userId, chatId, messageId int64) error {
+	return database.WrapWithTransaction(func(tx *sql.Tx) error {
+		_, err := tx.Exec(DELETE_MESSAGE,
+			messageId,
+			chatId,
+			userId,
+		)
+		if err != nil {
+			utils.SQLiteErrorTarget(err, DELETE_MESSAGE)
+			return err
+		}
+		return nil
+	})
 }

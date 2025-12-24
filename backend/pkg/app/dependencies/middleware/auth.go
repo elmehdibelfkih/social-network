@@ -57,7 +57,7 @@ func tryRememberMe(w http.ResponseWriter, r *http.Request) (int64, error) {
 	if err != nil {
 		return 0, err
 	}
-
+	
 	rememberMe, err := auth.SelectUserRememberMe(rememberValue)
 	if err != nil || rememberMe == nil || rememberMe.IsExpired() {
 		return 0, err

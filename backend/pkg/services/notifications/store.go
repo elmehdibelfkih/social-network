@@ -150,7 +150,7 @@ func ModularNotifisQuery(query string, args []any) ([]*Notification, error) {
 		err := rows.Scan(
 			&n.ID, &n.UserID, &n.Type, &n.ReferenceType,
 			&n.ReferenceID, &n.Content, &n.IsRead,
-			&n.CreatedAt, &n.ReadAt,
+			&n.CreatedAt, &n.ReadAt, &n.ActorName, &n.ActorAvatarId,
 		)
 		if err != nil {
 			utils.SQLiteErrorTarget(err, query)

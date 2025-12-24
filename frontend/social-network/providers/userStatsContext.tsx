@@ -15,9 +15,10 @@ type Action =
   | { type: 'INCREMENT_COMMENTS_RECEIVED' }
   | { type: 'DECREMENT_COMMENTS_RECEIVED' }
   | { type: 'NEW_NOTIFICATION' }
+  | { type: 'READ_NOTIFICATION' }
   | { type: 'READ_ALL_NOTIFICATIONS' }
   | { type: 'SET_STATS'; payload: Partial<UserStatsState> }
-  | { type: 'SET_PRIVACY'; payload: 'public' | 'private' | string }
+  | { type: 'SET_PRIVACY'; payload: 'public' | 'private' }
   | { type: 'SET_NICKNAME'; payload: string | null }
   | { type: 'SET_FIRST_NAME'; payload: string | null }
   | { type: 'SET_LAST_NAME'; payload: string | null }
@@ -44,11 +45,13 @@ const userStatsReducer = (state: UserStatsState, action: Action): UserStatsState
     case 'DECREMENT_LIKES_RECEIVED':
       return { ...state, likesReceived: Math.max(0, state.likesReceived - 1) };
     case 'INCREMENT_COMMENTS_RECEIVED':
-        return { ...state, commentsReceived: state.commentsReceived + 1 };
+      return { ...state, commentsReceived: state.commentsReceived + 1 };
     case 'DECREMENT_COMMENTS_RECEIVED':
-        return { ...state, commentsReceived: Math.max(0, state.commentsReceived - 1) };
+      return { ...state, commentsReceived: Math.max(0, state.commentsReceived - 1) };
     case 'NEW_NOTIFICATION':
       return { ...state, unreadNotifications: state.unreadNotifications + 1 };
+    case 'READ_NOTIFICATION':
+      return { ...state, unreadNotifications: Math.max(0, state.unreadNotifications - 1) };
     case 'READ_ALL_NOTIFICATIONS':
       return { ...state, unreadNotifications: 0 };
     case 'SET_STATS':
@@ -79,7 +82,7 @@ const UserStatsContext = createContext<{
 
 type UserStatsProviderProps = {
   children: ReactNode;
-  initialState?: Partial<UserStatsState>; 
+  initialState?: Partial<UserStatsState>;
 };
 
 export const UserStatsProvider = ({ children, initialState }: UserStatsProviderProps) => {
@@ -95,9 +98,10 @@ export const UserStatsProvider = ({ children, initialState }: UserStatsProviderP
     nickname: null,
     firstName: "",
     lastName: "",
-    avatarId:  null,
-    aboutMe:  null,
+    avatarId: null,
+    aboutMe: null,
     dateOfBirth: null,
+    email: null,
     joinedAt: null,
   };
 

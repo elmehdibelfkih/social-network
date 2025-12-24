@@ -13,46 +13,33 @@ import (
 func HandleGetNotifications(w http.ResponseWriter, r *http.Request) {
 	userID := utils.GetUserIdFromContext(r)
 
-	page, err := getIntQueryParam(r, "page")
-	if err != nil {
-		utils.BadRequest(w, err.Error(), utils.ErrorTypeAlert)
-		return
-	}
-
-	if page < 1 {
-		utils.BadRequest(w, "incorrect page parameter", utils.ErrorTypeAlert)
-		return
-	}
-
 	limit, err := getIntQueryParam(r, "limit")
 	if err != nil {
 		utils.BadRequest(w, err.Error(), utils.ErrorTypeAlert)
 		return
 	}
 	if limit > MAX_NUM_OF_NOTIFICATIONS || limit < 1 {
-		utils.BadRequest(w, "limit parameter must be "+strconv.Itoa(MAX_NUM_OF_NOTIFICATIONS), utils.ErrorTypeAlert)
+		utils.BadRequest(w, "limit parameter must be between 1 and "+strconv.Itoa(MAX_NUM_OF_NOTIFICATIONS), utils.ErrorTypeAlert)
 		return
 	}
 
-	readStatus := r.URL.Query().Get("read")
-	if readStatus != "" && readStatus != "read" && readStatus != "unread" {
-		utils.BadRequest(w, "Invalid 'read' parameter. Must be 'read' or 'unread'.", utils.ErrorTypeAlert)
-		return
+	lastIDStr := r.URL.Query().Get("last_id")
+	var lastID int64 = 0
+	if lastIDStr != "" {
+		lastID, err = strconv.ParseInt(lastIDStr, 10, 64)
+		if err != nil {
+			utils.BadRequest(w, "Invalid last_id parameter", utils.ErrorTypeAlert)
+			return
+		}
 	}
 
-	notifType := r.URL.Query().Get("type")
-	if !validTypes[notifType] {
-		utils.BadRequest(w, "invalid notification type", utils.ErrorTypeAlert)
-		notifType = ""
-	}
-
-	notifs, err := getNotifications(userID, page, limit, readStatus, notifType)
+	notifs, err := getNotifications(userID, limit, lastID)
 	if err != nil {
 		utils.InternalServerError(w)
 		return
 	}
-	utils.WriteSuccess(w, http.StatusOK, PaginatedNotificationsResponse{
-		Page:          page,
+
+	utils.WriteSuccess(w, http.StatusOK, NotificationsResponse{
 		Limit:         limit,
 		Notifications: notifs,
 	})
@@ -113,5 +100,7 @@ func HandleGetUnreadCount(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	utils.WriteSuccess(w, http.StatusOK, map[string]int{"unreadCount": count})
+	fmt.Printf("HandleGetUnreadCount - userID: %d, count: %d\n", userID, count)
+
+	utils.WriteSuccess(w, http.StatusOK, map[string]int{"unreadNotifications": count})
 }

@@ -1,13 +1,15 @@
 import { ReactNode } from "react";
 import { Navbar } from "@/features/navbar";
-import { AppProviders } from "@/providers/appProviders";
 import { UserStatsProvider } from "@/providers/userStatsContext";
 import { getUserId } from "@/libs/helpers";
 import { http } from "@/libs/apiFetch";
 import { NotificationCount } from "@/libs/globalTypes";
 import { ProfileAPIResponse } from "@/libs/globalTypes";
+import { AuthProvider } from "@/providers/authProvider";
+import SharedWorekerClient from "@/components/ui/worker";
 import { UserStatsState } from "@/libs/globalTypes";
 import { Counts } from "@/libs/globalTypes";
+import { NotificationProvider } from "@/providers/notifsProvider";
 
 
 export default async function AppLayout({ children }: { children: ReactNode }) {
@@ -19,20 +21,22 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
     http.get<Counts>(`/api/v1/users/${userId}/stats`)
   ]);
 
+  console.log('Layout - notificationsRes:', notificationsRes);
+
   if (!profileRes || !notificationsRes || !counts) {
     return null;
   }
   const stats: UserStatsState = {
     userId: profileRes.userId,
-    nickname: profileRes.nickname ,
+    nickname: profileRes.nickname,
     firstName: profileRes.firstName,
     lastName: profileRes.lastName,
     avatarId: profileRes.avatarId,
     aboutMe: profileRes.aboutMe,
     dateOfBirth: profileRes.dateOfBirth,
-    privacy: profileRes.privacy,
+    privacy: profileRes.privacy as 'public' | 'private',
     joinedAt: profileRes.joinedAt,
-    email: profileRes.email, 
+    email: profileRes.email,
     unreadNotifications: notificationsRes.unreadNotifications,
     postsCount: counts.postsCount,
     followersCount: counts.followersCount,
@@ -44,11 +48,14 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
   console.log("stats :>", stats);
 
   return (
-    <AppProviders>
+    <AuthProvider>
       <UserStatsProvider initialState={stats}>
-        <Navbar />
-        {children}
+        <NotificationProvider>
+          <SharedWorekerClient />
+          <Navbar />
+          {children}
+        </NotificationProvider>
       </UserStatsProvider>
-    </AppProviders>
+    </AuthProvider>
   );
 }

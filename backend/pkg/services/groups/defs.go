@@ -2,7 +2,7 @@ package groups
 
 import "social/pkg/utils"
 
-//groups
+// groups
 
 // /api/v1/groups (POST) => create group
 type CreateGroupRequestJson struct {
@@ -29,6 +29,7 @@ type GetGroupResponseJson struct {
 	Description string `json:"description"`
 	MemberCount int64  `json:"memberCount"`
 	AvatarId    *int64 `json:"avatarId"` // optional
+	Status      string `json:"status"`
 	CreatedAt   string `json:"createdAt"`
 	UpdatedAt   string `json:"updatedAt"`
 }
@@ -124,7 +125,7 @@ type PaginationJson struct {
 	Total int64 `json:"total"`
 }
 
-//group_events
+// group_events
 
 // /api/v1/groups/:group_id/events (POST)
 type CreateEventRequestJson struct {
@@ -192,8 +193,8 @@ type RSVPResponseJson struct {
 }
 
 type GetRSVPResponseJson struct{
-	Countgoing int32      `json:"going_count"`
-	CountNotgoing int32   `json:"notgoing_count"`
+	Countgoing *int32      `json:"going_count"`
+	CountNotgoing *int32   `json:"notgoing_count"`
 	Amigoing bool		  `json:"ami_going"`
 }
 

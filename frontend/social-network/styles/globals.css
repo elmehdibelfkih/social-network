@@ -1,4 +1,5 @@
-@import './variables.css'; /* only if not already imported */
+@import './variables.css';
+/* only if not already imported */
 
 /* ensure the page is full-height so background fills viewport */
 html,
@@ -12,11 +13,12 @@ body {
   margin: 0;
   min-height: 100vh;
   background-color: var(--background-cream);
-  /* optional: subtle gradient with your light variable:
-     background: linear-gradient(180deg, var(--background-cream), var(--background-light));
-  */
+  /* optional: subtle gradient with your light variable: */
+  /* background: linear-gradient(180deg, var(--background-cream), var(--background-light)); */
+
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  
 }
 
 /* class-based alternative (if you prefer using class in layout) */
@@ -32,9 +34,19 @@ body {
   margin-bottom: 5rem;
 }
 
+.test {
+  border: orange solid 1px;
+  width: 700px;
+  height: 300px;
+}
 
-.g_layout{
-      max-width: 1240px;
-    min-height: 100vh;
-    margin: 0 auto;
+#chat-portals {
+  position: fixed;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  width: 90%;
+  bottom: 0;
+  overflow: auto;
+  z-index: 1000;
 }

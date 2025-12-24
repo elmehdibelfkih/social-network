@@ -1,4 +1,4 @@
-export type SettingsTab = 'profile' | 'privacy' | 'devices';
+export type SettingsTab = 'profile' | 'password' | 'privacy' | 'devices';
 
 export type ProfileUpdateData = {
   firstName: string;

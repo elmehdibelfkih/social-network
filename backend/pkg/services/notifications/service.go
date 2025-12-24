@@ -2,6 +2,7 @@ package notifications
 
 import (
 	"fmt"
+	"math"
 	"net/http"
 	"strconv"
 	"strings"
@@ -35,7 +36,7 @@ func canMarkNotifAsRead(r *http.Request) (bool, error) {
 	return false, nil
 }
 
-func getNotifications(userID int64, page, limit int, readStatus, notifType string) ([]*Notification, error) {
+func getNotifications(userID int64, limit int, lastID int64) ([]*Notification, error) {
 	baseSelect := QUERY_GET_NOTIFICATION
 
 	args := []any{}
@@ -44,23 +45,16 @@ func getNotifications(userID int64, page, limit int, readStatus, notifType strin
 	whereParts := []string{}
 	whereParts = append(whereParts, "user_id = ?")
 
-	switch readStatus {
-	case "read":
-		whereParts = append(whereParts, "is_read = 1")
-	case "unread":
-		whereParts = append(whereParts, "is_read = 0")
+	if lastID == 0 {
+		lastID = math.MaxInt64
 	}
-
-	if notifType != "" {
-		whereParts = append(whereParts, "type = ?")
-		args = append(args, notifType)
-	}
+	whereParts = append(whereParts, "id < ?")
+	args = append(args, lastID)
 
 	whereQuery := " WHERE " + strings.Join(whereParts, " AND ")
-	listQuery := baseSelect + whereQuery + " ORDER BY created_at DESC LIMIT ? OFFSET ?;"
+	listQuery := baseSelect + whereQuery + " ORDER BY id DESC LIMIT ?;"
 
-	offset := (page - 1) * limit
-	args = append(args, limit, offset)
+	args = append(args, limit)
 
 	notifs, err := ModularNotifisQuery(listQuery, args)
 	if err != nil {
