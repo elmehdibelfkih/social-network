@@ -8,7 +8,7 @@ import { SeenStatus } from "@/components/ui/chats/seen"
 import { useDebounceCbf } from "@/libs/debounce";
 import TypingIndicator from "./typing.indicator";
 import AvatarHolder from "@/components/ui/avatar_holder/avatarholder.client";
-import { EmojiIcon, SendIcon } from "@/components/ui/icons";
+import { CloseChatIcon, EmojiIcon, SendIcon } from "@/components/ui/icons";
 
 interface ChatConversationProps {
     chatId: number;
@@ -316,7 +316,7 @@ export default function ChatConversation({ chatId, user, onClose }: ChatConversa
                 <AvatarHolder avatarId={user.avatarId} size={48} />
                 <span>{`${user.firstName} ${user.lastName}`}</span>
                 <button className={styles.closeBtn} onClick={onClose}>
-                    <img src="/svg/x_white.svg" alt="" />
+                    <CloseChatIcon />
                 </button>
             </div>
 
