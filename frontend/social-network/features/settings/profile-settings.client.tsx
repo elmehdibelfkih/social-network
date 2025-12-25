@@ -67,11 +67,12 @@ export function ProfileSettings({ profile }: { profile: ProfileAPIResponse }) {
         }
 
         ShowSnackbar({ status: true, message: 'Profile updated successfully' });
-      }
+
+      } else {ShowSnackbar({ status: false, message: 'Profile update failed.' });}
+
+
     } catch (error: any) {
-      console.error('Failed to update profile:', error);
-      // The apiFetch function already shows snackbar for errors with errorType: 'alert'
-      // No need to show additional snackbar here as backend returns 'alert' type for password errors
+      console.error('Failed to update profile:', error);  
     } finally {
       setIsLoading(false);
     }
