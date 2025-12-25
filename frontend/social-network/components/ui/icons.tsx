@@ -292,15 +292,15 @@ export const SendIcon = () => (
 );
 
 export const CheckSentIcon = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none"
         stroke="#d8d8d8ff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-check-icon lucide-check">
         <path d="M20 6 9 17l-5-5" />
     </svg>
 )
 
 export const CheckDeliveredIcon = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#d8d8d8ff"
-        stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#d8d8d8ff"
+        strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
         className="lucide lucide-check-check-icon lucide-check-check">
         <path d="M18 6 7 17l-5-5" />
         <path d="m22 10-7.5 7.5L13 16" />
@@ -308,10 +308,18 @@ export const CheckDeliveredIcon = () => (
 )
 
 export const CheckReadIcon = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#00eeffff"
-        stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#00eeffff"
+        strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
         className="lucide lucide-check-check-icon lucide-check-check">
         <path d="M18 6 7 17l-5-5" />
         <path d="m22 10-7.5 7.5L13 16" />
     </svg>
+)
+
+export const MessageSquareIcon = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+        viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
+        strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-messages-square-icon lucide-messages-square">
+        <path d="M16 10a2 2 0 0 1-2 2H6.828a2 2 0 0 0-1.414.586l-2.202 2.202A.71.71 0 0 1 2 14.286V4a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
+        <path d="M20 9a2 2 0 0 1 2 2v10.286a.71.71 0 0 1-1.212.502l-2.202-2.202A2 2 0 0 0 17.172 19H10a2 2 0 0 1-2-2v-1" /></svg>
 )

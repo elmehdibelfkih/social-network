@@ -6,9 +6,7 @@ import { http } from '@/libs/apiFetch'
 import { FollowApiResponse } from './types'
 import { useUserStats } from '@/providers/userStatsContext'
 import { MiniProfile } from '@/libs/globalTypes'
-import { User } from '../chat/types'
-import FloatingChat from '../chat/chat.popup.client'
-import { chatService } from '../chat'
+import { useChatProviderState } from '../chat/global.chat.client'
 
 
 type Props = {
@@ -18,69 +16,23 @@ type Props = {
 
 
 export function MiniProfileActions({ data }: Props) {
+  const { openChats,
+    setOpenChats,
+    users,
+    setUsers,
+    handleOpenChat,
+    handleCloseChat,
+    handleCloseAll
+  } = useChatProviderState()
+
   const { state, dispatch } = useUserStats();
   const isCurrentUser = state.userId != null && data?.userId != null && state.userId === data.userId;
   const [status, setStatus] = useState<string | null>(data?.status ?? null)
   const [followersCount, setFollowersCount] = useState(data?.stats?.followersCount ?? 0)
-  const [currentChat, setCurrentChat] = useState<Map<number, User>>(new Map());
-  const [users, setUsers] = useState<User[]>([]);
   const [chatId, setChatId] = useState<number | null | undefined>(
     data?.chatId ?? null
   )
   const [busy, setBusy] = useState(false)
-
-  useEffect(() => {
-
-    const onUnMount = chatService.addListener((data) => {
-      console.log("received from sharedworker:", data.type, data);
-      switch (data.type) {
-        case 'online_status':
-          setUsers(data?.payload?.onlineStatus.onlineUsers)
-          setCurrentChat(prev => {
-            const userIds = new Set(users.map(u => u.chatId))
-            const next = new Map(prev)
-
-            for (const [chatId, user] of next) {
-              if (!userIds.has(user.chatId)) {
-                next.delete(chatId)
-              }
-            }
-
-            return next
-          })
-          break;
-        case 'onlineUser': {
-          const updated = data?.payload?.onlineUser.user;
-          setUsers(prev =>
-            prev?.map(u =>
-              u.userId === updated.userId
-                ? { ...u, online: updated.online }
-                : u
-            )
-          );
-          break;
-        }
-        case 'offlineUser': {
-          const updated = data?.payload?.offlineUser.user;
-          setUsers(prev =>
-            prev?.map(u =>
-              u.userId === updated.userId
-                ? { ...u, online: updated.online }
-                : u
-            )
-          );
-          break;
-        }
-        default:
-          break;
-      }
-    })
-
-
-    chatService.sendToWorker({ source: 'client', type: 'online_status', payload: null });
-
-    return onUnMount;
-  }, []);
 
   async function doFollow() {
     if (busy || !data?.userId) return
@@ -104,14 +56,6 @@ export function MiniProfileActions({ data }: Props) {
       setBusy(false)
     }
   }
-
-  const handleCloseChat = (chatId: number) => {
-    setCurrentChat(prev => {
-      const next = new Map(prev);
-      next.delete(chatId);
-      return next;
-    });
-  };
 
   async function doUnfollow() {
     if (busy || !data?.userId) return
@@ -149,11 +93,7 @@ export function MiniProfileActions({ data }: Props) {
       avatarId: data.avatarId,
       online: true,
     }
-    setCurrentChat(prev => {
-      const next = new Map(prev);
-      next.set(chatId, user);
-      return next;
-    });
+    handleOpenChat(user.chatId, user);
   }
 
   if (!data) return null
@@ -258,14 +198,6 @@ export function MiniProfileActions({ data }: Props) {
           )}
         </div>
       </div>
-      {Array.from(currentChat.entries()).map(([chatId, user]) => (
-        <FloatingChat
-          key={chatId}
-          chatId={chatId}
-          user={user}
-          onClose={() => handleCloseChat(chatId)}
-        />
-      ))}
     </>
   )
 }
