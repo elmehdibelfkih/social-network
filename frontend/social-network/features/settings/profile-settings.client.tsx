@@ -53,25 +53,17 @@ export function ProfileSettings({ profile }: { profile: ProfileAPIResponse }) {
       const res = await http.patch(`/api/v1/users/${profile.userId}/profile`, updateData);
 
       if (res) {
-        dispatch({ type: 'SET_FIRST_NAME', payload: formData.firstName });
-        dispatch({ type: 'SET_LAST_NAME', payload: formData.lastName });
-        dispatch({ type: 'SET_NICKNAME', payload: formData.nickname });
-        dispatch({ type: 'SET_ABOUT_ME', payload: formData.aboutMe });
-        dispatch({ type: 'SET_DATE_OF_BIRTH', payload: formData.dateOfBirth });
-        dispatch({ type: 'SET_AVATAR_ID', payload: formData.avatarId });
+        dispatch({ type: 'SET_FIRST_NAME', payload: updateData.firstName });
+        dispatch({ type: 'SET_LAST_NAME', payload: updateData.lastName });
+        dispatch({ type: 'SET_NICKNAME', payload: updateData.nickname });
+        dispatch({ type: 'SET_ABOUT_ME', payload: updateData.aboutMe });
+        dispatch({ type: 'SET_DATE_OF_BIRTH', payload: updateData.dateOfBirth });
+        dispatch({ type: 'SET_AVATAR_ID', payload: updateData.avatarId });
 
-        // Clear password fields after successful update
-        setFormData(prev => ({
-          ...prev,
-          ...updateData,
-          currentPassword: '',
-          newPassword: '',
-          confirmPassword: ''
-        }));
-
+        setFormData(updateData);
         // Update auth provider with new email
         if (user) {
-          const updatedUser = { ...user, email: formData.email, nickname: formData.nickname };
+          const updatedUser = { ...user, email: updateData.email, nickname: updateData.nickname };
           setUser(updatedUser);
         }
 
