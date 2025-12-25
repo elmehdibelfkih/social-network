@@ -3,7 +3,6 @@ package follow
 import (
 	"database/sql"
 	"errors"
-	"fmt"
 	"strings"
 
 	socket "social/pkg/app/sockets"
@@ -26,6 +25,17 @@ func toInt64Ptr(ni sql.NullInt64) *int64 {
 		return nil
 	}
 	return &ni.Int64
+}
+
+func isGroupChat(chatId int64, tx *sql.Tx) (bool, error) {
+	var groupId *int64
+	err := tx.QueryRow(SELECT_CHAT_GROUP_ID, chatId).Scan(&groupId)
+	if err != nil || groupId == nil {
+		utils.SQLiteErrorTarget(err, SELECT_CHAT_GROUP_ID)
+		return false, err
+	}
+
+	return true, nil
 }
 
 func selectFollowStatus(followerId, followedId int64) (string, error) {
@@ -158,9 +168,9 @@ func followBack(followerId, followedId int64) (bool, error) {
 	return exist, err
 }
 
-func createConversation(followerId, followedId int64) error {
+func createConversation(followerId, followedId int64) (int64, error) {
 	var chatId int64
-	return database.WrapWithTransaction(func(tx *sql.Tx) error {
+	err := database.WrapWithTransaction(func(tx *sql.Tx) error {
 		err := tx.QueryRow(SELECT_SHARED_CHATS, followerId, followedId).Scan(&chatId)
 		if err != nil && err != sql.ErrNoRows {
 			utils.SQLiteErrorTarget(err, SELECT_SHARED_CHATS)
@@ -172,7 +182,6 @@ func createConversation(followerId, followedId int64) error {
 				utils.SQLiteErrorTarget(err, UPDATE_CHAT_ACTIVE)
 				return err
 			}
-			fmt.Println("update")
 			socket.WSManger.AddChatUser(chatId, followerId)
 			socket.WSManger.AddChatUser(chatId, followedId)
 			return nil
@@ -206,32 +215,35 @@ func createConversation(followerId, followedId int64) error {
 			utils.SQLiteErrorTarget(err, ADD_CHAT_PARTICIPANT)
 			return err
 		}
-		fmt.Println("creation")
 		socket.WSManger.AddChatUser(chatId, followerId)
 		socket.WSManger.AddChatUser(chatId, followedId)
 
 		return nil
 	})
+	return chatId, err
 }
 
-func createChatId(followerId, followedId int64) error {
+func createChatId(followerId, followedId int64) (int64, error) {
+	var chatId int64
 	public, err := isPublic(followedId)
 	if err != nil {
-		return err
+		return chatId, err
 	}
 	if public {
-		return createConversation(followerId, followedId)
+		chatId, err = createConversation(followerId, followedId)
+		return chatId, err
 	}
 	if !public {
 		follower, err := followBack(followerId, followedId)
 		if err != nil {
-			return err
+			return chatId, err
 		}
 		if follower {
-			return createConversation(followerId, followedId)
+			chatId, err = createConversation(followerId, followedId)
+			return chatId, err
 		}
 	}
-	return nil
+	return chatId, nil
 }
 
 func suspendConversation(followerId, followedId int64) error {
@@ -254,6 +266,14 @@ func suspendConversation(followerId, followedId int64) error {
 				utils.SQLiteErrorTarget(err, SELECT_SHARED_CHATS)
 				return err
 			}
+			isGroup, err := isGroupChat(chatId, tx)
+			if err != nil {
+				utils.SQLiteErrorTarget(err, SELECT_CHAT_GROUP_ID)
+				return err
+			}
+			if isGroup {
+				continue
+			}
 			_, err = tx.Exec(UPDATE_CHAT_STATUS, chatId)
 			if err != nil {
 				utils.SQLiteErrorTarget(err, UPDATE_CHAT_STATUS)
@@ -262,6 +282,48 @@ func suspendConversation(followerId, followedId int64) error {
 		}
 		return nil
 	})
+}
+
+func SelectSharedChat(followerId, followedId int64) (*int64, error) {
+	var currentChatId *int64
+	err := database.WrapWithTransaction(func(tx *sql.Tx) error {
+		rows, err := tx.Query(
+			SELECT_SHARED_CHATS,
+			followerId,
+			followedId,
+		)
+		if err != nil {
+			utils.SQLiteErrorTarget(err, SELECT_SHARED_CHATS_STATUS)
+			return err
+		}
+		defer rows.Close()
+
+		for rows.Next() {
+			var chatId int64
+			var status string
+			err = rows.Scan(&chatId, &status)
+			if err != nil {
+				utils.SQLiteErrorTarget(err, SELECT_SHARED_CHATS_STATUS)
+				return err
+			}
+			isGroup, err := isGroupChat(chatId, tx)
+			if err != nil {
+				utils.SQLiteErrorTarget(err, SELECT_SHARED_CHATS_STATUS)
+				return err
+			}
+			if !isGroup {
+				if status == "suspended" {
+					currentChatId = nil
+					break
+				}
+				currentChatId = &chatId
+				break
+			}
+		}
+		return err
+	})
+
+	return currentChatId, err
 }
 
 func suspendChatId(followerId, followedId int64) error {
@@ -283,15 +345,17 @@ func suspendChatId(followerId, followedId int64) error {
 		}
 		if !public {
 			return suspendConversation(followerId, followedId)
+
 		}
 	}
 	if !follow2 {
 		public, err := isPublic(followerId)
 		if err != nil {
-			return err
+
 		}
 		if !public {
 			return suspendConversation(followerId, followedId)
+
 		}
 	}
 	return nil

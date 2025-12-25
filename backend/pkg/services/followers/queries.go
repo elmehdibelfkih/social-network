@@ -1,6 +1,9 @@
 package follow
 
 const (
+	SELECT_CHAT_GROUP_ID = `
+		SELECT group_id FROM chats WHERE id = ?
+	`
 	UPDATE_CHAT_STATUS = `
 	UPDATE chats
 	SET status = 'suspended',
@@ -17,6 +20,11 @@ const (
 	SELECT chat_id FROM chat_participants WHERE user_id = ?
 	INTERSECT
 	SELECT chat_id FROM chat_participants WHERE user_id = ?;
+	`
+	SELECT_SHARED_CHATS_STATUS = `
+	SELECT chat_id, status FROM chat_participants WHERE user_id = ?
+	INTERSECT
+	SELECT chat_id, status FROM chat_participants WHERE user_id = ?;
 	`
 	CREATE_CHAT_ROW = `
 		INSERT INTO chats (id) VALUES (?)	
