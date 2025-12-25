@@ -288,7 +288,7 @@ func SelectSharedChat(followerId, followedId int64) (*int64, error) {
 	var currentChatId *int64
 	err := database.WrapWithTransaction(func(tx *sql.Tx) error {
 		rows, err := tx.Query(
-			SELECT_SHARED_CHATS,
+			SELECT_SHARED_CHATS_STATUS,
 			followerId,
 			followedId,
 		)

@@ -22,9 +22,12 @@ const (
 	SELECT chat_id FROM chat_participants WHERE user_id = ?;
 	`
 	SELECT_SHARED_CHATS_STATUS = `
-	SELECT chat_id, status FROM chat_participants WHERE user_id = ?
-	INTERSECT
-	SELECT chat_id, status FROM chat_participants WHERE user_id = ?;
+	SELECT c.id AS chat_id, c.status
+	FROM chats c
+	JOIN chat_participants cp1 ON cp1.chat_id = c.id
+	JOIN chat_participants cp2 ON cp2.chat_id = c.id
+	WHERE cp1.user_id = ?
+  	AND cp2.user_id = ?;
 	`
 	CREATE_CHAT_ROW = `
 		INSERT INTO chats (id) VALUES (?)	
