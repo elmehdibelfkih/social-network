@@ -40,11 +40,11 @@ export function ProfileSettings({ profile }: { profile: ProfileAPIResponse }) {
 
     try {
       const updateData: any = {
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-        nickname: formData.nickname,
-        email: formData.email,
-        aboutMe: formData.aboutMe,
+        firstName: formData.firstName.trim(),
+        lastName: formData.lastName.trim(),
+        nickname: formData.nickname.trim(),
+        email: formData.email.trim(),
+        aboutMe: formData.aboutMe.trim(),
         dateOfBirth: formData.dateOfBirth,
         avatarId: formData.avatarId,
       };
@@ -59,23 +59,24 @@ export function ProfileSettings({ profile }: { profile: ProfileAPIResponse }) {
         dispatch({ type: 'SET_ABOUT_ME', payload: formData.aboutMe });
         dispatch({ type: 'SET_DATE_OF_BIRTH', payload: formData.dateOfBirth });
         dispatch({ type: 'SET_AVATAR_ID', payload: formData.avatarId });
-  
+
         // Clear password fields after successful update
         setFormData(prev => ({
           ...prev,
+          ...updateData,
           currentPassword: '',
           newPassword: '',
           confirmPassword: ''
         }));
-  
+
         // Update auth provider with new email
         if (user) {
           const updatedUser = { ...user, email: formData.email, nickname: formData.nickname };
           setUser(updatedUser);
         }
-  
+
         ShowSnackbar({ status: true, message: 'Profile updated successfully' });
-      } 
+      }
     } catch (error: any) {
       console.error('Failed to update profile:', error);
       // The apiFetch function already shows snackbar for errors with errorType: 'alert'
@@ -204,7 +205,7 @@ export function ProfileSettings({ profile }: { profile: ProfileAPIResponse }) {
             onChange={(e) => setFormData({ ...formData, nickname: e.target.value })}
             placeholder="Your nickname"
             maxLength={50}
-            // minLength={3}
+          // minLength={3}
           />
         </div>
 
