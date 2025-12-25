@@ -163,33 +163,6 @@ func GetUserStats(w http.ResponseWriter, userId int64, context string) (UserStat
 	return response, true
 }
 
-// UpdateUserPrivacy updates a user's privacy setting
-func UpdateUserPrivacy(w http.ResponseWriter, userId int64, req *UpdatePrivacyRequestJson, context string) (UpdatePrivacyResponseJson, bool) {
-	var response UpdatePrivacyResponseJson
-
-	// Validate privacy value
-	if req.Privacy != "public" && req.Privacy != "private" {
-		utils.BadRequest(w, "Privacy must be 'public' or 'private'.", "alert")
-		return response, false
-	}
-
-	// Update privacy
-	err := UpdateUserPrivacyInDB(userId, req.Privacy)
-	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			utils.NotFoundError(w, "User profile not found.")
-			return response, false
-		}
-		utils.BackendErrorTarget(err, context)
-		utils.InternalServerError(w)
-		return response, false
-	}
-
-	response.Message = "Profile privacy updated successfully."
-	response.Privacy = req.Privacy
-	return response, true
-}
-
 // updates a user's profile
 func UpdateUserProfile(w http.ResponseWriter, userId int64, req *UpdateProfileRequestJson, context string) (UpdateProfileResponseJson, bool) {
 	var response UpdateProfileResponseJson
@@ -383,6 +356,33 @@ func UpdateUserProfile(w http.ResponseWriter, userId int64, req *UpdateProfileRe
 	}
 
 	response.Message = "Updated successful."
+	return response, true
+}
+
+// UpdateUserPrivacy updates a user's privacy setting
+func UpdateUserPrivacy(w http.ResponseWriter, userId int64, req *UpdatePrivacyRequestJson, context string) (UpdatePrivacyResponseJson, bool) {
+	var response UpdatePrivacyResponseJson
+
+	// Validate privacy value
+	if req.Privacy != "public" && req.Privacy != "private" {
+		utils.BadRequest(w, "Privacy must be 'public' or 'private'.", "alert")
+		return response, false
+	}
+
+	// Update privacy
+	err := UpdateUserPrivacyInDB(userId, req.Privacy)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			utils.NotFoundError(w, "User profile not found.")
+			return response, false
+		}
+		utils.BackendErrorTarget(err, context)
+		utils.InternalServerError(w)
+		return response, false
+	}
+
+	response.Message = "Profile privacy updated successfully."
+	response.Privacy = req.Privacy
 	return response, true
 }
 

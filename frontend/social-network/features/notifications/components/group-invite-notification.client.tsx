@@ -7,27 +7,32 @@ import AvatarHolder from '@/components/ui/avatar_holder/avatarholder.client'
 import { http } from '@/libs/apiFetch'
 import { formatTimeAgo } from '@/libs/helpers'
 import { useRouter } from 'next/navigation'
+import { useAuth } from '@/providers/authProvider'
 
 export function GroupInviteNotification({ notification, onMarkAsRead }: NotificationProps) {
+  console.log(notification)
+  const { user } = useAuth()
   const [group, setGroup] = useState<GroupType>(null)
   const [requestHandled, setRequestHandled] = useState(false)
   const [isRead, setIsRead] = useState(notification.isRead == 1)
   const router = useRouter()
 
-  const getReferenceGroup = async () => {
-    try {
-      const response = await http.get<GroupType>(`/api/v1/groups/${notification.referenceId}`)
-      setGroup(response)
-      console.log(response);
-
-    } catch (error) {
-      console.error('Failed to fetch group:', error)
-    }
-  }
-
   useEffect(() => {
-    getReferenceGroup()
-  }, [notification.notificationId])
+    const fetchGroup = async () => {
+      try {
+        const url = notification.type === 'group_join'
+          ? `/api/v1/groups/${notification.referenceId}?checkUserId=${notification.actorId}`
+          : `/api/v1/groups/${notification.referenceId}`
+
+        const response = await http.get<GroupType>(url)
+        setGroup(response)
+      } catch (error) {
+        console.error('Failed to fetch group:', error)
+      }
+    }
+
+    fetchGroup()
+  }, [notification.referenceId, notification.actorId, notification.type])
 
   const handleClick = () => {
     if (!isRead && onMarkAsRead) {
@@ -36,27 +41,41 @@ export function GroupInviteNotification({ notification, onMarkAsRead }: Notifica
     }
 
     if (notification.referenceId) {
-      router.push(`/groups/${notification.referenceId}`)
+      router.push(`/groups/${notification.referenceId}/posts`)
     }
   }
 
   const acceptInvitation = async (e: React.MouseEvent) => {
     e.stopPropagation()
     try {
-      await http.post(`/api/v1/groups/${notification.referenceId}/accept`)
+      const targetUserId = notification.type === 'group_invite' ? user?.userId : notification.actorId
+
+      if (!targetUserId) {
+        console.error('Target user ID is undefined', { notification, user })
+        return
+      }
+
+      await http.post(`/api/v1/groups/${notification.referenceId}/members/${targetUserId}/accept`)
       setRequestHandled(true)
     } catch (error) {
-
+      console.error('Failed to accept invitation:', error)
     }
   }
 
   const declineInvitation = async (e: React.MouseEvent) => {
     e.stopPropagation()
     try {
-      await http.post(`/api/v1/groups/${notification.referenceId}/decline`)
+      const targetUserId = notification.type === 'group_invite' ? user?.userId : notification.actorId
+
+      if (!targetUserId) {
+        console.error('Target user ID is undefined', { notification, user })
+        return
+      }
+
+      await http.post(`/api/v1/groups/${notification.referenceId}/members/${targetUserId}/decline`)
       setRequestHandled(true)
     } catch (error) {
-
+      console.error('Failed to decline invitation:', error)
     }
   }
 
@@ -71,7 +90,7 @@ export function GroupInviteNotification({ notification, onMarkAsRead }: Notifica
   return (
     <div className={isRead ? styles.readNotif : styles.notifContainer} onClick={handleClick}>
       <div className={styles.avatar}>
-        <AvatarHolder avatarId={group.avatarId} />
+        <AvatarHolder avatarId={notification.actorAvatarId} />
       </div>
 
       <div className={styles.contentSection}>
@@ -92,18 +111,16 @@ export function GroupInviteNotification({ notification, onMarkAsRead }: Notifica
 
         <p className={styles.timeAgo}>{formatTimeAgo(notification.createdAt)}</p>
 
-        {notification.type === 'group_invite' && (
-          <div className={styles.actionButtons}>
-            <button className={styles.acceptButton}
-              onClick={acceptInvitation}
-              disabled={group.status == 'accepted' || requestHandled || group.status == 'pending'}
-            >✓ Accept</button>
-            <button className={styles.declineButton}
-              onClick={declineInvitation}
-              disabled={group.status == 'accepted' || requestHandled || group.status == 'pending'}
-            >× Decline</button>
-          </div>
-        )}
+        <div className={styles.actionButtons}>
+          <button className={styles.acceptButton}
+            onClick={acceptInvitation}
+            disabled={group.memberStatus !== 'pending' || requestHandled}
+          >✓ Accept</button>
+          <button className={styles.declineButton}
+            onClick={declineInvitation}
+            disabled={group.memberStatus !== 'pending' || requestHandled}
+          >× Decline</button>
+        </div>
       </div>
     </div>
   )

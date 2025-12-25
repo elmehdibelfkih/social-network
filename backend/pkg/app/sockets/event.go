@@ -51,15 +51,16 @@ type MarkSeen struct {
 
 type Notification struct {
 	NotificationId int64   `json:"notificationId"`
+	ActorId        int64   `json:"actorId"`
 	ActorName      string  `json:"actorName"`
 	ActorAvatarId  *int64  `json:"actorAvatarId"`
 	UserId         int64   `json:"userId"`
 	Type           string  `json:"type"`
-	RefrenceId     int64   `json:"refrenceId"`
-	RefrenceType   string  `json:"refrenceType"`
+	ReferenceId    int64   `json:"referenceId"`
+	ReferenceType  string  `json:"referenceType"`
 	Content        string  `json:"content"`
 	Status         string  `json:"status"`
-	IsRead         string  `json:"isRead"`
+	IsRead         int     `json:"isRead"`
 	CreatedAt      string  `json:"createdAt"`
 	ReadAt         *string `json:"readAt"`
 }

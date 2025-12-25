@@ -3,6 +3,7 @@ package groups
 import "social/pkg/utils"
 
 // groups
+// groups
 
 // /api/v1/groups (POST) => create group
 type CreateGroupRequestJson struct {
@@ -13,6 +14,7 @@ type CreateGroupRequestJson struct {
 
 type CreateGroupResponseJson struct {
 	GroupId     int64  `json:"groupId"`
+	ChatId      int64  `json:"chatId"`
 	CreatorId   int64  `json:"creatorId"`
 	Title       string `json:"title"`
 	Description string `json:"description"`
@@ -23,15 +25,17 @@ type CreateGroupResponseJson struct {
 
 // /api/v1/groups/:group_id (GET) => get group info
 type GetGroupResponseJson struct {
-	GroupId     int64  `json:"groupId"`
-	CreatorId   int64  `json:"creatorId"`
-	Title       string `json:"title"`
-	Description string `json:"description"`
-	MemberCount int64  `json:"memberCount"`
-	AvatarId    *int64 `json:"avatarId"` // optional
-	Status      string `json:"status"`
-	CreatedAt   string `json:"createdAt"`
-	UpdatedAt   string `json:"updatedAt"`
+	GroupId      int64   `json:"groupId"`
+	CreatorId    int64   `json:"creatorId"`
+	ChatId       int64   `json:"chatId"`
+	Title        string  `json:"title"`
+	Description  string  `json:"description"`
+	MemberCount  int64   `json:"memberCount"`
+	AvatarId     *int64  `json:"avatarId"` // optional
+	Status       string  `json:"status"`
+	MemberStatus *string `json:"memberStatus"` // nullable - status of the requesting user's membership
+	CreatedAt    string  `json:"createdAt"`
+	UpdatedAt    string  `json:"updatedAt"`
 }
 
 // /api/v1/groups/:group_id (PUT) => update group
@@ -65,6 +69,7 @@ type BrowseGroupsResponseJson struct {
 
 type GroupItemJson struct {
 	GroupId     int64  `json:"groupId"`
+	Status	  	string `json:"status"`
 	Title       string `json:"title"`
 	Description string `json:"description"`
 	AvatarId    *int64 `json:"avatarId"` // optional
@@ -125,6 +130,7 @@ type PaginationJson struct {
 	Total int64 `json:"total"`
 }
 
+// group_events
 // group_events
 
 // /api/v1/groups/:group_id/events (POST)
@@ -192,10 +198,10 @@ type RSVPResponseJson struct {
 	Message string `json:"message"`
 }
 
-type GetRSVPResponseJson struct{
-	Countgoing *int32      `json:"going_count"`
-	CountNotgoing *int32   `json:"notgoing_count"`
-	Amigoing bool		  `json:"ami_going"`
+type GetRSVPResponseJson struct {
+	Countgoing    *int32 `json:"going_count"`
+	CountNotgoing *int32 `json:"notgoing_count"`
+	Amigoing      bool   `json:"ami_going"`
 }
 
 // validators

@@ -45,8 +45,6 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
     commentsReceived: counts.commentsReceived,
   };
 
-  console.log("stats :>", stats);
-
   return (
     <AuthProvider>
       <UserStatsProvider initialState={stats}>

@@ -31,17 +31,22 @@ export function NotificationProvider({ children }) {
         try {
             const notificationsResponse = await notificationsService.getNotifications(20)
 
-            const activeNotifications = notificationsResponse.notifications.filter(
+            const activeNotifications = notificationsResponse?.notifications?.filter(
                 (notif) => notif.status === 'active'
             )
             setNotifications(activeNotifications)
             setHasMore(notificationsResponse?.notifications?.length == 20)
+
+
+
+            const unreadCount = activeNotifications?.filter(n => n.isRead === 0).length || 0
+            userStatsDispatch({ type: 'SET_STATS', payload: { unreadNotifications: unreadCount } })
         } catch (error) {
             console.error('Failed to load notifications:', error)
         } finally {
             setLoading(false)
         }
-    }, [])
+    }, [userStatsDispatch])
 
     useEffect(() => {
         if (user) {
@@ -126,23 +131,18 @@ export function NotificationProvider({ children }) {
 
     const prependNotifications = useCallback((newNotification: Notification) => {
         if (newNotification.status === 'suspended') {
-            let shouldDecrementUnread = false
-
             setNotifications((prev) => {
                 const suspended = prev.find(n => n.notificationId === newNotification.notificationId)
                 if (suspended && suspended.isRead === 0) {
-                    shouldDecrementUnread = true
+                    userStatsDispatch({ type: 'READ_NOTIFICATION' })
                 }
                 return prev.filter(n => n.notificationId !== newNotification.notificationId)
             })
-
-            if (shouldDecrementUnread) {
-                userStatsDispatch({ type: 'READ_NOTIFICATION' })
-            }
             return
         }
 
         setNotifications((prev) => {
+            if (!prev) return
             const exists = prev.some(n => n.notificationId === newNotification.notificationId)
             if (exists) {
                 return prev

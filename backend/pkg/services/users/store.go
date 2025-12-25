@@ -264,6 +264,7 @@ func UpdateUserProfileInDB(userId int64, firstName, lastName string, nickname, a
 
 // UpdateUserPrivacyInDB updates a user's privacy value.
 func UpdateUserPrivacyInDB(userId int64, privacy string) error {
+
 	result, err := config.DB.Exec(UPDATE_USER_PRIVACY, privacy, userId)
 	if err != nil {
 		utils.SQLiteErrorTarget(err, UPDATE_USER_PRIVACY)

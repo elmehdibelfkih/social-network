@@ -134,12 +134,13 @@ func (h *Hub) Notify(n Notification) {
 			Payload: &ClientMessage{
 				Notification: &Notification{
 					NotificationId: n.NotificationId,
+					ActorId:        n.ActorId,
 					ActorName:      n.ActorName,
 					ActorAvatarId:  n.ActorAvatarId,
 					UserId:         n.UserId,
 					Type:           n.Type,
-					RefrenceId:     n.RefrenceId,
-					RefrenceType:   n.RefrenceType,
+					ReferenceId:     n.ReferenceId,
+					ReferenceType:   n.ReferenceType,
 					Content:        n.Content,
 					Status:         n.Status,
 					IsRead:         n.IsRead,

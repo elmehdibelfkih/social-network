@@ -90,7 +90,7 @@ async getOthersGroups(limit = 10, offset?: number): Promise<Group[]> {
       })
     );
 
-    console.log('MY MY MY MY MY MY MY groups with events: ', groupsWithEvent);
+    console.log('############### groups with events: ', groupsWithEvent);
 
     return groupsWithEvent; 
   } catch (error) {

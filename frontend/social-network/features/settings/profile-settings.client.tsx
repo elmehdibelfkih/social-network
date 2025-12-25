@@ -51,7 +51,6 @@ export function ProfileSettings({ profile }: { profile: ProfileAPIResponse }) {
 
 
       const res = await http.patch(`/api/v1/users/${profile.userId}/profile`, updateData);
-
       if (res) {
         dispatch({ type: 'SET_FIRST_NAME', payload: updateData.firstName });
         dispatch({ type: 'SET_LAST_NAME', payload: updateData.lastName });
@@ -91,6 +90,7 @@ export function ProfileSettings({ profile }: { profile: ProfileAPIResponse }) {
 
     try {
       const response = await authService.uploadAvatar(pendingAvatarFile);
+      if (!response) return
       setFormData(prev => ({ ...prev, avatarId: response.mediaId }));
 
       // Save avatar immediately to backend

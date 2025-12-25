@@ -3,6 +3,10 @@ package groups
 // SELECT
 
 const (
+	SELECT_GROUP_CHAT_ID = `
+		SELECT id FROM chats WHERE group_id = ?
+	`
+
 	SELECT_GROUP_OWNER = `
 		SELECT creator_id FROM groups WHERE id = ?
 	`
@@ -37,6 +41,9 @@ const (
 		SELECT EXISTS (
 			SELECT 1 FROM group_members WHERE group_id = ? AND user_id = ? AND status = 'pending'
 		);
+	`
+	SELECT_MEMBER_STATUS_BY_USER = `
+		SELECT status FROM group_members WHERE group_id = ? AND user_id = ?
 	`
 	SELECT_GROUP_MEMBERS_COUNT = `
 		SELECT followers_count FROM counters WHERE entity_type = ? AND entity_id = ?
@@ -121,6 +128,17 @@ const (
 // INSERT
 
 const (
+	INSERT_GROUP_CHAT_MEMBER=`
+		INSERT INTO chat_participants (chat_id, user_id)
+		VALUES (?,?)
+	`
+
+
+	INSERT_GROUP_CHAT_ID = `
+	INSERT INTO chats (id, group_id, title)
+	VALUES (?, ?, ?)
+	RETURNING id;
+	`
 	INSERT_GROUP_BY_USER_ID = `
 		INSERT INTO groups (id, creator_id, title, description, avatar_id)
 		VALUES (?, ?, ?, ?, ?)
