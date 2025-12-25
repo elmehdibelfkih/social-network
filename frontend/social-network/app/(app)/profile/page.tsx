@@ -11,11 +11,12 @@ export default async function ProfilePage({ searchParams }: PageProps) {
   const userId = await getUserId();
   const profile = await getProfileData(String(userId))
   const { tab } = await searchParams;
-  
+
   return (
     <>
       <Profile profile={profile} />
       <ProfileFeed profile={profile} tab={tab || 'about'} />
+      <div id="chat-portals"></div>
     </>
   );
 }

@@ -116,6 +116,16 @@ func (h *Hub) BroadcastToChat(userId, chatId int64, event Event) {
 	h.mu.Lock()
 	defer h.mu.Unlock()
 
+	if h.clients != nil && len(h.clients[userId]) > 0 {
+		if event.Payload != nil {
+			if event.Payload.ChatMessage != nil {
+				event.Payload.ChatMessage.SenderData = h.clients[userId][0].user
+			}
+			if event.Payload.MarkSeen != nil {
+				event.Payload.MarkSeen.SenderData = h.clients[userId][0].user
+			}
+		}
+	}
 	for _, clients := range h.chatUsers[chatId] {
 		for _, c := range clients {
 			c.events <- event

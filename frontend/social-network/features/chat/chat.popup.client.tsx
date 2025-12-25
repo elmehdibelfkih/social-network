@@ -8,7 +8,7 @@ import { User } from "./types";
 interface FloatingChatProps {
     chatId: number;
     user: User;
-    onClose: () => void;
+    onClose?: () => void;
 }
 
 export default function FloatingChat({ chatId, user, onClose }: FloatingChatProps) {
