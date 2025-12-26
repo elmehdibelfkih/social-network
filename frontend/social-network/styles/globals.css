@@ -18,7 +18,7 @@ body {
 
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  
+
 }
 
 /* class-based alternative (if you prefer using class in layout) */
@@ -47,4 +47,9 @@ body {
   width: 90%;
   bottom: 0;
   z-index: 1000;
+}
+
+.notFound {
+  text-align: center;
+  margin-top: 50;
 }

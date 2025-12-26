@@ -1,7 +1,6 @@
 import Footer from '@/features/footer/footer.server';
 import Snackbar from '@/components/ui/snackbar/snackbar';
 import '@/styles/globals.css';
-import '@/styles/globals.css';
 import type { ReactNode } from 'react';
 
 export const metadata = {

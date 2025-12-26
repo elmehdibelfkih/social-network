@@ -1,5 +1,4 @@
-import { redirect as nextRedirect } from 'next/navigation';
-
+import { redirect as nextRedirect, notFound } from 'next/navigation';
 import { ShowSnackbar } from '@/components/ui/snackbar/snackbar';
 import { MediaResponse } from './globalTypes';
 
@@ -189,7 +188,7 @@ export async function apiFetch<T>(
         title: redirectTitle,
         message: errorMessage
       });
-      // performRedirect(target, clientNavigate);
+      performRedirect(target, clientNavigate);
     }
   }
 
