@@ -413,22 +413,43 @@
     flex-direction: column;
     margin: 10px;
     gap: 16px;
+    align-items: center;
   }
 
   .sidebar {
     width: 100%;
+    max-width: 600px;
   }
 
   .nav {
     flex-direction: row;
     overflow-x: auto;
+    gap: 8px;
+  }
+
+  .navItem {
+    white-space: nowrap;
+    min-width: fit-content;
   }
 
   .content {
     padding: 20px;
+    width: 100%;
+    max-width: 600px;
   }
 
   .row {
     flex-direction: column;
+  }
+
+  .actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .cancelBtn,
+  .saveBtn,
+  .updateBtn {
+    width: 100%;
   }
 }

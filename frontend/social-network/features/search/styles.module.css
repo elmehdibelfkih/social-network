@@ -147,12 +147,23 @@
 }
 
 @media (max-width: 640px) {
+    .page {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 0 10px;
+    }
+
     .searchCard {
         padding: 1.5rem;
+        width: 100%;
+        max-width: 100%;
+        margin: 14px auto 0;
     }
 
     .title {
         font-size: 1.25rem;
+        text-align: center;
     }
 
     .buttonsContainer {
@@ -163,13 +174,19 @@
         width: 100%;
     }
 
-    .loadingContainer,
-    .errorContainer,
-    .emptyContainer {
-        padding: 1.5rem;
+    .resultsContainer {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .resultsGrid {
+        grid-template-columns: 1fr;
+        justify-items: center;
     }
 
     .searchedCard {
         padding: 0.75rem;
+        width: 100%;
+        max-width: 400px;
     }
 }
