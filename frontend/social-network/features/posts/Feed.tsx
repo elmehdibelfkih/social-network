@@ -106,8 +106,8 @@ export function Feed({ initialPosts }: { initialPosts: Post[] }) {
         </div>
       )}
       {!hasMore && posts.length > 0 && (
-        <div style={{ textAlign: 'center', padding: '20px', color: '#9ca3af' }}>
-          No more posts to load
+        <div style={{ textAlign: 'center', padding: '20px', color: '#707070ff', background: '#ffffffff', borderRadius: '10px', border: '5px Dotted #d1d5db'}}>
+          No more posts to load .
         </div>
       )}
     </div>

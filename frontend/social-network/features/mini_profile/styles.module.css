@@ -2,7 +2,7 @@
 
 .miniCardLarge {
   width: 100%;
-  max-width: 380px;
+  /* max-width: 380px; */
   background: var(--white);
   border-radius: var(--border-radius-lg);
   padding: var(--spacing-xl) var(--spacing-lg) var(--spacing-lg);
