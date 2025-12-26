@@ -20,7 +20,7 @@ export default async function PostPage({ params }): Promise<JSX.Element> {
   return (
     <>
       <div>
-        <NewPost groupId={groupId} isMyprofile={false} />
+        <NewPost groupId={groupId} />
       </div>
       <div>
         {posts.length === 0 ? (

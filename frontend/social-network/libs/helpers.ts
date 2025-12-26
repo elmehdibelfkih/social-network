@@ -1,6 +1,7 @@
 import { http } from "./apiFetch";
 import type {
   MiniProfile,
+  UserStatsState,
   UserId
 } from '@/libs/globalTypes'
 
@@ -13,14 +14,14 @@ export async function getUserId() {
   return res.Id
 }
 
-export function displayName(profile: MiniProfile | null) {
+export function displayName(profile: MiniProfile | UserStatsState | null) {
   if (!profile) return 'User'
   const full = `${profile.firstName ?? ''} ${profile.lastName ?? ''}`.trim()
 
   return full || 'User'
 }
 
-export function handleName(profile: MiniProfile | null) {
+export function handleName(profile: MiniProfile | UserStatsState | null) {
   if (!profile) return '@user'
   if (profile.nickname && profile.nickname.trim()) return `@${profile.nickname}`
   const raw = `${profile.firstName ?? ''}${profile.lastName ?? ''}`.replace(/\s+/g, '')

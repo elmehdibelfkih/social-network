@@ -13,7 +13,7 @@ export function Feed({ initialPosts }: { initialPosts: Post[] }) {
   const [hasMore, setHasMore] = useState(true)
   const debouncedLoading = useDebounce(loading, 300)
   
-  const observer = useRef<IntersectionObserver>()
+  const observer = useRef<IntersectionObserver | null>(null)
 
   const lastPostElementRef = useCallback(node => {
     if (loading) return

@@ -22,7 +22,7 @@ export default function PrivacyToggle({ privacy }: { privacy: string }) {
                 body: payload
             })
             if (resp) {
-                dispatch({ type: 'SET_PRIVACY', payload: payload.privacy })
+                dispatch({ type: 'SET_PRIVACY', payload: payload.privacy as 'public' | 'private' })
             } else {
                 return
             }

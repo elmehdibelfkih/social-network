@@ -17,7 +17,7 @@ export async function getMiniProfileServer(userId: string | number): Promise<Min
       firstName: profile.firstName,
       lastName: profile.lastName,
       avatarId: profile.avatarId,
-      privacy: profile.privacy,
+      privacy: profile.privacy as 'public' | 'private',
       chatId: profile.chatId ?? null,
       stats: profile.stats,
       joinedAt: profile.joinedAt

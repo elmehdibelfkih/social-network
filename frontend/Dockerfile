@@ -1,36 +1,39 @@
-# ---- build stage ----
+# ---- Build Stage ----
 FROM node:20-alpine AS builder
 WORKDIR /app
-COPY package.json package-lock.json* pnpm-lock.yaml* ./
 
+# Copy package files from the Next.js app directory
+COPY social-network/package.json social-network/package-lock.json ./
+
+# Install dependencies
 RUN npm ci --legacy-peer-deps
 
-# Copy source and build
-COPY . .
+# Copy Next.js application source
+COPY social-network/ ./
+
+# Build the application (creates .next/standalone)
 RUN npm run build
 
-# ---- production stage ----
+# ---- Production Stage ----
 FROM node:20-alpine AS runner
 WORKDIR /app
 
 # Create a non-root user for security
-RUN addgroup -S next && adduser -S next -G next
+RUN addgroup -S nextjs && adduser -S nextjs -G nextjs
+
 ENV NODE_ENV=production
+ENV HOSTNAME="0.0.0.0"
 
 # Copy only the necessary artifacts from builder
-COPY --from=builder /app/package.json /app/package-lock.json* /app/
-COPY --from=builder /app/.next /app/.next
-COPY --from=builder /app/public /app/public
-# Copy next.config if you need it at runtime
-COPY --from=builder /app/next.config.js /app/next.config.js
-
-# Install only production dependencies (ensure package-lock exists)
-RUN npm ci --only=production --legacy-peer-deps
+COPY --from=builder --chown=nextjs:nextjs /app/.next/standalone ./
+COPY --from=builder --chown=nextjs:nextjs /app/.next/static ./.next/static
+COPY --from=builder --chown=nextjs:nextjs /app/public ./public
 
 # Drop privileges
-USER next
+USER nextjs
 
-# Expose port and run
-ENV PORT=3000
+# Expose port
 EXPOSE 3000
-CMD ["node", "./node_modules/next/dist/bin/next", "start", "-p", "3000"]
+
+# Start the application
+CMD ["node", "server.js"]

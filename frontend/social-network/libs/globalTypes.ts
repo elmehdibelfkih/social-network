@@ -269,7 +269,7 @@ export interface Follower {
   avatarId: number | null;
   privacy: 'public' | 'private';
   chatId: number | null;
-  Stats: Stats;
+  stats: Stats;
   joinedAt: string | null;
 }
 
