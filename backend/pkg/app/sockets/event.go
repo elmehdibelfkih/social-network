@@ -12,7 +12,6 @@ type EventError struct {
 }
 
 type ClientMessage struct {
-	// SourceId        int64            `json:"sourceId"`
 	TypingIndicator *TypingIndicator `json:"typingIndicator"`
 	ChatMessage     *ChatMessage     `json:"chatMessage"`
 	MarkSeen        *MarkSeen        `json:"markSeen"`
@@ -30,23 +29,25 @@ type TypingIndicator struct {
 }
 
 type ChatMessage struct {
-	MessageId int64  `json:"messageId"`
-	ChatId    int64  `json:"chatId"`
-	SenderId  int64  `json:"senderId"`
-	Content   string `json:"content"`
-	SeenState string `json:"seenState"`
-	CreatedAt string `json:"createdAt"`
-	UpdatedAt string `json:"updatedAt"`
+	SenderData UserData `json:"senderData"`
+	MessageId  int64    `json:"messageId"`
+	ChatId     int64    `json:"chatId"`
+	SenderId   int64    `json:"senderId"`
+	Content    string   `json:"content"`
+	SeenState  string   `json:"seenState"`
+	CreatedAt  string   `json:"createdAt"`
+	UpdatedAt  string   `json:"updatedAt"`
 }
 
 type MarkSeen struct {
-	MessageId int64  `json:"messageId"`
-	ChatId    int64  `json:"chatId"`
-	SenderId  int64  `json:"senderId"`
-	Content   string `json:"content"`
-	SeenState string `json:"seenState"`
-	CreatedAt string `json:"createdAt"`
-	UpdatedAt string `json:"updatedAt"`
+	SenderData UserData `json:"senderData"`
+	MessageId  int64    `json:"messageId"`
+	ChatId     int64    `json:"chatId"`
+	SenderId   int64    `json:"senderId"`
+	Content    string   `json:"content"`
+	SeenState  string   `json:"seenState"`
+	CreatedAt  string   `json:"createdAt"`
+	UpdatedAt  string   `json:"updatedAt"`
 }
 
 type Notification struct {

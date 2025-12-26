@@ -24,16 +24,13 @@ export default async function HomePage(): Promise<JSX.Element> {
         <div className={styles.firstSection}>
           <ProfileSummary />
         </div>
-
         <div className={styles.secondSection}>
           <NewPost />
           <Feed initialPosts={posts} />
         </div>
-
         <div className={styles.thirdSection}>
           <ChatSection></ChatSection>
         </div>
-        <div id="chat-portals"></div>
       </main>
     </>
   );

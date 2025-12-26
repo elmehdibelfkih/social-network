@@ -46,6 +46,5 @@ body {
   gap: 10px;
   width: 90%;
   bottom: 0;
-  overflow: auto;
   z-index: 1000;
 }

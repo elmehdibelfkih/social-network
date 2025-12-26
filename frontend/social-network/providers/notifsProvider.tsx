@@ -132,6 +132,7 @@ export function NotificationProvider({ children }) {
     const prependNotifications = useCallback((newNotification: Notification) => {
         if (newNotification.status === 'suspended') {
             setNotifications((prev) => {
+                if (!prev) return
                 const suspended = prev.find(n => n.notificationId === newNotification.notificationId)
                 if (suspended && suspended.isRead === 0) {
                     userStatsDispatch({ type: 'READ_NOTIFICATION' })

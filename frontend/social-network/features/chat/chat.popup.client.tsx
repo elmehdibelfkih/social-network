@@ -8,16 +8,17 @@ import { User } from "./types";
 interface FloatingChatProps {
     chatId: number;
     user: User;
-    onClose: () => void;
+    onClose?: () => void;
 }
 
 export default function FloatingChat({ chatId, user, onClose }: FloatingChatProps) {
-    const [portalNode, setPortalNode] = useState<HTMLElement | null>(null);
-    useEffect(() => {
-        setPortalNode(document.getElementById("chat-portals"));
-    }, []);
-    if (!portalNode) return null;
-    return createPortal(
+    // const [portalNode, setPortalNode] = useState<HTMLElement | null>(null);
+    // useEffect(() => {
+    //     console.log("effect trigred")
+    //     setPortalNode(document.getElementById("chat-portals"));
+    // }, []);
+    // if (!portalNode) return null;
+    return (
         <div className={styles.popupStyle}>
             <ChatConversation
                 key={chatId}
@@ -25,7 +26,6 @@ export default function FloatingChat({ chatId, user, onClose }: FloatingChatProp
                 user={user}
                 onClose={onClose}
             />
-        </div>,
-        portalNode
+        </div>
     );
 }

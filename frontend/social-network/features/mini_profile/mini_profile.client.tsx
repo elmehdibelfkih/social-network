@@ -1,23 +1,35 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import styles from './styles.module.css'
 import { http } from '@/libs/apiFetch'
 import { FollowApiResponse } from './types'
 import { useUserStats } from '@/providers/userStatsContext'
 import { MiniProfile } from '@/libs/globalTypes'
+import { useChatProviderState } from '../chat/global.chat.client'
+
 
 type Props = {
   data?: MiniProfile
 }
 
+
+
 export function MiniProfileActions({ data }: Props) {
+  const { openChats,
+    setOpenChats,
+    users,
+    setUsers,
+    handleOpenChat,
+    handleCloseChat,
+    handleCloseAll
+  } = useChatProviderState()
+
   const { state, dispatch } = useUserStats();
   const isCurrentUser = state.userId != null && data?.userId != null && state.userId === data.userId;
-
   const [status, setStatus] = useState<string | null>(data?.status ?? null)
   const [followersCount, setFollowersCount] = useState(data?.stats?.followersCount ?? 0)
-  const [chatId, setChatId] = useState<number | null | undefined>(
+  const [chatId, setChatId] = useState<number | null>(
     data?.chatId ?? null
   )
   const [busy, setBusy] = useState(false)
@@ -26,18 +38,20 @@ export function MiniProfileActions({ data }: Props) {
     if (busy || !data?.userId) return
     setBusy(true)
     try {
-      const res = await http.post<FollowApiResponse>(
-        `/api/v1/users/${encodeURIComponent(String(data.userId))}/follow`
-      )
-      const payload = res
-      const newStatus = payload?.status ?? null
-      const newChatId = payload?.chatId ?? null
-      setStatus(newStatus)
-      setChatId(newChatId)
-      if (newStatus === 'accepted') {
-        setFollowersCount(followersCount + 1)
-        dispatch({ type: 'INCREMENT_FOLLOWING' });
+      const res = await http.post<FollowApiResponse>(`/api/v1/users/${encodeURIComponent(String(data.userId))}/follow`)
+      console.log(res);
+      if (res) { 
+        const newStatus = res?.status ?? null
+        const newChatId = res?.chatId ?? null
+  
+        setStatus(newStatus)
+        setChatId(newChatId)
+        if (newStatus === 'accepted') {
+          setFollowersCount(followersCount + 1)
+          dispatch({ type: 'INCREMENT_FOLLOWING' });
+        }
       }
+
     } catch (err) {
       console.error('follow error', err)
     } finally {
@@ -49,14 +63,27 @@ export function MiniProfileActions({ data }: Props) {
     if (busy || !data?.userId) return
     setBusy(true)
     try {
-      await http.post(
-        `/api/v1/users/${encodeURIComponent(String(data.userId))}/unfollow`
-      )
-      setStatus(null)
-      if (status !== 'pending') {
-        setFollowersCount(followersCount - 1)
-        dispatch({ type: 'DECREMENT_FOLLOWING' });
+      const res = await http.post<FollowApiResponse>(`/api/v1/users/${encodeURIComponent(String(data.userId))}/unfollow`)
+      console.log(res);
+      
+      if (res) {
+        const newStatus = res?.status ?? null
+        const newChatId = res?.chatId ?? null
+        
+        setStatus(newStatus)
+        setChatId(newChatId)
+        if (status !== 'pending') {
+          setFollowersCount(followersCount - 1)
+          dispatch({ type: 'DECREMENT_FOLLOWING' });
+        }
       }
+
+      // if (newStatus === 'accepted') {
+      //   setFollowersCount(followersCount + 1)
+      //   dispatch({ type: 'INCREMENT_FOLLOWING' });
+      // }
+
+      // setStatus(null)
     } catch (err) {
       console.error('unfollow error', err)
     } finally {
@@ -66,7 +93,22 @@ export function MiniProfileActions({ data }: Props) {
 
   function onMessage() {
     if (!chatId) return
-    window.location.href = `/chat/${chatId}`
+    // window.location.href = `/chat/${chatId}`
+    const user = {
+      chatId: data.chatId,
+      role: "member",
+      unreadCount: 0,
+      userId: data.userId,
+      email: "",
+      firstName: data.firstName,
+      lastName: data.lastName,
+      dateOfBirth: "",
+      nickname: data.nickname,
+      aboutMe: "",
+      avatarId: data.avatarId,
+      online: true,
+    }
+    handleOpenChat(user.chatId, user);
   }
 
   if (!data) return null
