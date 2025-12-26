@@ -26,9 +26,10 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
 
   console.log('Layout - notificationsRes:', notificationsRes);
 
-  if (!profileRes || !notificationsRes || !counts) {
-    return null;
-  }
+ if (!profileRes || !notificationsRes || !counts) {
+  return 
+}
+
   const stats: UserStatsState = {
     userId: profileRes.userId,
     nickname: profileRes.nickname,

@@ -12,18 +12,16 @@ export default async function HomePage(): Promise<JSX.Element> {
 
   return (
     <>
-      <main className={styles.main}>
-        <div className={styles.firstSection}>
-          <ProfileSummary />
-        </div>
-        <div className={styles.secondSection}>
-          <NewPost />
-          <Feed initialPosts={posts} />
-        </div>
-        <div className={styles.thirdSection}>
-          <ChatSection></ChatSection>
-        </div>
-      </main>
+      <div className={styles.firstSection}>
+        <ProfileSummary />
+      </div>
+      <div className={styles.secondSection}>
+        <NewPost />
+        <Feed initialPosts={posts} />
+      </div>
+      <div className={styles.thirdSection}>
+        <ChatSection></ChatSection>
+      </div>
     </>
   );
 }
