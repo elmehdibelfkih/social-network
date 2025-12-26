@@ -1,9 +1,7 @@
-
-
-.seenIcon img{
+.seenIcon svg {
     height: 12px;
     width: 12px;
-    margin-left: 4px;
+    margin-inline: 2px;
 }
 
 .seenIcon {

@@ -76,10 +76,7 @@ func (h *Hub) addClient(c *Client) {
 	}
 }
 
-func (h *Hub) removeClient(c *Client) {
-	h.mu.Lock()
-	defer h.mu.Unlock()
-
+func (h *Hub) removeClientLocked(c *Client) {
 	clients, ok := h.clients[c.userId]
 	if !ok {
 		return
@@ -87,23 +84,58 @@ func (h *Hub) removeClient(c *Client) {
 
 	for i := range clients {
 		if clients[i] == c {
-			// close connection before deleting it
-			clients[i].connection.Close()
 			clients = append(clients[:i], clients[i+1:]...)
 			break
 		}
 	}
 
-	if len(clients) != 0 {
+	if len(clients) > 0 {
 		h.clients[c.userId] = clients
 		return
 	}
-	go c.handleEvent(Event{Source: "server", Type: "offlineUser"}) // might cause a panic
+
 	delete(h.clients, c.userId)
 	for _, chat := range h.chatUsers {
 		delete(chat, c.userId)
 	}
 }
+
+func (h *Hub) removeClient(c *Client) {
+	h.mu.Lock()
+	h.removeClientLocked(c)
+	h.mu.Unlock()
+
+	c.connection.Close()
+	c.handleEvent(Event{
+		Source: "server",
+		Type:   "offlineUser",
+	})
+}
+
+func (h *Hub) RemoveClientBySession(userId int64, session string) {
+	var target *Client
+
+	h.mu.Lock()
+	for _, c := range h.clients[userId] {
+		if c.sessionToken == session {
+			target = c
+			break
+		}
+	}
+	if target != nil {
+		h.removeClientLocked(target)
+	}
+	h.mu.Unlock()
+
+	if target != nil {
+		target.connection.Close()
+		target.handleEvent(Event{
+			Source: "server",
+			Type:   "offlineUser",
+		})
+	}
+}
+
 
 func (h *Hub) ChatOnlineUsers(chatId int64) int {
 	h.mu.Lock()
@@ -116,6 +148,16 @@ func (h *Hub) BroadcastToChat(userId, chatId int64, event Event) {
 	h.mu.Lock()
 	defer h.mu.Unlock()
 
+	if h.clients != nil && len(h.clients[userId]) > 0 {
+		if event.Payload != nil {
+			if event.Payload.ChatMessage != nil {
+				event.Payload.ChatMessage.SenderData = h.clients[userId][0].user
+			}
+			if event.Payload.MarkSeen != nil {
+				event.Payload.MarkSeen.SenderData = h.clients[userId][0].user
+			}
+		}
+	}
 	for _, clients := range h.chatUsers[chatId] {
 		for _, c := range clients {
 			c.events <- event
