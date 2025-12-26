@@ -30,7 +30,7 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 /node_modules
-package-lock.json
+# package-lock.json
 yarn.lock
 pnpm-lock.yaml
 dist

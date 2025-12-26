@@ -8,6 +8,7 @@ services:
     restart: unless-stopped
     volumes:
       - sqlite_data:/data
+      - ./logs/backend:/app/logs
     networks:
       - social-network
     expose:
@@ -22,6 +23,8 @@ services:
     restart: unless-stopped
     environment:
       - NODE_ENV=production
+    volumes:
+      - ./logs/frontend:/app/logs
     networks:
       - social-network
     expose:
@@ -40,7 +43,7 @@ services:
       - "8080:80"
       - "443:443"
     volumes:
-      - nginx_logs:/var/log/nginx
+      - ./logs/nginx:/var/log/nginx
       - ./nginx/ssl:/etc/nginx/ssl:ro
     networks:
       - social-network
@@ -50,8 +53,6 @@ services:
 
 volumes:
   sqlite_data:
-    driver: local
-  nginx_logs:
     driver: local
 
 networks:
