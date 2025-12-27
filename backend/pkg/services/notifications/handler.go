@@ -100,7 +100,5 @@ func HandleGetUnreadCount(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Printf("HandleGetUnreadCount - userID: %d, count: %d\n", userID, count)
-
 	utils.WriteSuccess(w, http.StatusOK, map[string]int{"unreadNotifications": count})
 }

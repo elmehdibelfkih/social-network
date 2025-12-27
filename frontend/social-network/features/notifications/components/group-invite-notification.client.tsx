@@ -10,7 +10,6 @@ import { useRouter } from 'next/navigation'
 import { useAuth } from '@/providers/authProvider'
 
 export function GroupInviteNotification({ notification, onMarkAsRead }: NotificationProps) {
-  console.log(notification)
   const { user } = useAuth()
   const [group, setGroup] = useState<GroupType>(null)
   const [requestHandled, setRequestHandled] = useState(false)

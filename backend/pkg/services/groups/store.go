@@ -2,7 +2,6 @@ package groups
 
 import (
 	"database/sql"
-	"fmt"
 	"math"
 	"strings"
 
@@ -199,7 +198,6 @@ func SelectGroupsByUserId(limit, userId int64, offset int64, l *BrowseGroupsResp
 }
 
 func SelectGroupById(groupId, userId int64, g *GetGroupResponseJson) error {
-	fmt.Println("USERID:", userId)
 	err := config.DB.QueryRow(SELECT_GROUP_BY_GROUP_ID,
 		groupId,
 	).Scan(
@@ -235,8 +233,6 @@ func SelectGroupById(groupId, userId int64, g *GetGroupResponseJson) error {
 		utils.SQLiteErrorTarget(err, SELECT_GROUP_CHAT_ID)
 		return err
 	}
-
-	fmt.Println("xxx", userId)
 
 	// Get member status for the requesting user
 	var memberStatus string
@@ -497,8 +493,8 @@ func InsertNewGroupMember(sourceId, targetId, groupId int64, status, role, notif
 			NotificationId: utils.GenerateID(),
 			UserId:         notificationReceiverId,
 			Type:           notificationType,
-			ReferenceId:     groupId,
-			ReferenceType:   "group",
+			ReferenceId:    groupId,
+			ReferenceType:  "group",
 			Content:        content,
 			Status:         "active",
 		}, sourceId, tx)
@@ -560,8 +556,8 @@ func insertNewGroupEvent(userId, groupId int64, e *CreateEventRequestJson, er *C
 				NotificationId: utils.GenerateID(),
 				UserId:         groupUser,
 				Type:           "event_created",
-				ReferenceId:     er.EventId,
-				ReferenceType:   "event",
+				ReferenceId:    er.EventId,
+				ReferenceType:  "event",
 				Content:        "An event has been created",
 				Status:         "active",
 			}, userId, tx)

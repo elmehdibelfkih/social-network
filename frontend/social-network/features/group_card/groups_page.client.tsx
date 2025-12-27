@@ -40,7 +40,7 @@ export default function GroupsPageClient({
   async function handleSubmit(payload: CreateGroupPayload) {
     try {
       const newGroup = await GroupService.createGroup(payload);
-      console.log("Group created:", newGroup);
+      // console.log("Group created:", newGroup);
       
       // Refresh both lists
       setIsRefreshing(true);

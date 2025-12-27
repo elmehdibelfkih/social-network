@@ -74,13 +74,11 @@ class WebSocketManger {
 
     #attachPortHandlers(port) {
         port.onmessage = (e) => {
-            console.log("init", e.data)
-            console.log("ws:", this.ws)
             if (e.data.type === "init_ws") {
                 this.#initWebsocket();
                 return;
             }
-            console.log(e.data)
+            console.log("data we are about to send", e.data)
             this.#sendOrQueue(e.data);
         };
     }
@@ -88,7 +86,7 @@ class WebSocketManger {
     #sendOrQueue(data) {
         if (!this.ws || this.ws.readyState !== WebSocket.OPEN) {
             this.messagesQueue.push(JSON.stringify(data))
-            console.log(this.messagesQueue)
+            console.log("hold on queue:", this.messagesQueue)
             return
         }
         this.ws.send(JSON.stringify(data))

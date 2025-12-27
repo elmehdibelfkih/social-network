@@ -22,9 +22,7 @@ export const GroupService = {
             const response = await http.get<GroupMembersResponse>(
                 `/api/v1/groups/${groupId}/members?${params.toString()}`
             );
-            console.log('group members: ', response.members);
             if (!response?.members) return [];
-            console.log('group members: ', response.members);
             return response.members;
         } catch (error) {
             console.error(`Failed to fetch members for group ${groupId}:`, error);
@@ -37,7 +35,6 @@ export const GroupService = {
             const response = await http.get<EventRsvpResponse>(
                 `/api/v1/groups/${groupId}/events/${eventId}/rsvp`
             );
-            console.log('event rsvp: ', response);
             if (!response) return null;
             return response;
         } catch (error) {
@@ -62,7 +59,6 @@ export const GroupService = {
                     redirectOnError: false
                 }
             );
-            console.log("this is RSVP ", response)
             return response;
         } catch (error) {
             console.error('Failed to RSVP to event:', error);
@@ -82,7 +78,6 @@ export const GroupService = {
                     location: payload.location
                 }
             );
-            console.log('Event created successfully:', response);
             return response;
         } catch (error) {
             console.error(`Failed to create event for group ${groupId}:`, error);

@@ -16,10 +16,6 @@ export function ChatPortals() {
         handleCloseAll
     } = useChatProviderState()
 
-    useEffect(() => {
-        console.log("has", openChats)
-    }, [openChats])
-
     return (
         <div id="chat-portals">
             {Array.from(openChats.entries()).map(([chatId, user]) => (

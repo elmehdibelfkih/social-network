@@ -12,12 +12,6 @@ interface FloatingChatProps {
 }
 
 export default function FloatingChat({ chatId, user, onClose }: FloatingChatProps) {
-    // const [portalNode, setPortalNode] = useState<HTMLElement | null>(null);
-    // useEffect(() => {
-    //     console.log("effect trigred")
-    //     setPortalNode(document.getElementById("chat-portals"));
-    // }, []);
-    // if (!portalNode) return null;
     return (
         <div className={styles.popupStyle}>
             <ChatConversation

@@ -51,7 +51,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
     useEffect(() => {
 
         const onUnMount = chatService.addListener((data) => {
-            console.log("received from sharedworker:", data.type, data);
+            // console.log("received from sharedworker:", data.type, data);
             switch (data.type) {
                 case 'online_status': {
                     const onlineUsers = data.payload.onlineStatus.onlineUsers;

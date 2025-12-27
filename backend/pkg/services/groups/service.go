@@ -1,7 +1,6 @@
 package groups
 
 import (
-	"fmt"
 	"net/http"
 	"social/pkg/db/database"
 	"social/pkg/utils"
@@ -180,7 +179,6 @@ func GroupUpdateHttp(w http.ResponseWriter,
 func GroupInfo(w http.ResponseWriter, r *http.Request,
 	response *GetGroupResponseJson, context string,
 ) bool {
-	fmt.Println("GROUPINFO1")
 	groupId := utils.GetWildCardValue(w, r, "group_id")
 	userId := utils.GetUserIdFromContext(r)
 	checkUserId := utils.GetQuerryPramInt(r, "checkUserId")

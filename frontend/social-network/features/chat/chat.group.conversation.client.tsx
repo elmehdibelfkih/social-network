@@ -27,7 +27,6 @@ export default function GroupChatConversation({ chatId, group }: GroupChatConver
     const [isLoading, setIsLoading] = useState(false)
     const [input, setInput] = useState("");
     const [userData, setUserData] = useState(null)
-    // const [isTyping, setIsTyping] = useState(false)
     const scrollRef = useRef<HTMLDivElement>(null);
     const [emojiOpen, setEmojiOpen] = useState(false);
     const inputRef = useRef<HTMLInputElement>(null);
@@ -54,12 +53,12 @@ export default function GroupChatConversation({ chatId, group }: GroupChatConver
 
     useEffect(() => {
         const onUnMount = chatService.addListener((data) => {
-            console.log("received from sharedworker:", data);
+            // console.log("received from sharedworker:", data);
             if (!data.payload) return
             switch (data.type) {
                 case 'chat_message':
                     if (chatId !== data.payload.chatMessage.chatId) return
-                    // if (data.payload.chatMessage.senderId != userData.userId) setIsTyping(false)
+
                     setLastMessage(data.payload.chatMessage)
                     setMessages(prev => {
                         const next = new Map(prev);
@@ -81,12 +80,6 @@ export default function GroupChatConversation({ chatId, group }: GroupChatConver
                         next.set(msgId, updated);
                         return next;
                     });
-                    break;
-                case 'chat_typing':
-                    // setIsTyping(true)
-                    break;
-                case 'chat_afk':
-                    // setIsTyping(false)
                     break;
                 default:
                     break;
@@ -142,8 +135,6 @@ export default function GroupChatConversation({ chatId, group }: GroupChatConver
     }
 
     async function loadOlderMessages() {
-        console.log(oldestMessage)
-        console.log(lastMessage)
         if (loadingOld || !hasMore) return;
         const div = scrollRef.current;
         if (!div) return;
@@ -185,7 +176,6 @@ export default function GroupChatConversation({ chatId, group }: GroupChatConver
         try {
             const resp = await chatService.chatHistory(chatId);
             if (!resp.messagesList) return
-            console.log(resp.messagesList)
             const corrected = resp.messagesList.reverse()
             const keyValuePairs: [number, ChatMessage][] = corrected.map(obj => [obj.messageId, obj]);
             const history: Map<number, ChatMessage> = new Map<number, ChatMessage>(keyValuePairs);
@@ -330,9 +320,6 @@ export default function GroupChatConversation({ chatId, group }: GroupChatConver
                         </div>
                     );
                 })}
-            </div>
-            <div className={styles.typingContainer}>
-                {/* <TypingIndicator isTyping={isTyping} user={user} /> */}
             </div>
             <form className={styles.chatInputContainer} onSubmit={handleSubmit}>
                 <input

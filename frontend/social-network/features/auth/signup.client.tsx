@@ -75,7 +75,6 @@ export function RegisterForm({ onAuthSuccess }: { onAuthSuccess?: () => void }) 
 
         try {
             const resp = await authService.register(formData);
-            console.log(resp)
             const newUser = {
                 userId: String(resp.userId),
                 avatarId: resp.avatarId,

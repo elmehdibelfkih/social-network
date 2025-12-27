@@ -1,7 +1,6 @@
 package feed
 
 import (
-	"fmt"
 	"net/http"
 	"social/pkg/utils"
 )
@@ -10,7 +9,7 @@ import (
 func IsGroupMember(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		userId := utils.GetUserIdFromContext(r)
-		fmt.Println("###############", userId)
+
 		if userId == -1 {
 			utils.Unauthorized(w, "You must be logged in.")
 			return

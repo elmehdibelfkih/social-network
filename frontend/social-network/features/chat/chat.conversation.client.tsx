@@ -55,7 +55,6 @@ export default function ChatConversation({ chatId, user, onClose }: ChatConversa
 
     useEffect(() => {
         const onUnMount = chatService.addListener((data) => {
-            console.log("received from sharedworker:", data);
             if (!data.payload) return
             switch (data.type) {
                 case 'chat_message':
@@ -99,8 +98,6 @@ export default function ChatConversation({ chatId, user, onClose }: ChatConversa
     }, [userData])
 
     async function loadOlderMessages() {
-        console.log(oldestMessage)
-        console.log(lastMessage)
         if (loadingOld || !hasMore) return;
         const div = scrollRef.current;
         if (!div) return;
@@ -187,7 +184,6 @@ export default function ChatConversation({ chatId, user, onClose }: ChatConversa
         try {
             const resp = await chatService.chatHistory(chatId);
             if (!resp.messagesList) return
-            console.log(resp.messagesList)
             const corrected = resp.messagesList.reverse()
             const keyValuePairs: [number, ChatMessage][] = corrected.map(obj => [obj.messageId, obj]);
             const history: Map<number, ChatMessage> = new Map<number, ChatMessage>(keyValuePairs);

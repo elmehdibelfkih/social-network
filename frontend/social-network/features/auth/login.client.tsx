@@ -79,10 +79,24 @@ export function LoginForm({ onAuthSuccess }: { onAuthSuccess?: () => void }) {
                     disabled={isLoading}
                     maxLength={64}
                     minLength={8}
-                    
+
                 />
             </div>
 
+            <div className={styles.rememberMe}>
+                <label className={styles.rememberLabel}>
+                    <input
+                        type="checkbox"
+                        checked={formData.rememberMe}
+                        onChange={(e) =>
+                            setFormData({ ...formData, rememberMe: e.target.checked })
+                        }
+                        disabled={isLoading}
+                    />
+                    <span>Remember me</span>
+                </label>
+            </div>
+            
             <button
                 type="submit"
                 className={styles.submitButton}
