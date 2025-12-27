@@ -33,6 +33,15 @@ const CreateGroupModal: React.FC<CreateGroupModalProps> = ({
       ...prev,
       [name]: value
     }));
+    // Clear error when user starts typing
+    if (error) setError('');
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    // Prevent form submission on Enter key
+    if (e.key === 'Enter' && e.target instanceof HTMLInputElement) {
+      e.preventDefault();
+    }
   };
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -62,6 +71,7 @@ const CreateGroupModal: React.FC<CreateGroupModalProps> = ({
 
       reader.onerror = () => {
         setError('Failed to read the image file');
+        setIsUploading(false);
         reader.abort();
       };
 
@@ -73,31 +83,44 @@ const CreateGroupModal: React.FC<CreateGroupModalProps> = ({
       };
       reader.readAsDataURL(file);
     }
-    setIsUploading(false);
+    
     setFormData(prev => ({
       ...prev,
       avatarId: -1
     }));
-
   };
 
   async function handleSubmit() {
+    // Clear previous errors
+    setError('');
+
+    // Validation checks with minimum length requirements
     if (!formData.title.trim() || !formData.description.trim()) {
       setError('Please fill in all required fields');
-      return;
+      return; // Keep modal open
     }
 
-    if (formData.title.trim().length > 40 || !formData.description.trim()) {
-      setError('the title is more than 40');
-      return;
+    if (formData.title.trim().length < 5) {
+      setError('Title must be at least 5 characters long');
+      return; // Keep modal open
     }
 
-    if (formData.description.trim().length > 250) {
-      setError('the description is more than 250');
-      return;
+    if (formData.title.trim().length > 50) {
+      setError('Title must be 40 characters or less');
+      return; // Keep modal open
     }
 
+    if (formData.description.trim().length < 10) {
+      setError('Description must be at least 10 characters long');
+      return; // Keep modal open
+    }
 
+    if (formData.description.trim().length > 400) {
+      setError('Description must be 250 characters or less');
+      return; // Keep modal open
+    }
+
+    // If no file selected, submit without avatar
     if (!selectedFile) {
       const payload: CreateGroupPayload = {
         title: formData.title,
@@ -106,37 +129,38 @@ const CreateGroupModal: React.FC<CreateGroupModalProps> = ({
       };
       onSubmit(payload);
       handleClose();
-
-    } else {
-      setIsUploading(true);
-      try {
-        const resp = await GroupService.uploadMedia(selectedFile);
-        if (!resp) {
-          setError('Failed to upload avatar. Please try again.');
-          return;
-        }
-        const payload: CreateGroupPayload = {
-          title: formData.title,
-          description: formData.description,
-          avatarId: resp.mediaId
-        };
-        onSubmit(payload);
-
-        handleClose();
-      } catch (err) {
-        setError('Failed to create group. Please try again.');
-      } finally {
-        setIsUploading(false);
-      }
+      return;
     }
 
-
-  };
+    // Upload file and submit
+    setIsUploading(true);
+    try {
+      const resp = await GroupService.uploadMedia(selectedFile);
+      if (!resp) {
+        setError('Failed to upload avatar. Please try again.');
+        setIsUploading(false);
+        return; // Keep modal open
+      }
+      
+      const payload: CreateGroupPayload = {
+        title: formData.title,
+        description: formData.description,
+        avatarId: resp.mediaId
+      };
+      onSubmit(payload);
+      handleClose();
+    } catch (err) {
+      setError('Failed to create group. Please try again.');
+      setIsUploading(false);
+      // Keep modal open
+    }
+  }
 
   const handleClose = () => {
     setFormData({ title: '', description: '', avatarId: null });
     setImagePreview(null);
-    setIsUploading(false)
+    setSelectedFile(null);
+    setIsUploading(false);
     setError('');
     onClose();
   };
@@ -165,7 +189,7 @@ const CreateGroupModal: React.FC<CreateGroupModalProps> = ({
           {/* Group Title */}
           <div className={styles.inputGroup}>
             <label htmlFor="group-title" className={styles.label}>
-              Group Title *
+              Group Title * (min 5 characters)
             </label>
             <input
               type="text"
@@ -173,15 +197,17 @@ const CreateGroupModal: React.FC<CreateGroupModalProps> = ({
               name="title"
               value={formData.title}
               onChange={handleInputChange}
+              onKeyDown={handleKeyDown}
               placeholder="Enter group title"
               className={styles.input}
+              maxLength={50}
             />
           </div>
 
           {/* Description */}
           <div className={styles.inputGroup}>
             <label htmlFor="group-description" className={styles.label}>
-              Description *
+              Description * (min 10 characters)
             </label>
             <textarea
               id="group-description"
@@ -191,7 +217,7 @@ const CreateGroupModal: React.FC<CreateGroupModalProps> = ({
               placeholder="What is this group about?"
               rows={4}
               className={styles.textarea}
-              maxLength={1024}
+              maxLength={300}
               required
             />
           </div>
@@ -199,7 +225,7 @@ const CreateGroupModal: React.FC<CreateGroupModalProps> = ({
           {/* Image Upload */}
           <div className={styles.inputGroup}>
             <label htmlFor="group-image" className={styles.label}>
-              Group Image * (max size: 10 MB)
+              Group Image (optional, max size: 10 MB)
             </label>
             <div className={styles.uploadWrapper}>
               <label htmlFor="group-image" className={styles.uploadArea}>
@@ -248,10 +274,14 @@ const CreateGroupModal: React.FC<CreateGroupModalProps> = ({
           {/* Create Button */}
           <button
             onClick={handleSubmit}
-            disabled={formData.title.trim() == '' || formData.description.trim() == ''}
+            disabled={
+              formData.title.trim().length < 5 || 
+              formData.description.trim().length < 10 || 
+              isUploading
+            }
             className={styles.submitButton}
           >
-            Create Group
+            {isUploading ? 'Creating...' : 'Create Group'}
           </button>
         </div>
       </div>

@@ -11,7 +11,7 @@ const (
 	QUERY_GET_SEARCH_GROUP = `
 		SELECT g.id, g.title, g.description, g.avatar_id, g.creator_id
 		FROM groups g
-		WHERE g.title LIKE ? OR g.description LIKE ?
+		WHERE g.title LIKE ? 
 		LIMIT 10;
 	`
 

@@ -3,7 +3,6 @@ package groups
 import (
 	"fmt"
 	"net/http"
-
 	"social/pkg/db/database"
 	"social/pkg/utils"
 )

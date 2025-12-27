@@ -29,8 +29,8 @@ export default function CreateGroupEvent({ groupId, onComplete, onClose }: Creat
         const endDateTime = new Date(`${endDate}T${endTime}`)
         const now = new Date()
 
-        if (startDateTime < now) {
-            return 'Start date and time must be in the future'
+        if ((startDateTime.getTime() - now.getTime()) / (1000 * 60) < 30) {
+            return 'Start date and time must be at least 30 minutes in the future'
         }
 
         if (endDateTime <= startDateTime) {
@@ -45,14 +45,28 @@ export default function CreateGroupEvent({ groupId, onComplete, onClose }: Creat
         return null
     }
 
+    const validateText = () => {
+         if (!title || !description || !startDate || !startTime || !endDate || !endTime || !location) {
+            return 'Please fill in all fields'
+        }
+
+        if (!title || title.trim().length < 6 || title.trim().length > 35) {
+            return 'Title must be between 6 and 35 characters'
+        }
+
+        if (!description || description.trim().length < 10 || description.trim().length > 200) {
+            return 'Description must be between 10 and 200 characters'
+        }
+
+        if (!location || location.trim().length < 6 || location.trim().length > 35) {
+            return 'Location must be between 6 and 35 characters'
+        }
+        return null
+    }
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
         setError('')
-        
-        if (!title || !description || !startDate || !startTime || !endDate || !endTime || !location) {
-            setError('Please fill in all fields')
-            return
-        }
 
         // Validate date and time
         const validationError = validateDateTime()
@@ -61,12 +75,19 @@ export default function CreateGroupEvent({ groupId, onComplete, onClose }: Creat
             return
         }
 
+         const validationTextError = validateText()
+        if (validationTextError) {
+            setError(validationTextError)
+            return
+        }
+
         setIsSubmitting(true)
 
         try {
-            const startDateTime = `${startDate}T${startTime}:00Z`
-            const endDateTime = `${endDate}T${endTime}:00Z`
-            
+            // Create proper ISO datetime strings in local timezone
+            const startDateTime = new Date(`${startDate}T${startTime}`).toISOString()
+            const endDateTime = new Date(`${endDate}T${endTime}`).toISOString()
+
             const response = await GroupService.createGroupEvent(Number(groupId), {
                 title,
                 description,
@@ -108,8 +129,8 @@ export default function CreateGroupEvent({ groupId, onComplete, onClose }: Creat
                     <p className={styles.modalDesc}>Organize an event for your group members</p>
                 </div>
                 {onClose && (
-                    <button 
-                        className={styles.closeBtn} 
+                    <button
+                        className={styles.closeBtn}
                         onClick={onClose}
                         type="button"
                     >
@@ -134,7 +155,10 @@ export default function CreateGroupEvent({ groupId, onComplete, onClose }: Creat
                         placeholder="Enter event title"
                         className={styles.input}
                         value={title}
-                        onChange={(e) => setTitle(e.target.value)}
+                        onChange={(e) => {
+                            setTitle(e.target.value)
+                            setError('')
+                        }}
                         required
                     />
                 </div>
@@ -147,7 +171,10 @@ export default function CreateGroupEvent({ groupId, onComplete, onClose }: Creat
                         placeholder="What's this event about?"
                         className={styles.textarea}
                         value={description}
-                        onChange={(e) => setDescription(e.target.value)}
+                        onChange={(e) => {
+                            setDescription(e.target.value)
+                            setError('')
+                        }}
                         rows={4}
                         required
                     />
@@ -162,7 +189,10 @@ export default function CreateGroupEvent({ groupId, onComplete, onClose }: Creat
                             type="date"
                             className={styles.input}
                             value={startDate}
-                            onChange={(e) => setStartDate(e.target.value)}
+                            onChange={(e) => {
+                                setStartDate(e.target.value)
+                                setError('')
+                            }}
                             required
                         />
                     </div>
@@ -175,7 +205,10 @@ export default function CreateGroupEvent({ groupId, onComplete, onClose }: Creat
                             type="time"
                             className={styles.input}
                             value={startTime}
-                            onChange={(e) => setStartTime(e.target.value)}
+                            onChange={(e) => {
+                                setStartTime(e.target.value)
+                                setError('')
+                            }}
                             required
                         />
                     </div>
@@ -190,7 +223,10 @@ export default function CreateGroupEvent({ groupId, onComplete, onClose }: Creat
                             type="date"
                             className={styles.input}
                             value={endDate}
-                            onChange={(e) => setEndDate(e.target.value)}
+                            onChange={(e) => {
+                                setEndDate(e.target.value)
+                                setError('')
+                            }}
                             required
                         />
                     </div>
@@ -203,7 +239,10 @@ export default function CreateGroupEvent({ groupId, onComplete, onClose }: Creat
                             type="time"
                             className={styles.input}
                             value={endTime}
-                            onChange={(e) => setEndTime(e.target.value)}
+                            onChange={(e) => {
+                                setEndTime(e.target.value)
+                                setError('')
+                            }}
                             required
                         />
                     </div>
@@ -218,7 +257,10 @@ export default function CreateGroupEvent({ groupId, onComplete, onClose }: Creat
                         placeholder="e.g., Group voice room, Main Hall, Online"
                         className={styles.input}
                         value={location}
-                        onChange={(e) => setLocation(e.target.value)}
+                        onChange={(e) => {
+                            setLocation(e.target.value)
+                            setError('')
+                        }}
                         required
                     />
                 </div>

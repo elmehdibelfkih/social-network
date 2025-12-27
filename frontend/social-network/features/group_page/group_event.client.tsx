@@ -23,7 +23,7 @@ export default function CreateRSVP({
       if (data) {
         setGoingCount(data.going_count)
         setNotGoingCount(data.notgoing_count)
-
+        console.log("Am i going",data.ami_going)
         if (data.ami_going === true) {
           setIsGoing('going')
         } else if (data.ami_going === false) {
