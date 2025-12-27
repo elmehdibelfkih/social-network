@@ -20,7 +20,7 @@ export function Search() {
   const [searchQuery, setSearchQuery] = useState('')
   const [activeTab, setActiveTab] = useState<'users' | 'groups' | 'posts'>('users')
   const debouncedQuery = useDebounce(searchQuery, 200)
-  const router = useRouter();
+  const router = useRouter()
 
   const handleJoinGroup = async (groupId: number) => {
     try {
@@ -44,11 +44,14 @@ export function Search() {
   useEffect(() => {
     const loadAllData = async () => {
       try {
+        const searchParam = debouncedQuery ? `?q=${encodeURIComponent(debouncedQuery)}` : '?q='
+        
         const [usersRes, groupsRes, postsRes] = await Promise.all([
-          http.get<types.User[]>('/api/v1/search?q=&type=users'),
-          http.get<types.Group[]>('/api/v1/search?q=&type=groups'),
-          http.get<Post[]>('/api/v1/search?q=&type=posts')
+          http.get<types.User[]>(`/api/v1/search${searchParam}&type=users`),
+          http.get<types.Group[]>(`/api/v1/search${searchParam}&type=groups`),
+          http.get<Post[]>(`/api/v1/search${searchParam}&type=posts`)
         ])
+        
         setAllUsers(usersRes || [])
         setAllGroups(groupsRes || [])
         setAllPosts(postsRes || [])
@@ -56,8 +59,11 @@ export function Search() {
         console.error('Failed to load data:', error)
       }
     }
+    
     loadAllData()
+  }, [debouncedQuery])
 
+  useEffect(() => {
     const handleUpdatePost = (event: CustomEvent) => {
       const { postId, ...updates } = event.detail
       setAllPosts(prev => prev.map(post =>
@@ -79,38 +85,9 @@ export function Search() {
     }
   }, [])
 
-  // Filter data based on search query
   const filteredUsers = allUsers.filter(searchUser => {
-    // Exclude current user
     if (user && searchUser.userId === Number(user.userId)) return false
-
-    if (!debouncedQuery) return true
-    const query = debouncedQuery.toLowerCase()
-    return (
-      searchUser.firstName?.toLowerCase().includes(query) ||
-      searchUser.lastName?.toLowerCase().includes(query) ||
-      searchUser.nickname?.toLowerCase().includes(query)
-    )
-  })
-
-  const filteredGroups = allGroups.filter(group => {
-    if (!debouncedQuery) return true
-    const query = debouncedQuery.toLowerCase()
-    return (
-      group.title?.toLowerCase().includes(query) ||
-      group.description?.toLowerCase().includes(query)
-    )
-  })
-
-  const filteredPosts = allPosts.filter(post => {
-    if (!debouncedQuery) return true
-    const query = debouncedQuery.toLowerCase()
-    return (
-      post.content?.toLowerCase().includes(query) ||
-      post.authorFirstName?.toLowerCase().includes(query) ||
-      post.authorLastName?.toLowerCase().includes(query) ||
-      post.authorNickname?.toLowerCase().includes(query)
-    )
+    return true
   })
 
   return (
@@ -137,13 +114,13 @@ export function Search() {
             className={`${styles.filterButton} ${activeTab === 'groups' ? styles.active : ''}`}
             onClick={() => setActiveTab('groups')}
           >
-            Groups ({filteredGroups.length})
+            Groups ({allGroups.length})
           </button>
           <button
             className={`${styles.filterButton} ${activeTab === 'posts' ? styles.active : ''}`}
             onClick={() => setActiveTab('posts')}
           >
-            Posts ({filteredPosts.length})
+            Posts ({allPosts.length})
           </button>
         </div>
       </div>
@@ -158,7 +135,7 @@ export function Search() {
         )}
         {activeTab === 'groups' && (
           <div className={styles.resultsGrid}>
-            {filteredGroups.map(group => (
+            {allGroups.map(group => (
               <GroupCard
                 key={group.groupId}
                 group={group}
@@ -171,7 +148,7 @@ export function Search() {
         )}
         {activeTab === 'posts' && (
           <div className={styles.resultsGrid}>
-            {filteredPosts.map(post => (
+            {allPosts.map(post => (
               <PostCard key={post.postId} post={post} />
             ))}
           </div>
