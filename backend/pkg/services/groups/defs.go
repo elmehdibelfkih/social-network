@@ -207,7 +207,7 @@ type GetRSVPResponseJson struct {
 // validators
 
 func (v *CreateGroupRequestJson) Validate() (bool, string) {
-	if ok, str := utils.TextContentValidationEscape(&v.Title, 5, 32); !ok {
+	if ok, str := utils.TextContentValidationEscape(&v.Title, 5, 100); !ok {
 		return false, str
 	}
 	if ok, str := utils.TextContentValidationEscape(&v.Description, 5, 4096); !ok {
@@ -217,7 +217,7 @@ func (v *CreateGroupRequestJson) Validate() (bool, string) {
 }
 
 func (v *UpdateGroupRequestJson) Validate() (bool, string) {
-	if ok, str := utils.TextContentValidationEscape(&v.Title, 5, 32); !ok {
+	if ok, str := utils.TextContentValidationEscape(&v.Title, 5, 100); !ok {
 		return false, str
 	}
 	if ok, str := utils.TextContentValidationEscape(&v.Description, 5, 4096); !ok {
@@ -228,7 +228,7 @@ func (v *UpdateGroupRequestJson) Validate() (bool, string) {
 }
 
 func (v *CreateEventRequestJson) Validate() (bool, string) {
-	if ok, str := utils.TextContentValidationEscape(&v.Title, 5, 32); !ok {
+	if ok, str := utils.TextContentValidationEscape(&v.Title, 5, 100); !ok {
 		return false, str
 	}
 	if ok, str := utils.TextContentValidationEscape(&v.Description, 5, 4096); !ok {
@@ -240,17 +240,16 @@ func (v *CreateEventRequestJson) Validate() (bool, string) {
 	if !utils.DateValidation(v.EndAt) {
 		return false, "invalid Date"
 	}
-	if ok, str := utils.TextContentValidationEscape(&v.Location, 5, 32); !ok {
+	if ok, str := utils.TextContentValidationEscape(&v.Location, 5, 100); !ok {
 		return false, str
 	}
 	return true, "OK"
 }
 
-// FIXME
 
 func (v *RSVPRequestJson) Validate() (bool, string) {
-	// if !utils.OptionValidation(v.Option) {
-	// 	return false, "invalid option"
-	// }
+	if !utils.OptionValidation(v.Option) {
+		return false, "invalid option"
+	}
 	return true, "OK"
 }

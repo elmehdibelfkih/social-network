@@ -10,7 +10,7 @@ func SearchUsers(q string) ([]any, error) {
 	var args []interface{}
 	
 	if q == "" {
-		query = `SELECT u.id, u.nickname, u.first_name, u.last_name, u.avatar_id, u.privacy FROM users u LIMIT 10`
+		query = `SELECT u.id, u.nickname, u.first_name, u.last_name, u.avatar_id, u.privacy FROM users u LIMIT 11`
 	} else {
 		searchKeyword := "%" + q + "%"
 		query = QUERY_GET_SEARCH_USER

@@ -1,11 +1,5 @@
 import { http } from "@/libs/apiFetch"
 import { Group, GroupsResponse, CreateGroupPayload, JoinGroupResponse , GroupEventsResponse , Event , MediaUploadResponse } from "./types"
-import { group, log } from "console";
-import { getgroups } from "process";
-
-// group_card.services.ts
-// Minimal service stubs for group_card
-
 
 export const GroupService = {
 
@@ -59,8 +53,6 @@ async getMyGroups(limit = 10, offset?: number): Promise<Group[]> {
       })
     );
 
-    console.log('MY MY MY MY MY MY MY groups with events: ', groupsWithEvent);
-
     return groupsWithEvent; 
   } catch (error) {
     console.error("Failed to fetch groups:", error);
@@ -79,12 +71,10 @@ async getOthersGroups(limit = 10, offset?: number): Promise<Group[]> {
     if (!response?.groups) return [];
     const groupsWithEvent = await Promise.all(
       response.groups.map(async (grp) => {
-        const events = await this.getGroupEvents(grp.groupId);
-        return { ...grp, events };
+        //const events = await this.getGroupEvents(grp.groupId);
+        return { ...grp};
       })
     );
-
-    console.log('############### groups with events: ', groupsWithEvent);
 
     return groupsWithEvent; 
   } catch (error) {
@@ -119,8 +109,8 @@ async getGroup(groupId: number): Promise<Group | null> {
         '/api/v1/group',
         data,
         {
-          throwOnError: false, // Handle errors gracefully
-          redirectOnError: false // Don't redirect on error
+          throwOnError: false, 
+          redirectOnError: false 
         }
       );
 
@@ -177,18 +167,6 @@ async getGroup(groupId: number): Promise<Group | null> {
   
       return response;
     },
-
-
-
-
-
-
-  async fetchGroup(limit = 10,): Promise<null> {
-    // replace with real API call
-
-
-    return null;
-  }
 
 
 }

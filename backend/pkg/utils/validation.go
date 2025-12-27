@@ -86,3 +86,11 @@ func ValidateJsonRequest(w http.ResponseWriter, r *http.Request, body any, conte
 	}
 	return true
 }
+
+func OptionValidation(Option string) bool {
+	trimmed := strings.TrimSpace(Option)
+	if trimmed != "going" && trimmed != "not_going" {
+		return false
+	}
+	return true
+}
