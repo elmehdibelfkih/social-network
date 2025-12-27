@@ -44,12 +44,13 @@
 
 .loginContainer {
     width: 100%;
-    max-width: 400px;
+    max-width: 550px;
     background-color: white;
     border-radius: 16px;
     padding: 2rem;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
     margin: auto;
+    overflow: hidden;
 }
 
 .navButtons {
@@ -82,7 +83,15 @@
 .formContainer {
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
+    gap: 1rem;
+    overflow: hidden;
+}
+
+.row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    width: 100%;
 }
 
 .header {
@@ -107,12 +116,17 @@
     display: flex;
     flex-direction: column;
     gap: 6px;
+    width: 100%;
+    min-width: 0;
 }
 
 .inputGroup label {
     font-size: 0.9rem;
     font-weight: 500;
     color: #374151;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .input {
@@ -123,6 +137,8 @@
     color: #374151;
     background-color: white;
     transition: all 0.2s ease;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .input:focus {
@@ -165,29 +181,202 @@
     cursor: not-allowed;
 }
 
+.passwordRequirements {
+    margin-top: 8px;
+    padding: 12px;
+    background-color: #f9fafb;
+    border-radius: 6px;
+    border: 1px solid #e5e7eb;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    font-size: 0.85rem;
+}
+
+.requirement {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #6b7280;
+    transition: color 0.2s ease;
+}
+
+.requirement.valid {
+    color: #059669;
+}
+
+.checkmark {
+    font-weight: bold;
+    font-size: 1rem;
+    min-width: 16px;
+}
+
+.textarea {
+    resize: vertical;
+    font-family: inherit;
+}
+
+.fileInput {
+    padding: 8px 12px;
+    font-size: 0.9rem;
+}
+
+.passwordInputWrapper {
+    position: relative;
+    width: 100%;
+}
+
+.passwordInputWrapper .input {
+    padding-right: 48px;
+}
+
+.passwordToggle {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.2rem;
+    padding: 4px 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.2s ease;
+    z-index: 1;
+}
+
+.passwordToggle:hover {
+    opacity: 0.7;
+}
+
+.passwordToggle:focus {
+    outline: 2px solid var(--primary-purple);
+    outline-offset: 2px;
+    border-radius: 4px;
+}
+
+.avatarUploadContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+}
+
+.avatarPreview {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 3px solid var(--primary-purple);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    align-self: center;
+}
+
+.avatarPreview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
 @media (max-width: 768px) {
     .authCard {
         flex-direction: column;
         min-height: 100vh;
     }
-    
+
     .leftPanel {
         min-height: 30vh;
         padding: 1.5rem;
     }
-    
+
     .leftPanel h1 {
         font-size: 2rem;
     }
-    
+
     .rightPanel {
-        padding: 1.5rem;
+        padding: 1rem;
         min-height: 70vh;
     }
-    
+
     .loginContainer {
         max-width: none;
         box-shadow: none;
         border-radius: 0;
+        padding: 1.5rem;
+    }
+
+    .row {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    .passwordRequirements {
+        grid-template-columns: 1fr;
+    }
+
+    .formContainer {
+        gap: 0.875rem;
+    }
+
+    .avatarPreview {
+        width: 100px;
+        height: 100px;
+    }
+}
+
+@media (max-width: 480px) {
+    .loginContainer {
+        padding: 1rem;
+    }
+
+    .header {
+        margin-bottom: 0.75rem;
+    }
+
+    .title {
+        font-size: 1.5rem;
+    }
+
+    .welcomeMsg {
+        font-size: 0.875rem;
+    }
+
+    .input {
+        padding: 10px 14px;
+        font-size: 0.95rem;
+    }
+
+    .passwordInputWrapper .input {
+        padding-right: 44px;
+    }
+
+    .passwordToggle {
+        font-size: 1rem;
+        right: 10px;
+    }
+
+    .formContainer {
+        gap: 0.75rem;
+    }
+
+    .inputGroup {
+        gap: 4px;
+    }
+
+    .inputGroup label {
+        font-size: 0.85rem;
+    }
+
+    .passwordRequirements {
+        padding: 10px;
+        font-size: 0.8rem;
+        gap: 4px;
+    }
+
+    .avatarPreview {
+        width: 80px;
+        height: 80px;
     }
 }

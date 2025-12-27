@@ -63,7 +63,7 @@
     align-self: flex-start;
 }
 
-.otherMessage .timestamp img {
+.otherMessage .timestamp svg{
     display: none;
 }
 

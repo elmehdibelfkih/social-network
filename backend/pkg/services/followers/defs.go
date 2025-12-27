@@ -7,6 +7,7 @@ type FollowResponseJson struct {
 	Status       string `json:"status"`
 	TargetUserId int64  `json:"targetUserId"`
 	FollowerId   int64  `json:"followerId"`
+	ChatId       *int64 `json:"chatId"`
 }
 
 // POST /api/v1/users/:user_id/unfollow
@@ -15,6 +16,7 @@ type UnfollowResponseJson struct {
 	Message      string `json:"message"`
 	TargetUserId int64  `json:"targetUserId"`
 	FollowerId   int64  `json:"followerId"`
+	ChatId       *int64 `json:"chatId"`
 }
 
 type UserFollowItem struct {
@@ -64,6 +66,7 @@ type AcceptFollowResponseJson struct {
 	FollowerId int64  `json:"followerId"`
 	FollowedId int64  `json:"followedId"`
 	Status     string `json:"status"`
+	ChatId     *int64 `json:"chatId"`
 }
 
 // POST /api/v1/follow-requests/:user_id/decline
@@ -74,7 +77,9 @@ type DeclineResponseJson struct {
 	FollowerId int64  `json:"followerId"`
 	FollowedId int64  `json:"followedId"`
 	Status     string `json:"status"`
+	ChatId     *int64 `json:"chatId"`
 }
+
 type Notification struct {
 	id            int64
 	UserId        int64

@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"time"
 
+	socket "social/pkg/app/sockets"
 	"social/pkg/utils"
 )
 
@@ -126,12 +127,13 @@ func LogoutUserAccount(w http.ResponseWriter, r *http.Request, context string) b
 		return false
 	}
 	err = DeleteUserSessionBySessionToken(session, userId)
-	err = DeleteUserSessionBySessionToken(session, userId)
 	if err != nil {
 		utils.BackendErrorTarget(err, context)
 		utils.IdentifySqlError(w, err)
 		return false
 	}
+
+	socket.WSManger.RemoveClientBySession(userId, session)
 	return true
 }
 

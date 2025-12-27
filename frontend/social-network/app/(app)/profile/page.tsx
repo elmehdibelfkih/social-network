@@ -16,7 +16,6 @@ export default async function ProfilePage({ searchParams }: PageProps) {
     <>
       <Profile profile={profile} />
       <ProfileFeed profile={profile} tab={tab || 'about'} />
-      <div id="chat-portals"></div>
     </>
   );
 }
