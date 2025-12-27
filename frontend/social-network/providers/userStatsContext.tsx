@@ -24,7 +24,7 @@ type Action =
   | { type: 'SET_LAST_NAME'; payload: string | null }
   | { type: 'SET_AVATAR_ID'; payload: number | null }
   | { type: 'SET_ABOUT_ME'; payload: string | null }
-  // | { type: 'SET_EMAIL'; payload: string | null }
+  | { type: 'SET_EMAIL'; payload: string | null }
   | { type: 'SET_DATE_OF_BIRTH'; payload: string | null };
 
 const userStatsReducer = (state: UserStatsState, action: Action): UserStatsState => {
@@ -71,8 +71,8 @@ const userStatsReducer = (state: UserStatsState, action: Action): UserStatsState
       return { ...state, aboutMe: action.payload };
     case 'SET_DATE_OF_BIRTH':
       return { ...state, dateOfBirth: action.payload };
-    // case 'SET_EMAIL':
-    //   return { ...state, email: action.payload };
+    case 'SET_EMAIL':
+      return { ...state, email: action.payload };
   
     default:
       return state;

@@ -5,7 +5,7 @@ export type ProfileUpdateData = {
   lastName: string;
   nickname: string;
   aboutMe: string;
-  // email: string;
+  email: string;
   dateOfBirth: string;
   avatarId?: number;
 };

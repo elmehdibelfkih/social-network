@@ -56,7 +56,7 @@ export function ProfileSettings({ profile }: { profile: ProfileAPIResponse }) {
         dispatch({ type: 'SET_LAST_NAME', payload: updateData.lastName });
         dispatch({ type: 'SET_NICKNAME', payload: updateData.nickname });
         dispatch({ type: 'SET_ABOUT_ME', payload: updateData.aboutMe });
-        // dispatch({ type: 'SET_EMAIL', payload: updateData.email });
+        dispatch({ type: 'SET_EMAIL', payload: updateData.email });
         dispatch({ type: 'SET_DATE_OF_BIRTH', payload: updateData.dateOfBirth });
         dispatch({ type: 'SET_AVATAR_ID', payload: updateData.avatarId });
 
