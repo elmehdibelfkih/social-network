@@ -93,6 +93,9 @@ func SelectUserSession(session string) (*SessionItemJson, error) {
 		&s.ExpiresAt,
 	)
 	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
 		utils.SQLiteErrorTarget(err, SELECT_SESSION_BY_SESSION)
 		return nil, err
 	}

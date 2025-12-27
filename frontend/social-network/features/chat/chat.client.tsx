@@ -2,7 +2,7 @@
 import styles from './styles/styles.module.css';
 import ChatCard from './chat.card.client';
 import FloatingChat from './chat.popup.client';
-import { MessageSquareIcon } from '@/components/ui/icons';
+import { MessageSquareIcon, CloseIcon } from '@/components/ui/icons';
 import { useChatProviderState } from './global.chat.client';
 
 export function ChatSection() {
@@ -21,10 +21,10 @@ export function ChatSection() {
             <div className={styles.header}>
                 <div className={styles.banner}>
                     <MessageSquareIcon />
-                    <h2>Chats</h2>
+                    <h2>Your chats</h2>
                 </div>
                 <button className={styles.closeAll} onClick={handleCloseAll}>
-                    <img src="/svg/x.svg" alt="" />
+                    <CloseIcon />
                 </button>
             </div>
             <div className={styles.scrollArea}>

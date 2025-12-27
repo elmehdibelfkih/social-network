@@ -2,6 +2,7 @@ package chat
 
 import (
 	"database/sql"
+
 	socket "social/pkg/app/sockets"
 	"social/pkg/db/database"
 	"social/pkg/utils"
@@ -10,9 +11,15 @@ import (
 func isGroupChat(chatId int64, tx *sql.Tx) (bool, error) {
 	var groupId *int64
 	err := tx.QueryRow(SELECT_CHAT_GROUP_ID, chatId).Scan(&groupId)
-	if err != nil || groupId == nil {
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return false, nil
+		}
 		utils.SQLiteErrorTarget(err, SELECT_CHAT_GROUP_ID)
 		return false, err
+	}
+	if groupId == nil {
+		return false, nil
 	}
 
 	return true, nil
@@ -119,7 +126,7 @@ func UpdateMessageStatus(s *MarkSeen) error {
 }
 
 func SelectChatMessages(userId, chatId, messageId int64, l *MessagesList) error {
-	return database.WrapWithTransaction(func(tx *sql.Tx) error {
+	err := database.WrapWithTransaction(func(tx *sql.Tx) error {
 		var count int
 		limit := 20
 		err := tx.QueryRow(SELECT_UNREAD_COUNT, userId).Scan(&count)
@@ -182,26 +189,40 @@ func SelectChatMessages(userId, chatId, messageId int64, l *MessagesList) error 
 				&msg.SenderData.AboutMe,
 				&msg.SenderData.Privacy,
 			)
-			socket.WSManger.BroadcastToChat(userId, chatId, socket.Event{
-				Source: "server",
-				Type:   "chat_seen",
-				Payload: &socket.ClientMessage{
-					MarkSeen: &socket.MarkSeen{
-						MessageId: msg.MessageId,
-						ChatId:    msg.ChatId,
-						SenderId:  msg.SenderId,
-						Content:   msg.Content,
-						SenderData: socket.UserData(msg.SenderData),
-						SeenState: msg.SeenState,
-						CreatedAt: msg.CreatedAt,
-						UpdatedAt: msg.UpdatedAt,
-					},
-				},
-			})
+			if err != nil {
+				utils.SQLiteErrorTarget(err, SELECT_USER_BY_ID)
+				return err
+			}
 			l.Messages = append(l.Messages, msg)
 		}
 		return nil
 	})
+
+	if err != nil {
+		return err
+	}
+
+	// Broadcast to WebSocket AFTER transaction is committed
+	for _, msg := range l.Messages {
+		socket.WSManger.BroadcastToChat(userId, chatId, socket.Event{
+			Source: "server",
+			Type:   "chat_seen",
+			Payload: &socket.ClientMessage{
+				MarkSeen: &socket.MarkSeen{
+					MessageId:  msg.MessageId,
+					ChatId:     msg.ChatId,
+					SenderId:   msg.SenderId,
+					Content:    msg.Content,
+					SenderData: socket.UserData(msg.SenderData),
+					SeenState:  msg.SeenState,
+					CreatedAt:  msg.CreatedAt,
+					UpdatedAt:  msg.UpdatedAt,
+				},
+			},
+		})
+	}
+
+	return nil
 }
 
 func DeleteMessage(userId, chatId, messageId int64) error {

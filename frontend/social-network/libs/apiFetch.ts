@@ -54,10 +54,10 @@ function buildErrorTarget(
   if (apiError.statusCode) params.set('code', String(apiError.statusCode));
   if (apiError.statusText) params.set('statusText', apiError.statusText);
 
-  const finalTitle = apiError.errorTitle || custom?.title || 'Error';
+  const finalTitle = apiError.errorTitle ?? custom?.title ?? 'Error';
   params.set('title', finalTitle);
 
-  const finalMessage = apiError.errorMessage || custom?.message || 'An unexpected error occurred';
+  const finalMessage = apiError.errorMessage ?? custom?.message ?? 'An unexpected error occurred';
   params.set('msg', finalMessage);
 
   if (apiError.errorDescription) params.set('desc', apiError.errorDescription);
@@ -126,11 +126,18 @@ export async function apiFetch<T>(
       next: nextRevalidate !== undefined ? { revalidate: nextRevalidate } : undefined,
     } as RequestInit);
 
+    if (!response) {
+      throw new Error('No response received from server');
+    }
+
     status = response.status;
     rawBody = await response.json().catch(() => null);
 
   } catch (err: any) {
-    if (isServer && (err.digest?.startsWith('NEXT_REDIRECT') || err.message === 'NEXT_REDIRECT')) {
+    if (isServer && err?.digest?.startsWith('NEXT_REDIRECT')) {
+      throw err;
+    }
+    if (isServer && err?.message === 'NEXT_REDIRECT') {
       throw err;
     }
     const networkMsg = err instanceof Error ? err.message : 'Network failure';
@@ -140,8 +147,8 @@ export async function apiFetch<T>(
     return null;
   }
 
-  if (response.ok && rawBody && rawBody.success === true) {
-    return rawBody.payload;
+  if (response.ok && rawBody !== null && typeof rawBody === 'object' && rawBody.success === true) {
+    return rawBody.payload ?? null;
   }
 
   let apiError: ApiError = {
@@ -151,16 +158,16 @@ export async function apiFetch<T>(
     errorType: 'unknown'
   };
 
-  if (!response.ok && rawBody && rawBody.success === false) {
-    const apiErrorData = rawBody.error || {};
+  if (!response.ok && rawBody !== null && typeof rawBody === 'object' && rawBody.success === false) {
+    const apiErrorData = rawBody.error ?? {};
 
     apiError = {
-      statusCode: apiErrorData.statusCode || status,
-      statusText: apiErrorData.statusText || response.statusText,
-      errorMessage: apiErrorData.errorMessage || apiErrorData.errorMessage || 'Request failed',
-      errorTitle: apiErrorData.errorTitle || apiErrorData.errorTitle,
-      errorDescription: apiErrorData.errorDescription || apiErrorData.errorDescription,
-      errorType: apiErrorData.errorType || 'unknown'
+      statusCode: apiErrorData.statusCode ?? status,
+      statusText: apiErrorData.statusText ?? response.statusText ?? 'Unknown Error',
+      errorMessage: apiErrorData.errorMessage ?? 'Request failed',
+      errorTitle: apiErrorData.errorTitle,
+      errorDescription: apiErrorData.errorDescription,
+      errorType: apiErrorData.errorType ?? 'unknown'
     };
   }
 
@@ -168,10 +175,10 @@ export async function apiFetch<T>(
     performRedirect('/auth', clientNavigate);
   }
 
-  const message = apiError.errorMessage || 'Request failed';
+  const message = apiError.errorMessage ?? 'Request failed';
 
   if (redirectOnError && apiError.errorType === 'redirect') {
-    const target = buildErrorTarget(errorRoute, apiError, status, {
+    const target = buildErrorTarget(errorRoute ?? '/error', apiError, status, {
       title: redirectTitle,
       message: errorMessage
     });
@@ -186,7 +193,7 @@ export async function apiFetch<T>(
       }
       return null;
     } else {
-      const target = buildErrorTarget(errorRoute, apiError, status, {
+      const target = buildErrorTarget(errorRoute ?? '/error', apiError, status, {
         title: redirectTitle,
         message: errorMessage
       });
@@ -211,13 +218,15 @@ export const http = {
 
 
 export async function fetchMediaClient(mediaId: string): Promise<MediaResponse | null> {
+  if (!mediaId) return null;
+
   try {
     const res = await http.get(`/api/v1/media/${encodeURIComponent(mediaId)}`, {
       redirectOnError: false,
       throwOnError: false
     });
     if (!res) return null;
-    if (typeof res === "object" && "payload" in (res as any)) {
+    if (typeof res === "object" && res !== null && "payload" in res) {
       return (res as any).payload as MediaResponse;
     }
     return res as MediaResponse;

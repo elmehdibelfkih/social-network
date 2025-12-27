@@ -1,90 +1,186 @@
+@import './variables.css';
+
 .main {
     display: flex;
-    /* max-width: 1000px; */
     margin: 0 auto;
-    padding: 20px;
-    gap: 20px;
+    padding: var(--spacing-xl) 120px;
+    gap: var(--spacing-xl);
     min-height: 100vh;
+    max-width: 1600px;
+    align-items: flex-start;
+    position: relative;
 }
 
 .firstSection {
-    flex: 0 0 280px;
-    background-color: white;
-    border-radius: 12px;
-    padding: 20px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    flex: 0 0 300px;
+    background-color: transparent;
+    border-radius: var(--border-radius-xl);
+    padding: 0;
     height: fit-content;
-    position: fixed;
-    top: 90px;
-    left: 20px;
+    position: sticky;
+    top: 100px;
 }
 
 .secondSection {
     flex: 1;
-    max-width: 600px;
+    max-width: 680px;
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: var(--spacing-xl);
     margin: 0 auto;
+    width: 100%;
 }
 
 .thirdSection {
-    flex: 0 0 280px;
-    background-color: white;
-    border-radius: 12px;
-    padding: 20px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    flex: 0 0 300px;
+    background-color: transparent;
+    border-radius: var(--border-radius-xl);
+    padding: 0;
     height: fit-content;
-    position: fixed;
-    top: 90px;
-    right: 20px;
+    position: sticky;
+    top: 100px;
 }
 
-@media (max-width: 1024px) {
-    .main {
-        padding: 15px;
-        gap: 15px;
+.chatPopup {
+    position: fixed;
+    bottom: var(--spacing-xl);
+    right: var(--spacing-xl);
+    width: 380px;
+    height: 560px;
+    background: var(--white);
+    border-radius: var(--border-radius-xl);
+    box-shadow: var(--shadow-xl);
+    border: 1px solid var(--gray-200);
+    z-index: 1000;
+    display: none;
+    overflow: hidden;
+    transition: all var(--transition-slow) ease;
+}
+
+.chatPopup.open {
+    display: flex;
+    flex-direction: column;
+    animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
     }
-    
-    .firstSection,
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media (max-width: 1400px) {
+    .main {
+        padding: var(--spacing-lg);
+        gap: var(--spacing-lg);
+        max-width: 1400px;
+    }
+
+    .firstSection {
+        flex: 0 0 280px;
+    }
+
+    .secondSection {
+        max-width: 640px;
+    }
+
     .thirdSection {
-        flex: 0 0 250px;
+        flex: 0 0 340px;
     }
 }
 
 @media (max-width: 1300px) {
     .main {
         flex-direction: column;
-        padding: 10px;
-        gap: 15px;
+        padding: var(--spacing-md) var(--spacing-sm);
+        gap: var(--spacing-lg);
+        max-width: 100%;
     }
-    
+
     .firstSection,
     .thirdSection {
         display: none;
     }
-    
+
     .secondSection {
         order: 1;
-        max-width: none;
-        margin: 0;
+        max-width: 680px;
+        margin: 0 auto;
+        width: 100%;
+    }
+
+    .chatPopup {
+        width: 360px;
+        height: 540px;
+        right: var(--spacing-md);
+        bottom: var(--spacing-md);
     }
 }
 
-.chatPopup {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    width: 350px;
-    height: 500px;
-    background: white;
-    border-radius: 12px;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-    z-index: 1000;
-    display: none;
+@media (max-width: 768px) {
+    .main {
+        padding: var(--spacing-sm);
+        gap: var(--spacing-md);
+    }
+
+    .secondSection {
+        max-width: 100%;
+        gap: var(--spacing-md);
+    }
+
+    .chatPopup {
+        width: calc(100vw - var(--spacing-lg));
+        max-width: 400px;
+        height: 500px;
+        right: var(--spacing-sm);
+        bottom: var(--spacing-sm);
+    }
 }
 
-.chatPopup.open {
-    display: flex;
-    flex-direction: column;
+@media (max-width: 640px) {
+    .main {
+        padding: var(--spacing-xs) var(--spacing-sm);
+    }
+
+    .secondSection {
+        gap: var(--spacing-sm);
+    }
+
+    .chatPopup {
+        width: calc(100vw - var(--spacing-md));
+        height: 480px;
+    }
+}
+
+@media (max-width: 480px) {
+    .main {
+        padding: var(--spacing-xs);
+    }
+
+    .chatPopup {
+        width: calc(100vw - var(--spacing-sm));
+        max-width: none;
+        height: calc(100vh - 120px);
+        bottom: var(--spacing-xs);
+        right: var(--spacing-xs);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .firstSection,
+    .thirdSection,
+    .chatPopup {
+        transition: none !important;
+    }
+
+    .chatPopup.open {
+        animation: none !important;
+    }
 }
