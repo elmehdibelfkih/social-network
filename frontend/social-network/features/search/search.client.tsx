@@ -41,28 +41,70 @@ export function Search() {
     router.push(`/groups/${groupId}/invite`)
   }
 
+  // Load all data initially on mount
   useEffect(() => {
     const loadAllData = async () => {
       try {
-        const searchParam = debouncedQuery ? `?q=${encodeURIComponent(debouncedQuery)}` : '?q='
-        
         const [usersRes, groupsRes, postsRes] = await Promise.all([
-          http.get<types.User[]>(`/api/v1/search${searchParam}&type=users`),
-          http.get<types.Group[]>(`/api/v1/search${searchParam}&type=groups`),
-          http.get<Post[]>(`/api/v1/search${searchParam}&type=posts`)
+          http.get<types.User[]>('/api/v1/search?q=&type=users'),
+          http.get<types.Group[]>('/api/v1/search?q=&type=groups'),
+          http.get<Post[]>('/api/v1/search?q=&type=posts')
         ])
-        
         setAllUsers(usersRes || [])
         setAllGroups(groupsRes || [])
         setAllPosts(postsRes || [])
+      } catch (error) {
+        console.error('Failed to load initial data:', error)
+      }
+    }
+    loadAllData()
+  }, [])
+
+  // Fetch data for the active tab when search query changes
+  useEffect(() => {
+    // If search query is empty, reload all initial data
+    if (!debouncedQuery) {
+      const loadAllData = async () => {
+        try {
+          const [usersRes, groupsRes, postsRes] = await Promise.all([
+            http.get<types.User[]>('/api/v1/search?q=&type=users'),
+            http.get<types.Group[]>('/api/v1/search?q=&type=groups'),
+            http.get<Post[]>('/api/v1/search?q=&type=posts')
+          ])
+          setAllUsers(usersRes || [])
+          setAllGroups(groupsRes || [])
+          setAllPosts(postsRes || [])
+        } catch (error) {
+          console.error('Failed to load initial data:', error)
+        }
+      }
+      loadAllData()
+      return
+    }
+
+    const loadData = async () => {
+      try {
+        const searchParam = `?q=${encodeURIComponent(debouncedQuery)}`
+        
+        if (activeTab === 'users') {
+          const usersRes = await http.get<types.User[]>(`/api/v1/search${searchParam}&type=users`)
+          setAllUsers(usersRes || [])
+        } else if (activeTab === 'groups') {
+          const groupsRes = await http.get<types.Group[]>(`/api/v1/search${searchParam}&type=groups`)
+          setAllGroups(groupsRes || [])
+        } else if (activeTab === 'posts') {
+          const postsRes = await http.get<Post[]>(`/api/v1/search${searchParam}&type=posts`)
+          setAllPosts(postsRes || [])
+        }
       } catch (error) {
         console.error('Failed to load data:', error)
       }
     }
     
-    loadAllData()
-  }, [debouncedQuery])
+    loadData()
+  }, [debouncedQuery, activeTab])
 
+  // Set up post update/delete listeners
   useEffect(() => {
     const handleUpdatePost = (event: CustomEvent) => {
       const { postId, ...updates } = event.detail
@@ -85,6 +127,7 @@ export function Search() {
     }
   }, [])
 
+  // Filter out current user from results
   const filteredUsers = allUsers.filter(searchUser => {
     if (user && searchUser.userId === Number(user.userId)) return false
     return true
@@ -167,10 +210,13 @@ function UserCard({ user }: { user: types.User }) {
       firstName: user.firstName,
       lastName: user.lastName,
       avatarId: user.avatarId,
-      privacy: (user.privacy || 'public') as 'public' | 'private',
+      aboutMe: null,
+      dateOfBirth: null,
+      privacy: user.privacy || 'public',
       stats: { postsCount: 0, followersCount: 0, followingCount: 0 },
       joinedAt: null,
-      chatId: null
+      chatId: null,
+      email: null
     }} />
   )
 }
