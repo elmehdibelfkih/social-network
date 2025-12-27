@@ -15,6 +15,17 @@ export interface User {
     online: boolean
 }
 
+export interface UserData {
+    aboutMe: string | null
+    avatarId: number | null
+    dateOfBirth: string
+    firstName: string
+    lastName: string
+    nickname: string | null
+    privacy: string
+}
+
+
 export interface SocketMessage {
     source: string;
     type: string;
@@ -31,6 +42,7 @@ export interface ChatMessage {
     seenState: string
     createdAt: string
     updatedAt: string
+    senderData: UserData
 }
 
 export interface MarkSeen {
@@ -41,6 +53,7 @@ export interface MarkSeen {
     seenState: string
     createdAt: string
     updatedAt: string
+    senderData: UserData  
 }
 
 export interface messagesList {

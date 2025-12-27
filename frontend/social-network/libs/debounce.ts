@@ -14,8 +14,7 @@ export function useDebounce<T>(value: T, delay: number = 350) {
 }
 
 export function useDebounceCbf<T extends (...args: any[]) => any>(cbf: T, delay: number) {
-    const timeoutRef = useRef<NodeJS.Timeout | null>(null);
-    const canInvock = useRef<boolean>(true)
+    const timeoutRef = useRef<number | null>(null);
     const cbfRef = useRef<T>(cbf);
 
     useEffect(() => {
@@ -23,17 +22,13 @@ export function useDebounceCbf<T extends (...args: any[]) => any>(cbf: T, delay:
     }, [cbf]);
 
     return (...args: Parameters<T>) => {
-        if (canInvock.current) {
-            cbfRef.current(...args);
-            canInvock.current = false;
-            return
-        }
         if (timeoutRef.current) {
             clearTimeout(timeoutRef.current);
         }
 
-        timeoutRef.current = setTimeout(() => {
-            canInvock.current = true;
+        timeoutRef.current = window.setTimeout(() => {
+            cbfRef.current(...args);
         }, delay);
-    }
+    };
 }
+

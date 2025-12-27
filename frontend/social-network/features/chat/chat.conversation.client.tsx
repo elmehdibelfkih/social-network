@@ -8,6 +8,7 @@ import { SeenStatus } from "@/components/ui/chats/seen"
 import { useDebounceCbf } from "@/libs/debounce";
 import TypingIndicator from "./typing.indicator";
 import AvatarHolder from "@/components/ui/avatar_holder/avatarholder.client";
+import { CloseChatIcon, EmojiIcon, SendIcon } from "@/components/ui/icons";
 
 interface ChatConversationProps {
     chatId: number;
@@ -152,31 +153,31 @@ export default function ChatConversation({ chatId, user, onClose }: ChatConversa
     }, [messages, hasMore, loadingOld]);
 
     async function updateSeen(last: ChatMessage) {
-        last.seenState = "read"
-        const resp = await chatService.sendChatSeen(last, chatId);
-        const chatSeenResponse = {
-            messageId: resp.messageId,
-            chatId: resp.chatId,
-            senderId: last.senderId,
-            content: resp.content,
-            seenState: resp.seenState,
-            createdAt: resp.createdAt,
-            updatedAt: resp.updatedAt,
+        const updatedLast = {
+            ...last,
+            seenState: "read",
         };
+        const resp = await chatService.sendChatSeen(updatedLast, chatId);
         setMessages(prev => {
             const next = new Map(prev);
-            next.set(chatSeenResponse.messageId, chatSeenResponse);
+            const existing = next.get(resp.messageId);
+            if (!existing) return prev;
+            next.set(resp.messageId, {
+                ...existing,
+                seenState: resp.seenState,
+                updatedAt: resp.updatedAt,
+            });
             return next;
         })
     }
 
     useEffect(() => {
-        if (!lastMessage) return
-        console.log(lastMessage.senderId != userData.userId)
+        if (!lastMessage || !userData) return;
         if (lastMessage.senderId != userData.userId) {
-            updateSeen(lastMessage)
+            updateSeen(lastMessage);
         }
-    }, [lastMessage])
+    }, [lastMessage, userData]);
+
 
     useEffect(() => {
         loadMessages();
@@ -206,7 +207,6 @@ export default function ChatConversation({ chatId, user, onClose }: ChatConversa
         e.preventDefault();
         setEmojiOpen(v => !v);
     }
-
 
     function insertEmoji(emoji: string) {
         const el = inputRef.current;
@@ -244,7 +244,6 @@ export default function ChatConversation({ chatId, user, onClose }: ChatConversa
 
     const handleSubmitMessage = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault()
-        console.log("onsubmit")
         if (!input) return
         setIsLoading(true);
         try {
@@ -257,6 +256,7 @@ export default function ChatConversation({ chatId, user, onClose }: ChatConversa
                 seenState: 'sent',
                 createdAt: Date.now().toString(),
                 updatedAt: Date.now().toString(),
+                senderData: null
             }
             const resp = await chatService.sendChatMessage(chatMessage, chatId);
             const chatMessageResponse = {
@@ -267,6 +267,7 @@ export default function ChatConversation({ chatId, user, onClose }: ChatConversa
                 seenState: resp.seenState,
                 createdAt: resp.createdAt,
                 updatedAt: resp.updatedAt,
+                senderData: resp.senderData,
             };
             setLastMessage(chatMessageResponse)
             setMessages(prev => {
@@ -289,6 +290,11 @@ export default function ChatConversation({ chatId, user, onClose }: ChatConversa
 
     const handleSubmitDebounced = useDebounceCbf(handleSubmitMessage, 200)
 
+    const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        handleSubmitDebounced(e);
+    }
+
     const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
         setInput(e.target.value);
         //send typing
@@ -304,22 +310,13 @@ export default function ChatConversation({ chatId, user, onClose }: ChatConversa
         })
     };
 
-    const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        handleSubmitDebounced(e);
-    }
-
     return (
         <div className={styles.chatContainer}>
-
             <div className={styles.chatHeader}>
-                {/* <ChatImage mediaId={user.avatarId} /> */}
                 <AvatarHolder avatarId={user.avatarId} size={48} />
-
-                {/* <span>Chat {chatId}</span> */}
                 <span>{`${user.firstName} ${user.lastName}`}</span>
                 <button className={styles.closeBtn} onClick={onClose}>
-                    <img src="/svg/x_white.svg" alt="" />
+                    <CloseChatIcon />
                 </button>
             </div>
 
@@ -351,10 +348,10 @@ export default function ChatConversation({ chatId, user, onClose }: ChatConversa
                     ref={inputRef}
                 />
                 <button ref={emojiBtnRef} type="button" className={styles.emojiBtn} onClick={handleEmojiPallete}>
-                    <img src="/svg/smile.svg" alt="" />
+                    <EmojiIcon />
                 </button>
                 <button type="submit" disabled={isLoading} className={styles.sendBtn}>
-                    <img src="/svg/send-horizontal.svg" alt="" />
+                    <SendIcon />
                 </button>
             </form>
 

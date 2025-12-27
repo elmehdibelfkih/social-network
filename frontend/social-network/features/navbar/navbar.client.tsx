@@ -2,7 +2,7 @@
 
 import styles from './styles.module.css';
 import AvatarHolder from '@/components/ui/avatar_holder/avatarholder.client';
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { SettingsIcon, ProfileIcon, LogoutIcon, HomeIcon, GroupsIcon, SearchIcon } from '@/components/ui/icons';
 import { http } from '@/libs/apiFetch';
@@ -15,6 +15,20 @@ export function NavProfile() {
   const [open, setOpen] = useState(false);
   const { setUser } = useAuth();
   const { state } = useUserStats();
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setOpen(false);
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [menuRef]);
 
   const handleLogout = async () => {
     try {
@@ -40,7 +54,7 @@ export function NavProfile() {
   const displayName = state?.nickname ?? state?.firstName ?? "";
 
   return (
-    <>
+    <div ref={menuRef}>
       <div
         className={styles.userProfile}
         onClick={() => setOpen((v) => !v)}
@@ -90,7 +104,7 @@ export function NavProfile() {
 
         </div>
       )}
-    </>
+    </div>
   );
 }
 

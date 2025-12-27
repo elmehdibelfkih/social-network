@@ -2,7 +2,7 @@ package notifications
 
 const (
 	QUERY_GET_NOTIFICATION = `
-		SELECT id, user_id, type, reference_type, reference_id, content, is_read, created_at, read_at, actor_name, actor_avatar_id
+		SELECT id, user_id, type, reference_type, reference_id, content, status, is_read, created_at, read_at, actor_id, actor_name, actor_avatar_id
 		FROM notifications
 	`
 

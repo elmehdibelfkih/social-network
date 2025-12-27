@@ -3,9 +3,10 @@ package users
 import (
 	"database/sql"
 	"errors"
+	"strings"
+
 	"social/pkg/config"
 	"social/pkg/utils"
-	"strings"
 )
 
 // Read operations
@@ -220,12 +221,27 @@ func SelectUserPasswordHash(userId int64) (string, error) {
 // Write operations
 
 // UpdateUserProfileInDB persists profile changes.
+
 func UpdateUserProfileInDB(userId int64, firstName, lastName string, nickname, aboutMe *string, avatarId *int64, dateOfBirth, email string) error {
+	// Convert nullable string pointers to interface{} to properly handle nil values
+	var nicknameVal, aboutMeVal any
+	
+	if nickname != nil {
+		nicknameVal = *nickname
+	} else {
+		nicknameVal = nil
+	}
+	if aboutMe != nil {
+		aboutMeVal = *aboutMe
+	} else {
+		aboutMeVal = nil
+	}
+
 	result, err := config.DB.Exec(UPDATE_USER_PROFILE,
 		firstName,
 		lastName,
-		*nickname,
-		*aboutMe,
+		nicknameVal,
+		aboutMeVal,
 		avatarId,
 		dateOfBirth,
 		email,

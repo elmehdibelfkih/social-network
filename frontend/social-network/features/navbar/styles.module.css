@@ -235,7 +235,6 @@
 .userName {
   font-size: 15px;
   font-weight: 500;
-  background-color: red;
   color: var(--gray-700);
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -396,6 +395,51 @@
 
 .menuItem:hover {
   background: var(--gray-100);
+}
+
+.chatButton {
+  position: relative;
+  background: var(--primary-purple);
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: var(--border-radius-full);
+  transition: background var(--transition-slow);
+  display: none;
+}
+
+.chatButton:hover {
+  background: var(--primary-purple-dark);
+}
+
+.chatButton img {
+  width: 24px;
+  height: 24px;
+  filter: brightness(0) invert(1);
+}
+
+.chatPopout {
+  position: absolute;
+  top: 60px;
+  right: 0;
+  width: 350px;
+  height: 500px;
+  background: var(--white);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-xl);
+  z-index: 2000;
+  display: none;
+}
+
+.chatPopout.open {
+  display: flex;
+  flex-direction: column;
+}
+
+@media (max-width: 1300px) {
+  .chatButton {
+    display: block;
+  }
 }
 
 .logout {

@@ -7,13 +7,24 @@ import (
 
 // "POST", "/api/v1/chats/{chat_id}/messages"
 type ChatMessage struct {
-	MessageId int64  `json:"messageId"`
-	ChatId    int64  `json:"chatId"`
-	SenderId  int64  `json:"senderId"`
-	Content   string `json:"content"`
-	SeenState string `json:"seenState"`
-	CreatedAt string `json:"createdAt"`
-	UpdatedAt string `json:"updatedAt"`
+	MessageId  int64    `json:"messageId"`
+	ChatId     int64    `json:"chatId"`
+	SenderId   int64    `json:"senderId"`
+	SenderData UserData `json:"senderData"`
+	Content    string   `json:"content"`
+	SeenState  string   `json:"seenState"`
+	CreatedAt  string   `json:"createdAt"`
+	UpdatedAt  string   `json:"updatedAt"`
+}
+
+type UserData struct {
+	FirstName   string  `json:"firstName"`
+	LastName    string  `json:"lastName"`
+	Nickname    *string `json:"nickname"`
+	AvatarId    *int64  `json:"avatarId"`
+	AboutMe     *string `json:"aboutMe"`
+	DateOfBirth string  `json:"dateOfBirth"`
+	Privacy     string  `json:"privacy"`
 }
 
 // "PUT", "/api/v1/chats/{chat_id}/messages/{message_id}"

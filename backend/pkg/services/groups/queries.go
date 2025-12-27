@@ -42,6 +42,9 @@ const (
 			SELECT 1 FROM group_members WHERE group_id = ? AND user_id = ? AND status = 'pending'
 		);
 	`
+	SELECT_MEMBER_STATUS_BY_USER = `
+		SELECT status FROM group_members WHERE group_id = ? AND user_id = ?
+	`
 	SELECT_GROUP_MEMBERS_COUNT = `
 		SELECT followers_count FROM counters WHERE entity_type = ? AND entity_id = ?
 	`

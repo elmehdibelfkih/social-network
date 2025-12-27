@@ -34,8 +34,8 @@ func GetNotifications(userID int64, limit, offset int) ([]*Notification, error) 
 		n := &Notification{}
 		err := rows.Scan(
 			&n.ID, &n.UserID, &n.Type, &n.ReferenceType,
-			&n.ReferenceID, &n.Content, &n.IsRead,
-			&n.CreatedAt, &n.ReadAt,
+			&n.ReferenceID, &n.Content, &n.Status, &n.IsRead,
+			&n.CreatedAt, &n.ReadAt, &n.ActorId, &n.ActorName, &n.ActorAvatarId,
 		)
 		if err != nil {
 			utils.SQLiteErrorTarget(err, "GetNotifications (Scan)")
@@ -149,8 +149,8 @@ func ModularNotifisQuery(query string, args []any) ([]*Notification, error) {
 		var n Notification
 		err := rows.Scan(
 			&n.ID, &n.UserID, &n.Type, &n.ReferenceType,
-			&n.ReferenceID, &n.Content, &n.IsRead,
-			&n.CreatedAt, &n.ReadAt, &n.ActorName, &n.ActorAvatarId,
+			&n.ReferenceID, &n.Content, &n.Status, &n.IsRead,
+			&n.CreatedAt, &n.ReadAt, &n.ActorId, &n.ActorName, &n.ActorAvatarId,
 		)
 		if err != nil {
 			utils.SQLiteErrorTarget(err, query)

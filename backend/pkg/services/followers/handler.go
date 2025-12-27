@@ -7,7 +7,6 @@ import (
 )
 
 // POST /api/v1/users/:user_id/follow => send follow request or follow immediately if target is public
-// todo: creat chat table if not exist
 func FollowHandler(w http.ResponseWriter, r *http.Request) {
 	userId := utils.GetUserIdFromContext(r)
 	targetUserId := utils.GetWildCardValue(w, r, "user_id")
@@ -16,15 +15,15 @@ func FollowHandler(w http.ResponseWriter, r *http.Request) {
 		utils.IdentifySqlError(w, err)
 		return
 	}
-	err = createChatId(userId, targetUserId)
+	chatId, err := createChatId(userId, targetUserId)
 	if err != nil {
 		utils.IdentifySqlError(w, err)
 		return
 	}
-	
+
 	socket.WSManger.UpdateChats(userId)
 	socket.WSManger.UpdateChats(targetUserId)
-	followResponse(w, r)
+	followResponse(w, r, chatId)
 	// todo: check notNound and supper flous error in localhost:8080/api/v1/users/:user_id/follow and similar
 }
 
@@ -42,9 +41,14 @@ func UnfollowHandler(w http.ResponseWriter, r *http.Request) {
 		utils.IdentifySqlError(w, err)
 		return
 	}
+	chatId, err := SelectSharedChat(userId, targetUserId)
+	if err != nil {
+		utils.IdentifySqlError(w, err)
+		return
+	}
 	socket.WSManger.UpdateChats(userId)
 	socket.WSManger.UpdateChats(targetUserId)
-	unfollowResponse(w, r)
+	unfollowResponse(w, r, chatId)
 }
 
 // GET /api/v1/users/:user_id/followers => list followers
@@ -93,12 +97,12 @@ func AcceptFollowHandler(w http.ResponseWriter, r *http.Request) {
 		utils.InternalServerError(w)
 		return
 	}
-	err = createChatId(targetUserId, userId)
+	chatId, err := createChatId(targetUserId, userId)
 	if err != nil {
 		utils.IdentifySqlError(w, err)
 		return
 	}
-	acceptFollowResponse(w, r)
+	acceptFollowResponse(w, r, chatId)
 }
 
 // POST /api/v1/follow-requests/:user_id/decline => decline request
@@ -110,5 +114,10 @@ func DeclineFollowHandler(w http.ResponseWriter, r *http.Request) {
 		utils.InternalServerError(w)
 		return
 	}
-	declineFollowResponse(w, r)
+	chatId, err := SelectSharedChat(userId, targetUserId)
+	if err != nil {
+		utils.IdentifySqlError(w, err)
+		return
+	}
+	declineFollowResponse(w, r, chatId)
 }

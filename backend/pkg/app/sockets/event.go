@@ -12,7 +12,6 @@ type EventError struct {
 }
 
 type ClientMessage struct {
-	// SourceId        int64            `json:"sourceId"`
 	TypingIndicator *TypingIndicator `json:"typingIndicator"`
 	ChatMessage     *ChatMessage     `json:"chatMessage"`
 	MarkSeen        *MarkSeen        `json:"markSeen"`
@@ -30,36 +29,39 @@ type TypingIndicator struct {
 }
 
 type ChatMessage struct {
-	MessageId int64  `json:"messageId"`
-	ChatId    int64  `json:"chatId"`
-	SenderId  int64  `json:"senderId"`
-	Content   string `json:"content"`
-	SeenState string `json:"seenState"`
-	CreatedAt string `json:"createdAt"`
-	UpdatedAt string `json:"updatedAt"`
+	SenderData UserData `json:"senderData"`
+	MessageId  int64    `json:"messageId"`
+	ChatId     int64    `json:"chatId"`
+	SenderId   int64    `json:"senderId"`
+	Content    string   `json:"content"`
+	SeenState  string   `json:"seenState"`
+	CreatedAt  string   `json:"createdAt"`
+	UpdatedAt  string   `json:"updatedAt"`
 }
 
 type MarkSeen struct {
-	MessageId int64  `json:"messageId"`
-	ChatId    int64  `json:"chatId"`
-	SenderId  int64  `json:"senderId"`
-	Content   string `json:"content"`
-	SeenState string `json:"seenState"`
-	CreatedAt string `json:"createdAt"`
-	UpdatedAt string `json:"updatedAt"`
+	SenderData UserData `json:"senderData"`
+	MessageId  int64    `json:"messageId"`
+	ChatId     int64    `json:"chatId"`
+	SenderId   int64    `json:"senderId"`
+	Content    string   `json:"content"`
+	SeenState  string   `json:"seenState"`
+	CreatedAt  string   `json:"createdAt"`
+	UpdatedAt  string   `json:"updatedAt"`
 }
 
 type Notification struct {
 	NotificationId int64   `json:"notificationId"`
+	ActorId        int64   `json:"actorId"`
 	ActorName      string  `json:"actorName"`
 	ActorAvatarId  *int64  `json:"actorAvatarId"`
 	UserId         int64   `json:"userId"`
 	Type           string  `json:"type"`
-	RefrenceId     int64   `json:"refrenceId"`
-	RefrenceType   string  `json:"refrenceType"`
+	ReferenceId    int64   `json:"referenceId"`
+	ReferenceType  string  `json:"referenceType"`
 	Content        string  `json:"content"`
 	Status         string  `json:"status"`
-	IsRead         string  `json:"isRead"`
+	IsRead         int     `json:"isRead"`
 	CreatedAt      string  `json:"createdAt"`
 	ReadAt         *string `json:"readAt"`
 }

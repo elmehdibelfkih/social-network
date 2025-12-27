@@ -13,8 +13,8 @@ func followNotification(followerId, followedId int64, status string, notifStatus
 	notification.NotificationId = utils.GenerateID()
 	notification.UserId = followedId
 	notification.Type = "follow_request"
-	notification.RefrenceType = "user"
-	notification.RefrenceId = followerId
+	notification.ReferenceType = "user"
+	notification.ReferenceId = followerId
 	if status == "pending" {
 		notification.Content = "New follow request received."
 	} else {
@@ -35,7 +35,7 @@ func followUnfollowUpdateCounterStruct(entityType string, entityID int64, counte
 	return counter
 }
 
-func followResponse(w http.ResponseWriter, r *http.Request) {
+func followResponse(w http.ResponseWriter, r *http.Request, chatId int64) {
 
 	userId := utils.GetUserIdFromContext(r)
 	targetUserId := utils.GetWildCardValue(w, r, "user_id")
@@ -45,7 +45,6 @@ func followResponse(w http.ResponseWriter, r *http.Request) {
 		utils.InternalServerError(w)
 		return
 	}
-
 	switch status {
 	case "pending":
 		response.Message = "Follow request sent successfully."
@@ -56,12 +55,16 @@ func followResponse(w http.ResponseWriter, r *http.Request) {
 	response.Status = status
 	response.TargetUserId = targetUserId
 	response.FollowerId = userId
+	response.ChatId = &chatId
+	if chatId == 0 {
+		response.ChatId = nil
+	}
 
 	utils.WriteSuccess(w, http.StatusAccepted, response)
 
 }
 
-func unfollowResponse(w http.ResponseWriter, r *http.Request) {
+func unfollowResponse(w http.ResponseWriter, r *http.Request, chatId *int64) {
 
 	userId := utils.GetUserIdFromContext(r)
 	targetUserId := utils.GetWildCardValue(w, r, "user_id")
@@ -70,11 +73,12 @@ func unfollowResponse(w http.ResponseWriter, r *http.Request) {
 	response.Message = "Unfollow successful."
 	response.TargetUserId = targetUserId
 	response.FollowerId = userId
+	response.ChatId = chatId
 
 	utils.WriteSuccess(w, http.StatusAccepted, response)
 }
 
-func acceptFollowResponse(w http.ResponseWriter, r *http.Request) {
+func acceptFollowResponse(w http.ResponseWriter, r *http.Request, chatId int64) {
 	userId := utils.GetUserIdFromContext(r)
 	targetUserId := utils.GetWildCardValue(w, r, "user_id")
 	var response AcceptFollowResponseJson
@@ -83,11 +87,15 @@ func acceptFollowResponse(w http.ResponseWriter, r *http.Request) {
 	response.FollowerId = userId
 	response.FollowedId = targetUserId
 	response.Status = "accepted"
+	response.ChatId = &chatId
+	if chatId == 0 {
+		response.ChatId = nil
+	}
 
 	utils.WriteSuccess(w, http.StatusAccepted, response)
 }
 
-func declineFollowResponse(w http.ResponseWriter, r *http.Request) {
+func declineFollowResponse(w http.ResponseWriter, r *http.Request, chatId *int64) {
 	userId := utils.GetUserIdFromContext(r)
 	targetUserId := utils.GetWildCardValue(w, r, "user_id")
 	var response AcceptFollowResponseJson
@@ -96,6 +104,7 @@ func declineFollowResponse(w http.ResponseWriter, r *http.Request) {
 	response.FollowerId = userId
 	response.FollowedId = targetUserId
 	response.Status = "declined"
+	response.ChatId = chatId
 
 	utils.WriteSuccess(w, http.StatusAccepted, response)
 }
