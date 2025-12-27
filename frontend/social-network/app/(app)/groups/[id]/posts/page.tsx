@@ -24,9 +24,7 @@ export default async function PostPage({ params }): Promise<JSX.Element> {
       </div>
       <div>
         {posts.length === 0 ? (
-          <p>
-            No posts yet. Be the first to create one! 456123
-          </p>
+          <p style={{ textAlign: 'center', padding: '20px', color: '#707070ff', background: '#ffffffff', borderRadius: '10px', border: '5px Dotted #d1d5db'}}> No posts yet. Be the first to create one! </p>
         ) : (
           <Feed initialPosts={posts} />
         )}

@@ -10,6 +10,9 @@ import SharedWorekerClient from "@/components/ui/worker";
 import { UserStatsState } from "@/libs/globalTypes";
 import { Counts } from "@/libs/globalTypes";
 import { NotificationProvider } from "@/providers/notifsProvider";
+import { ChatProvider } from "@/features/chat/global.chat.client";
+import { ChatSection } from "@/features/chat";
+import { ChatPortals } from "@/features/chat/portals.client";
 
 
 export default async function AppLayout({ children }: { children: ReactNode }) {
@@ -46,14 +49,19 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthProvider>
-      <UserStatsProvider initialState={stats}>
-        <NotificationProvider>
+    <>
+      <AuthProvider>
+        <UserStatsProvider initialState={stats}>
           <SharedWorekerClient />
-          <Navbar />
-          {children}
-        </NotificationProvider>
-      </UserStatsProvider>
-    </AuthProvider>
+          <NotificationProvider>
+            <ChatProvider>
+              <Navbar />
+              <ChatPortals />
+              {children}
+            </ChatProvider>
+          </NotificationProvider>
+        </UserStatsProvider>
+      </AuthProvider>
+    </>
   );
 }

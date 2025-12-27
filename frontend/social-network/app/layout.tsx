@@ -27,8 +27,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
       <head />
-      <body className="app-root">
-        {/* {children} */}
+      <body className="app-root" suppressHydrationWarning={true}>
         <main className="main-content">{children}</main>
         <Snackbar />
         <Footer />

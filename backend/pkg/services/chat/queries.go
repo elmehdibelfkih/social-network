@@ -2,6 +2,12 @@ package chat
 
 const (
 	// select
+	SELECT_USER_BY_ID = `
+		SELECT first_name, last_name ,nickname, date_of_birth, avatar_id, about_me, privacy FROM users WHERE id = ?
+	`
+	SELECT_CHAT_GROUP_ID = `
+		SELECT group_id FROM chats WHERE id = ?
+	`
 	SELECT_CHAT_MEMBER = `
 		SELECT 1 FROM chat_participants cp
 		JOIN chats c ON cp.chat_id = c.id

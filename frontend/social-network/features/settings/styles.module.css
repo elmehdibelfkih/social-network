@@ -20,7 +20,7 @@
   margin: 0 0 8px 0;
   font-size: 24px;
   font-weight: 700;
-  color: #7c3aed;
+  color: #6b2d8f;
 }
 
 .subtitle {
@@ -57,7 +57,7 @@
 }
 
 .navItem.active {
-  background: #7c3aed;
+  background: #6b2d8f;
   color: white;
 }
 
@@ -122,7 +122,7 @@
 
 .uploadBtn {
   padding: 8px 16px;
-  background: #7c3aed;
+  background: #6b2d8f;
   color: white;
   border: none;
   border-radius: 8px;
@@ -201,7 +201,7 @@
 
 .saveBtn {
   padding: 10px 24px;
-  background: #7c3aed;
+  background: #6b2d8f;
   color: white;
   border: none;
   border-radius: 8px;
@@ -239,7 +239,7 @@
 
 .updateBtn {
   padding: 10px 24px;
-  background: #7c3aed;
+  background: #6b2d8f;
   color: white;
   border: none;
   border-radius: 8px;

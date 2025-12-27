@@ -2,16 +2,25 @@ package chat
 
 import (
 	"database/sql"
-	"fmt"
 	socket "social/pkg/app/sockets"
 	"social/pkg/db/database"
 	"social/pkg/utils"
 )
 
+func isGroupChat(chatId int64, tx *sql.Tx) (bool, error) {
+	var groupId *int64
+	err := tx.QueryRow(SELECT_CHAT_GROUP_ID, chatId).Scan(&groupId)
+	if err != nil || groupId == nil {
+		utils.SQLiteErrorTarget(err, SELECT_CHAT_GROUP_ID)
+		return false, err
+	}
+
+	return true, nil
+}
+
 func InsertMessage(c *ChatMessage) error {
 	return database.WrapWithTransaction(func(tx *sql.Tx) error {
 		c.SeenState = "sent"
-		fmt.Println(socket.WSManger.ChatOnlineUsers(c.ChatId))
 		if socket.WSManger.ChatOnlineUsers(c.ChatId) > 1 {
 			c.SeenState = "delivered"
 			_, err := tx.Exec(
@@ -45,14 +54,22 @@ func InsertMessage(c *ChatMessage) error {
 			utils.SQLiteErrorTarget(err, INSERT_MESSAGE)
 			return err
 		}
-		_, err = tx.Exec(
-			UPDATE_UNREAD_COUNT,
-			c.ChatId,
-			c.SenderId,
-		)
+
+		isGroup, err := isGroupChat(c.ChatId, tx)
 		if err != nil {
-			utils.SQLiteErrorTarget(err, UPDATE_UNREAD_COUNT)
+			utils.SQLiteErrorTarget(err, "faild to get chat kind")
 			return err
+		}
+		if !isGroup {
+			_, err = tx.Exec(
+				UPDATE_UNREAD_COUNT,
+				c.ChatId,
+				c.SenderId,
+			)
+			if err != nil {
+				utils.SQLiteErrorTarget(err, UPDATE_UNREAD_COUNT)
+				return err
+			}
 		}
 		return nil
 	})
@@ -77,8 +94,16 @@ func SelectChatById(chatId, userId int64) (bool, error) {
 
 func UpdateMessageStatus(s *MarkSeen) error {
 	return database.WrapWithTransaction(func(tx *sql.Tx) error {
+		isGroup, err := isGroupChat(s.ChatId, tx)
+		if err != nil {
+			utils.SQLiteErrorTarget(err, "faild to get chat kind")
+			return err
+		}
 		s.SeenState = "read"
-		_, err := tx.Exec(
+		if isGroup {
+			s.SeenState = "delivered"
+		}
+		_, err = tx.Exec(
 			UPDATE_MESSAGE_STATUS,
 			s.SeenState,
 			s.MessageId,
@@ -145,6 +170,18 @@ func SelectChatMessages(userId, chatId, messageId int64, l *MessagesList) error 
 				utils.SQLiteErrorTarget(err, SELECT_CHAT_HISTORY)
 				return err
 			}
+			err = tx.QueryRow(
+				SELECT_USER_BY_ID,
+				msg.SenderId,
+			).Scan(
+				&msg.SenderData.FirstName,
+				&msg.SenderData.LastName,
+				&msg.SenderData.Nickname,
+				&msg.SenderData.DateOfBirth,
+				&msg.SenderData.AvatarId,
+				&msg.SenderData.AboutMe,
+				&msg.SenderData.Privacy,
+			)
 			socket.WSManger.BroadcastToChat(userId, chatId, socket.Event{
 				Source: "server",
 				Type:   "chat_seen",
@@ -154,6 +191,7 @@ func SelectChatMessages(userId, chatId, messageId int64, l *MessagesList) error 
 						ChatId:    msg.ChatId,
 						SenderId:  msg.SenderId,
 						Content:   msg.Content,
+						SenderData: socket.UserData(msg.SenderData),
 						SeenState: msg.SeenState,
 						CreatedAt: msg.CreatedAt,
 						UpdatedAt: msg.UpdatedAt,
