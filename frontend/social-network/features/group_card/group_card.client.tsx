@@ -27,7 +27,7 @@ export default function GroupCardClient({ groups, isMyGroups, onJoinGroup }: Gro
   };
 
   const handleComplete = (selectedUserIds: number[]) => {
-    console.log('Invited users:', selectedUserIds);
+    // console.log('Invited users:', selectedUserIds);
     setSelectedGroupId(null);
   };
 

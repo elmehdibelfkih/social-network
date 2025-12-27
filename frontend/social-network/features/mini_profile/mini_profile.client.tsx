@@ -39,11 +39,10 @@ export function MiniProfileActions({ data }: Props) {
     setBusy(true)
     try {
       const res = await http.post<FollowApiResponse>(`/api/v1/users/${encodeURIComponent(String(data.userId))}/follow`)
-      console.log(res);
-      if (res) { 
+      if (res) {
         const newStatus = res?.status ?? null
         const newChatId = res?.chatId ?? null
-  
+
         setStatus(newStatus)
         setChatId(newChatId)
         if (newStatus === 'accepted') {
@@ -64,12 +63,11 @@ export function MiniProfileActions({ data }: Props) {
     setBusy(true)
     try {
       const res = await http.post<FollowApiResponse>(`/api/v1/users/${encodeURIComponent(String(data.userId))}/unfollow`)
-      console.log(res);
-      
+
       if (res) {
         const newStatus = res?.status ?? null
         const newChatId = res?.chatId ?? null
-        
+
         setStatus(newStatus)
         setChatId(newChatId)
         if (status !== 'pending') {

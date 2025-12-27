@@ -102,17 +102,6 @@ func followUser(followerId, followedId int64) error {
 			utils.SQLiteErrorTarget(err, FOLLOW_REQUEST_QUERY)
 			return err
 		}
-		follower, err := followBack(followerId, followedId)
-		if follower {
-			_, err = tx.Exec(UPDATE_FOLLOW_STATUS,
-				followedId,
-				followerId,
-			)
-			if err != nil {
-				utils.SQLiteErrorTarget(err, UPDATE_FOLLOW_STATUS)
-				return err
-			}
-		}
 		status, err := selectFollowStatus(followerId, followedId)
 		if err != nil {
 			return err

@@ -24,13 +24,11 @@ export function EventNotification({ notification, onMarkAsRead }: NotificationPr
 
   const getReferenceEvent = async () => {
     if (!notification.referenceId) {
-      console.log('No referenceId in notification:', notification)
       return
     }
 
     try {
       const eventResponse = await http.get<EventType>(`/api/v1/events/${notification.referenceId}`)
-      console.log('Event response:', eventResponse)
       setEvent(eventResponse)
     } catch (error) {
       console.error('Failed to fetch event:', error)

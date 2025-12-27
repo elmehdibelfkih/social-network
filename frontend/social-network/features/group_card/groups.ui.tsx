@@ -11,7 +11,6 @@ export default function GroupsUI() {
 
   function handleSubmit(payload) {
     const creat = GroupService.createGroup(payload)
-    console.log("create group payload", creat);
     setIsOpen(false);
   }
 

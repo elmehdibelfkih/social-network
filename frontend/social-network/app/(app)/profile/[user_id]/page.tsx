@@ -13,7 +13,6 @@ export default async function ProfilePage({ params, searchParams }: PageProps) {
 
   
   const profile = await getProfileData(user_id)
-  console.log("xxxx", profile)
 
   return (
     <>

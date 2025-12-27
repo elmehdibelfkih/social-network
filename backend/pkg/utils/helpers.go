@@ -149,7 +149,7 @@ func CheckPasswordHash(password, hash string) bool {
 func GenerateSessionToken(length int) string {
 	bytes := make([]byte, length)
 	if _, err := rand.Read(bytes); err != nil {
-		log.Fatalf("failed to generate token %v", err)
+		BackendErrorTarget(err, "failed to GenerateSessionToken")
 	}
 	return base64.URLEncoding.EncodeToString(bytes)
 }

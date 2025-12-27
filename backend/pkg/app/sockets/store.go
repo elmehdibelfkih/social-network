@@ -233,8 +233,6 @@ func InsertNotification(n Notification, actorId int64, tx *sql.Tx) error {
 		return err
 	}
 
-	fmt.Println("x:", n)
-
 	WSManger.Notify(n)
 	return nil
 }
