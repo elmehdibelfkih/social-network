@@ -12,9 +12,15 @@ LOGS_PATH = "$(PROJECT_ROOT)/logs/"
 SQLITE_LOGS_PATH = $(PROJECT_ROOT)/logs/backend-sqlite.log
 FRONTEND_LOGS_PATH = $(PROJECT_ROOT)/logs/frontend.log
 BACKEND_LOGS_PATH = $(PROJECT_ROOT)/logs/backend.log
+
 NGINX_LOGS_FOLDER_PATH = $(PROJECT_ROOT)/logs/nginx
 NGINX_ERROR_LOGS_PATH = $(PROJECT_ROOT)/logs/nginx/error.log
 NGINX_ACCESS_LOGS_PATH = $(PROJECT_ROOT)/logs/nginx/access.log
+
+SSL_PATH = $(PROJECT_ROOT)/nginx/ssl
+SSL_CERT_PATH = $(PROJECT_ROOT)/nginx/ssl/cert.pem
+SSL_KEY_PATH = $(PROJECT_ROOT)/nginx/ssl/key.pem
+
 
 DATA_PATH = $(PROJECT_ROOT)/data/
 SQLITE_DATA_PATH = $(PROJECT_ROOT)/data/sqlite
@@ -88,10 +94,17 @@ confirm:
 		echo "❌ $(GREEN)Operation cancelled by user.$(RESET)"; \
 		exit 1; \
 	fi
+ssl:
+	@echo "$(GREEN)Generating SSL certificates...$(RESET)"
+	@mkdir -p $(SSL_PATH)
+	@	: >> $(SSL_CERT_PATH)
+	@	: >> $(SSL_KEY_PATH)
+	@chmod +x generate-ssl-certs.sh
+	@./generate-ssl-certs.sh
 #=============================================================
 
 # docker =====================================================
-docker-up: setup
+docker-up: setup ssl
 	@echo "$(GREEN)Building and starting Docker containers...$(RESET)"
 	docker compose -f $(DOCKER_COMPOSE_PATH) up -d --build
 
@@ -142,6 +155,9 @@ prune: docker-prune
 #=============================================================
 
 # clean ======================================================
+clean-ssl: confirm
+	@echo "$(YELLOW)Cleaning SSL certificates...$(RESET)"
+	@rm -rf $(SSL_PATH)
 clean-logs: confirm
 	@echo "$(YELLOW)Cleaning logs files...$(RESET)"
 	@rm -rf $(LOGS_PATH)
@@ -165,7 +181,7 @@ clean-next:
 	@rm -f $(FRONTEND_PATH)/yarn-error.log
 	@rm -f $(FRONTEND_PATH)/next-env.d.ts
 	@find $(FRONTEND_PATH) -type f -name ".DS_Store" -delete
-purge: stop-dev clean-logs clean-data clean-next
+purge: stop-dev clean-logs clean-data clean-next clean-ssl
 	@echo "$(GREEN)purge: done$(RESET)"
 #=============================================================
 

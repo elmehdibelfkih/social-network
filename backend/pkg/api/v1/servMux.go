@@ -1,8 +1,6 @@
 package v1
 
 import (
-	"net/http"
-
 	"social/pkg/app/dependencies/middleware"
 	"social/pkg/app/dependencies/router"
 	socket "social/pkg/app/sockets"
@@ -49,7 +47,7 @@ func SocialMux() *router.Router {
 	socialMux.HandleFunc("GET", "/api/v1/groups/{group_id}/members", utils.MiddlewareChain(groups.GetGroupMembers, middleware.AuthMiddleware))
 	socialMux.HandleFunc("DELETE", "/api/v1/groups/{group_id}", utils.MiddlewareChain(groups.DeleteGroup, middleware.AuthMiddleware, groups.IsGroupOwner))
 
-	// events   
+	// events
 	socialMux.HandleFunc("POST", "/api/v1/groups/{group_id}/events", utils.MiddlewareChain(groups.PostCreateEvent, middleware.AuthMiddleware, groups.IsMemeber))
 	socialMux.HandleFunc("POST", "/api/v1/groups/{group_id}/events/{event_id}/rsvp", utils.MiddlewareChain(groups.PostEventRSVP, middleware.AuthMiddleware, groups.IsMemeber))
 	socialMux.HandleFunc("GET", "/api/v1/groups/{group_id}/events/{event_id}/rsvp", utils.MiddlewareChain(groups.GetEventRSVP, middleware.AuthMiddleware, groups.IsMemeber))
@@ -79,6 +77,7 @@ func SocialMux() *router.Router {
 	socialMux.HandleFunc("POST", "/api/v1/follow-requests/{user_id}/decline", utils.MiddlewareChain(follow.DeclineFollowHandler, middleware.AuthMiddleware, follow.DeclineFollowRequestMiddleWare))
 
 	// Users_Profiles
+	socialMux.HandleFunc("GET", "/api/v1/users/id", utils.MiddlewareChain(users.GetId, middleware.AuthMiddleware))
 	socialMux.HandleFunc("GET", "/api/v1/users/{user_id}/profile", utils.MiddlewareChain(users.GetProfile, middleware.AuthMiddleware))
 	socialMux.HandleFunc("PATCH", "/api/v1/users/{user_id}/profile", utils.MiddlewareChain(users.PatchProfile, middleware.AuthMiddleware))
 	socialMux.HandleFunc("PATCH", "/api/v1/users/{user_id}/password", utils.MiddlewareChain(users.PatchPassword, middleware.AuthMiddleware))
@@ -102,9 +101,6 @@ func SocialMux() *router.Router {
 	socialMux.HandleFunc("POST", "/api/v1/posts/{post_id}/like", utils.MiddlewareChain(posts.HandleLikePost, middleware.UserContext, middleware.AuthMiddleware, posts.PostViewMiddleware))
 	socialMux.HandleFunc("DELETE", "/api/v1/posts/{post_id}/like", utils.MiddlewareChain(posts.HandleUnlikePost, middleware.UserContext, middleware.AuthMiddleware, posts.PostViewMiddleware))
 
-
-
-	
 	socialMux.HandleFunc("POST", "/api/v1/comments/{comment_id}/like", utils.MiddlewareChain(posts.HandleLikeComment, middleware.UserContext, middleware.AuthMiddleware))
 	socialMux.HandleFunc("DELETE", "/api/v1/comments/{comment_id}/like", utils.MiddlewareChain(posts.HandleUnlikeComment, middleware.UserContext, middleware.AuthMiddleware))
 
@@ -125,24 +121,5 @@ func SocialMux() *router.Router {
 	socialMux.HandleFunc("GET", "/api/v1/users/{user_id}/feed", utils.MiddlewareChain(feed.GetFeedUser, middleware.AuthMiddleware))
 	socialMux.HandleFunc("GET", "/api/v1/groups/{group_id}/feed", utils.MiddlewareChain(feed.GetFeedGroup, middleware.AuthMiddleware, feed.IsGroupMember))
 
-	socialMux.HandleFunc("GET", "/api/v1/users/id", utils.MiddlewareChain(GetId, middleware.AuthMiddleware))
-
 	return socialMux
-}
-
-func GetId(w http.ResponseWriter, r *http.Request) {
-	viewerUserId := utils.GetUserIdFromContext(r)
-	if viewerUserId == -1 {
-		utils.BadRequest(w, "Invalid user ID.", "redirect")
-		return
-	}
-	type Id struct {
-		Id int64 `json:"Id"`
-	}
-
-	var id Id
-	id.Id = viewerUserId
-
-	// Return success response
-	utils.WriteSuccess(w, http.StatusOK, id)
 }

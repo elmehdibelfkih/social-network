@@ -6,6 +6,23 @@ import (
 	"social/pkg/utils"
 )
 
+func GetId(w http.ResponseWriter, r *http.Request) {
+	viewerUserId := utils.GetUserIdFromContext(r)
+	if viewerUserId == -1 {
+		utils.BadRequest(w, "Invalid user ID.", "redirect")
+		return
+	}
+	type Id struct {
+		Id int64 `json:"Id"`
+	}
+
+	var id Id
+	id.Id = viewerUserId
+
+	// Return success response
+	utils.WriteSuccess(w, http.StatusOK, id)
+}
+
 func GetProfile(w http.ResponseWriter, r *http.Request) {
 	profileUserId := utils.GetWildCardValue(w, r, "user_id")
 	if profileUserId == 0 {
