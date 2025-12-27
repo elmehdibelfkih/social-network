@@ -142,7 +142,6 @@ export function ProfileSettings({ profile }: { profile: ProfileAPIResponse }) {
       }
       ShowSnackbar({ status: true, message: 'Avatar removed successfully' });
     } catch (error) {
-      console.error('Failed to remove avatar:', error);
       ShowSnackbar({ status: false, message: 'Failed to remove avatar' });
     }
   };
@@ -199,14 +198,13 @@ export function ProfileSettings({ profile }: { profile: ProfileAPIResponse }) {
             onChange={(e) => setFormData({ ...formData, nickname: e.target.value })}
             placeholder="Your nickname"
             maxLength={50}
-          // minLength={3}
           />
         </div>
 
         <div className={styles.field}>
           <label>Email Address</label>
           <input
-            type="email"
+            type="text"
             value={formData.email}
             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
             required
