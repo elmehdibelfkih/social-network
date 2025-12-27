@@ -11,8 +11,10 @@ PROJECT_ROOT := $(shell pwd)
 LOGS_PATH = "$(PROJECT_ROOT)/logs/"
 SQLITE_LOGS_PATH = $(PROJECT_ROOT)/logs/backend-sqlite.log
 FRONTEND_LOGS_PATH = $(PROJECT_ROOT)/logs/frontend.log
-NGINX_LOGS_PATH = $(PROJECT_ROOT)/logs/nginx-error.log
 BACKEND_LOGS_PATH = $(PROJECT_ROOT)/logs/backend.log
+NGINX_LOGS_FOLDER_PATH = $(PROJECT_ROOT)/logs/nginx
+NGINX_ERROR_LOGS_PATH = $(PROJECT_ROOT)/logs/nginx/error.log
+NGINX_ACCESS_LOGS_PATH = $(PROJECT_ROOT)/logs/nginx/access.log
 
 DATA_PATH = $(PROJECT_ROOT)/data/
 SQLITE_DATA_PATH = $(PROJECT_ROOT)/data/sqlite
@@ -63,8 +65,10 @@ setup:
 	@mkdir -p $(LOGS_PATH)
 	@	: >> $(SQLITE_LOGS_PATH)
 	@	: >> $(FRONTEND_LOGS_PATH)
-	@	: >> $(NGINX_LOGS_PATH)
 	@	: >> $(BACKEND_LOGS_PATH)
+	@mkdir -p $(NGINX_LOGS_FOLDER_PATH)
+	@	: >> $(NGINX_ERROR_LOGS_PATH)
+	@	: >> $(NGINX_ACCESS_LOGS_PATH)
 	@mkdir -p $(DATA_PATH)
 	@mkdir -p $(SQLITE_DATA_PATH)
 	@mkdir -p $(UPLOADS_DATA_PATH)
@@ -87,16 +91,54 @@ confirm:
 #=============================================================
 
 # docker =====================================================
-up: setup
+docker-up: setup
+	@echo "$(GREEN)Building and starting Docker containers...$(RESET)"
+	docker compose -f $(DOCKER_COMPOSE_PATH) up -d --build
+
+docker-start: setup
+	@echo "$(GREEN)Starting Docker containers...$(RESET)"
 	docker compose -f $(DOCKER_COMPOSE_PATH) up -d
-build: setup
-	docker compose -f $(DOCKER_COMPOSE_PATH) build
-down:
+
+docker-stop:
+	@echo "$(YELLOW)Stopping Docker containers...$(RESET)"
+	docker compose -f $(DOCKER_COMPOSE_PATH) stop
+
+docker-down:
+	@echo "$(YELLOW)Stopping and removing Docker containers...$(RESET)"
 	docker compose -f $(DOCKER_COMPOSE_PATH) down
-status:
+
+docker-down-v:
+	@echo "$(RED)Stopping and removing Docker containers with volumes...$(RESET)"
+	docker compose -f $(DOCKER_COMPOSE_PATH) down -v
+
+docker-build: setup
+	@echo "$(GREEN)Building Docker images...$(RESET)"
+	docker compose -f $(DOCKER_COMPOSE_PATH) build
+
+docker-rebuild:
+	@echo "$(GREEN)Rebuilding $(SERVICE)...$(RESET)"
+	docker compose -f $(DOCKER_COMPOSE_PATH) build --no-cache $(SERVICE)
+
+docker-logs:
+	docker compose -f $(DOCKER_COMPOSE_PATH) logs -f
+
+docker-logs-service:
+	docker compose -f $(DOCKER_COMPOSE_PATH) logs -f $(SERVICE)
+
+docker-status:
 	docker compose -f $(DOCKER_COMPOSE_PATH) ps
-prune:
-	docker system prune -a --volumes
+
+docker-restart: docker-down docker-up
+
+docker-prune: confirm
+	@echo "$(RED)Pruning Docker system...$(RESET)"
+	docker system prune -a --volumes -f
+
+up: docker-up
+build: docker-build
+down: docker-down
+status: docker-status
+prune: docker-prune
 #=============================================================
 
 # clean ======================================================
@@ -109,7 +151,7 @@ clean-data: confirm
 clean-next:
 	@echo "$(YELLOW)Cleaning Next.js artifacts and generated files...$(RESET)"
 	@rm -rf $(FRONTEND_PATH)/node_modules
-	@rm -f $(FRONTEND_PATH)/package-lock.json
+# 	@rm -f $(FRONTEND_PATH)/package-lock.json
 	@rm -f $(FRONTEND_PATH)/yarn.lock
 	@rm -f $(FRONTEND_PATH)/pnpm-lock.yaml
 	@rm -rf $(FRONTEND_PATH)/.next
@@ -130,4 +172,11 @@ purge: stop-dev clean-logs clean-data clean-next
 
 # re-prune: prune dev
 
-# .PHONY: dev 
+.PHONY: dev stop-dev start-backend start-frontend stop-backend stop-frontend \
+        restart-backend restart-frontend re-dev re-purge-dev \
+        setup next-setup confirm \
+        ssl-generate up build rebuild down down-volumes restart status \
+        logs logs-backend logs-frontend logs-nginx logs-db \
+        shell-backend shell-frontend shell-nginx shell-db \
+        health ssl-check prune prune-safe \
+        clean-logs clean-data clean-next purge

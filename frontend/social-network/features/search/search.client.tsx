@@ -190,13 +190,10 @@ function UserCard({ user }: { user: types.User }) {
       firstName: user.firstName,
       lastName: user.lastName,
       avatarId: user.avatarId,
-      aboutMe: null,
-      dateOfBirth: null,
-      privacy: user.privacy || 'public',
+      privacy: (user.privacy || 'public') as 'public' | 'private',
       stats: { postsCount: 0, followersCount: 0, followingCount: 0 },
       joinedAt: null,
-      chatId: null,
-      email: null
+      chatId: null
     }} />
   )
 }

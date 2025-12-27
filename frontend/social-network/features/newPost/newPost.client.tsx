@@ -223,7 +223,7 @@ export function NewPostClient({ groupId }: { groupId?: number | null }) {
               <AddFriends
                 title="Allowed followers"
                 desc="Choose who can see"
-                groupId="0"
+                componentId="0"
                 purpose="post"
                 onComplete={(ids) => {
                   setSelectedFollowers(ids);

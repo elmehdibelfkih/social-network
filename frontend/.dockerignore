@@ -1,0 +1,41 @@
+# Dependencies
+social-network/node_modules
+social-network/.pnp
+social-network/.pnp.js
+
+# Testing
+social-network/coverage
+
+# Next.js
+social-network/.next/
+social-network/out/
+
+# Production
+social-network/build
+
+# Misc
+social-network/.DS_Store
+social-network/*.pem
+
+# Debug
+social-network/npm-debug.log*
+social-network/yarn-debug.log*
+social-network/yarn-error.log*
+
+# Local env files
+social-network/.env*.local
+social-network/.env
+
+# Vercel
+social-network/.vercel
+
+# Typescript
+social-network/*.tsbuildinfo
+social-network/next-env.d.ts
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+*~
