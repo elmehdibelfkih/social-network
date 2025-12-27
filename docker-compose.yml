@@ -6,11 +6,12 @@ services:
     image: social-api:latest
     container_name: social-api
     restart: unless-stopped
-    volumes:
-      - sqlite_data:/data
-      - ./logs/backend:/app/logs
     networks:
       - social-network
+    volumes:
+      - ./logs:/app/logs
+      - ./data:/app/data
+      - ./backend/pkg/db/migrations:/app/backend/pkg/db/migrations
     expose:
       - "8080"
 
@@ -24,7 +25,7 @@ services:
     environment:
       - NODE_ENV=production
     volumes:
-      - ./logs/frontend:/app/logs
+      - ./logs:/app/logs
     networks:
       - social-network
     expose:
@@ -50,10 +51,6 @@ services:
     depends_on:
       - social-api
       - social-frontend
-
-volumes:
-  sqlite_data:
-    driver: local
 
 networks:
   social-network:

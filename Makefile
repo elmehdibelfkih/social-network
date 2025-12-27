@@ -11,8 +11,10 @@ PROJECT_ROOT := $(shell pwd)
 LOGS_PATH = "$(PROJECT_ROOT)/logs/"
 SQLITE_LOGS_PATH = $(PROJECT_ROOT)/logs/backend-sqlite.log
 FRONTEND_LOGS_PATH = $(PROJECT_ROOT)/logs/frontend.log
-NGINX_LOGS_PATH = $(PROJECT_ROOT)/logs/nginx-error.log
 BACKEND_LOGS_PATH = $(PROJECT_ROOT)/logs/backend.log
+NGINX_LOGS_FOLDER_PATH = $(PROJECT_ROOT)/logs/nginx
+NGINX_ERROR_LOGS_PATH = $(PROJECT_ROOT)/logs/nginx/error.log
+NGINX_ACCESS_LOGS_PATH = $(PROJECT_ROOT)/logs/nginx/access.log
 
 DATA_PATH = $(PROJECT_ROOT)/data/
 SQLITE_DATA_PATH = $(PROJECT_ROOT)/data/sqlite
@@ -63,8 +65,10 @@ setup:
 	@mkdir -p $(LOGS_PATH)
 	@	: >> $(SQLITE_LOGS_PATH)
 	@	: >> $(FRONTEND_LOGS_PATH)
-	@	: >> $(NGINX_LOGS_PATH)
 	@	: >> $(BACKEND_LOGS_PATH)
+	@mkdir -p $(NGINX_LOGS_FOLDER_PATH)
+	@	: >> $(NGINX_ERROR_LOGS_PATH)
+	@	: >> $(NGINX_ACCESS_LOGS_PATH)
 	@mkdir -p $(DATA_PATH)
 	@mkdir -p $(SQLITE_DATA_PATH)
 	@mkdir -p $(UPLOADS_DATA_PATH)
