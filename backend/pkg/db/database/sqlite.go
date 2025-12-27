@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+
 	config "social/pkg/config"
 
 	"github.com/golang-migrate/migrate/v4"
@@ -12,20 +13,26 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-const USER_ENTITY_TYPE = `user`
-const POST_ENTITY_TYPE = `post`
-const GROUP_ENTITY_TYPE = `group`
-const COMMENT_ENTITY_TYPE = `comment`
+const (
+	USER_ENTITY_TYPE    = `user`
+	POST_ENTITY_TYPE    = `post`
+	GROUP_ENTITY_TYPE   = `group`
+	COMMENT_ENTITY_TYPE = `comment`
+)
 
-const FOLLOWERS_ENTITY_NAME = "followers"
-const FOLLOWEES_ENTITY_NAME = "followees"
-const POSTS_ENTITY_NAME = "posts"
-const COMMENTS_ENTITY_NAME = "comments"
-const REACTIONS_ENTITY_NAME = "reactions"
-const SHARSE_ENTITY_TYPE = "shares"
+const (
+	FOLLOWERS_ENTITY_NAME = "followers"
+	FOLLOWEES_ENTITY_NAME = "followees"
+	POSTS_ENTITY_NAME     = "posts"
+	COMMENTS_ENTITY_NAME  = "comments"
+	REACTIONS_ENTITY_NAME = "reactions"
+	SHARSE_ENTITY_TYPE    = "shares"
+)
 
-const ACTION_INCREMENT = "increment"
-const ACTION_DECREMENT = "decrement"
+const (
+	ACTION_INCREMENT = "increment"
+	ACTION_DECREMENT = "decrement"
+)
 
 type DBCounterSetter struct {
 	CounterName string
@@ -99,7 +106,6 @@ func GetCounter(counter DBCounterGetter) (int64, error) {
 	var followers, followees, posts, comments, reactions, shares sql.NullInt64
 	err := config.DB.QueryRow(SELECT_COUNTS, counter.EntityType, counter.EntityID).
 		Scan(&followers, &followees, &posts, &comments, &reactions, &shares)
-
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return 0, nil
@@ -143,7 +149,6 @@ func InitDB() error {
 	if err != nil {
 		return err
 	}
-
 	// create schema_migrations to track version controll
 	instance, err := sqlite3.WithInstance(config.DB, &sqlite3.Config{})
 	if err != nil {
@@ -163,13 +168,19 @@ func InitDB() error {
 	return nil
 }
 
-// for all write operation u should wrap them with this wrapper insert/update/delete
 func WrapWithTransaction(fn func(*sql.Tx) error) error {
 	var err error
 	tx, err := config.DB.Begin()
 	if err != nil {
 		return err
 	}
+
+	defer func() {
+		if p := recover(); p != nil {
+			tx.Rollback()
+			panic(p)
+		}
+	}()
 
 	err = fn(tx)
 	if err != nil {

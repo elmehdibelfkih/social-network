@@ -1,30 +1,23 @@
-
 @import '../../styles/variables.css';
 
-/* Profile Card - Small, elegant, centered sidebar card */
-/* Max width: 25% of viewport or 280px, whichever is smaller */
 .profileCard {
-  width: min(25vw, 280px);
+  width: min(25vw, 300px);
   background: var(--white);
-  border-radius: var(--border-radius-lg);
-  padding: var(--spacing-lg);
+  border-radius: var(--border-radius-xl);
+  padding: var(--spacing-xl);
   box-shadow: var(--shadow-md);
   border: 1px solid var(--gray-200);
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--spacing-lg);
+  gap: var(--spacing-xl);
   font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   color: var(--gray-900);
-  transition: box-shadow var(--transition-base);
+  transition: all var(--transition-slow) ease;
+  overflow: hidden;
 }
 
-.profileCard:hover {
-  box-shadow: var(--shadow-lg);
-}
-
-/* Header: centered avatar */
 .header {
   display: flex;
   flex-direction: column;
@@ -33,21 +26,19 @@
   width: 100%;
 }
 
-/* Text wrapper - centered and truncation-safe */
 .textWrap {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--spacing-xs);
+  gap: var(--spacing-sm);
   text-align: center;
   width: 100%;
-  min-width: 0; /* allow flex overflow to truncate */
+  min-width: 0;
 }
 
-/* Display name - large, bold, truncated */
 .displayName {
   margin: 0;
-  font-size: 1.0625rem; /* 17px */
+  font-size: 1.25rem;
   font-weight: 700;
   color: var(--gray-900);
   line-height: 1.2;
@@ -55,95 +46,153 @@
   text-overflow: ellipsis;
   white-space: nowrap;
   width: 100%;
+  letter-spacing: -0.02em;
 }
 
-/* Username/handle - subtle */
 .username {
   margin: 0;
-  font-size: 0.8125rem; /* 13px */
+  font-size: 0.9375rem;
   color: var(--gray-500);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   width: 100%;
+  font-weight: 500;
 }
 
-/* Privacy indicator */
 .privacy {
   display: inline-flex;
   align-items: center;
-  gap: var(--spacing-xs);
-  font-size: 0.75rem;
-  color: var(--gray-500);
+  gap: 6px;
+  font-size: 0.8125rem;
+  color: var(--gray-600);
   margin-top: var(--spacing-xs);
+  padding: 4px 12px;
+  background: var(--gray-50);
+  border-radius: var(--border-radius-full);
+  border: 1px solid var(--gray-200);
+  font-weight: 500;
+  transition: all var(--transition-fast) ease;
 }
 
-/* Joined date */
+.privacy:hover {
+  background: var(--gray-100);
+  border-color: var(--gray-300);
+}
+
 .joined {
-  font-size: 0.75rem;
+  font-size: 0.8125rem;
   color: var(--gray-500);
   margin-top: var(--spacing-xs);
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
-/* Divider line */
 .divider {
-  width: calc(100% + (var(--spacing-lg) * 2)); /* extend to edges */
+  width: calc(100% + (var(--spacing-xl) * 2));
   height: 1px;
-  background: var(--gray-200);
+  background: linear-gradient(90deg, transparent, var(--gray-200), transparent);
   border: none;
-  margin: 0 calc(var(--spacing-lg) * -1);
+  margin: 0 calc(var(--spacing-xl) * -1);
 }
 
-/* Stats area: three blocks horizontally */
 .statsContainer {
   width: 100%;
   display: flex;
   flex-wrap: wrap;
   justify-content: space-around;
-  gap: var(--spacing-md);
-  padding: 0;
+  gap: var(--spacing-lg);
+  padding: var(--spacing-md) 0;
   box-sizing: border-box;
+  background: var(--gray-50);
+  border-radius: var(--border-radius-lg);
+  margin: calc(var(--spacing-xs) * -1) 0;
 }
 
-/* Each stat block centered */
 .statBlock {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--spacing-xs);
+  gap: 6px;
   flex: 1;
+  min-width: 60px;
+  transition: transform var(--transition-fast) ease;
+  cursor: default;
 }
 
-/* Stat label - uppercase, small, muted */
 .statLabel {
-  font-size: 0.7rem;
+  font-size: 0.75rem;
   color: var(--gray-600);
   text-transform: uppercase;
-  letter-spacing: 0.4px;
+  letter-spacing: 0.5px;
   line-height: 1;
-  font-weight: 600;
-}
-
-/* Stat value - bold, purple */
-.statValue {
-  font-size: 1.125rem;
   font-weight: 700;
-  color: var(--primary-purple);
-  line-height: 1.2;
 }
 
-/* Responsive adjustments */
+.statValue {
+  font-size: 1.375rem;
+  font-weight: 800;
+  color: var(--primary-purple);
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  .profileCard,
+  .profileCard::before,
+  .statBlock,
+  .privacy {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+@media (max-width: 1200px) {
+  .profileCard {
+    width: min(28vw, 280px);
+  }
+}
+
 @media (max-width: 900px) {
   .profileCard {
-    width: min(30vw, 260px);
+    width: min(32vw, 260px);
+    padding: var(--spacing-lg);
+    gap: var(--spacing-lg);
+  }
+
+  .divider {
+    width: calc(100% + (var(--spacing-lg) * 2));
+    margin: 0 calc(var(--spacing-lg) * -1);
+  }
+
+  .displayName {
+    font-size: 1.125rem;
+  }
+
+  .statValue {
+    font-size: 1.25rem;
+  }
+
+  .statsContainer {
+    gap: var(--spacing-md);
+  }
+}
+
+@media (max-width: 768px) {
+  .profileCard {
+    width: min(40vw, 240px);
   }
 }
 
 @media (max-width: 600px) {
   .profileCard {
-    width: min(45vw, 240px);
+    width: min(50vw, 240px);
     padding: var(--spacing-md);
     gap: var(--spacing-md);
+    border-radius: var(--border-radius-lg);
   }
 
   .divider {
@@ -152,29 +201,66 @@
   }
 
   .displayName {
-    font-size: 1rem;
+    font-size: 1.0625rem;
   }
 
   .username {
-    font-size: 0.75rem;
+    font-size: 0.875rem;
   }
 
   .statValue {
-    font-size: 1rem;
+    font-size: 1.125rem;
+  }
+
+  .statsContainer {
+    padding: var(--spacing-sm) 0;
   }
 }
 
 @media (max-width: 480px) {
   .profileCard {
     width: min(80vw, 220px);
+    padding: var(--spacing-sm) var(--spacing-md);
+  }
+
+  .displayName {
+    font-size: 1rem;
+  }
+
+  .username {
+    font-size: 0.8125rem;
+  }
+
+  .statLabel {
+    font-size: 0.6875rem;
+    letter-spacing: 0.4px;
+  }
+
+  .statValue {
+    font-size: 1rem;
+  }
+
+  .statsContainer {
+    gap: var(--spacing-sm);
+  }
+
+  .privacy {
+    font-size: 0.75rem;
+    padding: 3px 10px;
+  }
+
+  .joined {
+    font-size: 0.75rem;
+  }
+}
+
+@media (max-width: 360px) {
+  .profileCard {
+    width: min(90vw, 200px);
   }
 
   .displayName {
     font-size: 0.9375rem;
-  }
-
-  .statLabel {
-    font-size: 0.65rem;
   }
 
   .statValue {

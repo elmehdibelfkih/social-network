@@ -4,8 +4,8 @@
   width: 100%;
   max-width: 380px;
   background: var(--white);
-  border-radius: var(--border-radius-lg);
-  padding: var(--spacing-xl) var(--spacing-lg) var(--spacing-lg);
+  border-radius: var(--border-radius-xl);
+  padding: var(--spacing-2xl) var(--spacing-xl) var(--spacing-xl);
   box-shadow: var(--shadow-md);
   border: 1px solid var(--gray-200);
   display: flex;
@@ -15,38 +15,43 @@
   box-sizing: border-box;
   color: var(--gray-900);
   font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  transition: box-shadow var(--transition-base);
-}
-
-.miniCardLarge:hover {
-  box-shadow: var(--shadow-lg);
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
 }
 
 .miniHeaderLarge {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-sm);
+  gap: var(--spacing-md);
   align-items: center;
   width: 100%;
   text-align: center;
 }
 
 .avatarWrap {
-  width: 80px;
-  height: 80px;
-  min-width: 80px;
-  min-height: 80px;
+  width: 96px;
+  height: 96px;
+  min-width: 96px;
+  min-height: 96px;
   border-radius: var(--border-radius-full);
   overflow: hidden;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: var(--gray-100);
-  box-shadow: var(--shadow-sm);
-  border: 3px solid var(--white);
+  background: linear-gradient(135deg, var(--gray-100), var(--gray-50));
+  box-shadow: var(--shadow-lg);
+  border: 4px solid var(--white);
   flex-shrink: 0;
   box-sizing: border-box;
-  margin-bottom: var(--spacing-xs);
+  margin-bottom: var(--spacing-sm);
+  transition: all var(--transition-slow) ease;
+  position: relative;
+}
+
+.miniCardLarge:hover .avatarWrap {
+  transform: scale(1.05);
+  box-shadow: var(--shadow-xl);
 }
 
 .avatar {
@@ -65,23 +70,23 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--gray-100);
+  background: linear-gradient(135deg, var(--gray-100), var(--gray-50));
   color: var(--gray-400);
-  font-size: 2rem;
+  font-size: 2.5rem;
+  font-weight: 600;
 }
 
-/* Info section (name, handle, etc.) */
 .miniInfoLarge {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 6px;
   align-items: center;
   width: 100%;
 }
 
 .miniTitleRow {
   display: flex;
-  gap: var(--spacing-xs);
+  gap: var(--spacing-sm);
   align-items: center;
   justify-content: center;
   width: 100%;
@@ -89,7 +94,7 @@
 
 .miniName {
   margin: 0;
-  font-size: 1.125rem;
+  font-size: 1.25rem;
   line-height: 1.3;
   font-weight: 700;
   color: var(--gray-900);
@@ -98,6 +103,7 @@
   text-overflow: ellipsis;
   flex-shrink: 1;
   min-width: 0;
+  letter-spacing: -0.02em;
 }
 
 .miniLock {
@@ -105,6 +111,7 @@
   display: inline-flex;
   align-items: center;
   flex-shrink: 0;
+  font-size: 1rem;
 }
 
 .miniHandleRow {
@@ -117,54 +124,61 @@
 }
 
 .miniHandle {
-  font-size: 0.875rem;
+  font-size: 0.9375rem;
   color: var(--gray-500);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   min-width: 0;
+  font-weight: 500;
 }
 
 .badge {
-  font-size: 0.7rem;
-  padding: 3px var(--spacing-sm);
+  font-size: 0.75rem;
+  padding: 4px 10px;
   border-radius: var(--border-radius-full);
   background: var(--gray-100);
   border: 1px solid var(--gray-200);
   color: var(--gray-700);
   display: inline-flex;
   align-items: center;
-  gap: var(--spacing-xs);
+  gap: 6px;
   flex-shrink: 0;
   white-space: nowrap;
   line-height: 1;
-  font-weight: 500;
+  font-weight: 600;
+  transition: all var(--transition-fast) ease;
 }
 
-/* Status badges row */
+.badge:hover {
+  background: var(--gray-200);
+  border-color: var(--gray-300);
+}
+
 .statusBadges {
   display: flex;
   gap: var(--spacing-sm);
   align-items: center;
   justify-content: center;
   flex-wrap: wrap;
-  margin-top: var(--spacing-xs);
+  margin-top: var(--spacing-sm);
 }
 
 .badgeOffline,
 .badgeOnline,
 .badgePrivacy {
-  font-size: 0.75rem;
-  padding: 4px 12px;
+  font-size: 0.8125rem;
+  padding: 5px 14px;
   border-radius: var(--border-radius-full);
   display: inline-flex;
   align-items: center;
-  gap: var(--spacing-xs);
+  gap: 6px;
   flex-shrink: 0;
   white-space: nowrap;
   line-height: 1;
-  font-weight: 500;
+  font-weight: 600;
   border: 1px solid;
+  transition: all var(--transition-fast) ease;
 }
 
 .badgeOffline {
@@ -173,16 +187,32 @@
   color: var(--gray-600);
 }
 
+.badgeOffline:hover {
+  background: var(--gray-100);
+  border-color: var(--gray-300);
+}
+
 .badgeOnline {
   background: #ecfdf5;
   border-color: #86efac;
   color: #16a34a;
+  box-shadow: 0 0 0 3px rgba(134, 239, 172, 0.1);
+}
+
+.badgeOnline:hover {
+  background: #d1fae5;
+  box-shadow: 0 0 0 4px rgba(134, 239, 172, 0.15);
 }
 
 .badgePrivacy {
   background: var(--gray-50);
   border-color: var(--gray-200);
   color: var(--gray-600);
+}
+
+.badgePrivacy:hover {
+  background: var(--gray-100);
+  border-color: var(--gray-300);
 }
 
 .aboutMe {
@@ -193,51 +223,56 @@
   display: none;
 }
 
-/* Divider - hidden */
 .miniDivider {
   display: none;
 }
 
-/* Stats section */
 .miniStatsLarge {
   display: flex;
   flex-direction: row;
-  gap: var(--spacing-lg);
+  gap: var(--spacing-xl);
   align-items: center;
   justify-content: center;
   width: 100%;
-  margin-top: var(--spacing-md);
-  margin-bottom: var(--spacing-md);
-  padding: var(--spacing-sm) 0;
+  margin-top: var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
+  padding: var(--spacing-md) 0;
+  background: var(--gray-50);
+  border-radius: var(--border-radius-lg);
 }
 
 .miniStat {
   display: flex;
   flex-direction: row;
-  gap: 4px;
+  gap: 6px;
   align-items: baseline;
   white-space: nowrap;
+  transition: transform var(--transition-fast) ease;
+}
+
+.miniStat:hover {
+  transform: scale(1.05);
 }
 
 .miniStatValue {
-  font-weight: 700;
-  color: var(--gray-900);
-  font-size: 0.9375rem;
+  font-weight: 800;
+  color: var(--primary-purple);
+  font-size: 1.125rem;
   line-height: 1;
+  letter-spacing: -0.02em;
 }
 
 .miniStatLabel {
-  font-size: .9375rem;
+  font-size: 1rem;
   color: var(--gray-600);
   line-height: 1;
-  font-weight: 400;
+  font-weight: 500;
 }
 
-/* Actions section */
 .miniActionsLarge {
   display: flex;
   flex-direction: row;
-  gap: var(--spacing-sm);
+  gap: var(--spacing-md);
   align-items: center;
   justify-content: center;
   width: 100%;
@@ -245,78 +280,82 @@
 
 .viewProfileBtnLarge {
   flex: 1;
-  max-width: 200px;
+  max-width: 220px;
   text-decoration: none;
   background: var(--white);
-  border: 1px solid var(--gray-300);
-  padding: var(--spacing-sm) var(--spacing-lg);
-  font-size: 0.9375rem;
-  border-radius: var(--border-radius);
+  border: 2px solid var(--gray-300);
+  padding: 12px var(--spacing-xl);
+  font-size: 1rem;
+  border-radius: var(--border-radius-lg);
   text-align: center;
   color: var(--gray-900);
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
   box-shadow: var(--shadow-sm);
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  transition: all var(--transition-base);
+  transition: all var(--transition-base) ease;
   white-space: nowrap;
+  letter-spacing: -0.01em;
 }
 
 .viewProfileBtnLarge:hover {
   background: var(--gray-50);
-  box-shadow: var(--shadow);
+  box-shadow: var(--shadow-md);
   border-color: var(--gray-400);
+  transform: translateY(-1px);
 }
 
 .viewProfileBtnLarge:active {
-  transform: scale(0.98);
+  transform: translateY(0) scale(0.98);
 }
 
-/* Action icons row */
 .actionIcons {
   display: flex;
-  gap: var(--spacing-sm);
+  gap: var(--spacing-md);
   align-items: center;
   justify-content: center;
 }
 
 .iconBtn {
-  border-radius: var(--border-radius);
+  border-radius: var(--border-radius-lg);
   background: var(--white);
-  border: 1px solid var(--gray-300);
+  border: 2px solid var(--gray-300);
   display: inline-flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   color: var(--gray-600);
-  transition: all var(--transition-base);
+  transition: all var(--transition-base) ease;
   flex-shrink: 0;
-  font-size: 1rem;
+  font-size: 1.125rem;
   line-height: 1;
+  box-shadow: var(--shadow-sm);
 }
 
 .iconBtn:hover {
   background: var(--gray-50);
   color: var(--gray-900);
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow-md);
   border-color: var(--gray-400);
+  transform: translateY(-2px);
 }
 
 .iconBtn:active {
-  transform: scale(0.95);
+  transform: translateY(0) scale(0.95);
 }
 
 .iconBtn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+  transform: none;
 }
 
 .followBtn {
-  width: 40px;
-  height: 40px;
-  border-radius: var(--border-radius);
+  width: 44px;
+  height: 44px;
+  border-radius: var(--border-radius-lg);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -324,36 +363,38 @@
   cursor: pointer;
   padding: 0;
   box-sizing: border-box;
-  font-weight: 700;
-  font-size: 1.125rem;
-  transition: all var(--transition-base);
+  font-weight: 800;
+  font-size: 1.25rem;
+  transition: all var(--transition-base) ease;
   flex-shrink: 0;
   line-height: 1;
 }
 
 .followPrimary {
-  background: var(--primary-purple);
+  background: linear-gradient(135deg, var(--primary-purple), var(--primary-purple-dark));
   color: var(--white);
-  box-shadow: var(--shadow);
-}
-
-.followPrimary:hover {
-  background: var(--primary-purple-dark);
   box-shadow: var(--shadow-md);
 }
 
+.followPrimary:hover {
+  background: linear-gradient(135deg, var(--primary-purple-dark), var(--primary-purple));
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-2px) scale(1.05);
+}
+
 .followPrimary:active {
-  transform: scale(0.95);
+  transform: translateY(0) scale(0.98);
 }
 
 .followPrimary:disabled {
   opacity: 0.7;
   cursor: not-allowed;
+  transform: none;
 }
 
 .followOutline {
   background: var(--white);
-  border: 1px solid var(--gray-300);
+  border: 2px solid var(--gray-300);
   color: var(--gray-900);
   box-shadow: var(--shadow-sm);
 }
@@ -361,51 +402,80 @@
 .followOutline:hover {
   background: var(--gray-50);
   border-color: var(--gray-400);
-  box-shadow: var(--shadow);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
 }
 
 .followOutline:active {
-  transform: scale(0.95);
+  transform: translateY(0) scale(0.98);
 }
 
 .followOutline:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+  transform: none;
 }
 
 .followDisabled {
   background: var(--gray-100);
   color: var(--gray-400);
   cursor: not-allowed;
-  border: 1px solid var(--gray-200);
+  border: 2px solid var(--gray-200);
   box-shadow: none;
 }
 
-/* Focus states */
-.viewProfileBtnLarge:focus,
-.iconBtn:focus,
-.followBtn:focus {
-  outline: 2px solid var(--primary-purple);
-  outline-offset: 2px;
-  border-radius: var(--border-radius);
+.viewProfileBtnLarge:focus-visible,
+.iconBtn:focus-visible,
+.followBtn:focus-visible {
+  outline: 3px solid var(--primary-purple);
+  outline-offset: 3px;
+  border-radius: var(--border-radius-lg);
 }
 
-/* Reduce motion */
 @media (prefers-reduced-motion: reduce) {
 
   .miniCardLarge,
+  .miniCardLarge::before,
   .avatarWrap,
   .viewProfileBtnLarge,
   .iconBtn,
-  .followBtn {
+  .followBtn,
+  .miniStat,
+  .badge {
     transition: none !important;
+    animation: none !important;
   }
 }
 
-/* Responsive adjustments */
 @media (max-width: 768px) {
   .miniCardLarge {
     max-width: 100%;
+  }
+}
+
+@media (max-width: 640px) {
+  .miniCardLarge {
+    padding: var(--spacing-xl) var(--spacing-lg) var(--spacing-lg);
+    border-radius: var(--border-radius-lg);
+  }
+
+  .avatarWrap {
+    width: 84px;
+    height: 84px;
+    min-width: 84px;
+    min-height: 84px;
+    border-width: 3px;
+  }
+
+  .miniName {
+    font-size: 1.125rem;
+  }
+
+  .miniStatsLarge {
+    gap: var(--spacing-lg);
+    padding: var(--spacing-sm) 0;
+    margin-top: var(--spacing-md);
+    margin-bottom: var(--spacing-md);
   }
 }
 
@@ -415,38 +485,72 @@
   }
 
   .avatarWrap {
-    width: 72px;
-    height: 72px;
-    min-width: 72px;
-    min-height: 72px;
+    width: 76px;
+    height: 76px;
+    min-width: 76px;
+    min-height: 76px;
   }
 
   .miniName {
-    font-size: 1rem;
+    font-size: 1.0625rem;
   }
 
   .miniHandle {
-    font-size: 0.8125rem;
+    font-size: 0.875rem;
   }
 
   .miniStatsLarge {
     gap: var(--spacing-md);
   }
 
-  .miniStatValue,
+  .miniStatValue {
+    font-size: 1rem;
+  }
+
   .miniStatLabel {
-    font-size: 0.875rem;
+    font-size: 0.9375rem;
   }
 
   .viewProfileBtnLarge {
-    font-size: 0.875rem;
-    padding: var(--spacing-sm) var(--spacing-md);
+    font-size: 0.9375rem;
+    padding: 10px var(--spacing-lg);
   }
 
   .iconBtn,
   .followBtn {
-    width: 38px;
-    height: 38px;
-    font-size: 0.9375rem;
+    width: 40px;
+    height: 40px;
+    font-size: 1rem;
+  }
+
+  .miniActionsLarge {
+    gap: var(--spacing-sm);
+  }
+}
+
+@media (max-width: 360px) {
+  .miniCardLarge {
+    padding: var(--spacing-md) var(--spacing-sm) var(--spacing-sm);
+  }
+
+  .avatarWrap {
+    width: 68px;
+    height: 68px;
+    min-width: 68px;
+    min-height: 68px;
+  }
+
+  .miniName {
+    font-size: 1rem;
+  }
+
+  .miniStatsLarge {
+    gap: var(--spacing-sm);
+  }
+
+  .iconBtn,
+  .followBtn {
+    width: 36px;
+    height: 36px;
   }
 }
