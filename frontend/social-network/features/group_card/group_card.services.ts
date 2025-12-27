@@ -21,9 +21,6 @@ async getGroupEvents(groupId: number): Promise<Event[]> {
   }
 },
 
-
-
-
 async getGroups(limit = 10, lastItemId?: number): Promise<Group[]> {
   try {
     const params = new URLSearchParams();
@@ -46,9 +43,6 @@ async getGroups(limit = 10, lastItemId?: number): Promise<Group[]> {
     return [];
   }
 },
-
-
-
 
 
 async getMyGroups(limit = 10, offset?: number): Promise<Group[]> {
