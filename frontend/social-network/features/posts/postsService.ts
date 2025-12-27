@@ -82,6 +82,15 @@ export const postsService = {
     }
   },
 
+  // Toggle like (like if not liked, unlike if liked)
+  async toggleLike(postId: string | number, currentlyLiked: boolean): Promise<boolean> {
+    if (currentlyLiked) {
+      return await this.unlikePost(postId)
+    } else {
+      return await this.likePost(postId)
+    }
+  },
+
   // Delete post
   async deletePost(postId: string | number): Promise<boolean> {
     try {

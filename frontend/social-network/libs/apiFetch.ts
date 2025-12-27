@@ -190,7 +190,7 @@ export async function apiFetch<T>(
         title: redirectTitle,
         message: errorMessage
       });
-      // performRedirect(target, clientNavigate);
+      performRedirect(target, clientNavigate);
     }
   }
 

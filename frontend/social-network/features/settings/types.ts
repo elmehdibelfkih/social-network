@@ -15,7 +15,7 @@ export type PasswordUpdateData = {
   confirmPassword: string;
 };
 
-export { ProfileAPIResponse } from '@/libs/globalTypes';
+export type { ProfileAPIResponse } from '@/libs/globalTypes';
 
 export interface Session {
   sessionId: number;
