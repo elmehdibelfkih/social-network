@@ -87,7 +87,7 @@ export function RegisterForm({ onAuthSuccess }: { onAuthSuccess?: () => void }) 
                         required
                         maxLength={50}
 
-                    />
+                    /><br/>
                 </div>
                 <div className={styles.inputGroup}>
                     <label htmlFor="lastName">Last Name *</label>
