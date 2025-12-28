@@ -2,7 +2,6 @@ package socket
 
 import (
 	"errors"
-	"fmt"
 	"time"
 
 	"social/pkg/utils"

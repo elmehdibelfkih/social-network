@@ -2,7 +2,6 @@ package socket
 
 import (
 	"database/sql"
-	"fmt"
 
 	"social/pkg/db/database"
 	"social/pkg/utils"
